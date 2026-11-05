@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexHierarchyPkg"
+    nsURI="http://example.org/complexHierarchy"
+    nsPrefix="ch">
+
+  <!-- 0: Root container class -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootContainer" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="topLevelElements" lowerBound="0" upperBound="-1"
+        ordered="true" unique="true" containment="true" resolveProxies="true"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="config" lowerBound="0" upperBound="1"
+        ordered="true" unique="true" containment="true" resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 1: Abstract super type for elements -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" upperBound="1"
+        ordered="true" unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label" lowerBound="0" upperBound="1"
+        ordered="true" unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 2: Concrete element A with attributes and single containment -->
+  <eClassifiers xsi:type="ecore:EClass" name="ElementA" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority" lowerBound="0" upperBound="1"
+        ordered="true" unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="detail" lowerBound="0" upperBound="1"
+        ordered="true" unique="true" containment="true" resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 3: Detail class with bidirectional container reference to ElementA -->
+  <eClassifiers xsi:type="ecore:EClass" name="Detail" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" lowerBound="0" upperBound="1"
+        ordered="true" unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ownerA" lowerBound="0" upperBound="1"
+        ordered="true" unique="true" containment="false" resolveProxies="true"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.1"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 4: Concrete element B referencing other elements and using an enum -->
+  <eClassifiers xsi:type="ecore:EClass" name="ElementB" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active" lowerBound="0" upperBound="1"
+        ordered="true" unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind" lowerBound="0" upperBound="1"
+        ordered="true" unique="true"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="references" lowerBound="0" upperBound="-1"
+        ordered="true" unique="true" containment="false" resolveProxies="true"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="childBs" lowerBound="0" upperBound="-1"
+        ordered="true" unique="true" containment="true" resolveProxies="true"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 5: Configuration class with attributes and enum-typed property -->
+  <eClassifiers xsi:type="ecore:EClass" name="Configuration" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="version" lowerBound="1" upperBound="1"
+        ordered="true" unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="globalMode" lowerBound="0" upperBound="1"
+        ordered="true" unique="true"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mainElement" lowerBound="0" upperBound="1"
+        ordered="true" unique="true" containment="false" resolveProxies="true"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 6: Utility class with EOperation and parameters -->
+  <eClassifiers xsi:type="ecore:EClass" name="Utility" abstract="false" interface="false">
+    <eOperations name="computeScore" ordered="true" unique="true" lowerBound="0" upperBound="1">
+      <eParameters name="element" ordered="true" unique="true" lowerBound="1" upperBound="1"
+          eType="//@eClassifiers.1"/>
+      <eParameters name="weight" ordered="true" unique="true" lowerBound="1" upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eExceptions eType="//@eClassifiers.8"/>
+      <eExceptions eType="//@eClassifiers.9"/>
+      <eType eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 7: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Mode">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 8: Exception-like data type A -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ComputationException"
+      instanceClassName="java.lang.RuntimeException"/>
+
+  <!-- 9: Exception-like data type B -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ValidationException"
+      instanceClassName="java.lang.IllegalArgumentException"/>
+
+  <!-- 10: Map entry type used for annotations or properties -->
+  <eClassifiers xsi:type="ecore:EClass" name="PropertyEntry" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" lowerBound="1" upperBound="1"
+        ordered="true" unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="0" upperBound="1"
+        ordered="true" unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

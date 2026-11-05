@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="netMultiBranch" name="MultiBranchWorkflow">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s_start" name="Start" isInitial="true" isActive="true" action="init"/>
+    <elements xsi:type="Grafcet:Step" location="s_branchA" name="BranchA" isInitial="false" isActive="false" action="doA"/>
+    <elements xsi:type="Grafcet:Step" location="s_branchB" name="BranchB" isInitial="false" isActive="false" action="doB"/>
+    <elements xsi:type="Grafcet:Step" location="s_merge" name="Merge" isInitial="false" isActive="false" action="join"/>
+    <elements xsi:type="Grafcet:Step" location="s_end" name="End" isInitial="false" isActive="false" action="finish"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t_splitA" name="ToA" condition="chooseA"/>
+    <elements xsi:type="Grafcet:Transition" location="t_splitB" name="ToB" condition="chooseB"/>
+    <elements xsi:type="Grafcet:Transition" location="t_fromA" name="FromA" condition="doneA"/>
+    <elements xsi:type="Grafcet:Transition" location="t_fromB" name="FromB" condition="doneB"/>
+    <elements xsi:type="Grafcet:Transition" location="t_toEnd" name="ToEnd" condition="allDone"/>
+    <!-- Connections: indices of elements:
+         0: Start(step), 1: BranchA(step), 2: BranchB(step), 3: Merge(step), 4: End(step),
+         5: ToA(trans), 6: ToB(trans), 7: FromA(trans), 8: FromB(trans), 9: ToEnd(trans) -->
+    <!-- Split from Start to BranchA and BranchB -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c_s_toA" name="startToA" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c_A" name="A_enter" from="/0/@elements.5" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c_s_toB" name="startToB" from="/0/@elements.0" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c_B" name="B_enter" from="/0/@elements.6" to="/0/@elements.2"/>
+    <!-- From branches to merge (many Steps to same Transition, and many Transitions to same Step) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c_A_toMerge" name="A_toMerge" from="/0/@elements.1" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c_B_toMerge" name="B_toMerge" from="/0/@elements.2" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c_fromA_toMerge" name="fromA_toMerge" from="/0/@elements.7" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c_fromB_toMerge" name="fromB_toMerge" from="/0/@elements.8" to="/0/@elements.3"/>
+    <!-- From merge to end -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c_merge_toEnd" name="mergeToEnd" from="/0/@elements.3" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c_end" name="endReach" from="/0/@elements.9" to="/0/@elements.4"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

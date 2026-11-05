@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryManager"
+    basedir="lib-src"
+    description="Ant build for library manager"
+    default="buildTarget">
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="lib.name" value="library-manager"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.build.dir" location="build"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Target that will be the default goal -->
+  <targets xmi:id="buildTarget" name="build" description="Compile and package">
+    <!-- Compile Java sources with includes/excludes -->
+    <tasks xsi:type="Ant:Javac" srcdir="lib-src/main" destdir="build/classes" debug="on" fork="false" optimize="true" deprecation="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="have.sources"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" unless="include.internal"/>
+    </tasks>
+    <!-- Create jar from compiled classes -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/library-manager.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF"/>
+    <!-- Create distribution directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+
+  <!-- Separate target for cleaning build artifacts -->
+  <targets xmi:id="cleanTarget" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" defaultexcludes="true"/>
+  </targets>
+
+  <!-- Target for generating javadoc -->
+  <targets xmi:id="docTarget" name="javadoc" description="Generate API documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="lib-src/main"
+           destdir="build/docs/api"
+           packagenames="com.example.lib.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Library Manager API"/>
+  </targets>
+</Ant:Project>

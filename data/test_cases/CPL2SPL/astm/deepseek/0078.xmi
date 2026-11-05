@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="login"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="user@domain.com"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <default contents="//@elements.0"/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="urgent"/>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="login"/>
+  <elements xsi:type="CPL:Location" url="sip:voicemail@domain.com" priority="1" clear="no"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <busy>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:Location" url="sip:assistant@domain.com" priority="1" clear="no"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <failure/>
+      </contents>
+    </redirection>
+    <failure>
+      <contents xsi:type="CPL:SubCall" ref="voicemail"/>
+    </failure>
+    <default>
+      <contents xsi:type="CPL:Busy"/>
+    </default>
+  </elements>
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses is="boss@domain.com"/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20240101T000000" interval="P1D" wkst="MO"/>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="3"/>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="voicemail"/>
+</CPL:CPLModel>

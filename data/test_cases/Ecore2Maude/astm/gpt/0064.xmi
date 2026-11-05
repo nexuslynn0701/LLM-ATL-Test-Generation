@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootLib"
+    nsURI="http://example.org/rootLib"
+    nsPrefix="rootLib">
+
+  <!-- Subpackage to exercise eSuperPackage/eSubpackages and superPackage/subPackages equations -->
+  <eSubpackages name="catalogPkg"
+                nsURI="http://example.org/catalog"
+                nsPrefix="catalog">
+    <!-- Classifiers in subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="CatalogItem">
+      <!-- One attribute without default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="code"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           lowerBound="1"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           iD="true"/>
+      <!-- One reference with opposite, non-containment -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="primarySupplier"
+                           eType="//@eClassifiers.1"
+                           lowerBound="0"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           containment="false"
+                           resolveProxies="true"
+                           eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="Supplier">
+      <!-- opposite side of reference, multiplicity * to exercise upperBound="*"
+           and containment=true plus opposite -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="suppliedItems"
+                           eType="//@eSubpackages.0/@eClassifiers.0"
+                           lowerBound="0"
+                           upperBound="-1"
+                           ordered="true"
+                           unique="true"
+                           containment="true"
+                           resolveProxies="true"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.1"/>
+    </eClassifiers>
+
+    <!-- Enum in subpackage -->
+    <eClassifiers xsi:type="ecore:EEnum" name="AvailabilityStatus">
+      <eLiterals name="InStock" value="0" literal="InStock"/>
+      <eLiterals name="BackOrder" value="1" literal="BackOrder"/>
+      <eLiterals name="Discontinued" value="2" literal="Discontinued"/>
+    </eClassifiers>
+
+    <!-- Class that uses the enum in an attribute, with string default containing quotes to exercise escapeQuotes -->
+    <eClassifiers xsi:type="ecore:EClass" name="StockInfo" abstract="false" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="status"
+                           eType="//@eSubpackages.0/@eClassifiers.2"
+                           lowerBound="1"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           iD="false"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="note"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           lowerBound="0"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           defaultValueLiteral="Urgent &quot;check&quot; needed"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers in root package -->
+  <!-- Abstract superclass with both attribute and reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="identifier"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="related"
+                         eType="//@eClassifiers.0"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Concrete subclass with superTypes, attributes with various primitive types and default values -->
+  <eClassifiers xsi:type="ecore:EClass" name="DetailedElement" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.0">
+    <!-- String attribute with default to trigger AttEqSpecificDefaultValue for String -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="defaultLabel"/>
+    <!-- Boolean attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="true"/>
+    <!-- Int attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"/>
+    <!-- Reference without opposite, containment=true, single-valued -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="details"
+                         eType="//@eSubpackages.0/@eClassifiers.3"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Enum in root package, used to test enumeration mappings and default value from first literal -->
+  <eClassifiers xsi:type="ecore:EEnum" name="SeverityLevel">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+    <eLiterals name="CRITICAL" value="3" literal="CRITICAL"/>
+  </eClassifiers>
+
+  <!-- Class using the SeverityLevel enum and a non-primitive EDataType to exercise @DataType fallback -->
+  <eClassifiers xsi:type="ecore:EClass" name="Issue" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="severity"
+                         eType="//@eClassifiers.2"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"/>
+    <!-- Custom EDataType to trigger generic @DataType mapping in attDataType -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="customValue"
+                         eType="//@eClassifiers.4"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"/>
+  </eClassifiers>
+
+  <!-- Custom EDataType -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="CustomNumeric"
+                instanceClassName="java.lang.Number"/>
+</ecore:EPackage>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companySpec"
+    nsURI="http://example.org/companySpec"
+    nsPrefix="company">
+
+  <!-- 0: Abstract Person with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        lowerBound="0"
+        defaultValueLiteral="true"/>
+  </eClassifiers>
+
+  <!-- 1: Employee extends Person, has container reference to Department and a non-containment ref to Project -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Employee"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="department"
+        eType="//@eClassifiers.3"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="projects"
+        eType="//@eClassifiers.2"
+        upperBound="-1"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- 2: Project with attributes and containment of Tasks -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="eccore:EAttribute"
+        name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="budget"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        lowerBound="0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="tasks"
+        eType="//@eClassifiers.4"
+        upperBound="-1"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 3: Department contains Employees and Projects, and has a manager reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="deptName"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        eType="//@eClassifiers.1"
+        upperBound="-1"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="projects"
+        eType="//@eClassifiers.2"
+        upperBound="-1"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="manager"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- 4: Task with enumeration-typed status and relationship to Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <eStructuralFeatures xsi:type="eccore:EAttribute"
+        name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="estimateHours"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        eType="//@eClassifiers.5"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="assignee"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- 5: Status enumeration -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 6: Address datatype, used as attribute type -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="AddressData"
+      instanceClassName="java.lang.String"
+      serializable="true"/>
+
+  <!-- 7: Office with complex attributes and references to Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Office">
+    <eStructuralFeatures xsi:type="eccore:EAttribute"
+        name="location"
+        eType="//@eClassifiers.6"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="capacity"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="departments"
+        eType="//@eClassifiers.3"
+        upperBound="-1"
+        containment="false"/>
+  </eClassifiers>
+
+</ecore:EPackage>

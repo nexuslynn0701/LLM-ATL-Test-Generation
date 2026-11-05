@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: main CPL root with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- contents points to complex Proxy at elements[5] -->
+      <contents href="//@elements.5"/>
+    </subActions>
+    <outgoing>
+      <!-- contents points to AddressSwitch at elements[6] -->
+      <contents href="//@elements.6"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: SubAction used as target of SubCall ref="saAux" -->
+  <elements xsi:type="CPL:SubAction" id="saAux"/>
+
+  <!-- 2: Location used by simple Proxy at elements[3] -->
+  <elements xsi:type="CPL:Location" url="sip:simple@example.com" clear="no"/>
+
+  <!-- 3: simple Proxy (isSimple = true since all branches undefined) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- no busy/noAnswer/redirection/failure/default children -->
+  </elements>
+
+  <!-- 4: Redirect (permanent) with a Location child so locations is non-empty -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents href="//@elements.7"/>
+  </elements>
+
+  <!-- 5: complex Proxy (isSimple = false) with all branches; -->
+  <!-- busy holds a SubCall, noAnswer holds simple Proxy, redirection holds Redirect -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <busy>
+      <contents href="//@elements.8"/>
+    </busy>
+    <noAnswer>
+      <contents href="//@elements.3"/>
+    </noAnswer>
+    <redirection>
+      <contents href="//@elements.4"/>
+    </redirection>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- 6: AddressSwitch with one SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="user@example.com"/>
+    <notPresent/>
+    <otherwise>
+      <contents href="//@elements.4"/>
+    </otherwise>
+  </elements>
+
+  <!-- 7: Location used by Redirect at elements[4] -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.com" clear="yes"/>
+
+  <!-- 8: SubCall calling SubAction with id="saAux" -->
+  <elements xsi:type="CPL:SubCall" ref="saAux"/>
+
+</CPL:CPLModel>

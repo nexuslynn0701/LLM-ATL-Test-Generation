@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="action1"/>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <default contents="//@elements.2"/>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="action1"/>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="192.168.1.1"/>
+    <notPresent/>
+    <otherwise contents="//@elements.4"/>
+  </elements>
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+  <elements xsi:type="CPL:StringSwitch" field="User-Agent">
+    <strings contains="Cisco"/>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" tzid="America/New_York">
+    <times dtstart="20240101T000000" interval="1" wkst="MO"/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5"/>
+  </elements>
+</CPL:CPLModel>

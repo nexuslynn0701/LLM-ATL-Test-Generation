@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    default="build"
+    basedir="src"
+    description="A sample Ant project for testing transformation">
+  <targets xmi:id="build" name="build">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Copy" todir="build/classes/resources">
+      <fileset dir="src/resources"/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="build"/>
+    <tasks xsi:type="Ant:Delete" dir="dist"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Java" classname="org.junit.runner.JUnitCore" fork="true"/>
+  </targets>
+  <targets xmi:id="docs" name="docs">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Sample API"/>
+  </targets>
+  <targets xmi:id="all" name="all">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="DSTAMP" pattern="yyyyMMdd" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/usr/local/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+</Ant:Project>

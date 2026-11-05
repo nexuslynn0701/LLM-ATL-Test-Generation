@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: CPL root with one SubAction, one Outgoing, one Incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction sa1 -->
+    <subActions id="sa1">
+      <!-- contents is SubCall referencing id "sa1" -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </subActions>
+
+    <!-- Outgoing with simple Proxy whose Location uses Location2URIConstant -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </outgoing>
+
+    <!-- Incoming with complex Proxy using same Location -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <busy>
+          <!-- busy contents: SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- 1: SubCall as top-level element referencing the SubAction by id -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- 2: Location used by proxies and redirect (for Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:example@domain.com" clear="true"/>
+
+  <!-- 3: AddressSwitch with one SwitchedAddress and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1" contains="c1" subDomainOf="sd1">
+      <!-- SwitchedAddress contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <notPresent>
+      <!-- NotPresent is empty -->
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </otherwise>
+  </elements>
+
+  <!-- 4: Complex Proxy as top-level element -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy>
+      <!-- Busy contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default>
+      <!-- Default contents: reference to top-level SubCall (index 1) -->
+      <contents contents="//@elements.1"/>
+    </default>
+  </elements>
+
+  <!-- 5: Redirect that will also use Location2URIConstant via its Location -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- Redirect contents: reference to Location (index 2) -->
+    <contents contents="//@elements.2"/>
+  </elements>
+
+</CPL:CPLModel>

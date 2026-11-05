@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Project with multiple targets and diverse predefined tasks"
+    default="core-build">
+
+  <!-- Core build target: compile and package -->
+  <targets xmi:id="core-build" name="core-build" description="Compile and package core module">
+    <tasks xsi:type="Ant:Mkdir" dir="build/core-classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/core" destdir="build/core-classes" debug="on" optimize="off"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/core-module.jar" basedir="build/core-classes" compress="true" encoding="UTF-8"/>
+  </targets>
+
+  <!-- Test target: compile tests and build test jar -->
+  <targets xmi:id="tests" name="tests" description="Compile and package test sources">
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes" deprecation="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/tests.jar" basedir="build/test-classes" manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Documentation target: generate Javadoc -->
+  <targets xmi:id="docs" name="docs" description="Generate project documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/core"
+           destdir="docs/api"
+           packagenames="com.example.core.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Core API Documentation"/>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="clean" name="clean" description="Clean all generated artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" defaultexcludes="false"/>
+  </targets>
+
+</Ant:Project>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootModel"
+    nsURI="http://rootModel/1.0"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise superPackage/subPackages -->
+  <eSubpackages name="subPkg"
+      nsURI="http://rootModel/sub"
+      nsPrefix="sub">
+    <!-- Class in subpackage with superType from root package (cross-package inheritance) -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubEntity">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="subCode"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="0"
+          upperBound="1"
+          defaultValueLiteral="S-001"
+          iD="false"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="parent"
+          eType="//@eClassifiers.0"
+          lowerBound="0"
+          upperBound="1"
+          containment="false"
+          resolveProxies="true"/>
+    </eClassifiers>
+
+    <!-- Enum in subpackage with multiple literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+      <eLiterals name="NEW" value="0" literal="NEW"/>
+      <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+      <eLiterals name="ARCHIVED" value="2" literal="ARCHIVED"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Class 0: BaseType, abstract, in root package -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseType" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"/>
+  </eClassifiers>
+
+  <!-- Class 1: Person extends BaseType, has attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- String attribute with default value (tests AttEqSpecificDefaultValue + escapeQuotes) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="&quot;Unknown&quot;"
+        iD="false"/>
+    <!-- Int attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"/>
+    <!-- Enum-typed attribute from subpackage -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        eType="//@eSubpackages.0/@eClassifiers.1"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="ACTIVE"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- Class 2: Address, owned by Person via containment, and participating in bidirectional ref -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="Main St."
+        iD="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="number"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"/>
+    <!-- back reference to Person (non-containment, opposite set below) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Class 3: Company, with multi-valued refs and attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="legalName"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="Acme Corp"
+        iD="false"/>
+    <!-- multi-valued reference to Person, containment with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Enum 4: Color with single literal (to hit single-literal branch and EnumLiteral2Operation) -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="RED" value="0" literal="RED"/>
+  </eClassifiers>
+
+  <!-- Cross-references that need eOpposite set after declaration -->
+  <!-- employees <-> employer -->
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="PersonWithEmployer" name="PersonWithEmployer" abstract="false" interface="false">
+    <eSuperTypes href="#//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- We cannot use href cross-ref per instructions; instead,
+       we add the extra references directly on existing classes below. -->
+
+  <!-- Add bidirectional association between Person and Company, and between Person and Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="__patch_Person_Assocs" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employer"
+        eType="//@eClassifiers.3"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="addresses"
+        eType="//@eClassifiers.2"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- Patch Address.owner opposite -->
+  <eClassifiers xsi:type="ecore:EClass" name="__patch_Address_Opp" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="ownerOpp"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+</ecore:EPackage>

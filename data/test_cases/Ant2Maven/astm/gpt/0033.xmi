@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="workspace"
+    description="Complex build with multiple targets and tasks"
+    default="build-main">
+
+  <!-- Properties exercising all Ant Property types -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- One taskdef (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+
+  <!-- Default target with several different tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Compile, jar and cleanup">
+    <!-- Compile task with inExcludes and classPath left unset to avoid references -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Javadoc task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API"/>
+    <!-- Jar creation -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/example-main.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Make directory -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/temp"/>
+    <!-- Copy with nested FileSet, PatternSet, Includes/Excludes, FilterSet, Filters and Mapper -->
+    <tasks xsi:type="Ant:Copy"
+           todir="build/filtered">
+      <fileset dir="resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties" ifCondition="include.props" unless=""/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/secret/**" ifCondition="" unless="skip.secret"/>
+        </patternset>
+        <include name="**/*.xml" ifCondition="" unless="skip.xml"/>
+        <exclude name="**/tmp/**" ifCondition="" unless=""/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexBuild"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="" classpath="" classpathref="" from="*.txt" to="*.cfg"/>
+    </tasks>
+    <!-- Delete directory with various attributes set -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           file="build/obsolete.log"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           includesfile="config/delete-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/delete-excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target with Java and Tstamp to exercise more rules -->
+  <targets xmi:id="run-and-timestamp" name="run-and-timestamp" description="Run main class and timestamp build">
+    <!-- Java execution task (without classPath to avoid references) -->
+    <tasks xsi:type="Ant:Java"
+           classname="com.example.Main"
+           jar="dist/example-main.jar"
+           fork="true"/>
+    <!-- Tstamp task with two FormatTstamp children -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" offset="0" unit="second" locale="en_US"/>
+      <format property="build.date" pattern="yyyy-MM-dd" offset="0" unit="day" locale="en_US"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

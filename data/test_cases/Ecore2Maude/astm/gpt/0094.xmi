@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="meta94"
+    nsURI="http://example.org/meta94"
+    nsPrefix="m94">
+
+  <!-- Root EPackage (index 0) -->
+  <!-- eClassifiers[0] = Person (EClass) -->
+  <!-- eClassifiers[1] = Employee (EClass, subclass of Person) -->
+  <!-- eClassifiers[2] = Department (EClass, references Person and Employee) -->
+  <!-- eClassifiers[3] = Country (EClass, single attribute) -->
+  <!-- eClassifiers[4] = Status (EEnum) -->
+  <!-- eClassifiers[5] = Role (EEnum with default value use) -->
+
+  <!-- Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="false" interface="false">
+    <!-- Attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="Unknown"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Enum attribute (Status) with default literal, will trigger AttEqSpecificDefaultValue enum branch -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="ACTIVE"
+        eType="//@eClassifiers.4"/>
+
+    <!-- References -->
+    <!-- containment, multivalued, no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="addresses"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Employee, subclass of Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- attribute with String default containing quotes to exercise escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="&quot;Senior&quot; Dev"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- attribute with Float/Double type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="salary"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="0.0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <!-- Enum attribute (Role) without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="role"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.5"/>
+
+    <!-- bidirectional reference to Department with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="department"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.2"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <!-- cross-ref to Person (no opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="head"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.0"/>
+    <!-- opposite side of Employee.department -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- Country (simple class, used as containment target from Person.addresses) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Country" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- Status enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+    <eLiterals name="INACTIVE" value="1" literal="INACTIVE"/>
+  </eClassifiers>
+
+  <!-- Role enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Role">
+    <eLiterals name="DEV" value="0" literal="DEV"/>
+    <eLiterals name="MANAGER" value="1" literal="MANAGER"/>
+    <eLiterals name="HR" value="2" literal="HR"/>
+  </eClassifiers>
+
+</ecore:EPackage>

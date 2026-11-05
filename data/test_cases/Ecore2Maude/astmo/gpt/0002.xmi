@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example/rootPkg"
+    nsPrefix="root">
+  <!-- Classifiers index:
+       0: RootClass
+       1: ChildClass
+       2: Status (EEnum)
+       3: code (EDataType alias for EInt)
+  -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClass">
+    <!-- Attribute with default value, ID, bounds 1..* -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="rootName"
+        lowerBound="1"
+        upperBound="-1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="defaultRoot"/>
+    <!-- Attribute of EInt with default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="5"/>
+    <!-- Attribute using custom EDataType alias for EInt -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="codeValue"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.3"/>
+    <!-- Reference to ChildClass, containment, many -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="true"/>
+    <!-- Reference to ChildClass, non-containment, single, opposite set later -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="mainChild"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.1"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="ChildClass">
+    <!-- Single-valued String attribute with quoted default to exercise escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="childLabel"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="&quot;special&quot; child"/>
+    <!-- Boolean attribute (EBoolean) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Enum-typed attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="statusAttr"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.2"/>
+    <!-- Reference back to RootClass, opposite of mainChild, non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.0"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.3"/>
+    <!-- Containment reference to RootClass, to trigger refImmediateComposite path if needed -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="nestedRoot"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.0"
+        containment="true"
+        resolveProxies="false"/>
+  </eClassifiers>
+
+  <!-- EEnum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- Custom EDataType aliasing EInt to exercise attDataType other branch -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="code"
+      instanceClassName="int"/>
+</ecore:EPackage>

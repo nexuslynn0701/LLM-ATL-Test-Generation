@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingAndMerge">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="StartUp" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Transition" location="t001" name="Split" condition="readyToBranch"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="PathA" isInitial="false" isActive="false" action="executeA"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="PathB" isInitial="false" isActive="false" action="executeB"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="Merge" condition="bothDone"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="Completed" isInitial="false" isActive="false" action="finalize"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="Restart" condition="restartCommand"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="Monitor" isInitial="false" isActive="false" action="observe"/>
+
+    <!-- Connections: StartUp -> Split -> PathA/PathB -> Merge -> Completed -> Restart -> StartUp and Restart -> Monitor -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="startupToSplit" from="/0/@elements.0" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c002" name="splitToPathA" from="/0/@elements.1" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c003" name="splitToPathB" from="/0/@elements.1" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c004" name="pathAToMerge" from="/0/@elements.2" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c005" name="pathBToMerge" from="/0/@elements.3" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c006" name="mergeToCompleted" from="/0/@elements.4" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c007" name="completedToRestart" from="/0/@elements.5" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c008" name="restartToStartup" from="/0/@elements.6" to="/0/@elements.0"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c009" name="restartToMonitor" from="/0/@elements.6" to="/0/@elements.7"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="rootURI"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise superPackage/subPackages -->
+  <eSubpackages name="subPkg"
+                nsURI="subURI"
+                nsPrefix="sub">
+    <!-- 0: Class in subpackage, supertype is RootClass -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="SubClass">
+      <!-- attribute with EString type, has default, is ID -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subName"
+                           lowerBound="0"
+                           upperBound="1"
+                           defaultValueLiteral="defaultSub"
+                           iD="true"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <!-- reference with containment, opposite set later via index, many-valued upperBound=-1 -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="backToRoot"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="false"
+                           eType="//@eClassifiers.0"/>
+    </eClassifiers>
+
+    <!-- 1: Enum inside subpackage -->
+    <eClassifiers xsi:type="ecore:EEnum"
+                  name="SubColor">
+      <eLiterals name="RED" value="0" literal="RED"/>
+      <eLiterals name="GREEN" value="1" literal="GREEN"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- 0: Root class with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="RootClass">
+    <!-- EAttribute with EInt type, non-ID, specific default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rootCount"
+                         lowerBound="1"
+                         upperBound="5"
+                         defaultValueLiteral="3"
+                         iD="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- EAttribute with EBoolean type, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- EAttribute with custom EDataType (index 3) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="customValue"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.3"/>
+    <!-- EReference to SubClass in subpackage, bidirectional opposite with backToRoot -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subItems"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 1: Another class extending RootClass to trigger superTypes and createSort -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="ChildClass"
+                abstract="true"
+                eSuperTypes="//@eClassifiers.0">
+    <!-- Reference to RootClass without opposite, upperBound *, ordered=false, unique=false -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="rootRef"
+                         ordered="false"
+                         unique="false"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 2: Enum in root package -->
+  <eClassifiers xsi:type="ecore:EEnum"
+                name="RootStatus">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+    <eLiterals name="CANCELLED" value="2" literal="CANCELLED"/>
+  </eClassifiers>
+
+  <!-- 3: Custom data type referenced by an attribute -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="CustomType"
+                instanceTypeName="java.lang.String"/>
+
+  <!-- 4: Class with attribute typed by RootStatus enum -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="StatusHolder">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+</ecore:EPackage>

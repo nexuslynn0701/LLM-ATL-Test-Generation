@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuild"
+    basedir="project-src"
+    description="Full build with compilation, packaging, directories and cleanup"
+    default="buildTarget">
+
+  <!-- Properties of all four kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="java.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="project-src/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="project-src/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A standalone task definition -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with several different tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <tasks xsi:type="Ant:Mkdir" dir="project-src/target/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="project-src/src"
+           destdir="project-src/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="project-src/target/fullbuild.jar"
+           basedir="project-src/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="project-src/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="project-src/target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile="project-src/tmp.includes"
+           excludes="**/keep/**"
+           excludesfile="project-src/tmp.excludes"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target exercising Path / FileSet / FilterSet / InExcludes family -->
+  <targets xmi:id="resourcesTarget" name="resources">
+    <tasks xsi:type="Ant:Copy"
+           todir="project-src/target/resources"
+           presservelastmodified="true"
+           overwrite="false"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="project-src/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/*-dev.properties"/>
+        </patternset>
+        <include name="config/**"/>
+        <exclude name="old/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="FullBuild"/>
+        <filter token="build.env" value="integration"/>
+        <filtersfile file="project-src/filters.properties"/>
+      </filterset>
+      <mapper type="glob"
+              classname="com.example.ant.Mapper"
+              classpath="lib/mappers.jar"
+              classpathref=""
+              from="*.properties"
+              to="*.cfg"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd'T'HH:mm:ss"
+              offset="+0"
+              unit="hour"
+              locale="en_US"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Java"
+           classname="com.example.tools.ResourceChecker"
+           jar="project-src/lib/tools.jar"
+           fork="true">
+      <classPath refid="">
+        <pathElement path="project-src/lib/resources-core.jar" location="project-src/lib"/>
+        <fileset dir="project-src/lib/ext">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+  </targets>
+
+  <!-- Path definition using nested PathElement and FileSet -->
+  <path>
+    <pathElement path="project-src/lib/main.jar" location="project-src/lib"/>
+    <fileset dir="project-src/lib">
+      <patternset>
+        <inexcludes xsi:type="Ant:IncludesFile" name="includes.list"/>
+        <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list"/>
+      </patternset>
+      <include name="optional/**"/>
+      <exclude name="legacy/**"/>
+    </fileset>
+  </path>
+
+</Ant:Project>

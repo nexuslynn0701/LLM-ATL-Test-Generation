@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataProcessing"
+    default="process"
+    basedir="/opt/data"
+    description="Data processing pipeline">
+  <properties xsi:type="Ant:PropertyValue" name="input.dir" value="/data/input"/>
+  <properties xsi:type="Ant:PropertyValue" name="output.dir" value="/data/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="/etc/app/config.xml"/>
+  <properties xsi:type="Ant:PropertyFile" file="/etc/app/default.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customTask" classname="com.example.CustomTask"/>
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="/data/output"/>
+    <tasks xsi:type="Ant:Copy" todir="/data/output/config">
+      <fileset dir="/etc/app">
+        <include name="*.xml"/>
+        <exclude name="backup*"/>
+      </fileset>
+    </tasks>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="/opt/data/src" destdir="/opt/data/classes" debug="true" optimize="true">
+      <inExcludes xsi:type="Ant:Excludes" name="**/test/**"/>
+      <classPath refid="compile.classpath">
+        <pathElement path="/opt/libs" location="/opt/libs/commons.jar"/>
+      </classPath>
+    </tasks>
+  </targets>
+  <targets xmi:id="process" name="process">
+    <tasks xsi:type="Ant:Java" classname="com.example.Processor" fork="true">
+      <classPath refid="runtime.classpath">
+        <pathElement path="/opt/runtime" location="/opt/runtime/app.jar"/>
+      </classPath>
+    </tasks>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" locale="en_US"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar" jarfile="/opt/dist/app.jar" basedir="/opt/data/classes" compress="true"/>
+    <tasks xsi:type="Ant:Delete" dir="/opt/data/temp" failonerror="false"/>
+  </targets>
+  <targets xmi:id="docs" name="docs">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="/opt/data/src" destdir="/opt/docs/api" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Data Processing API"/>
+  </targets>
+  <path id="compile.classpath">
+    <pathElement path="/opt/libs" location="/opt/libs/commons.jar"/>
+    <pathElement path="/opt/libs" location="/opt/libs/log4j.jar"/>
+  </path>
+  <path id="runtime.classpath">
+    <pathElement path="/opt/runtime" location="/opt/runtime/app.jar"/>
+  </path>
+</Ant:Project>

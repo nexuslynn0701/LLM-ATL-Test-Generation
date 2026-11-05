@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="testpkg"
+    nsURI="http://example/testpkg"
+    nsPrefix="tp">
+  <!-- ClassA: concrete class with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="ClassA" abstract="false" interface="false">
+    <!-- Attribute attrId: ID attribute of type EString -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="attrId"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="defaultId"/>
+    <!-- Attribute flag: boolean attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="flag"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <!-- Reference to ClassB, containment, with opposite set later -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="refsB"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- ClassB: subclass of ClassA, with an attribute and a non-containment reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="ClassB" abstract="false" interface="false" eSuperTypes="//@eClassifiers.0">
+    <!-- Attribute counter: int attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="counter"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="0"/>
+    <!-- Non-containment reference back to ClassA, opposite of refsB -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="ownerA"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- Simple enumeration with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- Data type to be used as attribute type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData"/>
+
+  <!-- ClassC: uses EEnum and custom EDataType -->
+  <eClassifiers xsi:type="ecore:EClass" name="ClassC" abstract="true" interface="false">
+    <!-- Attribute state: typed with StatusEnum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="state"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.2"/>
+    <!-- Attribute payload: typed with CustomData -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="payload"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Another enumeration to increase coverage -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ModeEnum">
+    <eLiterals name="FAST" value="0" literal="FAST"/>
+    <eLiterals name="SLOW" value="1" literal="SLOW"/>
+  </eClassifiers>
+</ecore:EPackage>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction and one Outgoing, plus a Location for URI generation -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction that will be called by the SubCall -->
+    <subActions>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+    </subActions>
+
+    <!-- Outgoing using a complex Proxy as its statement; exercises complex Proxy pipeline and Location2URIConstant -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy>
+          <contents>//@elements.2</contents>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by the simple Proxy via locations helper, to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:example@domain.com" clear="yes"/>
+
+  <!-- SubCall referring to the SubAction 'sa1' for additional SubCall2Return coverage -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- Redirect (permanent) to exercise Redirect2Return and Location2URIConstant (via first Location) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

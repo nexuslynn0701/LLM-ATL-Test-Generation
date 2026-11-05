@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMM"
+    nsURI="http://example.org/rootMM"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages and PackEqSupPackage/PackEqSubPackages -->
+  <eSubpackages name="subMM"
+                nsURI="http://example.org/subMM"
+                nsPrefix="sub">
+
+    <!-- Class in subpackage extending a class from root package -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubEntity">
+      <!-- superclass from root package will be linked via eSuperTypes in root package classifier -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subCode"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+
+  </eSubpackages>
+
+  <!-- EClassifiers in root package -->
+
+  <!-- 0: BaseEntity -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseEntity">
+    <!-- attributes: one ID boolean, one int with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         defaultValueLiteral="10"/>
+  </eClassifiers>
+
+  <!-- 1: Person extends BaseEntity -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+    <!-- EAttributes of different primitive types and an enum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rating"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="preferredColor"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.5">
+      <!-- link to EEnum Color defined below -->
+    </eStructuralFeatures>
+
+    <!-- References: single and many, with opposite and without -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="primaryAddress"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.2"
+                         containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="addresses"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"
+                         containment="true"/>
+    <!-- bidirectional non-containment reference to Company (opposite employees) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="employer"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.3"
+                         containment="false"
+                         eOpposite="//@eClassifiers.3/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 2: Address (contained by Person, has opposite back to owner) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="street"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         defaultValueLiteral="&quot;unknown street&quot;"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="postalCode"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- opposite back-reference to owning Person.addresses -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.4"/>
+  </eClassifiers>
+
+  <!-- 3: Company (has references to Person and to SubEntity in subpackage) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="legalName"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- opposite side of Person.employer -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="employees"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.6"/>
+    <!-- reference to class in subpackage, without opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subEntities"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         containment="false"/>
+  </eClassifiers>
+
+  <!-- 4: Department extends Company to exercise multiple-level inheritance -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eSuperTypes>//@eClassifiers.3</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 5: EEnum Color with 3 literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+    <eLiterals name="BLUE" value="2" literal="BLUE"/>
+  </eClassifiers>
+
+</ecore:EPackage>

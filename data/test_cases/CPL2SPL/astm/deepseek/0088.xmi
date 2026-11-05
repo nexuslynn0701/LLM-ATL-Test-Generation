@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="authCheck"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="sip:user@example.com">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default contents="//@elements.4"/>
+          </contents>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+            <busy>
+              <contents xsi:type="CPL:SubCall" ref="authCheck"/>
+            </busy>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default/>
+          </contents>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="urgent"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="yes"/>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="authCheck">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <busy/>
+      <noAnswer/>
+      <redirection/>
+      <failure/>
+      <default contents="//@elements.2"/>
+    </contents>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" priority="0" clear="yes"/>
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" priority="0" clear="yes"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+</CPL:CPLModel>

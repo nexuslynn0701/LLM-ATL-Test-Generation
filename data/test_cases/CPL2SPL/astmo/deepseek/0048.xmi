@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sub1"/>
+    <subActions id="sub2"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="alice@example.com">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy>
+              <contents xsi:type="CPL:SubCall" ref="sub1"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:SubCall" ref="sub2"/>
+            </noAnswer>
+            <redirection>
+              <contents xsi:type="CPL:Redirect" permanent="false"/>
+            </redirection>
+            <failure/>
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="yes"/>
+            </default>
+          </contents>
+        </addresses>
+        <addresses is="bob@example.com">
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Location" url="sip:notfound@example.com" clear="yes"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+            <busy>
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </busy>
+            <default>
+              <contents xsi:type="CPL:SubCall" ref="sub1"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="urgent">
+          <contents xsi:type="CPL:Location" url="sip:urgent@example.com" clear="yes"/>
+        </strings>
+        <strings is="normal">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:normal@example.com" clear="yes"/>
+            </default>
+          </contents>
+        </strings>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:other@example.com" clear="yes"/>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+</CPL:CPLModel>

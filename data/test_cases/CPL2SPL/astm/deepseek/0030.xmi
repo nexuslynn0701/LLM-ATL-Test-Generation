@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<cpmm:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cpmm="http://cpl/1.0">
+  <elements xsi:type="cpmm:CPL">
+    <incoming>
+      <contents xsi:type="cpmm:AddressSwitch" field="origin">
+        <addresses is="192.168.1.100"/>
+        <notPresent/>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="cpmm:StringSwitch" field="caller">
+        <strings contains="john"/>
+        <otherwise>
+          <contents xsi:type="cpmm:PrioritySwitch">
+            <priorities less="3"/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <subActions id="subOne"/>
+  </elements>
+  <elements xsi:type="cpmm:Location" url="sip:operator@test.com" priority="1" clear="yes"/>
+  <elements xsi:type="cpmm:SubCall" ref="subOne"/>
+  <elements xsi:type="cpmm:Proxy" recurse="yes" ordering="parallel" timeout="30">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.3"/>
+  </elements>
+  <elements xsi:type="cpmm:Redirect" permanent="false"/>
+  <elements xsi:type="cpmm:Reject" status="503" reason="Service Unavailable"/>
+  <elements xsi:type="cpmm:LanguageSwitch">
+    <languages matches="en"/>
+    <notPresent/>
+  </elements>
+</cpmm:CPLModel>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AntMDEProject"
+    basedir="project-src"
+    description="Ant build for MDE transformation tests"
+    default="build-main">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Task definition (not referenced by any task, per requirements) -->
+  <taskdef name="custom.task" classname="org.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"/>
+
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/antmdeproject.jar"
+           basedir="target/classes"/>
+
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/dist"/>
+
+    <tasks xsi:type="Ant:Delete"
+           dir="target/temp"/>
+  </targets>
+
+  <targets xmi:id="build-test" name="build-test" description="Test compilation target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="target/test-classes"/>
+
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/test-reports"/>
+
+    <tasks xsi:type="Ant:Delete"
+           dir="target/test-temp"/>
+  </targets>
+
+</Ant:Project>

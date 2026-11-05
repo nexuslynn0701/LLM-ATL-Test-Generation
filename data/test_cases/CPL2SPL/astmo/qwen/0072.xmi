@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <subActions id="action1"/>
+    <subActions id="action2"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="user@example.com"/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default contents="//@elements.5"/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="action1"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" clear="true"/>
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+    <busy>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:SubCall" ref="action2"/>
+    </redirection>
+    <default/>
+  </elements>
+  <elements xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:SubCall" ref="fallback"/>
+</CPL:CPLModel>

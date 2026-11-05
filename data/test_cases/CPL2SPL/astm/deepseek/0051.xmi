@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="subOne"/>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="alice@example.com">
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="urgent">
+          <contents xsi:type="CPL:SubCall" ref="subOne"/>
+        </strings>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="sequential">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="yes"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+</CPL:CPLModel>

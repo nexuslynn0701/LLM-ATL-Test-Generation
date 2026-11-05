@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyPkg"
+    nsURI="http://example.org/company"
+    nsPrefix="company">
+
+  <!-- 0: Custom EDataType -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="EmployeeId"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Base abstract class Person -->
+  <eClassifiers xsi:type="eccore:EClass" xmlns:eccore="http://www.eclipse.org/emf/2002/Ecore"
+      name="Person"
+      abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        eType="//@eClassifiers.0"
+        lowerBound="1"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 2: Department class -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="deptName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 3: Project class -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 4: Employee extends Person -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Employee"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="salary"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="department"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="projects"
+        upperBound="-1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 5: Manager extends Employee -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Manager"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="team"
+        upperBound="-1"
+        eType="//@eClassifiers.4"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 6: Contractor extends Person -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Contractor"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="dailyRate"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="assignedProject"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 7: Position enum -->
+  <eClassifiers xsi:type="ecore:EEnum"
+      name="Position">
+    <eLiterals xsi:type="ecore:EEnumLiteral"
+        name="JUNIOR"
+        value="0"
+        literal="junior"/>
+    <eLiterals xsi:type="ecore:EEnumLiteral"
+        name="SENIOR"
+        value="1"
+        literal="senior"/>
+    <eLiterals xsi:type="ecore:EEnumLiteral"
+        name="LEAD"
+        value="2"
+        literal="lead"/>
+  </eClassifiers>
+
+  <!-- 8: RoleAssignments class with EMap-like entry -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="RoleAssignments">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="entries"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+  <!-- 9: EStringToStringMapEntry for RoleAssignments -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="EStringToStringMapEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="key"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 10: OperationContainer to host EOperations with EParameters -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="OperationContainer">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="operations"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.11"/>
+  </eClassifiers>
+
+  <!-- 11: OperationDef to model an operation-like class (not EOperation itself) -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="OperationDef">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="parameters"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.12"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="resultType"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 12: ParameterDef to model an operation parameter-like class -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="ParameterDef">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="type"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- Populate containment trees -->
+
+  <!-- Add team members inside Manager, operations inside OperationContainer, and map entries inside RoleAssignments -->
+  <eSubpackages name="innerPkg"
+      nsURI="http://example.org/company/inner"
+      nsPrefix="companyInner">
+    <eClassifiers xsi:type="ecore:EClass"
+        name="TopLevelHolder">
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="headManager"
+          containment="true"
+          eType="//@eSuperPackage/@eClassifiers.5"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="roleAssignments"
+          containment="true"
+          eType="//@eSuperPackage/@eClassifiers.8"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="opContainer"
+          containment="true"
+          eType="//@eSuperPackage/@eClassifiers.10"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

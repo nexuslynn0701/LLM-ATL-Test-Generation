@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="familyPkg"
+    nsURI="http://example.org/family"
+    nsPrefix="fam">
+
+  <!-- 0: EClass Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="false" interface="false">
+    <!-- attribute with ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        iD="true"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- attribute without ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- containment reference to Address -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="address"
+        lowerBound="0"
+        upperBound="1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.1"/>
+    <!-- non-containment reference to spouse -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="spouse"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.0"/>
+    <!-- reference to children (many) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 1: EClass Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="zipCode"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 2: abstract EClass NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 3: EClass Employee extends Person, NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      abstract="false"
+      interface="false"
+      eSuperTypes="//@eClassifiers.0 //@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="salary"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="manager"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 4: EClass Department extends NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department"
+      abstract="false"
+      interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <!-- containment of employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+    <!-- reference to head (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="head"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 5: EEnum Role -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Role">
+    <eLiterals name="ADMIN" value="0" literal="ADMIN"/>
+    <eLiterals name="USER" value="1" literal="USER"/>
+  </eClassifiers>
+
+  <!-- 6: EClass Account extends NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Account"
+      abstract="false"
+      interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        lowerBound="1"
+        defaultValueLiteral="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="role"
+        lowerBound="1"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 7: EDataType CustomString -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="CustomString"
+      instanceClassName="java.lang.String"
+      serializable="true"/>
+
+  <!-- 8: EClass Project uses CustomString and Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="1"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="ownerDept"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+</ecore:EPackage>

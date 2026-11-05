@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : root CPL with one SubAction and one Outgoing (with simple Proxy) -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saRoot"/>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1] : SubAction referenced by SubCall (id 'saCall') -->
+  <elements xsi:type="CPL:SubAction" id="saCall"/>
+
+  <!-- elements[2] : simple Location used by Redirect and simple Proxy -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+
+  <!-- elements[3] : Redirect (non‑permanent, uses elements[2] as location) -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+  </elements>
+
+  <!-- elements[4] : SubCall calling 'saCall' -->
+  <elements xsi:type="CPL:SubCall" ref="saCall"/>
+
+  <!-- elements[5] : complex Proxy with all branches and Location (elements[2]) as location -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="saCall"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:Redirect" permanent="true">
+        <contents xsi:type="CPL:Location" url="sip:noanswer@example.com" clear="true"/>
+      </contents>
+    </noAnswer>
+    <redirection/>
+    <failure/>
+    <default>
+      <contents xsi:type="CPL:SubCall" ref="saRoot"/>
+    </default>
+    <contents xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+  </elements>
+
+  <!-- elements[6] : AddressSwitch with one SwitchedAddress and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="alice@example.com"/>
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="saCall"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[7] : StringSwitch to trigger rule StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents xsi:type="CPL:SubCall" ref="saRoot"/>
+  </elements>
+
+  <!-- elements[8] : LanguageSwitch (contents ignored as statements) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+  </elements>
+
+  <!-- elements[9] : TimeSwitch (contents ignored as statements) -->
+  <elements xsi:type="CPL:TimeSwitch">
+    <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+  </elements>
+
+  <!-- elements[10] : PrioritySwitch (contents ignored as statements) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+  </elements>
+
+</CPL:CPLModel>

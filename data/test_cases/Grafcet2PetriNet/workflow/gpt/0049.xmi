@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="ParallelBranchesWithMerge">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s100" name="Init" isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" location="s101" name="BranchA" isInitial="false" isActive="false" action="runBranchA"/>
+    <elements xsi:type="Grafcet:Step" location="s102" name="BranchB" isInitial="false" isActive="false" action="runBranchB"/>
+    <elements xsi:type="Grafcet:Step" location="s103" name="Join" isInitial="false" isActive="false" action="joinBranches"/>
+    <elements xsi:type="Grafcet:Step" location="s104" name="ErrorHandler" isInitial="false" isActive="false" action="handleError"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t100" name="Split" condition="startParallel"/>
+    <elements xsi:type="Grafcet:Transition" location="t101" name="A_Done" condition="aCompleted"/>
+    <elements xsi:type="Grafcet:Transition" location="t102" name="B_Done" condition="bCompleted"/>
+    <elements xsi:type="Grafcet:Transition" location="t103" name="Error" condition="errorDetected"/>
+    <elements xsi:type="Grafcet:Transition" location="t104" name="Recover" condition="recoverRequested"/>
+    <!-- Connections: indices of elements:
+         0:Init(step), 1:BranchA(step), 2:BranchB(step), 3:Join(step),
+         4:ErrorHandler(step), 5:Split(tr), 6:A_Done(tr), 7:B_Done(tr),
+         8:Error(tr), 9:Recover(tr)
+    -->
+    <!-- Init to Split, then Split to BranchA and BranchB -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c100" name="initToSplit" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c101" name="splitToBranchA" from="/0/@elements.5" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c102" name="splitToBranchB" from="/0/@elements.5" to="/0/@elements.2"/>
+    <!-- Each branch completes to Join -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c103" name="branchAToDone" from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c104" name="aDoneToJoin" from="/0/@elements.6" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c105" name="branchBToDone" from="/0/@elements.2" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c106" name="bDoneToJoin" from="/0/@elements.7" to="/0/@elements.3"/>
+    <!-- Error path from Init and Join to ErrorHandler, with recovery back to Init -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c107" name="initToError" from="/0/@elements.0" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c108" name="joinToError" from="/0/@elements.3" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c109" name="errorToHandler" from="/0/@elements.8" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c110" name="handlerToRecover" from="/0/@elements.4" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c111" name="recoverToInit" from="/0/@elements.9" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

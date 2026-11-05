@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataProcessing"
+    basedir="/opt/data"
+    description="Data processing pipeline">
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target/classes"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.location" location="/etc/app/config.xml"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customTask" classname="com.example.CustomTask"/>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="target"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="false" deprecation="false"/>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="target/classes" compress="true"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src/main/java" destdir="target/docs" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="API Documentation"/>
+  </targets>
+  <targets xmi:id="run" name="run">
+    <tasks xsi:type="Ant:Java" classname="com.example.Main" fork="true"/>
+  </targets>
+  <targets xmi:id="timestamp" name="timestamp">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="copy-resources" name="copy-resources">
+    <tasks xsi:type="Ant:Copy" todir="target/classes" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="default" name="default">
+    <tasks xsi:type="Ant:NewTask">
+      <taskName xsi:type="Ant:TaskDef" name="customTask" classname="com.example.CustomTask"/>
+      <attributes name="param1" value="value1"/>
+      <attributes name="param2" value="value2"/>
+    </tasks>
+  </targets>
+</Ant:Project>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AdvancedBuild"
+    basedir="project-src"
+    description="Full build lifecycle: compile, package, and clean"
+    default="compileTarget">
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="project-src"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+  <taskdef name="customTask" classname="org.example.ant.CustomTask"/>
+  <targets xmi:id="compileTarget" name="compile">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Javac"
+        srcdir="project-src"
+        destdir="target/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false"/>
+  </targets>
+  <targets xmi:id="packageTarget" name="package">
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/app.jar"
+        basedir="target/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="cleanTarget" name="clean">
+    <tasks xsi:type="Ant:Delete"
+        dir="target"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        includes="**/*"
+        defaultexcludes="false"/>
+  </targets>
+</Ant:Project>

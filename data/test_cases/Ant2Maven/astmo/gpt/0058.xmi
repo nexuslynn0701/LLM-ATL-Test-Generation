@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AntMavenDemoProject0058"
+    basedir="demo-src"
+    description="Demo Ant project to exercise Ant2Maven transformation rules."
+    default="mainTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="AntMavenDemoProject0058"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/project.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by tasks) -->
+  <taskdef name="customCompileTask" classname="com.example.ant.CustomCompileTask"/>
+
+  <!-- Path configuration (no external references, all contained) -->
+  <path id="compilePath">
+    <pathElement path="lib/commons.jar" location="lib/commons.jar"/>
+    <fileset dir="lib">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/test-*.jar"/>
+      </patternset>
+      <include name="**/*.jar"/>
+      <exclude name="**/old/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- Targets -->
+  <targets xmi:id="mainTarget" name="main">
+    <!-- Javac task -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="demo-src/main/java"
+           destdir="demo-build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <classPath refid="compileClasspathRef">
+        <pathElement path="demo-lib/core.jar" location="demo-lib/core.jar"/>
+        <fileset dir="demo-lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="compileSources" unless="skipCompile"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/experimental/**"/>
+    </tasks>
+
+    <!-- Javadoc task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="demo-src/main/java"
+           destdir="demo-build/javadoc"
+           packagenames="com.example.demo.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Ant Maven Demo API"/>
+
+    <!-- Jar task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="demo-dist/AntMavenDemoProject0058.jar"
+           basedir="demo-build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Mkdir task -->
+    <tasks xsi:type="Ant:Mkdir" dir="demo-build/resources"/>
+
+    <!-- Copy task with FileSet, FilterSet, Mapper -->
+    <tasks xsi:type="Ant:Copy"
+           file="demo-src/resources/config.properties"
+           presservelastmodified="true"
+           tofile="demo-build/resources/config.properties"
+           todir="demo-build/resources"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="demo-src/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+        </patternset>
+        <include name="**/*.properties"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="projectName" value="AntMavenDemoProject0058"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="com.example.ant.PathMapper" classpath="demo-lib/mapper.jar" classpathref="mapperClasspath" from="*.properties" to="*.cfg"/>
+    </tasks>
+
+    <!-- Delete task -->
+    <tasks xsi:type="Ant:Delete"
+           file="demo-build/temp.txt"
+           dir="demo-build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile="config/delete-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/delete-excludes.txt"
+           defaultexcludes="true"/>
+
+    <!-- Tstamp task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <targets xmi:id="testTarget" name="test">
+    <!-- Simple Javac task for test sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="demo-src/test/java"
+           destdir="demo-build/test-classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true">
+      <classPath refid="testClasspathRef">
+        <pathElement path="demo-lib/test-support.jar" location="demo-lib/test-support.jar"/>
+      </classPath>
+      <inExcludes xsi:type="Ant:Includes" name="**/*Test.java"/>
+    </tasks>
+
+    <!-- Javadoc task for tests -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="demo-src/test/java"
+           destdir="demo-build/test-javadoc"
+           packagenames="com.example.demo.test.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="false"
+           windowtitle="Ant Maven Demo Test API"/>
+  </targets>
+
+</Ant:Project>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    description="Main build project"
+    default="build"
+    basedir="src">
+  <targets xmi:id="build" name="build" description="Compile and package">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="bin" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="bin" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Delete" dir="temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="false"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run tests">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="test-bin" debug="true"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="API Documentation"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="bin"/>
+    <tasks xsi:type="Ant:Delete" dir="dist"/>
+    <tasks xsi:type="Ant:Delete" dir="test-bin"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/usr/local/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+</Ant:Project>

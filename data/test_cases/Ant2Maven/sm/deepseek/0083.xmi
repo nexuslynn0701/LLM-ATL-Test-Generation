@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="deploy"
+    basedir="/workspace"
+    description="Main build project">
+  <targets xmi:id="deploy" name="deploy" description="Deploy the application">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="deploy"/>
+    <tasks xsi:type="Ant:Copy" file="dist/app.jar" tofile="deploy/app.jar" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="false" quiet="true" failonerror="true" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run unit tests">
+    <tasks xsi:type="Ant:Javac" srcdir="test/java" destdir="target/test-classes" debug="true" fork="true" optimize="false" deprecation="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/test.jar" basedir="target/test-classes" compress="false" encoding="ISO-8859-1"/>
+    <tasks xsi:type="Ant:Mkdir" dir="test-reports"/>
+    <tasks xsi:type="Ant:Delete" file="test-output" verbose="true" quiet="false" failonerror="false" includeEmptyDirs="false"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="true" quiet="false" failonerror="false" includeEmptyDirs="true" includes="**/*.class" excludes="**/*.java"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" verbose="false" quiet="true" failonerror="true" includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+</Ant:Project>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise superPackage/subPackages logic -->
+  <eSubpackages name="subPkg"
+                nsURI="http://rootPkg/sub"
+                nsPrefix="sub">
+    <!-- Classifiers inside subPkg -->
+    <!-- Index 0 in subPkg: sub class -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubEntity">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subCode"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+    <!-- Index 1 in subPkg: sub enum -->
+    <eClassifiers xsi:type="ecore:EEnum" name="SubStatus">
+      <eLiterals name="SNEW" value="0" literal="SNEW"/>
+      <eLiterals name="SOLD" value="1" literal="SOLD"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers inside rootPkg -->
+  <!-- Index 0 in rootPkg: superclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseItem" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         iD="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- Index 1 in rootPkg: subclass with super type, attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Order"
+                eSuperTypes="//@eClassifiers.0">
+    <!-- Attribute with explicit lower/upper bounds and default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="orderNumber"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="ORD-0"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute with Boolean data type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="paid"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Reference to Customer (defined later), non-containment, bounded -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="customer"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.2"/>
+    <!-- Reference to Line, containment and multi-valued -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="lines"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Index 2 in rootPkg: another class to be referenced and to have an opposite -->
+  <eClassifiers xsi:type="ecore:EClass" name="Customer">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Opposite reference back to Order -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="orders"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         eType="//@eClassifiers.1"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- Complete the opposite on Order.customer -->
+  <eClassifiers xsi:type="ecore:EClass" name="Order"
+                eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="orderNumber"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="ORD-0"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="paid"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="customer"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.2"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="lines"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Index 3 in rootPkg: contained class to exercise containment and bounds -->
+  <eClassifiers xsi:type="ecore:EClass" name="Line">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="quantity"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference to BaseItem (super-type usage) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="item"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- Index 4 in rootPkg: enumeration with several literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Priority">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- Index 5 in rootPkg: class using the enum as attribute type -->
+  <eClassifiers xsi:type="ecore:EClass" name="Ticket">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="summary"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+</ecore:EPackage>

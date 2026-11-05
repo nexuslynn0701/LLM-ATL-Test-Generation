@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example/rootPkg"
+    nsPrefix="root">
+  <!-- Subpackage to trigger subPackages/superPackage logic -->
+  <eSubpackages name="subPkg"
+                nsURI="http://example/subPkg"
+                nsPrefix="sub">
+    <!-- 0: Enum in subpackage with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Color">
+      <eLiterals name="RED" value="0" literal="RED"/>
+      <eLiterals name="GREEN" value="1" literal="GREEN"/>
+    </eClassifiers>
+    <!-- 1: EDataType in subpackage -->
+    <eClassifiers xsi:type="ecore:EDataType" name="CustomString" instanceTypeName="java.lang.String"/>
+  </eSubpackages>
+
+  <!-- Classifiers of root package (indices 0..3) -->
+
+  <!-- 0: Superclass with one attribute and one reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="SuperClass" abstract="true">
+    <!-- Attribute with explicit String type, default value, and ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="superName"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="true"
+                         defaultValueLiteral="defaultSuper"/>
+    <!-- Reference to SubClass, containment, multiplicity 0..* -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subs"
+                         eType="//@eClassifiers.1"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"/>
+  </eClassifiers>
+
+  <!-- 1: SubClass extends SuperClass, has attribute and bidirectional reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="SubClass">
+    <!-- Super type -->
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+    <!-- Attribute with Boolean type and default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="true"/>
+    <!-- Reference back to SuperClass (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="parent"
+                         eType="//@eClassifiers.0"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"/>
+  </eClassifiers>
+
+  <!-- 2: Class with attribute typed by enum Color from subPkg -->
+  <eClassifiers xsi:type="ecore:EClass" name="ColoredItem">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="color"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="RED"/>
+  </eClassifiers>
+
+  <!-- 3: Class with multiple attributes of different primitive types and a reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Metrics">
+    <!-- Int attribute with bounds and no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="count"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="0"
+                         upperBound="1"/>
+    <!-- Float/Double-like attribute (EDouble) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="ratio"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+                         lowerBound="0"
+                         upperBound="1"/>
+    <!-- Attribute with no explicit type (will be treated as @NoType/@DataType) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="untyped"
+                         lowerBound="0"
+                         upperBound="1"/>
+    <!-- Reference to ColoredItem, multiplicity 1..* -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="items"
+                         eType="//@eClassifiers.2"
+                         lowerBound="1"
+                         upperBound="-1"
+                         containment="true"/>
+  </eClassifiers>
+</ecore:EPackage>

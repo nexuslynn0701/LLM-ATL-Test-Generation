@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Ant project with multiple targets and diverse predefined file and archive tasks."
+    default="t_compile">
+
+  <!-- Properties of different concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/classes"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="env"/>
+
+  <!-- A standalone taskdef (not referenced by tasks) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: compile -->
+  <targets xmi:id="t_compile" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+  </targets>
+
+  <!-- Test target with jar and delete tasks -->
+  <targets xmi:id="t_package" name="package" description="Package compiled classes into a jar">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/complex-build.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           excludes="**/keep/**"
+           includesfile="config/delete-includes.txt"
+           excludesfile="config/delete-excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Clean target that removes build and dist directories -->
+  <targets xmi:id="t_clean" name="clean" description="Clean build and distribution artifacts">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"
+           defaultexcludes="false"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="dist"
+           verbose="false"
+           quiet="true"
+           failonerror="false"
+           includeEmptyDirs="true"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

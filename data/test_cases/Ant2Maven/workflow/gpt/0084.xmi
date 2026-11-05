@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project-root"
+    description="Build, document, and package the application"
+    default="buildTarget">
+
+  <!-- Properties to exercise AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="java.version" value="17"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/complexbuild.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Secondary target with file management and attribute usage -->
+  <targets xmi:id="cleanupTarget" name="cleanup">
+    <tasks xsi:type="Ant:Copy"
+           todir="backup/output"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"/>
+  </targets>
+
+</Ant:Project>

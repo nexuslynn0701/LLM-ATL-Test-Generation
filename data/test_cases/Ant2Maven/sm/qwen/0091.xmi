@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildSystem"
+    default="build"
+    basedir="."
+    description="Comprehensive build script for testing ATL transformation">
+  <targets xmi:id="init" name="init" description="Initialize directories">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="build" name="build" description="Compile and package">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" deprecation="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true" manifest="manifest.mf"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" file="dist/app.jar"/>
+  </targets>
+  <targets xmi:id="doc" name="doc" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="docs/api"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="My Project API"/>
+  </targets>
+  <targets xmi:id="copy-resources" name="copy-resources" description="Copy resources to output">
+    <tasks xsi:type="Ant:Copy" todir="build/classes" overwrite="true" filtering="true">
+      <fileset dir="resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/temp/**"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="VERSION" value="1.0.0"/>
+        <filter token="BUILD_DATE" value="2024-06-15"/>
+      </filterset>
+    </tasks>
+  </targets>
+</Ant:Project>

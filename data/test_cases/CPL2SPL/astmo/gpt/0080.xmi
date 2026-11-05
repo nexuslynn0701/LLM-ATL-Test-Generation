@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: CPL root with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <!-- SubAction contents: a simple Proxy (R7) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+    <incoming>
+      <!-- Incoming contents: a not-simple Proxy (R8) with parallel ordering -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <!-- make it non-simple by giving at least one child -->
+        <busy>
+          <!-- Busy without contents -->
+        </busy>
+      </contents>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing contents: Busy whose contents is a SubCall (R9 + R13) -->
+      <contents xsi:type="CPL:Busy">
+        <contents xsi:type="CPL:SubCall" ref="sa1"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by Redirect (for Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+
+  <!-- 2: Redirect using the Location above (R14, Location2URIConstant) -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:SubCall" ref="sa1"/>
+  </elements>
+
+  <!-- 3: AddressSwitch with one SwitchedAddress and Otherwise, plus NotPresent (R15, R17, R18) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- notPresent case (R6 via NotPresent2ErrorResponse) -->
+    <notPresent>
+      <!-- NotPresent without contents -->
+    </notPresent>
+
+    <!-- otherwise case: contents is a SubCall (R18 + R13) -->
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </otherwise>
+
+    <!-- SwitchedAddress with simple Proxy contents (R17 + R7) -->
+    <addresses is="user@domain.com">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <!-- simple proxy again: no children -->
+      </contents>
+    </addresses>
+  </elements>
+
+  <!-- 4: StringSwitch (R16) -->
+  <elements xsi:type="CPL:StringSwitch" field="hdrField">
+    <!-- no specific children needed for this test -->
+  </elements>
+
+  <!-- 5: TimeSwitch just to be present (its contents is ignored for statements) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://example.com/tz"/>
+
+  <!-- 6: LanguageSwitch just to be present -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+  </elements>
+
+  <!-- 7: PrioritySwitch just to be present -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities/>
+  </elements>
+
+</CPL:CPLModel>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataPipeline"
+    basedir="/opt/data"
+    description="Data processing pipeline build">
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/reports"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="false" deprecation="false">
+      <inExcludes xsi:type="Ant:Excludes" name="**/*Test.java" ifCondition="skip.tests" unless="run.tests"/>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/data-pipeline.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="**/*.class" excludes="**/*.java"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="build/docs" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Data Pipeline API"/>
+  </targets>
+  <targets xmi:id="deploy" name="deploy">
+    <tasks xsi:type="Ant:Copy" file="dist/data-pipeline.jar" todir="/opt/deploy" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="false"/>
+  </targets>
+  <targets xmi:id="archive" name="archive">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" offset="1" unit="hour" locale="en_US"/>
+      <format property="build.date" pattern="yyyy-MM-dd"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="run" name="run">
+    <tasks xsi:type="Ant:Java" classname="com.example.Main" jar="dist/data-pipeline.jar" fork="true"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="app.version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.mode" value="production"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="/etc/data-pipeline"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+  <path id="compile.path">
+    <pathElement path="lib/commons.jar" location="/opt/lib/commons.jar"/>
+    <pathElement path="lib/log4j.jar" location="/opt/lib/log4j.jar"/>
+  </path>
+  <path id="test.path">
+    <pathElement path="lib/junit.jar" location="/opt/lib/junit.jar"/>
+  </path>
+  <targets xmi:id="all" name="all">
+    <tasks xsi:type="Ant:FilterSet" starttoken="@" endtoken="@">
+      <filter token="version" value="1.0.0"/>
+      <filter token="build.date" value="2024-01-15"/>
+      <filtersfile file="filters.properties"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="resources" name="resources">
+    <tasks xsi:type="Ant:FileSet" dir="src/resources">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.xml"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/*.bak"/>
+      </patternset>
+      <include name="**/*.properties"/>
+      <exclude name="**/*.tmp"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="docs" name="docs">
+    <tasks xsi:type="Ant:FileList" dir="docs" files="README.md,CHANGELOG.md"/>
+  </targets>
+  <targets xmi:id="verify" name="verify">
+    <tasks xsi:type="Ant:Filter" token="env" value="staging"/>
+  </targets>
+  <targets xmi:id="release" name="release">
+    <tasks xsi:type="Ant:IncludesFile" name="release-notes.txt" ifCondition="include.notes" unless="skip.notes"/>
+    <tasks xsi:type="Ant:ExcludesFile" name="exclude-list.txt"/>
+  </targets>
+  <targets xmi:id="backup" name="backup">
+    <tasks xsi:type="Ant:Copy" file="data.db" tofile="backup/data.db.bak" overwrite="true"/>
+  </targets>
+  <targets xmi:id="validate" name="validate">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes" debug="false" fork="true" optimize="true" deprecation="true">
+      <inExcludes xsi:type="Ant:IncludesFile" name="test-includes.txt"/>
+      <inExcludes xsi:type="Ant:ExcludesFile" name="test-excludes.txt"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="report" name="report">
+    <tasks xsi:type="Ant:Copy" todir="build/reports" filtering="true" flatten="true" includeEmptyDirs="true">
+      <fileset dir="src/reports">
+        <include name="**/*.html"/>
+        <exclude name="**/*.tmp"/>
+      </fileset>
+      <filterset starttoken="${" endtoken="}">
+        <filter token="project.name" value="DataPipeline"/>
+        <filtersfile file="report-filters.properties"/>
+      </filterset>
+    </tasks>
+  </targets>
+  <targets xmi:id="finalize" name="finalize">
+    <tasks xsi:type="Ant:Delete" file="temp/scratch.txt" failonerror="false" quiet="true"/>
+  </targets>
+  <targets xmi:id="main" name="main">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/final.jar" basedir="build/classes" compress="false"/>
+  </targets>
+  <targets xmi:id="setup" name="setup">
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Mkdir" dir="logs"/>
+  </targets>
+  <targets xmi:id="teardown" name="teardown">
+    <tasks xsi:type="Ant:Delete" dir="temp" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="build" name="build" default="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main" destdir="build/main" debug="true"/>
+  </targets>
+</Ant:Project>

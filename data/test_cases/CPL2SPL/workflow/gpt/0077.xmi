@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with subActions, incoming, outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions -->
+    <subActions id="sa1">
+      <!-- contents: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: all branches undefined -->
+      </contents>
+    </subActions>
+    <subActions id="sa2">
+      <!-- contents: Location referencing top-level Location element 4 -->
+      <contents xsi:type="CPL:Location"
+                url="sip:user@example.com"
+                priority="1"
+                clear="yes">
+        <!-- no nested contents -->
+      </contents>
+    </subActions>
+
+    <!-- Outgoing method body: non-simple Proxy with branches -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy>
+          <!-- Busy contents: SubCall to sa1 -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <!-- Default contents: SubCall to sa2 -->
+          <contents xsi:type="CPL:SubCall" ref="sa2"/>
+        </default>
+      </contents>
+    </outgoing>
+
+    <!-- Incoming method body: AddressSwitch with SwitchedAddress and Otherwise -->
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="addr1" contains="c1" subDomainOf="sd">
+          <!-- SwitchedAddress contents: SubCall to sa1 -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </addresses>
+        <notPresent/>
+        <otherwise>
+          <!-- Otherwise contents: SubCall to sa2 -->
+          <contents xsi:type="CPL:SubCall" ref="sa2"/>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- 1: SubCall whose ref matches sa1 -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- 2: SubCall whose ref matches sa2 -->
+  <elements xsi:type="CPL:SubCall" ref="sa2"/>
+
+  <!-- 3: Redirect with permanent="true" and Location contents (triggers Location2URIConstant) -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:Location"
+              url="sip:redirect@example.com"
+              priority="2"
+              clear="no">
+      <!-- no nested contents -->
+    </contents>
+  </elements>
+
+  <!-- 4: Top-level Location element, not used as contents -->
+  <elements xsi:type="CPL:Location"
+            url="sip:top@example.com"
+            priority="3"
+            clear="yes"/>
+
+  <!-- 5: StringSwitch (top-level, unused by any contents) -->
+  <elements xsi:type="CPL:StringSwitch" field="hdrField">
+    <!-- no strings -->
+  </elements>
+
+</CPL:CPLModel>

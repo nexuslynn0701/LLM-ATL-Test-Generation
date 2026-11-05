@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction SA1 -->
+    <subActions id="SA1">
+      <!-- contents: complex Proxy P1 (non-simple) via Location L0 -->
+      <!-- Location L0 is nested here so Location2URIConstant is used for Proxy2Select and Redirect2Return -->
+      <contents xsi:type="CPL:Location" url="sip:sa1@example.com" clear="true">
+        <!-- inner complex Proxy P1 -->
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+          <busy/>
+          <noAnswer/>
+          <redirection/>
+          <failure/>
+          <!-- default refers to SubCall SC1 (elements[1]) -->
+          <default contents="//@elements.1"/>
+        </contents>
+      </contents>
+    </subActions>
+
+    <!-- Incoming I1 -->
+    <incoming>
+      <!-- contents: complex Proxy P2 (non-simple) via Location L1 -->
+      <contents xsi:type="CPL:Location" url="sip:incoming@example.com" clear="true">
+        <contents xsi:type="CPL:Proxy" recurse="inrec" ordering="serial">
+          <busy/>
+          <noAnswer/>
+          <redirection/>
+          <failure/>
+          <!-- default refers to SubCall SC2 (elements[2]) -->
+          <default contents="//@elements.2"/>
+        </contents>
+      </contents>
+    </incoming>
+
+    <!-- Outgoing O1 -->
+    <outgoing>
+      <!-- contents: simple Proxy P3 via Location L2 -->
+      <contents xsi:type="CPL:Location" url="sip:outgoing@example.com" clear="true">
+        <contents xsi:type="CPL:Proxy" recurse="outrec" ordering="parallel">
+          <!-- simple Proxy: all branches undefined -->
+        </contents>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: SubCall SC1 refers to SA1 -->
+  <elements xsi:type="CPL:SubCall" ref="SA1"/>
+
+  <!-- elements[2]: SubCall SC2 refers to SA1 -->
+  <elements xsi:type="CPL:SubCall" ref="SA1"/>
+
+  <!-- elements[3]: Location L3 (top-level) for Redirect R1 -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.com" clear="true"/>
+
+  <!-- elements[4]: Redirect R1 (non-permanent) using Location L3 -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <!-- R1's location is L3 -->
+    <contents xsi:type="CPL:Location" url="sip:redirect@example.com" clear="true"/>
+  </elements>
+
+  <!-- elements[5]: AddressSwitch AS1 (field=origin) with SwitchedAddress and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- SwitchedAddress SAaddr (value "addr1") whose contents is SubCall SC1 -->
+    <addresses is="addr1">
+      <contents xsi:type="CPL:SubCall" ref="SA1"/>
+    </addresses>
+    <!-- NotPresent branch -->
+    <notPresent/>
+    <!-- Otherwise branch whose contents is complex Proxy P4 via Location L4 -->
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:otherwise@example.com" clear="true">
+        <contents xsi:type="CPL:Proxy" recurse="othrec" ordering="serial">
+          <busy/>
+          <noAnswer/>
+          <redirection/>
+          <failure/>
+          <!-- default refers to SubCall SC2 (elements[2]) -->
+          <default contents="//@elements.2"/>
+        </contents>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- elements[6]: AddressSwitch AS2 (field=destination) with SwitchedAddress only -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <!-- SwitchedAddress SAaddr2 (value "addr2") whose contents is SubCall SC2 -->
+    <addresses is="addr2">
+      <contents xsi:type="CPL:SubCall" ref="SA1"/>
+    </addresses>
+    <notPresent/>
+  </elements>
+
+  <!-- elements[7]: StringSwitch SS1 (to exercise StringSwitch2SelectStat) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField">
+    <!-- SwitchedString omitted; not needed for rule coverage -->
+  </elements>
+
+  <!-- elements[8]: LanguageSwitch LS1 with NotPresent -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- elements[9]: TimeSwitch TS1 (no contents, just to appear) -->
+  <elements xsi:type="CPL:TimeSwitch">
+    <!-- minimal required attributes for SwitchedTime when needed are omitted here since no contents -->
+  </elements>
+
+  <!-- elements[10]: PrioritySwitch PS1 (no contents) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <!-- minimal PrioritySwitch, no specific attributes required -->
+  </elements>
+
+</CPL:CPLModel>

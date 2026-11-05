@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMM"
+    nsURI="http://rootMM/example/0009"
+    nsPrefix="rootMM">
+
+  <!-- Classifiers order is important for index-based references -->
+
+  <!-- 0: Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- attribute with String type, default value, and marked as ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"
+        defaultValueLiteral="John &quot;Doe&quot;"/>
+    <!-- attribute with Int type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- reference to Address, containment, multiplicity 0..* -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="addresses"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 1: Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- attribute with String type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- reference back to Person, non-containment, 0..1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.0"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- 2: Employee extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- attribute with Int type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="salary"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- reference (opposite) back to Department, 0..* -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="departments"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.3"
+        containment="false"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 3: Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <!-- containment reference to Employee, 0..* with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.2"
+        containment="true"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 4: Color enumeration with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+  </eClassifiers>
+
+  <!-- 5: Status enumeration with one literal -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+  </eClassifiers>
+
+</ecore:EPackage>

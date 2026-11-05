@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingAndMerge">
+    <!-- Steps: two initials and multiple branches/merges -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="InitA" isInitial="true" isActive="true" action="initializeA"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="InitB" isInitial="true" isActive="true" action="initializeB"/>
+    <elements xsi:type="Grafcet:Transition" location="t001" name="StartParallel" condition="startBoth"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="BranchA" isInitial="false" isActive="false" action="runBranchA"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="BranchB" isInitial="false" isActive="false" action="runBranchB"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="MergeBranches" condition="branchesDone"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="Merged" isInitial="false" isActive="false" action="afterMerge"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="LoopBack" condition="needRestart"/>
+    <elements xsi:type="Grafcet:Step" location="s006" name="Final" isInitial="false" isActive="false" action="finishProcess"/>
+
+    <!-- Connections: fan-in, fan-out, and loop -->
+    <!-- Both initial steps go to StartParallel -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="initA_to_startParallel" from="/0/@elements.0" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c002" name="initB_to_startParallel" from="/0/@elements.1" to="/0/@elements.2"/>
+
+    <!-- StartParallel transitions to two branch steps -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c003" name="startParallel_to_branchA" from="/0/@elements.2" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c004" name="startParallel_to_branchB" from="/0/@elements.2" to="/0/@elements.4"/>
+
+    <!-- Each branch step leads to the merge transition -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c005" name="branchA_to_merge" from="/0/@elements.3" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c006" name="branchB_to_merge" from="/0/@elements.4" to="/0/@elements.5"/>
+
+    <!-- Merge transition leads to merged step -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c007" name="merge_to_merged" from="/0/@elements.5" to="/0/@elements.6"/>
+
+    <!-- Merged step goes either to loopBack or directly to Final -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c008" name="merged_to_loopBack" from="/0/@elements.6" to="/0/@elements.7"/>
+
+    <!-- LoopBack can send control to InitA again (loop) -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c009" name="loopBack_to_initA" from="/0/@elements.7" to="/0/@elements.0"/>
+
+    <!-- Direct path from merged to Final via an implicit transition-like shortcut:
+         modelled here as another transition leading to Final -->
+    <elements xsi:type="Grafcet:Transition" location="t004" name="FinishDirect" condition="noRestartNeeded"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c010" name="merged_to_finishDirect" from="/0/@elements.6" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c011" name="finishDirect_to_final" from="/0/@elements.9" to="/0/@elements.8"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

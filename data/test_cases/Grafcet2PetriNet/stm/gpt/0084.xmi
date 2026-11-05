@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_G0" name="ComplexGrafcetExample" location="1:1-200:1">
+
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_S0" name="InitStep" location="2:1-2:40"
+              isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S1" name="CheckInputs" location="3:1-3:50"
+              isInitial="false" isActive="false" action="readSensors"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S2" name="ProcessA" location="4:1-4:50"
+              isInitial="false" isActive="false" action="computePathA"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S3" name="ProcessB" location="5:1-5:50"
+              isInitial="false" isActive="false" action="computePathB"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S4" name="MergeStep" location="6:1-6:50"
+              isInitial="false" isActive="false" action="mergeResults"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S5" name="FinalStep" location="7:1-7:40"
+              isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T0" name="T_InitToCheck" location="8:1-8:60"
+              condition="startButtonPressed"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T1" name="T_CheckToBranch" location="9:1-9:60"
+              condition="inputsValid"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T2" name="T_ProcessAToMerge" location="10:1-10:60"
+              condition="pathAComplete"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T3" name="T_ProcessBToMerge" location="11:1-11:60"
+              condition="pathBComplete"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T4" name="T_MergeToFinal" location="12:1-12:60"
+              condition="resultsAccepted"/>
+    <!-- A self-loop on ProcessA to test cycles -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T5" name="T_ProcessALoop" location="13:1-13:60"
+              condition="recomputeNeeded"/>
+
+    <!-- Connections: Step -> Transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C0" name="C_Init_S2T_T0"
+                 location="20:1-20:60"
+                 from="/0/@elements.0" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C1" name="C_Check_S2T_T1"
+                 location="21:1-21:60"
+                 from="/0/@elements.1" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C2" name="C_ProcessA_S2T_T2"
+                 location="22:1-22:60"
+                 from="/0/@elements.2" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C3" name="C_ProcessB_S2T_T3"
+                 location="23:1-23:60"
+                 from="/0/@elements.3" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C4" name="C_Merge_S2T_T4"
+                 location="24:1-24:60"
+                 from="/0/@elements.4" to="/0/@elements.10"/>
+    <!-- StepToTransition for self-loop on ProcessA -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C5" name="C_ProcessA_S2T_T5"
+                 location="25:1-25:60"
+                 from="/0/@elements.2" to="/0/@elements.11"/>
+
+    <!-- Connections: Transition -> Step -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C6" name="C_T0_T2S_Check"
+                 location="30:1-30:60"
+                 from="/0/@elements.6" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C7" name="C_T1_T2S_ProcessA"
+                 location="31:1-31:60"
+                 from="/0/@elements.7" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C8" name="C_T1_T2S_ProcessB"
+                 location="32:1-32:60"
+                 from="/0/@elements.7" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C9" name="C_T2_T2S_Merge"
+                 location="33:1-33:60"
+                 from="/0/@elements.8" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C10" name="C_T3_T2S_Merge"
+                 location="34:1-34:60"
+                 from="/0/@elements.9" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C11" name="C_T4_T2S_Final"
+                 location="35:1-35:60"
+                 from="/0/@elements.10" to="/0/@elements.5"/>
+    <!-- TransitionToStep for self-loop returning to ProcessA -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C12" name="C_T5_T2S_ProcessA"
+                 location="36:1-36:60"
+                 from="/0/@elements.11" to="/0/@elements.2"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

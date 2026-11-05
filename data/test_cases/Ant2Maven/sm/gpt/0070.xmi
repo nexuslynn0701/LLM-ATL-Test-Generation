@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiPhaseBuild"
+    basedir="."
+    description="Build, test, and package workflow"
+    default="buildTarget">
+
+  <targets xmi:id="buildTarget" name="build" description="Compile main sources">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+  </targets>
+
+  <targets xmi:id="testTarget" name="test" description="Clean test output">
+    <tasks xsi:type="Ant:Delete"
+           dir="build/test-output"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           excludes="**/keep/**"/>
+  </targets>
+
+  <targets xmi:id="packageTarget" name="package" description="Create distribution archive">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multiphase-build.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+</Ant:Project>

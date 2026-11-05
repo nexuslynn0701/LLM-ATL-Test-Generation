@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainSub">
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="user@example.com"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:StringSwitch" field="subject">
+            <strings contains="urgent"/>
+            <otherwise>
+              <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential" timeout="30">
+                <default contents="//@elements.1"/>
+              </default>
+            </otherwise>
+          </contents>
+        </otherwise>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" tzid="UTC">
+        <times dtstart="20240101T090000" dtend="20240101T170000" interval="1" wkst="MO"/>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities greater="5"/>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction"/>
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" clear="true" priority="3"/>
+</CPL:CPLModel>

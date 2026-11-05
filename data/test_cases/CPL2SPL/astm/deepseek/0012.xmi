@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="subA"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="alice@example.com">
+          <contents xsi:type="CPL:SubCall" ref="subA"/>
+        </addresses>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities less="3">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy>
+              <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="yes"/>
+            </noAnswer>
+            <failure/>
+            <default>
+              <contents xsi:type="CPL:Redirection">
+                <contents xsi:type="CPL:Location" url="sip:backup@example.com" priority="2" clear="yes"/>
+              </contents>
+            </default>
+          </contents>
+        </priorities>
+        <otherwise>
+          <contents xsi:type="CPL:LanguageSwitch">
+            <languages matches="en">
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </languages>
+            <notPresent/>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:default@example.com" priority="0" clear="yes"/>
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20200101T000000" interval="1" wkst="MO">
+    <times dtstart="20210101T000000" interval="1" wkst="MO">
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="softphone"/>
+        <otherwise/>
+      </contents>
+    </times>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+</CPL:CPLModel>

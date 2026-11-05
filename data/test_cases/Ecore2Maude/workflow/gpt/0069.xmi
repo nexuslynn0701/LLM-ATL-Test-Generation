@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="myMeta"
+    nsURI="uriMyMeta"
+    nsPrefix="mym">
+  <!-- Index 0: A simple data type used as attribute type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="MyStringType"/>
+  <!-- Index 1: Enumeration with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ColorEnum">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+  </eClassifiers>
+  <!-- Index 2: Root class with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClass">
+    <!-- Attribute with primitive EString type, has default, is ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rootName"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="true"
+                         defaultValueLiteral="defaultRoot"
+                         eAttributeType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute with custom data type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         lowerBound="0"
+                         upperBound="5"
+                         ordered="false"
+                         unique="false"
+                         defaultValueLiteral="lbl"
+                         eAttributeType="//@eClassifiers.0"/>
+    <!-- Attribute with enum type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="color"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eAttributeType="//@eClassifiers.1"/>
+    <!-- Reference to ChildClass, containment, multiplicity 0..* -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+  <!-- Index 3: Child class extending RootClass, with bidirectional reference and attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="ChildClass"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <!-- Back reference to RootClass, non-containment, opposite of RootClass.children -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="parent"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eType="//@eClassifiers.2"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.3"/>
+    <!-- Attribute using EInt -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="index"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="0"
+                         eAttributeType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+</ecore:EPackage>

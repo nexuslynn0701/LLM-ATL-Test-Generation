@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="CoverageProject18"
+    basedir="src/main/java"
+    description="Project with description to trigger AntProject2Maven rule"
+    default="buildTarget">
+
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="java.version" value="17"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="DEV_ENV"/>
+
+  <!-- A simple TaskDef to trigger AntTaskDef2MavenMavenTaskDef -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with several tasks to trigger multiple task rules -->
+  <targets xmi:id="buildTarget" name="build" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/app-1.0.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/site"/>
+    <tasks xsi:type="Ant:Copy"
+           file="README.md"
+           tofile="target/README.txt"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="CoverageProject18 API"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Additional target to trigger extra Goal creation (no depends used) -->
+  <targets xmi:id="cleanTarget" name="clean" description="Cleanup target">
+    <tasks xsi:type="Ant:Delete"
+           dir="target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target"/>
+  </targets>
+
+</Ant:Project>

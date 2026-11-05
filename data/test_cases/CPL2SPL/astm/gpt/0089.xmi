@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL to trigger CPL2Program, Incoming2Method, Outgoing2Method -->
+  <elements xsi:type="CPL:CPL">
+    <!-- Two sub-actions: one with a simple Proxy, one with an AddressSwitch -->
+    <subActions id="saSimple">
+      <!-- contents points to simple Proxy at index 3 -->
+      <contents href="//@elements.3"/>
+    </subActions>
+    <subActions id="saSwitchBased">
+      <!-- contents points to AddressSwitch at index 4 -->
+      <contents href="//@elements.4"/>
+    </subActions>
+
+    <!-- Incoming method contents: SubCall, exercises SubCall2Return and SubAction2Function -->
+    <incoming>
+      <!-- contents points to SubCall at index 1 -->
+      <contents href="//@elements.1"/>
+    </incoming>
+
+    <!-- Outgoing method contents: complex Proxy, exercises Proxy2Select and nested cases -->
+    <outgoing>
+      <!-- contents points to complex Proxy at index 2 -->
+      <contents href="//@elements.2"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: SubCall referring textually to "saSimple" (SubCall2Return + SubAction2Function) -->
+  <elements xsi:type="CPL:SubCall" ref="saSimple"/>
+
+  <!-- 2: Complex Proxy (non-simple) to trigger Proxy2Select and Busy/NoAnswer/Redirection/Failure/Default rules -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <!-- Busy branch with nested simple Proxy (Proxy2Return via contents.statement) -->
+    <busy>
+      <!-- contents points to simple Proxy at index 3 -->
+      <contents href="//@elements.3"/>
+    </busy>
+
+    <!-- NoAnswer branch with Redirect (Redirect2Return) -->
+    <noAnswer>
+      <!-- contents points to Redirect at index 6 -->
+      <contents href="//@elements.6"/>
+    </noAnswer>
+
+    <!-- Redirection branch with SubCall (SubCall2Return from contents.statement) -->
+    <redirection>
+      <!-- contents points to SubCall at index 5 -->
+      <contents href="//@elements.5"/>
+    </redirection>
+
+    <!-- Failure branch left empty: Failure2ErrorResponse via separate element 10 -->
+    <failure/>
+
+    <!-- Default branch with Reject (no extra statements produced; still exercises Default2SelectDefault) -->
+    <default>
+      <!-- contents points to Reject at index 7 -->
+      <contents href="//@elements.7"/>
+    </default>
+  </elements>
+
+  <!-- 3: Simple Proxy (isSimple = true) with one Location, for Proxy2Return and Location2URIConstant -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+    <!-- One Location child so locations->first() is defined -->
+    <contents>
+      <contents xsi:type="CPL:Location" url="sip:simple@example.com" clear="true"/>
+    </contents>
+  </elements>
+
+  <!-- 4: AddressSwitch to trigger AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- A SwitchedAddress case with nested simple Proxy (Proxy2Return) -->
+    <addresses is="sip:user1@example.com">
+      <!-- contents points to simple Proxy at index 3 -->
+      <contents href="//@elements.3"/>
+    </addresses>
+
+    <!-- notPresent branch (NotPresent2ErrorResponse) -->
+    <notPresent/>
+
+    <!-- otherwise branch with Redirect (Redirect2Return) -->
+    <otherwise>
+      <!-- contents points to Redirect at index 6 -->
+      <contents href="//@elements.6"/>
+    </otherwise>
+  </elements>
+
+  <!-- 5: Another SubCall to be used inside a Redirection branch -->
+  <elements xsi:type="CPL:SubCall" ref="saSwitchBased"/>
+
+  <!-- 6: Redirect with location chain to trigger Redirect2Return and another Location2URIConstant -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <!-- Location as child so Redirect.locations is non-empty -->
+    <contents>
+      <contents xsi:type="CPL:Location" url="sip:redirect@example.org" clear="false"/>
+    </contents>
+  </elements>
+
+  <!-- 7: Reject node to trigger Reject use in statement selections -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 8: StringSwitch to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="customHeader">
+    <!-- No specific strings needed for the rule; kept empty -->
+  </elements>
+
+  <!-- 9: Standalone Location (top-level allowed, exercises Location.locations) -->
+  <elements xsi:type="CPL:Location" url="sip:toplocation@example.net" clear="true"/>
+
+  <!-- 10: Failure node (not top-level per constraint, so wrap in Proxy to trigger Failure2ErrorResponse) -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <failure/>
+  </elements>
+
+</CPL:CPLModel>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    default="build"
+    basedir="/home/project"
+    description="A sample Ant project for testing">
+  <properties xsi:type="Ant:PropertyValue" name="version" value="1.0"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib" location="/usr/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+  <targets xmi:id="build" name="build" description="Main build target">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="classes"/>
+    <tasks xsi:type="Ant:Delete" dir="dist"/>
+  </targets>
+  <targets xmi:id="doc" name="doc" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="API"/>
+  </targets>
+  <targets xmi:id="all" name="all" description="Build and document">
+    <tasks xsi:type="Ant:Tstamp"/>
+    <tasks xsi:type="Ant:Copy" todir="backup" filtering="false" flatten="true">
+      <fileset dir="src" includes="**/*.java"/>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0"/>
+      </filterset>
+    </tasks>
+    <tasks xsi:type="Ant:NewTask" taskName="customtask">
+      <attributes name="attr1" value="val1"/>
+      <attributes name="attr2" value="val2"/>
+    </tasks>
+  </targets>
+  <path id="build.path">
+    <pathElement path="/home/lib" location="/home/lib"/>
+    <fileset dir="/home/lib">
+      <include name="*.jar"/>
+      <exclude name="test.jar"/>
+    </fileset>
+  </path>
+</Ant:Project>

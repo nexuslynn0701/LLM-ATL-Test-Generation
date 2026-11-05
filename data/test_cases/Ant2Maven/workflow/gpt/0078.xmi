@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuild"
+    basedir="project-src"
+    description="End-to-end build with compilation, packaging, and cleanup"
+    default="buildTarget">
+
+  <!-- Properties to exercise PropertyValue, PropertyLocation, PropertyFile, PropertyEnv -->
+  <properties xsi:type="Ant:PropertyValue" name="compiler.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="project-src/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="project-src/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition to exercise TaskDef rule -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Path structure to exercise Path, PathElement, FileSet, PatternSet, Includes, Excludes, FilterSet, Filter, FiltersFile -->
+  <path id="compile.path">
+    <pathElement path="libs/runtime.jar" location="libs"/>
+    <pathElement path="libs/util.jar" location="libs"/>
+    <fileset dir="libs">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/*-sources.jar"/>
+      </patternset>
+      <include name="extra-lib.jar"/>
+      <exclude name="old-lib.jar"/>
+    </fileset>
+  </path>
+
+  <!-- ClassPath to exercise ClassPath rule (no external refs used) -->
+  <path>
+    <fileset dir="tools">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+      </patternset>
+    </fileset>
+  </path>
+
+  <!-- FilterSet with Filter and FiltersFile -->
+  <properties xsi:type="Ant:PropertyValue" name="build.profile" value="release"/>
+  <path>
+    <fileset dir="resources">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+      </patternset>
+    </fileset>
+  </path>
+
+  <!-- Build target is the default -->
+  <targets xmi:id="buildTarget" name="buildTarget">
+    <!-- Mkdir to create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="project-src/target/classes"/>
+    <!-- Javac to compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="project-src/src/main/java"
+           destdir="project-src/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <classPath>
+        <pathElement path="project-src/target/classes" location="project-src/target/classes"/>
+        <fileset dir="libs">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+    <!-- Jar to package compiled classes -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="project-src/target/fullbuild.jar"
+           basedir="project-src/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="project-src/META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Documentation target -->
+  <targets xmi:id="docsTarget" name="docsTarget">
+    <!-- Tstamp to exercise Tstamp rule -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyyMMdd-HHmmss" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+    <!-- Javadoc generation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="project-src/src/main/java"
+           destdir="project-src/target/apidocs"
+           packagenames="com.example.fullbuild.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="FullBuild API"/>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="cleanTarget" name="cleanTarget">
+    <!-- Delete compiled classes directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="project-src/target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/.git/**"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Resource processing target using Copy and FilterSet -->
+  <targets xmi:id="resourcesTarget" name="resourcesTarget">
+    <!-- FilterSet definition inside Copy -->
+    <tasks xsi:type="Ant:Copy"
+           todir="project-src/target/resources"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="project-src/src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.*"/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="FullBuild"/>
+        <filtersfile file="project-src/filters.properties"/>
+      </filterset>
+    </tasks>
+  </targets>
+
+  <!-- Target with a Java task to exercise Java rule -->
+  <targets xmi:id="runTarget" name="runTarget">
+    <tasks xsi:type="Ant:Java"
+           classname="com.example.fullbuild.Main"
+           jar="project-src/target/fullbuild.jar"
+           fork="true">
+      <classPath>
+        <pathElement path="project-src/target/fullbuild.jar" location="project-src/target"/>
+      </classPath>
+    </tasks>
+  </targets>
+
+  <!-- Target with a custom NewTask attributes and Attribut rule coverage is forbidden, so only Attribut via Copy/FilterSet/Path/etc is used -->
+
+</Ant:Project>

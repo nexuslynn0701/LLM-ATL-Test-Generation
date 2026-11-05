@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://rootpkg"
+    nsPrefix="root">
+
+  <!-- Class that will force createSort because its super type is an ecore EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="SuperInEcorePkg">
+    <!-- Reference to ClassInSubPkg: triggers Reference2Operation and related rules -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="refToSub"
+        eType="//@eSubpackages.0/@eClassifiers.0"
+        containment="false"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"/>
+    <!-- Attribute with EString type: triggers Attribute2Operation and attDataType -> @String -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        iD="false"
+        ordered="true"
+        unique="true"/>
+  </eClassifiers>
+
+  <!-- EEnum with literals to exercise enum-related rules -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- Plain EDataType, not used directly but increases variety -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomDataType"/>
+
+  <!-- Subpackage containing a class that inherits from an ecore EClass (EClass) -->
+  <eSubpackages name="subpkg" nsURI="http://subpkg" nsPrefix="sub">
+    <!-- This EClass extends an EClass from the ecore package (EClass),
+         so Class2Sort will see a super type in package 'ecore'
+         and will call createSort on that super type. -->
+    <eClassifiers xsi:type="ecore:EClass" name="ClassInSubPkg"
+                  eSuperTypes="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EClass">
+      <!-- Attribute typed by StatusEnum: exercises enum-based attDataType path -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="status"
+          eType="//@eClassifiers.1"
+          lowerBound="0"
+          upperBound="1"
+          iD="false"
+          ordered="true"
+          unique="true"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

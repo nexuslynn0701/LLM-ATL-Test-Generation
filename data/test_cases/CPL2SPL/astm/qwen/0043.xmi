@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="User busy"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="destination">
+            <addresses is="user@example.com">
+              <contents xsi:type="CPL:Location" url="sip:primary@example.com" clear="yes"/>
+            </addresses>
+            <notPresent/>
+            <otherwise>
+              <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="yes"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="MobileClient"/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:desktop@example.com" clear="no"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:TimeSwitch" tzid="UTC">
+        <times dtstart="20230101T000000Z" interval="1" wkst="MO"/>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="403" reason="Outside business hours"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction"/>
+  <elements xsi:type="CPL:Location" url="sip:fallback@example.com" clear="yes"/>
+</CPL:CPLModel>

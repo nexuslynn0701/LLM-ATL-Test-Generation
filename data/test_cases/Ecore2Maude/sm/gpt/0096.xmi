@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cpx">
+
+  <!-- 0: Simple data holder class with attributes, including an ID -->
+  <eClassifiers xsi:type="ecore:EClass" name="Node" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="nodeId"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1: Edge class with references to Node and containment to a detail class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Edge" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="source"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="target"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="detail"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract super type with a reference to Node, will be extended -->
+  <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="primaryNode"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 3: Contained detail class used by Edge, with primitive attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="EdgeDetail" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="weight"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="directed"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 4: Concrete subclass of Element, with attributes and a containment reference -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="ContainerElement"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="containerName"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 5: Concrete subclass of Element, with cross-reference back to ContainerElement -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="ContainedElement"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="index"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 6: Enum type with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="ARCHIVED" value="2" literal="ARCHIVED"/>
+  </eClassifiers>
+
+  <!-- 7: Class using the enum and an operation with parameters -->
+  <eClassifiers xsi:type="ecore:EClass" name="Process" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="processName"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         eType="//@eClassifiers.6"/>
+    <eOperations name="updateStatus"
+                 ordered="true"
+                 unique="true"
+                 lowerBound="0"
+                 upperBound="1">
+      <eParameters name="newStatus"
+                   ordered="true"
+                   unique="true"
+                   lowerBound="1"
+                   upperBound="1"
+                   eType="//@eClassifiers.6"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 8: Utility class with an operation that references other classifiers -->
+  <eClassifiers xsi:type="ecore:EClass" name="GraphUtil" abstract="false" interface="false">
+    <eOperations name="connect"
+                 ordered="true"
+                 unique="true"
+                 lowerBound="0"
+                 upperBound="1">
+      <eParameters name="from"
+                   ordered="true"
+                   unique="true"
+                   lowerBound="1"
+                   upperBound="1"
+                   eType="//@eClassifiers.0"/>
+      <eParameters name="to"
+                   ordered="true"
+                   unique="true"
+                   lowerBound="1"
+                   upperBound="1"
+                   eType="//@eClassifiers.0"/>
+      <eParameters name="edge"
+                   ordered="true"
+                   unique="true"
+                   lowerBound="1"
+                   upperBound="1"
+                   eType="//@eClassifiers.1"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

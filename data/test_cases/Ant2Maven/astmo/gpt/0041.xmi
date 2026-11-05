@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="demo-ant-project"
+    basedir="src"
+    description="Ant to Maven transformation demo project"
+    default="build">
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="conf/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+  <targets xmi:id="build" name="build" description="Compile and package">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="on" deprecation="off"/>
+    <tasks xsi:type="Ant:Jar" jarfile="target/demo-ant-project.jar" basedir="target/classes" compress="true" encoding="UTF-8"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/test-classes"/>
+    <tasks xsi:type="Ant:Delete" dir="target/temp"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.demo.*"
+           defaultexcludes="true"
+           author="true"
+           version="1.0.0"
+           use="true"
+           windowtitle="Demo Ant Project API"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+    <tasks xsi:type="Ant:Copy" todir="target/resources"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build outputs">
+    <tasks xsi:type="Ant:Delete" dir="target"/>
+  </targets>
+</Ant:Project>

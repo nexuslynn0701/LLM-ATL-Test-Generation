@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AdvancedAntProject"
+    basedir="project-root"
+    description="An advanced Ant build with multiple targets and properties."
+    default="buildMain">
+
+  <!-- Properties of all four concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- One task definition, not referenced by any NewTask -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with several tasks -->
+  <targets xmi:id="buildMain" name="buildMain" description="Compile sources and build main JAR">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/app-main.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/resources"/>
+    <tasks xsi:type="Ant:Delete" dir="target/temp"/>
+  </targets>
+
+  <!-- Additional target to increase rule coverage -->
+  <targets xmi:id="packageDist" name="packageDist" description="Package distribution archive">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/tools/java"
+           destdir="target/tools-classes"
+           debug="false"
+           fork="true"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/tools.jar"
+           basedir="target/tools-classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/TOOLS.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+    <tasks xsi:type="Ant:Delete" dir="target/old-dist"/>
+  </targets>
+
+</Ant:Project>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="maudeTestMM19"
+    nsURI="http://maudeTestMM19"
+    nsPrefix="mt19">
+
+  <!-- Root package classifiers order is important for index-based references -->
+  <!-- 0: Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- Attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="displayName"
+        lowerBound="0"
+        defaultValueLiteral="&quot;Unknown User&quot;"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        lowerBound="0"
+        defaultValueLiteral="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+
+    <!-- References -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="primaryAddress"
+        lowerBound="0"
+        upperBound="1"
+        containment="true"
+        ordered="false"
+        unique="true"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="allAddresses"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employer"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 1: Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="0"
+        defaultValueLiteral="&quot;no street&quot;"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="number"
+        lowerBound="0"
+        defaultValueLiteral="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+
+    <!-- Bidirectional, non-containment opposite to Person.primaryAddress -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="resident"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.3"/>
+
+    <!-- Bidirectional, non-containment opposite to Company.locations -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="company"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        ordered="false"
+        unique="false"
+        eType="//@eClassifiers.2"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 2: Company (superclass of TechCompany) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        defaultValueLiteral="&quot;Generic Corp&quot;"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="foundedYear"
+        lowerBound="0"
+        defaultValueLiteral="2000"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+
+    <!-- Bidirectional: many locations to one company -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="locations"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        ordered="true"
+        unique="false"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.3"/>
+
+    <!-- Employees reference back to Person.employer -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.5"/>
+  </eClassifiers>
+
+  <!-- 3: TechCompany extends Company -->
+  <eClassifiers xsi:type="ecore:EClass" name="TechCompany" interface="false" abstract="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="hasOpenSourceProjects"
+        lowerBound="0"
+        defaultValueLiteral="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 4: EmploymentKind enum with multiple literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmploymentKind">
+    <eLiterals name="Full_Time" value="0" literal="FULL_TIME"/>
+    <eLiterals name="PartTime" value="1" literal="PART_TIME"/>
+    <eLiterals name="Contractor" value="2" literal="CONTRACTOR"/>
+  </eClassifiers>
+
+  <!-- 5: Role class with attribute typed by enum EmploymentKind -->
+  <eClassifiers xsi:type="ecore:EClass" name="Role">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="1"
+        defaultValueLiteral="&quot;Engineer&quot;"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Enum-typed attribute with default literal "Full_Time" -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="kind"
+        lowerBound="1"
+        defaultValueLiteral="Full_Time"
+        eType="//@eClassifiers.4"/>
+    <!-- Many-valued reference to Person, unordered + non-unique to exercise flags -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="assignedPeople"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        ordered="false"
+        unique="false"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- Subpackage to trigger PackEqSubPackages and package hierarchy -->
+  <eSubpackages name="hrSub"
+      nsURI="http://maudeTestMM19/hr"
+      nsPrefix="mt19hr">
+    <!-- 0 in subpackage: Position -->
+    <eClassifiers xsi:type="ecore:EClass" name="Position">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="positionCode"
+          lowerBound="1"
+          defaultValueLiteral="&quot;POS-001&quot;"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+
+    <!-- 1 in subpackage: Level enum with single literal -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Level">
+      <eLiterals name="Senior" value="0" literal="SR"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

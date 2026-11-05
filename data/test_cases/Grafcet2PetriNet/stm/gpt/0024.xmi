@@ -1,0 +1,70 @@
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="/0" name="ComplexGrafcet" location="0:0-0:0">
+
+    <!-- Elements: 5 Steps and 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="/0/@elements.0" name="InitStep" location="1:1-1:10"
+              isInitial="true" isActive="true" action="initialize_system"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="/0/@elements.1" name="ParallelStepA" location="2:1-2:15"
+              isInitial="false" isActive="false" action="run_branch_A"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="/0/@elements.2" name="ParallelStepB" location="3:1-3:15"
+              isInitial="false" isActive="false" action="run_branch_B"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="/0/@elements.3" name="MergeStep" location="4:1-4:12"
+              isInitial="false" isActive="false" action="merge_branches"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="/0/@elements.4" name="FinalStep" location="5:1-5:11"
+              isInitial="false" isActive="false" action="shutdown_system"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="/0/@elements.5" name="T_InitToParallel" location="6:1-6:20"
+              condition="init_done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="/0/@elements.6" name="T_ParallelToMerge" location="7:1-7:22"
+              condition="A_done and B_done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="/0/@elements.7" name="T_MergeToFinal" location="8:1-8:20"
+              condition="merged"/>
+
+    <!-- Connections: create a small graph with branching and merging -->
+
+    <!-- From InitStep to T_InitToParallel -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="/0/@connections.0"
+                 name="C_Init_to_TInitPar" location="9:1-9:30"
+                 from="/0/@elements.0" to="/0/@elements.5"/>
+
+    <!-- From T_InitToParallel to ParallelStepA -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="/0/@connections.1"
+                 name="C_TInitPar_to_A" location="10:1-10:28"
+                 from="/0/@elements.5" to="/0/@elements.1"/>
+
+    <!-- From T_InitToParallel to ParallelStepB -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="/0/@connections.2"
+                 name="C_TInitPar_to_B" location="11:1-11:28"
+                 from="/0/@elements.5" to="/0/@elements.2"/>
+
+    <!-- From ParallelStepA to T_ParallelToMerge -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="/0/@connections.3"
+                 name="C_A_to_TParMerge" location="12:1-12:30"
+                 from="/0/@elements.1" to="/0/@elements.6"/>
+
+    <!-- From ParallelStepB to T_ParallelToMerge -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="/0/@connections.4"
+                 name="C_B_to_TParMerge" location="13:1-13:30"
+                 from="/0/@elements.2" to="/0/@elements.6"/>
+
+    <!-- From T_ParallelToMerge to MergeStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="/0/@connections.5"
+                 name="C_TParMerge_to_Merge" location="14:1-14:32"
+                 from="/0/@elements.6" to="/0/@elements.3"/>
+
+    <!-- From MergeStep to T_MergeToFinal -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="/0/@connections.6"
+                 name="C_Merge_to_TFinal" location="15:1-15:30"
+                 from="/0/@elements.3" to="/0/@elements.7"/>
+
+    <!-- From T_MergeToFinal to FinalStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="/0/@connections.7"
+                 name="C_TFinal_to_Final" location="16:1-16:28"
+                 from="/0/@elements.7" to="/0/@elements.4"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

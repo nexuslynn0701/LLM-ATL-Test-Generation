@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://test/mm/0047"
+    nsPrefix="t47">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="subPkg"
+                nsURI="http://test/mm/0047/sub"
+                nsPrefix="t47sub">
+    <!-- Class with no supers, both attributes and references -->
+    <eClassifiers xsi:type="ecore:EClass" name="Person">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="id"
+                           iD="true"
+                           lowerBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="name"
+                           lowerBound="1"
+                           defaultValueLiteral="&quot;Unknown&quot;"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="addresses"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="true"
+                           eType="//@eSubpackages.0/@eClassifiers.1"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="bestFriend"
+                           lowerBound="0"
+                           upperBound="1"
+                           containment="false"
+                           eType="//@eSubpackages.0/@eClassifiers.0"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.3"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="friends"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="false"
+                           eType="//@eSubpackages.0/@eClassifiers.0"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.2"/>
+    </eClassifiers>
+
+    <!-- Contained class, no supers, only attributes -->
+    <eClassifiers xsi:type="ecore:EClass" name="Address">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="street"
+                           lowerBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="zipCode"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eClassifiers>
+
+    <!-- Enumeration with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Color">
+      <eLiterals name="Red" value="0" literal="Red"/>
+      <eLiterals name="Blue" value="1" literal="Blue"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root-level classifiers -->
+  <!-- Abstract superclass with multi supers later -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="alias"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="defaultAlias"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- Class with single supertype (NamedElement) -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Project">
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eSubpackages.0/@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="Red"
+                         eType="//@eSubpackages.0/@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- Concrete class with two EClass supertypes: NamedElement and Person -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="SpecialPerson">
+    <eSuperTypes>//@eClassifiers.0 //@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="score"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+  </eClassifiers>
+
+  <!-- Extra EDataType whose name matches built-in to trigger dataType mapping branch -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="Integer"
+                instanceClassName="java.lang.Integer"/>
+</ecore:EPackage>

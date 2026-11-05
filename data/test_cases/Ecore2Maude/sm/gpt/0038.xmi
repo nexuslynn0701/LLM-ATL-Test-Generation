@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cp">
+
+  <!-- 0: Primitive alias -->
+  <eClassifiers xsi:type="ecore:EDataType" name="AliasString" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 2: Simple base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+                         eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract named node with operations -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractNode" abstract="true">
+    <eSuperTypes>//@eClassifiers.2</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eOperations name="computeScore"
+                 eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt">
+      <eParameters name="factor"
+                   eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 4: Concrete TaskNode -->
+  <eClassifiers xsi:type="ecore:EClass" name="TaskNode">
+    <eSuperTypes>//@eClassifiers.3</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="estimatedHours"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="subTasks"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependsOn"
+                         upperBound="-1"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 5: Concrete Milestone -->
+  <eClassifiers xsi:type="ecore:EClass" name="Milestone">
+    <eSuperTypes>//@eClassifiers.3</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="deadline"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relatedTasks"
+                         upperBound="-1"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 6: Bidirectional reference pair -->
+  <eClassifiers xsi:type="ecore:EClass" name="Worker">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignedTasks"
+                         upperBound="-1"
+                         eType="//@eClassifiers.4"
+                         eOpposite="//@eClassifiers.4/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <!-- 7: TaskNode side of the bidirectional reference (add here to maintain index) -->
+  <!-- NOTE: index-based layout requires this class to appear after Worker for the eOpposite path above -->
+  <!-- Re-declare TaskNode with additional reference at index 3 in its structural features -->
+  <!-- We keep structural feature order to match the eOpposite index used above -->
+  <eClassifiers xsi:type="ecore:EClass" name="TaskNodeWithWorker">
+    <eSuperTypes>//@eClassifiers.4</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="workers"
+                         upperBound="-1"
+                         eType="//@eClassifiers.6"
+                         eOpposite="//@eClassifiers.6/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 8: Container class with containments and attribute map entry -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rootTasks"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="milestones"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="workers"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metadata"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+  <!-- 9: Map entry -->
+  <eClassifiers xsi:type="ecore:EClass" name="ProjectProperty">
+    <eSuperTypes>ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EStringToStringMapEntry</eSuperTypes>
+  </eClassifiers>
+
+</ecore:EPackage>

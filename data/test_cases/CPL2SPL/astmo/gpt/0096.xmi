@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction referencing a complex Proxy (non-simple) -->
+    <subActions id="saMain">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- complex proxy has all branches -->
+        <busy>
+          <!-- Busy contents: Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents: SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents: AddressSwitch -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin" subField="fromUser">
+            <!-- SwitchedAddress with an address string -->
+            <addresses is="userA@example.com" contains="A" subDomainOf="example.com">
+              <!-- SwitchedAddress contents: SubCall -->
+              <contents xsi:type="CPL:SubCall" ref="saMain"/>
+            </addresses>
+            <!-- NotPresent branch (no contents) -->
+            <notPresent/>
+            <!-- Otherwise branch containing a simple Proxy -->
+            <otherwise>
+              <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+                <!-- simple proxy: no sub-branches, locations will be inherited -->
+              </contents>
+            </otherwise>
+          </contents>
+        </redirection>
+        <failure>
+          <!-- Failure contents: Reject -->
+          <contents xsi:type="CPL:Reject" status="405" reason="Method Not Allowed"/>
+        </failure>
+        <default>
+          <!-- Default contents: SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Incoming with contents: Reject (no statements from contents) -->
+    <incoming>
+      <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+    </incoming>
+
+    <!-- Outgoing with contents: simple Proxy (isSimple=true) -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by proxies and redirect via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+
+</CPL:CPLModel>

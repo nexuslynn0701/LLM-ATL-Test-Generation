@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingAndMerge">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s010" name="StartUp" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Step" location="s011" name="LoadConfig" isInitial="false" isActive="false" action="load"/>
+    <elements xsi:type="Grafcet:Step" location="s012" name="ValidateConfig" isInitial="false" isActive="false" action="validate"/>
+    <elements xsi:type="Grafcet:Step" location="s013" name="RunService" isInitial="false" isActive="false" action="run"/>
+    <elements xsi:type="Grafcet:Step" location="s014" name="ErrorHandler" isInitial="false" isActive="false" action="recover"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t010" name="ConfigLoaded" condition="configReady"/>
+    <elements xsi:type="Grafcet:Transition" location="t011" name="ConfigValid" condition="validationOK"/>
+    <elements xsi:type="Grafcet:Transition" location="t012" name="ConfigInvalid" condition="validationFailed"/>
+    <elements xsi:type="Grafcet:Transition" location="t013" name="Recovered" condition="recoveryDone"/>
+    <!-- Connections: linear, branch, and merge -->
+    <!-- StartUp -> ConfigLoaded -> LoadConfig -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c010" name="startupToLoaded" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c011" name="loadedToLoadConfig" from="/0/@elements.5" to="/0/@elements.1"/>
+    <!-- LoadConfig -> ConfigValid -> ValidateConfig -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c012" name="loadToValid" from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c013" name="validToValidate" from="/0/@elements.6" to="/0/@elements.2"/>
+    <!-- Branch from ValidateConfig: to RunService or ErrorHandler -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c014" name="validateToRun" from="/0/@elements.2" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c015" name="validToRunService" from="/0/@elements.6" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c016" name="validateToError" from="/0/@elements.2" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c017" name="invalidToErrorHandler" from="/0/@elements.7" to="/0/@elements.4"/>
+    <!-- ErrorHandler -> Recovered -> RunService (merge into main flow) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c018" name="errorToRecovered" from="/0/@elements.4" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c019" name="recoveredToRunService" from="/0/@elements.8" to="/0/@elements.3"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

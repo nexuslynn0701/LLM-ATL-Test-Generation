@@ -1,0 +1,80 @@
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcetExample" location="loc:/grafcet/complex">
+
+    <!-- Elements: mix of Steps and Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="loc:/grafcet/complex/s0"
+              isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="ProcessingStepA" location="loc:/grafcet/complex/s1"
+              isInitial="false" isActive="false" action="processA"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="ProcessingStepB" location="loc:/grafcet/complex/s2"
+              isInitial="false" isActive="false" action="processB"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="FinalStep" location="loc:/grafcet/complex/s3"
+              isInitial="false" isActive="false" action="finalize"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="T_InitToA" location="loc:/grafcet/complex/t0"
+              condition="startButtonPressed"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="T_AorB" location="loc:/grafcet/complex/t1"
+              condition="modeSelection"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="T_BranchJoin" location="loc:/grafcet/complex/t2"
+              condition="syncComplete"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" name="T_ToFinal" location="loc:/grafcet/complex/t3"
+              condition="shutdownRequest"/>
+
+    <!-- Connections: StepToTransition and TransitionToStep forming branches and joins -->
+
+    <!-- From initial step to first transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0"
+                 name="C_Init_s0_t0" location="loc:/grafcet/complex/c0"
+                 from="/0/@elements.0" to="/0/@elements.4"/>
+
+    <!-- From T_InitToA to ProcessingStepA -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c1"
+                 name="C_A_t0_s1" location="loc:/grafcet/complex/c1"
+                 from="/0/@elements.4" to="/0/@elements.1"/>
+
+    <!-- From T_InitToA to ProcessingStepB (fan-out to two branches) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c2"
+                 name="C_B_t0_s2" location="loc:/grafcet/complex/c2"
+                 from="/0/@elements.4" to="/0/@elements.2"/>
+
+    <!-- From ProcessingStepA to T_AorB (branch A to join) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c3"
+                 name="C_AJoin_s1_t1" location="loc:/grafcet/complex/c3"
+                 from="/0/@elements.1" to="/0/@elements.5"/>
+
+    <!-- From ProcessingStepB to same T_AorB (branch B to join) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c4"
+                 name="C_BJoin_s2_t1" location="loc:/grafcet/complex/c4"
+                 from="/0/@elements.2" to="/0/@elements.5"/>
+
+    <!-- From T_AorB to intermediate step s2 again (loop back) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c5"
+                 name="C_Loop_t1_s2" location="loc:/grafcet/complex/c5"
+                 from="/0/@elements.5" to="/0/@elements.2"/>
+
+    <!-- From ProcessingStepB to T_BranchJoin (forward progress) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c6"
+                 name="C_Forward_s2_t2" location="loc:/grafcet/complex/c6"
+                 from="/0/@elements.2" to="/0/@elements.6"/>
+
+    <!-- From T_BranchJoin to FinalStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c7"
+                 name="C_ToFinal_t2_s3" location="loc:/grafcet/complex/c7"
+                 from="/0/@elements.6" to="/0/@elements.3"/>
+
+    <!-- Direct shortcut from InitStep to T_ToFinal (alternative path) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c8"
+                 name="C_Shortcut_s0_t3" location="loc:/grafcet/complex/c8"
+                 from="/0/@elements.0" to="/0/@elements.7"/>
+
+    <!-- From T_ToFinal directly to FinalStep (completing shortcut) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c9"
+                 name="C_Shortcut_t3_s3" location="loc:/grafcet/complex/c9"
+                 from="/0/@elements.7" to="/0/@elements.3"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

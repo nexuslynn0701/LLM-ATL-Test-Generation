@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-root"
+    description="Ant project with multiple tasks and properties"
+    default="build-main">
+
+  <!-- Path for coverage of AntPath2MavenMavenPath & AntPathElement2MavenMavenPathElement & AntFileSet2MavenMavenFileSet -->
+  <path id="main.path">
+    <fileset dir="lib">
+      <include name="**/*.jar"/>
+      <exclude name="**/test-*.jar"/>
+    </fileset>
+    <pathElement path="lib/extra" location="/opt/extra-libs"/>
+  </path>
+
+  <!-- Properties of all four concrete types -->
+  <properties xsi:type="Ant:PropertyValue" name="build.mode" value="release"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/settings.xml"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- TaskDef (no taskName references from tasks) -->
+  <taskdef name="customTask" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target with several tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <!-- Javac with simple classPath (no refid/classpathref) and includes/excludes -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes">
+      <classPath refid="compile.classpath">
+        <pathElement path="build/classes" location="/workspace/build/classes"/>
+        <fileset dir="lib/compile">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classPath>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- Jar task -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/complex-project.jar" basedir="build/classes"/>
+
+    <!-- Mkdir task -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/reports"/>
+
+    <!-- Copy task with FileSet, FilterSet, Mapper, FiltersFile, Filter -->
+    <tasks xsi:type="Ant:Copy" todir="dist/resources" overwrite="true">
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="includes.list"/>
+        </patternset>
+        <include name="**/*.properties"/>
+        <exclude name="**/temp/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexAntProject"/>
+        <filtersfile file="config/filters.txt"/>
+      </filterset>
+      <mapper type="glob" from="*.template" to="*.conf"/>
+    </tasks>
+
+    <!-- Delete task -->
+    <tasks xsi:type="Ant:Delete" dir="build/tmp" verbose="true" failonerror="false" includeEmptyDirs="true"/>
+  </targets>
+
+  <!-- Secondary target to increase Goal count and property/task coverage -->
+  <targets xmi:id="test-suite" name="test-suite" description="Run tests">
+    <!-- Javac for test sources -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="build/test-classes" debug="true"/>
+
+    <!-- Javadoc task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="org.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntProject API"/>
+
+    <!-- Tstamp task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+
+    <!-- Copy task using only FileSet -->
+    <tasks xsi:type="Ant:Copy" todir="build/test-resources">
+      <fileset dir="src/test/resources">
+        <include name="**/*.*"/>
+      </fileset>
+    </tasks>
+
+    <!-- Delete task targeting old reports -->
+    <tasks xsi:type="Ant:Delete" dir="build/old-reports" quiet="true"/>
+  </targets>
+
+</Ant:Project>

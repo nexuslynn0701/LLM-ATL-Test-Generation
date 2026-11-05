@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companySpec"
+    nsURI="http://example.com/companySpec"
+    nsPrefix="cs">
+
+  <!-- 0: Simple string-based EDataType -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="Code"
+                instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RoleKind">
+    <eLiterals name="DEV"  value="0" literal="DEV"/>
+    <eLiterals name="MAN"  value="1" literal="MAN"/>
+  </eClassifiers>
+
+  <!-- 2: Base class Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         iD="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 3: Employee extends Person, uses enum and custom datatype, has self-reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" eSuperTypes="//@eClassifiers.2">
+    <!-- Attribute typed with EEnum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="role"
+                         eType="//@eClassifiers.1"/>
+    <!-- Attribute typed with user EDataType -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         eType="//@eClassifiers.0"/>
+    <!-- Non-containment reference to manager (Employee) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="manager"
+                         eType="//@eClassifiers.3"/>
+    <!-- Containment reference to direct reports (to show references & containments) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="reports"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 4: Department, contains employees, references manager -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="deptName"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- containment list of employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="employees"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.3"/>
+    <!-- non-containment reference to manager (must be one of employees in instances) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="manager"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 5: Project, many references to Employee and Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="projectId"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- main department responsible -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="ownerDept"
+                         eType="//@eClassifiers.4"/>
+    <!-- participants -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="team"
+                         upperBound="-1"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 6: Interface-like abstract class with operations -->
+  <eClassifiers xsi:type="ecore:EClass" name="Identifiable" abstract="true" interface="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="uuid"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eOperations name="getDisplayName"
+                 eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 7: Manager extends Employee and implements Identifiable-like EClass -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Manager"
+                eSuperTypes="//@eClassifiers.3 //@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="level"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 8: Utility class for demonstrating multiple structural features -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="street"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="city"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="zip"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

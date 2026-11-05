@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComprehensiveBuild"
+    basedir="projectRoot"
+    description="Full build lifecycle for a sample project"
+    default="buildTarget">
+
+  <!-- Properties covering all subclasses -->
+  <properties xsi:type="Ant:PropertyValue" name="compiler.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="output/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- One TaskDef to exercise AntTaskDef2MavenMavenTaskDef -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Path with one PathElement to exercise Path and PathElement rules -->
+  <path id="compile.path">
+    <pathElement path="lib/runtime.jar" location="lib"/>
+  </path>
+
+  <!-- Target used as default goal -->
+  <targets xmi:id="buildTarget" name="buildTarget">
+    <!-- Mkdir task -->
+    <tasks xsi:type="Ant:Mkdir" dir="output"/>
+
+    <!-- Javac task with minimal attributes -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="output/classes"/>
+
+    <!-- Jar task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/app-complete.jar"
+           basedir="output/classes"/>
+
+    <!-- Delete task -->
+    <tasks xsi:type="Ant:Delete"
+           dir="output/temp"/>
+  </targets>
+
+  <!-- Additional target to increase Goal coverage, no depends and no tasks -->
+  <targets xmi:id="cleanTarget" name="cleanTarget"/>
+</Ant:Project>

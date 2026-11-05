@@ -1,0 +1,60 @@
+<xmi:XMI xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_G0" name="ComplexGrafcetExample" location="model.grafcet">
+    <!-- Elements: 4 Steps + 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_S0" name="InitStep" location="model.grafcet#S0"
+              isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S1" name="BranchStepA" location="model.grafcet#S1"
+              isInitial="false" isActive="false" action="handleBranchA"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S2" name="BranchStepB" location="model.grafcet#S2"
+              isInitial="false" isActive="false" action="handleBranchB"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S3" name="MergeStep" location="model.grafcet#S3"
+              isInitial="false" isActive="false" action="finalizeProcess"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T0" name="SplitTransition" location="model.grafcet#T0"
+              condition="sensorReady"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T1" name="JoinTransition" location="model.grafcet#T1"
+              condition="A_completed AND B_completed"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T2" name="LoopBackTransition" location="model.grafcet#T2"
+              condition="restartRequested"/>
+
+    <!-- Connections: StepToTransition (S->T) -->
+    <!-- Initial step to split transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C0"
+                 name="Init_to_Split" location="model.grafcet#C0"
+                 from="/0/@elements.0" to="/0/@elements.4"/>
+    <!-- Branch A step to join transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C3"
+                 name="A_to_Join" location="model.grafcet#C3"
+                 from="/0/@elements.1" to="/0/@elements.5"/>
+    <!-- Branch B step to join transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C4"
+                 name="B_to_Join" location="model.grafcet#C4"
+                 from="/0/@elements.2" to="/0/@elements.5"/>
+    <!-- Merge step back to loop transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C6"
+                 name="Merge_to_Loop" location="model.grafcet#C6"
+                 from="/0/@elements.3" to="/0/@elements.6"/>
+
+    <!-- Connections: TransitionToStep (T->S) -->
+    <!-- Split to branch A -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C1"
+                 name="Split_to_A" location="model.grafcet#C1"
+                 from="/0/@elements.4" to="/0/@elements.1"/>
+    <!-- Split to branch B -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C2"
+                 name="Split_to_B" location="model.grafcet#C2"
+                 from="/0/@elements.4" to="/0/@elements.2"/>
+    <!-- Join to merge -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C5"
+                 name="Join_to_Merge" location="model.grafcet#C5"
+                 from="/0/@elements.5" to="/0/@elements.3"/>
+    <!-- Loop transition back to initial step -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C7"
+                 name="Loop_to_Init" location="model.grafcet#C7"
+                 from="/0/@elements.6" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="act1">
+      <!-- SubAction contents: a simple Proxy (triggers R2+R7) -->
+      <contents xsi:type="CPL:Proxy" recurse="once" ordering="parallel">
+        <!-- No busy/noAnswer/redirection/failure/default => isSimple = true -->
+      </contents>
+    </subActions>
+
+    <!-- Incoming method with a complex Proxy via contents (R3+R8 and nested Busy/NoAnswer/Redirection/Default rules) -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="always" ordering="serial">
+        <!-- Non‑simple Proxy: all branches present -->
+        <busy>
+          <!-- Busy with contents = Redirect (R9 + R14) -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer with contents = TimeSwitch (filtered out in statements) (R10) -->
+          <contents xsi:type="CPL:TimeSwitch" tzid="TZ1" tzurl="http://tz.example">
+            <times dtstart="20250101T000000" interval="60" wkst="MO"/>
+          </contents>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection with contents = LanguageSwitch (filtered) (R11) -->
+          <contents xsi:type="CPL:LanguageSwitch">
+            <languages matches="en"/>
+          </contents>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default with contents = SubCall (R12 + R13) -->
+          <contents xsi:type="CPL:SubCall" ref="act1"/>
+        </default>
+      </contents>
+    </incoming>
+
+    <!-- Outgoing method with contents = Redirect (R4 + R14) -->
+    <outgoing>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by Proxies/Redirects for locations helper and Location2URIConstant (R19) -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" priority="1" clear="yes"/>
+
+  <!-- Simple Proxy as its own top-level element (R7) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+
+  <!-- Complex Proxy as top-level element (R8, R9–R12, R5, R6) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+    <!-- Busy with no contents (R9) -->
+    <busy/>
+    <!-- NoAnswer with contents = Proxy (treated as statement) (R10 + R7) -->
+    <noAnswer>
+      <contents xsi:type="CPL:Proxy" recurse="inner" ordering="parallel"/>
+    </noAnswer>
+    <!-- Redirection with contents = SubCall (R11 + R13) -->
+    <redirection>
+      <contents xsi:type="CPL:SubCall" ref="act1"/>
+    </redirection>
+    <!-- Failure and Default for Proxy2Select (R5 + R12) -->
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- AddressSwitch with SwitchedAddress and NotPresent/Otherwise (R15, R17, R18, R6) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="userA@example.com"/>
+    <addresses is="userB@example.com">
+      <!-- SwitchedAddress contents = Reject (filtered in statements) -->
+      <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+    </addresses>
+    <!-- NotPresent and Otherwise with contents that will be filtered (R6, R18) -->
+    <notPresent>
+      <contents xsi:type="CPL:Location" url="sip:np@example.com" priority="2" clear="no"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities/>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- StringSwitch to trigger R16 -->
+  <elements xsi:type="CPL:StringSwitch" field="callid">
+    <strings is="abc" contains="x"/>
+    <strings is="def" contains="y"/>
+  </elements>
+
+  <!-- LanguageSwitch top-level (no direct SPL rule, but used in filters) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="fr"/>
+  </elements>
+
+  <!-- TimeSwitch top-level (no direct SPL rule, but used in filters) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example/paris">
+    <times dtstart="20250101T080000" interval="30" wkst="MO"/>
+  </elements>
+
+  <!-- PrioritySwitch top-level (no direct SPL rule, but used in filters) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.5" equal="0.8" greater="1.0"/>
+  </elements>
+
+  <!-- Top-level Redirect using locations from enclosing context (R14 + R19 via Location element) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- Top-level SubCall referencing act1 (R13) -->
+  <elements xsi:type="CPL:SubCall" ref="act1"/>
+
+</CPL:CPLModel>

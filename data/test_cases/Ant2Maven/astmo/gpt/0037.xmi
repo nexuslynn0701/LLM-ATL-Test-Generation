@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="Ant2MavenSample37"
+    basedir="workspace"
+    description="Sample Ant project for Ant2Maven ATL transformation"
+    default="build-main">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by tasks, but transformed by AntTaskDef2MavenMavenTaskDef) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="init-env" name="init-env" description="Initialize environment">
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+  </targets>
+
+  <targets xmi:id="build-main" name="build-main" description="Compile and package main sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes"/>
+    <tasks xsi:type="Ant:Jar" jarfile="target/app-main.jar" basedir="target/classes"/>
+    <tasks xsi:type="Ant:Delete" dir="target/temp"/>
+  </targets>
+
+  <targets xmi:id="build-docs" name="build-docs" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Javac" srcdir="src/doc/java" destdir="target/doc-classes"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="Example Author"
+           version="1.0.0"
+           use="true"
+           windowtitle="Example Project API"/>
+  </targets>
+
+</Ant:Project>

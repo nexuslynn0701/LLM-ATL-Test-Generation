@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiPhaseBuild"
+    basedir="."
+    description="Project with separate compile and package phases"
+    default="compilePhase">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target/classes"/>
+  <properties xsi:type="Ant:PropertyValue" name="dist.dir" value="target/dist"/>
+
+  <!-- Compile phase is the default target -->
+  <targets xmi:id="compilePhase" name="compilePhase" description="Compile Java sources">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="true"/>
+  </targets>
+
+  <!-- Packaging phase with archive and cleanup tasks -->
+  <targets xmi:id="packagePhase" name="packagePhase" description="Create distribution and clean temp files">
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+    <tasks xsi:type="Ant:Jar" jarfile="target/dist/multiphase-build.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Delete" dir="target/tmp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="**/*.tmp" excludes="**/keep/**" defaultexcludes="true"/>
+  </targets>
+
+  <!-- Auxiliary target that only manipulates the file system -->
+  <targets xmi:id="preparePhase" name="preparePhase" description="Prepare directories structure">
+    <tasks xsi:type="Ant:Mkdir" dir="target/tmp"/>
+    <tasks xsi:type="Ant:Mkdir" dir="logs"/>
+    <tasks xsi:type="Ant:Copy" todir="logs" overwrite="true" flatten="true" includeEmptyDirs="false"/>
+  </targets>
+
+</Ant:Project>

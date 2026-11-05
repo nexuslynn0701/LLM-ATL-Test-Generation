@@ -1,0 +1,42 @@
+<xmi:XMI xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcet" location="file://model/grafcet79.gcf">
+    <!-- Elements: 4 Steps (2 initial), 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep1" location="1:1-1:50" isInitial="true" isActive="true" action="initializeSubsystemA"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="InitStep2" location="2:1-2:50" isInitial="true" isActive="false" action="initializeSubsystemB"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="ProcessingStep" location="3:1-3:50" isInitial="false" isActive="false" action="processData"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="FinalStep" location="4:1-4:50" isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="T_InitToProc" location="5:1-5:50" condition="A_ready &amp;&amp; B_ready"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="T_ProcLoop" location="6:1-6:50" condition="more_data"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="T_ProcToFinal" location="7:1-7:50" condition="done &amp;&amp; !error"/>
+
+    <!-- Connections: fan-in to T0, self-loop on S2 via T1, and path to final -->
+    <!-- Fan-in: S0 -> T0, S1 -> T0 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="Arc_S0_T0" location="8:1-8:40"
+                 from="/0/@elements.0" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c1" name="Arc_S1_T0" location="9:1-9:40"
+                 from="/0/@elements.1" to="/0/@elements.4"/>
+
+    <!-- Fork from T0 to two different steps: S1 (re-init path) and S2 (normal path) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c2" name="Arc_T0_S1" location="10:1-10:40"
+                 from="/0/@elements.4" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c3" name="Arc_T0_S2" location="11:1-11:40"
+                 from="/0/@elements.4" to="/0/@elements.2"/>
+
+    <!-- Self-loop on ProcessingStep: S2 -> T1 -> S2 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c4" name="Arc_S2_T1" location="12:1-12:40"
+                 from="/0/@elements.2" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c5" name="Arc_T1_S2" location="13:1-13:40"
+                 from="/0/@elements.5" to="/0/@elements.2"/>
+
+    <!-- Linear path from ProcessingStep to FinalStep: S2 -> T2 -> S3 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c6" name="Arc_S2_T2" location="14:1-14:40"
+                 from="/0/@elements.2" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c7" name="Arc_T2_S3" location="15:1-15:40"
+                 from="/0/@elements.6" to="/0/@elements.3"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

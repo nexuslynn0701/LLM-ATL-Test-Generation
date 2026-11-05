@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryManager"
+    basedir="src/main/java"
+    description="Ant build for LibraryManager project"
+    default="buildTarget">
+
+  <!-- simple property value -->
+  <properties xsi:type="Ant:PropertyValue" name="lib.version" value="2.3.1"/>
+
+  <!-- property defined from a file -->
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+
+  <!-- property defined from environment -->
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- user-defined task definition (unreferenced by tasks, as required) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- default target with several tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources and package artifact">
+    <!-- compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <!-- generate javadocs -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.library.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="LibraryManager API"/>
+    <!-- create jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/librarymanager-2.3.1.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- ensure output directory exists -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/distribution"/>
+    <!-- clean temporary directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           excludes=""
+           defaultexcludes="true"/>
+    <!-- timestamp task (tested by dedicated rule) -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- secondary target, no depends, only a mkdir and delete to exercise rules again -->
+  <targets xmi:id="cleanTarget" name="clean" description="Remove build outputs">
+    <tasks xsi:type="Ant:Delete"
+           dir="target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           defaultexcludes="false"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+  </targets>
+
+</Ant:Project>

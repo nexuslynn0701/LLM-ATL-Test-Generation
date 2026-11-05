@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="checkTime"/>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch">
+        <times dtstart="20250101T000000" interval="3600" wkst="MO"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="checkTime"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="user@example.com"/>
+        <notPresent>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default/>
+          </contents>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="checkTime">
+    <contents xsi:type="CPL:StringSwitch" field="user-agent">
+      <strings is="MySoftPhone"/>
+      <notPresent/>
+      <otherwise>
+        <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" clear="yes"/>
+      </otherwise>
+    </contents>
+  </elements>
+  <elements xsi:type="CPL:Reject" status="603" reason="Declined"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <default>
+      <contents xsi:type="CPL:Location" url="sip:backup@example.com" clear="yes"/>
+    </default>
+  </elements>
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="sip:boss@company.com"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="10"/>
+    <otherwise/>
+  </elements>
+</CPL:CPLModel>

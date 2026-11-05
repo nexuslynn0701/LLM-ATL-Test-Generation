@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://root/pkg"
+    nsPrefix="root">
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages relations -->
+  <eSubpackages name="subPkg"
+                nsURI="http://root/pkg/sub"
+                nsPrefix="sub">
+    <!-- Classifier 0 in subPkg: an extra enum to increase variety -->
+    <eClassifiers xsi:type="ecore:EEnum" name="SubStatus">
+      <eLiterals name="Started" value="0" literal="Started"/>
+      <eLiterals name="Finished" value="1" literal="Finished"/>
+    </eClassifiers>
+    <!-- Classifier 1 in subPkg: an extra class to be referenced from root -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubEntity">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subCode"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifier 0 in rootPkg: an enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Priority">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="HIGH" value="1" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- Classifier 1 in rootPkg: abstract base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true" interface="false">
+    <!-- id attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true"/>
+  </eClassifiers>
+
+  <!-- Classifier 2 in rootPkg: concrete class extending BaseElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.1">
+    <!-- name attribute with default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="Unnamed Task"/>
+    <!-- priority attribute typed by local enum Priority with default literal HIGH -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         eType="//@eClassifiers.0"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="HIGH"/>
+    <!-- cross-package reference, non-containment, unbounded upper -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="relatedSubEntities"
+                         eType="//@eSubpackages.0/@eClassifiers.1"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         resolveProxies="true"/>
+    <!-- containment reference with opposite back from SubInfo.detail -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="details"
+                         eType="//@eClassifiers.3"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.3/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- Classifier 3 in rootPkg: another class with attributes and opposite refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="SubInfo" abstract="false" interface="false">
+    <!-- numerical attribute using EInt -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="value"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"/>
+    <!-- opposite reference back to Task.details -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="detailOf"
+                         eType="//@eClassifiers.2"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.3"/>
+  </eClassifiers>
+</ecore:EPackage>

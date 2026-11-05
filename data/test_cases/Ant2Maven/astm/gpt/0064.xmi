@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="lib-src"
+    description="Build and package the library"
+    default="lib-compile">
+
+  <!-- Properties to exercise AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/lib"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="conf/library.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition to exercise AntTaskDef2MavenMavenTaskDef -->
+  <taskdef name="customProcessor" classname="com.example.tools.CustomProcessor"/>
+
+  <!-- Default target: exercises Javac, Javadoc, Jar, Mkdir, Delete, Tstamp -->
+  <targets xmi:id="lib-compile" name="lib-compile" description="Compile sources and create jar">
+    <tasks xsi:type="Ant:Mkdir" dir="build/lib/classes"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="lib-src"
+           destdir="build/lib/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="lib-src"
+           destdir="build/lib/javadoc"
+           packagenames="com.example.lib.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Library API"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/example-lib.jar"
+           basedir="build/lib/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/lib/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile="conf/delete-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="conf/delete-excludes.txt"
+           defaultexcludes="yes"/>
+  </targets>
+
+  <!-- Additional target: exercises Copy, FilterSet, Filter, FiltersFile, FileSet, PatternSet, Includes/Excludes -->
+  <targets xmi:id="lib-distribute" name="lib-distribute" description="Prepare distribution layout">
+    <tasks xsi:type="Ant:Mkdir" dir="dist/lib"/>
+    <tasks xsi:type="Ant:Copy"
+           todir="dist/lib"
+           overwrite="true"
+           includeEmptyDirs="true">
+      <fileset dir="build/lib/classes">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.class"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+        </patternset>
+        <include name="**/*.properties"/>
+        <exclude name="**/*.log"/>
+      </fileset>
+      <filterset starttoken="${" endtoken="}">
+        <filter token="version" value="1.0.0"/>
+        <filter token="artifactId" value="example-lib"/>
+        <filtersfile file="conf/filters.properties"/>
+      </filterset>
+    </tasks>
+  </targets>
+
+</Ant:Project>

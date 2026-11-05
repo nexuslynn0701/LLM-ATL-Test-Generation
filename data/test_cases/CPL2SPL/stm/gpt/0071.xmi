@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL root with multiple subActions and incoming/outgoing branches -->
+  <elements xsi:type="CPL:CPL">
+    <!-- incoming branch, points to a SubCall -->
+    <incoming contents="//@elements.1"/>
+    <!-- outgoing branch, points to a Proxy -->
+    <outgoing contents="//@elements.2"/>
+    <!-- subActions referenced via SubCall.ref as plain strings -->
+    <subActions id="subA">
+      <!-- contents from a SubAction to a Location -->
+      <contents href="//@elements.3"/>
+    </subActions>
+    <subActions id="subB">
+      <!-- contents from another SubAction to a Switch -->
+      <contents href="//@elements.5"/>
+    </subActions>
+  </elements>
+
+  <!-- 1: SubCall that refers (by string) to a SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="subA"/>
+
+  <!-- 2: Proxy with all optional branches present, each containing different nodes -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential" timeout="30">
+    <!-- Busy branch forwards to a Location -->
+    <busy>
+      <contents href="//@elements.3"/>
+    </busy>
+    <!-- NoAnswer branch forwards to a Reject -->
+    <noAnswer>
+      <contents href="//@elements.4"/>
+    </noAnswer>
+    <!-- Redirection branch forwards to an AddressSwitch -->
+    <redirection>
+      <contents href="//@elements.5"/>
+    </redirection>
+    <!-- Failure branch forwards to a TimeSwitch -->
+    <failure>
+      <contents href="//@elements.7"/>
+    </failure>
+    <!-- Default branch forwards to a PrioritySwitch -->
+    <default>
+      <contents href="//@elements.8"/>
+    </default>
+  </elements>
+
+  <!-- 3: Location node container and leaf node -->
+  <elements xsi:type="CPL:Location" url="sip:alice@example.com" priority="1" clear="yes">
+    <!-- Location acting as NodeContainer: includes another Location and a Redirect -->
+    <contents href="//@elements.9"/>
+    <contents href="//@elements.4"/>
+  </elements>
+
+  <!-- 4: Reject signalling action -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 5: AddressSwitch with NotPresent/Otherwise and multiple SwitchedAddress entries -->
+  <elements xsi:type="CPL:AddressSwitch" field="To" subField="user">
+    <notPresent>
+      <!-- NotPresent branch leads to a Redirect -->
+      <contents href="//@elements.6"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise branch leads back to main CPL root -->
+      <contents href="//@elements.0"/>
+    </otherwise>
+    <addresses is="sip:bob@example.com" contains="bob" subDomainOf="example.com">
+      <contents href="//@elements.3"/>
+    </addresses>
+    <addresses is="sip:carol@example.org" contains="carol" subDomainOf="example.org">
+      <contents href="//@elements.4"/>
+    </addresses>
+  </elements>
+
+  <!-- 6: Redirect signalling action -->
+  <elements xsi:type="CPL:Redirect" permanent="no"/>
+
+  <!-- 7: TimeSwitch with multiple SwitchedTime configurations -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <notPresent>
+      <!-- route to Reject when time info is not present -->
+      <contents href="//@elements.4"/>
+    </notPresent>
+    <otherwise>
+      <!-- otherwise go to Location -->
+      <contents href="//@elements.3"/>
+    </otherwise>
+    <times dtstart="20240101T080000" dtend="20240101T180000" duration="8h" freq="DAILY"
+           until="20241231T235959" count="10" interval="1" bySecond="0" byMinute="0"
+           byHour="8" byDay="MO,TU,WE,TH,FR" byMonthDay="1,15" byYearDay="100"
+           byWeekNo="10" byMonth="1,2,3" wkst="MO" bySetPos="1">
+      <contents href="//@elements.3"/>
+    </times>
+    <times dtstart="20240101T000000" interval="2" wkst="SU">
+      <contents href="//@elements.6"/>
+    </times>
+  </elements>
+
+  <!-- 8: PrioritySwitch with two SwitchedPriority branches -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <!-- If priority not present, go to Reject -->
+      <contents href="//@elements.4"/>
+    </notPresent>
+    <otherwise>
+      <!-- default: go to AddressSwitch -->
+      <contents href="//@elements.5"/>
+    </otherwise>
+    <priorities less="0.3" greater="" equal="">
+      <contents href="//@elements.3"/>
+    </priorities>
+    <priorities less="" greater="0.7" equal="">
+      <contents href="//@elements.6"/>
+    </priorities>
+  </elements>
+
+  <!-- 9: Additional Location used from several containers -->
+  <elements xsi:type="CPL:Location" url="sip:dave@example.net" priority="0.5" clear="no"/>
+
+</CPL:CPLModel>

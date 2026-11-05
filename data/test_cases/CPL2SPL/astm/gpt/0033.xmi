@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions -->
+    <subActions id="mainAction">
+      <!-- mainAction -> Incoming (7) as entry -->
+      <contents href="//@elements.7"/>
+    </subActions>
+    <subActions id="helperAction">
+      <!-- helperAction -> SubCall (3) -->
+      <contents href="//@elements.3"/>
+    </subActions>
+
+    <!-- Incoming/Outgoing for R3/R4 -->
+    <incoming>
+      <!-- Incoming contents: complex Proxy (4) -->
+      <contents href="//@elements.4"/>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing contents: simple Proxy (5) -->
+      <contents href="//@elements.5"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy (5) and Redirect (6) -->
+  <elements xsi:type="CPL:Location" url="sip:userA@example.com" clear="true">
+    <!-- No nested statements from this location -->
+  </elements>
+
+  <!-- 2: Location used by complex Proxy (4) and Switches -->
+  <elements xsi:type="CPL:Location" url="sip:userB@example.org" clear="false">
+    <!-- This location is nested with a Redirect (6) as its contents -->
+    <contents href="//@elements.6"/>
+  </elements>
+
+  <!-- 3: SubCall (R13) referencing helperAction -->
+  <elements xsi:type="CPL:SubCall" ref="helperAction"/>
+
+  <!-- 4: Complex Proxy (R8 + R9–R12 + R5 via inner Failure) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- Locations for this proxy come from Location 2 -->
+    <busy>
+      <!-- Busy contents: Redirect (6) -->
+      <contents href="//@elements.6"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer contents: SubCall (3) -->
+      <contents href="//@elements.3"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection contents: AddressSwitch (9) -->
+      <contents href="//@elements.9"/>
+    </redirection>
+    <failure>
+      <!-- Failure contents: Reject (8) to exercise empty-statements branch -->
+      <contents href="//@elements.8"/>
+    </failure>
+    <default>
+      <!-- Default contents: StringSwitch (10) -->
+      <contents href="//@elements.10"/>
+    </default>
+  </elements>
+
+  <!-- 5: Simple Proxy (R7) using Location 1 -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+
+  <!-- 6: Redirect (R14), locations from Location 2 -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 7: Incoming with AddressSwitch (9) as contents (R3) -->
+  <elements xsi:type="CPL:Incoming">
+    <contents href="//@elements.9"/>
+  </elements>
+
+  <!-- 8: Reject used inside Failure (4.failure) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 9: AddressSwitch (R15, R17, R18, R6) with one SwitchedAddress and NotPresent -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- SwitchedAddress with contents = simple Proxy (5) -->
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <contents href="//@elements.5"/>
+    </addresses>
+    <!-- NotPresent to trigger NotPresent2ErrorResponse -->
+    <notPresent/>
+    <!-- Otherwise with contents = SubCall (3) -->
+    <otherwise>
+      <contents href="//@elements.3"/>
+    </otherwise>
+  </elements>
+
+  <!-- 10: StringSwitch (R16) -->
+  <elements xsi:type="CPL:StringSwitch" field="callState">
+    <!-- No strings here; just used as a content node -->
+  </elements>
+
+  <!-- 11: Outgoing with Redirect (6) as contents (R4) -->
+  <elements xsi:type="CPL:Outgoing">
+    <contents href="//@elements.6"/>
+  </elements>
+
+  <!-- 12: TimeSwitch (not directly transformed as a statement) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com/utc">
+    <times dtstart="20250101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 13: LanguageSwitch (not directly transformed as a statement) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+  </elements>
+
+  <!-- 14: PrioritySwitch (not directly transformed as a statement) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.8" equal="0.5">
+      <!-- Make this priority case lead to simple Proxy 5 -->
+      <contents href="//@elements.5"/>
+    </priorities>
+  </elements>
+
+</CPL:CPLModel>

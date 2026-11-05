@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cpl:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cpl="http://cpl/1.0">
+  <elements xsi:type="cpl:CPL" subActions="//@elements.1" outgoing="//@elements.2" incoming="//@elements.3"/>
+  <elements xsi:type="cpl:SubAction" id="action1"/>
+  <elements xsi:type="cpl:Outgoing">
+    <contents xsi:type="cpl:AddressSwitch" field="origin">
+      <addresses is="alice@example.com">
+        <contents xsi:type="cpl:Redirect" permanent="false"/>
+        <contents xsi:type="cpl:Location" url="sip:bob@example.com" priority="1" clear="false"/>
+      </addresses>
+      <notPresent>
+        <contents xsi:type="cpl:Reject" status="404" reason="Not Found"/>
+      </notPresent>
+      <otherwise>
+        <contents xsi:type="cpl:SubCall" ref="action1"/>
+      </otherwise>
+    </contents>
+  </elements>
+  <elements xsi:type="cpl:Incoming">
+    <contents xsi:type="cpl:Proxy" recurse="yes" ordering="sequential">
+      <busy>
+        <contents xsi:type="cpl:SubCall" ref="action1"/>
+      </busy>
+      <noAnswer>
+        <contents xsi:type="cpl:Location" url="sip:voicemail@example.com" priority="1" clear="true"/>
+      </noAnswer>
+      <redirection>
+        <contents xsi:type="cpl:Redirect" permanent="true"/>
+      </redirection>
+      <failure>
+        <contents xsi:type="cpl:Reject" status="500" reason="Server Error"/>
+      </failure>
+      <default>
+        <contents xsi:type="cpl:StringSwitch" field="subject">
+          <strings is="urgent" contains="urgent">
+            <contents xsi:type="cpl:Proxy" recurse="yes" ordering="parallel"/>
+          </strings>
+          <strings is="spam" contains="spam">
+            <contents xsi:type="cpl:Reject" status="603" reason="Declined"/>
+          </strings>
+        </contents>
+      </default>
+    </contents>
+  </elements>
+</cpl:CPLModel>

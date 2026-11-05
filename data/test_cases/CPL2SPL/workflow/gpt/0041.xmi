@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction[0] with id 'sa1' and contents a simple Proxy (Location child) -->
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" recurse="r1" ordering="serial">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+        <!-- Location child provides locations for Proxy; triggers Location2URIConstant -->
+        <contents xsi:type="CPL:Location" url="sip:location1" clear="true"/>
+      </contents>
+    </subActions>
+
+    <!-- Incoming[0] with contents a simple Proxy (Location child) -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="r2" ordering="parallel">
+        <!-- simple proxy with Location child, also triggers Location2URIConstant -->
+        <contents xsi:type="CPL:Location" url="sip:incomingLoc" clear="true"/>
+      </contents>
+    </incoming>
+
+    <!-- Outgoing[0] with contents a complex Proxy -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" timeout="t1" recurse="r3" ordering="parallel">
+        <!-- non-simple proxy: has busy, noAnswer, redirection, failure, default -->
+        <busy>
+          <!-- Busy.contents is a SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer.contents is Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection.contents is SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </redirection>
+        <failure>
+          <!-- Failure.contents is Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </failure>
+        <default>
+          <!-- Default.contents is SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: SubCall top-level representing subaction "sa2" -->
+  <elements xsi:type="CPL:SubCall" ref="sa2">
+    <contents xsi:type="CPL:AddressSwitch" field="origin">
+      <!-- AddressSwitch.notPresent with contents SubCall -->
+      <notPresent>
+        <contents xsi:type="CPL:SubCall" ref="sa1"/>
+      </notPresent>
+      <!-- AddressSwitch.otherwise with contents Proxy (simple, Location child) -->
+      <otherwise>
+        <contents xsi:type="CPL:Proxy" recurse="r4" ordering="serial">
+          <contents xsi:type="CPL:Location" url="sip:addrSwitchLoc" clear="true"/>
+        </contents>
+      </otherwise>
+      <!-- One SwitchedAddress with contents SubCall -->
+      <addresses is="addr1" contains="c1" subDomainOf="sd1">
+        <contents xsi:type="CPL:SubCall" ref="sa1"/>
+      </addresses>
+    </contents>
+  </elements>
+
+  <!-- elements[2]: Location top-level (unused by rules but allowed) -->
+  <elements xsi:type="CPL:Location" url="sip:topLevelLoc" clear="true"/>
+
+  <!-- elements[3]: Redirect permanent=false (no locations, to avoid extra Location2URIConstant) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- elements[4]: Redirect permanent=true (no locations) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- elements[5]: Proxy top-level, non-simple, ordering serial
+       Used only to create additional ErrorResponses; its children have no contents -->
+  <elements xsi:type="CPL:Proxy" timeout="t2" recurse="r5" ordering="serial">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- elements[6]: StringSwitch (to exercise R16); field just a name -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField">
+    <strings is="val1" contains="cont1">
+      <!-- contents is Reject, so no statements generated -->
+      <contents xsi:type="CPL:Reject" status="s1" reason="r1"/>
+    </strings>
+  </elements>
+
+  <!-- elements[7]: LanguageSwitch with notPresent (for additional ErrorResponse) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- elements[8]: TimeSwitch with no contents (just to exercise class) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="tz1" tzurl="url1"/>
+
+  <!-- elements[9]: PrioritySwitch with no contents (just to exercise class) -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+</CPL:CPLModel>

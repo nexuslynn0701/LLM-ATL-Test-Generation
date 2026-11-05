@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : main CPL root exercising Incoming, Outgoing, SubActions and Location -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction whose body is a simple Proxy (will use SubAction2Function + Proxy2Return) -->
+    <subActions xsi:type="CPL:SubAction" id="sa_main">
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+
+    <!-- Outgoing using a simple Proxy (Outgoing2Method + Proxy2Return) -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy -->
+      </contents>
+    </outgoing>
+
+    <!-- Incoming using a SubCall to sa_main (Incoming2Method + SubCall2Return) -->
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1] : Location used by simple proxies via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes">
+    <!-- no contents -->
+  </elements>
+
+  <!-- elements[2] : complex Proxy with all cases, used by SubAction in elements[3] -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="no" ordering="sequential">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="sa_complex"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+    </redirection>
+    <failure>
+      <contents xsi:type="CPL:Reject" status="500" reason="Server Error"/>
+    </failure>
+    <default>
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </default>
+  </elements>
+
+  <!-- elements[3] : CPL root for AddressSwitch and complex Proxy SubAction -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction whose body is the complex Proxy (Proxy2Select) -->
+    <subActions xsi:type="CPL:SubAction" id="sa_complex">
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Reject" status="302" reason="Moved Temporarily"/>
+        </redirection>
+        <failure>
+          <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+        </failure>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- AddressSwitch with SwitchedAddress and NotPresent/Otherwise branches -->
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com">
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </addresses>
+        <addresses is="sip:bob@example.org" contains="bob" subDomainOf="example.org">
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="sa_complex"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+
+    <!-- Incoming using Redirect directly -->
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[4] : standalone Redirect to exercise Redirect2Return and OCL28/32/15 -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- elements[5] : standalone Reject (no direct rule, only affects statement selection) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- elements[6] : StringSwitch just to trigger rule R16 -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+  </elements>
+
+</CPL:CPLModel>

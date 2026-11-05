@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL root with both incoming and outgoing methods and subActions -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions referenced by SubCalls -->
+    <subActions id="sa1"/>
+    <subActions id="sa2"/>
+    <subActions id="sa3"/>
+
+    <!-- Incoming method: will use a simple Proxy statement (isSimple = true) -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- locations for this Proxy -->
+        <contents xsi:type="CPL:Location" url="sip:user1@example.com" clear="yes"/>
+      </contents>
+    </incoming>
+
+    <!-- Outgoing method: will use a complex Proxy with all branches -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+        <!-- locations for complex Proxy -->
+        <contents xsi:type="CPL:Location" url="sip:service@example.org" clear="no"/>
+        <busy>
+          <!-- Busy branch delegates to SubCall (via its contents) -->
+          <contents xsi:type="CPL:SubCall" ref="sa2"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer branch uses a Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection branch uses another simple Proxy -->
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <contents xsi:type="CPL:Location" url="sip:backup@example.org" clear="yes"/>
+          </contents>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default branch calls another SubAction -->
+          <contents xsi:type="CPL:SubCall" ref="sa3"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used only by Redirect in element 3 (to test Location.locations) -->
+  <elements xsi:type="CPL:Location" url="sip:redirect-target@example.net" clear="yes"/>
+
+  <!-- 2: AddressSwitch with NotPresent and Otherwise and one SwitchedAddress -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <!-- Contents is a Reject (no nested statements generated) -->
+      <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+    </addresses>
+    <notPresent>
+      <!-- exercise NotPresent2ErrorResponse -->
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise contains a simple Proxy to get nested statements -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="yes"/>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- 3: Redirect whose locations come from top-level Location (element 1) via CPL.locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <!-- no own Location, so helper will use Location from element 1 when computing locations sequence -->
+  </elements>
+
+  <!-- 4: StringSwitch to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <!-- only the field attribute is relevant for the transformation -->
+    <contents xsi:type="CPL:Location" url="sip:switch@example.com" clear="yes"/>
+  </elements>
+
+</CPL:CPLModel>

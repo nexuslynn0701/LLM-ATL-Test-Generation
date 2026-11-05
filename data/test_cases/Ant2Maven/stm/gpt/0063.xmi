@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryManager"
+    basedir="."
+    description="Build, test, and package a simple library"
+    default="buildMain">
+
+  <!-- Properties using different concrete subclasses -->
+  <properties xsi:type="Ant:PropertyValue" name="src.main" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="src.test" value="src/test/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="reports.dir" location="reports"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A standalone TaskDef (unreferenced by any task) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: buildMain -->
+  <targets xmi:id="buildMain" name="buildMain" description="Compile main sources and package jar">
+    <!-- Create output directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/lib"/>
+
+    <!-- Compile main classes (no inExcludes, no classpath) -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+
+    <!-- Package jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/lib/library-manager.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="MANIFEST.MF"/>
+  </targets>
+
+  <!-- Secondary target: cleanAndPrepare -->
+  <targets xmi:id="cleanAndPrepare" name="cleanAndPrepare" description="Clean build artifacts and recreate structure">
+    <!-- Delete old build directory (using only simple attributes) -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           includesfile=""
+           excludesfile=""
+           defaultexcludes="true"/>
+    <!-- Recreate base directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build"/>
+  </targets>
+
+  <!-- Test target: compile tests separately -->
+  <targets xmi:id="compileTests" name="compileTests" description="Compile test sources only">
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="build/test-classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+  </targets>
+
+</Ant:Project>

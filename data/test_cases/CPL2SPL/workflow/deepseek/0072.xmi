@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sub1"/>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <default contents="//@elements.2"/>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="sub1">
+    <contents xsi:type="CPL:Location" url="sip:backup@example.com" priority="2" clear="no"/>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="sub1"/>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com"/>
+    <notPresent/>
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="User-Agent">
+    <strings is="MySoftPhone" contains="MySoft"/>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <noAnswer/>
+        <failure/>
+        <default contents="//@elements.7"/>
+      </contents>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+</CPL:CPLModel>

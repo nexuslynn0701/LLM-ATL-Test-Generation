@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- elements[0]: main CPL root with one SubAction and both incoming & outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- subActions[0] -->
+    <subActions>
+      <!-- contents is a Proxy (non-simple) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- all branches present so Proxy is non-simple; default contents is SubCall -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.1"/>
+      </contents>
+    </subActions>
+    <!-- outgoing[0] -->
+    <outgoing>
+      <!-- contents is a Proxy (simple) using a Location to trigger Location2URIConstant -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no outcome handlers; location child provides URI -->
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:simple@example.com" clear="true"/>
+        </default>
+      </contents>
+    </outgoing>
+    <!-- incoming[0] -->
+    <incoming>
+      <!-- contents is a Redirect using same Location to trigger Location2URIConstant lazily -->
+      <contents xsi:type="CPL:Redirect" permanent="true">
+        <contents xsi:type="CPL:Location" url="sip:redirect@example.com" clear="true"/>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- elements[1]: SubCall referenced from Proxy.default in elements[0] -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[2]: Location top-level to ensure Location2URIConstant is exercised independently -->
+  <elements xsi:type="CPL:Location" url="sip:top@example.com" priority="1" clear="false"/>
+
+  <!-- elements[3]: AddressSwitch with SwitchedAddress and Otherwise, using NotPresent -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- addresses[0] -->
+    <addresses is="addr1" contains="abc" subDomainOf="example.com">
+      <!-- contents is a Proxy (simple) with Location to trigger Location2URIConstant -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:addr1@example.com" clear="true"/>
+        </default>
+      </contents>
+    </addresses>
+    <!-- notPresent -->
+    <notPresent/>
+    <!-- otherwise -->
+    <otherwise>
+      <!-- contents is a Redirect with Location -->
+      <contents xsi:type="CPL:Redirect" permanent="false">
+        <contents xsi:type="CPL:Location" url="sip:otherwise@example.com" clear="true"/>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- elements[4]: Proxy (simple) whose default contents is AddressSwitch in elements[3] -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <default contents="//@elements.3"/>
+  </elements>
+</CPL:CPLModel>

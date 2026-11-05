@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://rootpkg"
+    nsPrefix="rp">
+
+  <!-- 0: Root package classifiers -->
+  <!-- 0: EClass ClassA -->
+  <eClassifiers xsi:type="ecore:EClass" name="ClassA" abstract="false" interface="false">
+    <!-- Attribute with explicit EInt type, id = true, default value, non-unique, unordered -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="idA"
+        ordered="false"
+        unique="false"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        defaultValueLiteral="42"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Attribute with implicit EString type (no eAttributeType set) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="nameA"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        defaultValueLiteral="defaultNameA"/>
+    <!-- Reference to ClassB, containment, with opposite set later on ClassB -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="toB"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 1: EClass ClassB, extends ClassA -->
+  <eClassifiers xsi:type="ecore:EClass" name="ClassB" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- Attribute with explicit EString type and complex default (forces escaping) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="descB"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="A &quot;quoted&quot; value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Reference back to ClassA, non-containment, opposite of ClassA.toB -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="ownerA"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 2: EEnum StatusEnum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+    <eLiterals name="INACTIVE" value="1" literal="INACTIVE"/>
+  </eClassifiers>
+
+  <!-- 3: EEnum PriorityEnum with three literals, used as attribute type -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityEnum">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 4: EClass ClassC, references enums and has its own attrs/refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="ClassC" abstract="true" interface="false">
+    <!-- Attribute typed by PriorityEnum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.3"/>
+    <!-- Attribute without explicit type (falls back to default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="labelC"
+        lowerBound="0"
+        upperBound="-1"/>
+    <!-- Reference to ClassA without opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="linkToA"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 5: Subpackage to exercise subPackages/superPackage equations -->
+  <eSubpackages name="subpkg"
+      nsURI="http://subpkg"
+      nsPrefix="sp">
+    <!-- 0 in subpkg: EClass SubClassD, extends root ClassC -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClassD"
+        eSuperTypes="//@eClassifiers.4">
+      <!-- Attribute with explicit EBoolean type -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="flagD"
+          lowerBound="0"
+          upperBound="1"
+          defaultValueLiteral="true"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      <!-- Reference to root ClassB -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="refToB"
+          lowerBound="1"
+          upperBound="1"
+          containment="false"
+          eType="//@eClassifiers.1"/>
+    </eClassifiers>
+    <!-- 1 in subpkg: EEnum LocalEnum with one literal -->
+    <eClassifiers xsi:type="ecore:EEnum" name="LocalEnum">
+      <eLiterals name="ONLY" value="0" literal="ONLY"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

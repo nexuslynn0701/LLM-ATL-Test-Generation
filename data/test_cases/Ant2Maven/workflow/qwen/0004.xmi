@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullCoverageBuild"
+    basedir="."
+    description="Comprehensive build covering multiple transformation rules"
+    default="main">
+  <properties xsi:type="Ant:PropertyValue" name="build.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customTask" classname="com.example.CustomTask"/>
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="target/classes"
+        debug="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/*Test.java"/>
+      <inExcludes xsi:type="Ant:IncludesFile" name="includes.txt"/>
+      <inExcludes xsi:type="Ant:ExcludesFile" name="excludes.txt"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/app.jar"
+        basedir="target/classes"/>
+    <tasks xsi:type="Ant:Copy"
+        todir="target/dist">
+      <fileset dir="src/resources">
+        <include name="**/*.xml"/>
+        <exclude name="**/*-dev.xml"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0.0"/>
+        <filtersfile file="filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.template" to="*"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="target"/>
+  </targets>
+  <targets xmi:id="main" name="main"/>
+</Ant:Project>

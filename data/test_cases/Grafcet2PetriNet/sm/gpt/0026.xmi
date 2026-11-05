@@ -1,0 +1,47 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexBranchingGrafcet" location="file://model/complexBranching.grafcet">
+    <!-- Elements: Steps and Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="file://model/complexBranching.grafcet#InitStep" isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="ParallelStep1" location="file://model/complexBranching.grafcet#ParallelStep1" isInitial="false" isActive="false" action="handleBranch1"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="ParallelStep2" location="file://model/complexBranching.grafcet#ParallelStep2" isInitial="false" isActive="false" action="handleBranch2"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="MergeStep" location="file://model/complexBranching.grafcet#MergeStep" isInitial="false" isActive="false" action="mergeBranches"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s4" name="LoopStep" location="file://model/complexBranching.grafcet#LoopStep" isInitial="false" isActive="false" action="loopOnCondition"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s5" name="FinalStep" location="file://model/complexBranching.grafcet#FinalStep" isInitial="false" isActive="false" action="terminateSequence"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="InitToParallel" location="file://model/complexBranching.grafcet#InitToParallel" condition="startCommandReceived"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="InitToParallel2" location="file://model/complexBranching.grafcet#InitToParallel2" condition="secondaryStartCondition"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="Branch1ToMerge" location="file://model/complexBranching.grafcet#Branch1ToMerge" condition="branch1Done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" name="Branch2ToMerge" location="file://model/complexBranching.grafcet#Branch2ToMerge" condition="branch2Done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t4" name="MergeToLoop" location="file://model/complexBranching.grafcet#MergeToLoop" condition="mergeCompleted"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t5" name="LoopBack" location="file://model/complexBranching.grafcet#LoopBack" condition="repeatRequested"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t6" name="LoopToFinal" location="file://model/complexBranching.grafcet#LoopToFinal" condition="noMoreRepeats"/>
+
+    <!-- Connections: StepToTransition and TransitionToStep -->
+    <!-- From InitStep to two parallel transitions -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="Init_to_t0" location="file://model/complexBranching.grafcet#Init_to_t0" from="/0/@elements.0" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c1" name="Init_to_t1" location="file://model/complexBranching.grafcet#Init_to_t1" from="/0/@elements.0" to="/0/@elements.7"/>
+
+    <!-- t0 activates ParallelStep1, t1 activates ParallelStep2 -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c2" name="t0_to_ParallelStep1" location="file://model/complexBranching.grafcet#t0_to_ParallelStep1" from="/0/@elements.6" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c3" name="t1_to_ParallelStep2" location="file://model/complexBranching.grafcet#t1_to_ParallelStep2" from="/0/@elements.7" to="/0/@elements.2"/>
+
+    <!-- Branch1 and Branch2 converge into MergeStep through t2 and t3 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c4" name="ParallelStep1_to_t2" location="file://model/complexBranching.grafcet#ParallelStep1_to_t2" from="/0/@elements.1" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c5" name="ParallelStep2_to_t3" location="file://model/complexBranching.grafcet#ParallelStep2_to_t3" from="/0/@elements.2" to="/0/@elements.9"/>
+
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c6" name="t2_to_MergeStep" location="file://model/complexBranching.grafcet#t2_to_MergeStep" from="/0/@elements.8" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c7" name="t3_to_MergeStep" location="file://model/complexBranching.grafcet#t3_to_MergeStep" from="/0/@elements.9" to="/0/@elements.3"/>
+
+    <!-- From MergeStep to LoopStep -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c8" name="MergeStep_to_t4" location="file://model/complexBranching.grafcet#MergeStep_to_t4" from="/0/@elements.3" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c9" name="t4_to_LoopStep" location="file://model/complexBranching.grafcet#t4_to_LoopStep" from="/0/@elements.10" to="/0/@elements.4"/>
+
+    <!-- Loop structure: LoopStep -> t5 -> MergeStep (loop back) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c10" name="LoopStep_to_t5" location="file://model/complexBranching.grafcet#LoopStep_to_t5" from="/0/@elements.4" to="/0/@elements.11"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c11" name="t5_to_MergeStep" location="file://model/complexBranching.grafcet#t5_to_MergeStep" from="/0/@elements.11" to="/0/@elements.3"/>
+
+    <!-- Exit from loop to FinalStep -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c12" name="LoopStep_to_t6" location="file://model/complexBranching.grafcet#LoopStep_to_t6" from="/0/@elements.4" to="/0/@elements.12"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c13" name="t6_to_FinalStep" location="file://model/complexBranching.grafcet#t6_to_FinalStep" from="/0/@elements.12" to="/0/@elements.5"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataProcessing"
+    basedir="/opt/data"
+    description="Data processing pipeline"
+    default="process">
+  <properties xsi:type="Ant:PropertyValue" name="input.dir" value="/data/input"/>
+  <properties xsi:type="Ant:PropertyValue" name="output.dir" value="/data/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="/etc/app/config.xml"/>
+  <properties xsi:type="Ant:PropertyFile" file="/etc/app/default.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customTask" classname="com.example.CustomTask"/>
+  <targets xmi:id="init" name="init" description="Initialize directories">
+    <tasks xsi:type="Ant:Mkdir" dir="/data/input"/>
+    <tasks xsi:type="Ant:Mkdir" dir="/data/output"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="false" deprecation="false"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create JAR archive">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="*.class" excludes="*.java" defaultexcludes="false"/>
+  </targets>
+  <targets xmi:id="process" name="process" description="Main processing target">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main" destdir="target/classes" debug="false" fork="true" optimize="true" deprecation="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/processor.jar" basedir="target/classes" compress="false" encoding="ISO-8859-1" manifest="processor-manifest.mf"/>
+    <tasks xsi:type="Ant:Mkdir" dir="reports"/>
+    <tasks xsi:type="Ant:Delete" dir="temp" verbose="false" quiet="true" failonerror="false" includeEmptyDirs="false" includes="*.tmp" excludes="*.log" defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

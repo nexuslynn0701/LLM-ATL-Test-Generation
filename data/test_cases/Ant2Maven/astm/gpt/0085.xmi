@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntBuild"
+    basedir="project-src"
+    description="Complex Ant build with multiple targets and tasks"
+    default="t_build">
+    
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="conf/build.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A simple task definition, not referenced by tasks (per constraints) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Target 1: default target, various file and compile/documentation tasks -->
+  <targets xmi:id="t_build" name="build" description="Compile, document, and package">
+    <!-- Compile Java sources with includes/excludes -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- Generate API documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.app.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Application API"/>
+
+    <!-- Create output directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/docs/api"/>
+
+    <!-- Copy resources with fileset and filterset -->
+    <tasks xsi:type="Ant:Copy" todir="build/resources" overwrite="true" includeEmptyDirs="false">
+      <fileset dir="src/main/resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/secret/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexAntBuild"/>
+        <filtersfile file="conf/filters.properties"/>
+      </filterset>
+    </tasks>
+
+    <!-- Create distribution JAR -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/complex-ant-build.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="conf/MANIFEST.MF"/>
+
+    <!-- Delete temporary directory -->
+    <tasks xsi:type="Ant:Delete" dir="build/tmp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+  </targets>
+
+  <!-- Target 2: clean target with delete tasks -->
+  <targets xmi:id="t_clean" name="clean" description="Clean all build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+  </targets>
+
+</Ant:Project>

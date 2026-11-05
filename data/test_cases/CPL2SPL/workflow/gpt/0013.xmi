@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL as a top-level element -->
+  <elements xsi:type="CPL:CPL"/>
+
+  <!-- Top-level SubCall with a plain string ref -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- Top-level Location -->
+  <elements xsi:type="CPL:Location" url="sip:top@example.com" clear="true" priority="0.1"/>
+
+  <!-- Top-level Redirect with Location -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:topredir@example.com" clear="true" priority="0.3"/>
+  </elements>
+
+  <!-- Top-level Proxy that encodes the complex structure using contents references -->
+  <elements xsi:type="CPL:Proxy" timeout="t1" recurse="yes" ordering="parallel">
+    <busy>
+      <!-- Busy branch points to the SubCall element (index 1) -->
+      <contents contents="//@elements.1"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer branch points to the SubCall element (index 1) -->
+      <contents contents="//@elements.1"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection branch: Redirect with Location -->
+      <contents contents="//@elements.3"/>
+    </redirection>
+    <failure>
+      <!-- Failure branch: simple Proxy using a Location -->
+      <contents xsi:type="CPL:Proxy" timeout="t2" recurse="no" ordering="serial">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:fail@example.com" clear="true" priority="0.5"/>
+        </default>
+      </contents>
+    </failure>
+    <default>
+      <!-- Default branch: AddressSwitch whose cases call the SubCall (index 1) -->
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="user1@example.com">
+          <contents contents="//@elements.1"/>
+        </addresses>
+        <addresses is="user2@example.com">
+          <contents contents="//@elements.1"/>
+        </addresses>
+        <notPresent>
+          <contents contents="//@elements.1"/>
+        </notPresent>
+        <otherwise>
+          <contents contents="//@elements.1"/>
+        </otherwise>
+      </contents>
+    </default>
+  </elements>
+
+  <!-- Incoming method: Proxy with Location -->
+  <elements xsi:type="CPL:Proxy" timeout="t3" recurse="yes" ordering="parallel">
+    <default>
+      <contents xsi:type="CPL:Location" url="sip:in@example.com" clear="true" priority="0.7"/>
+    </default>
+  </elements>
+
+  <!-- Outgoing method: Redirect with Location -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:Location" url="sip:out@example.com" clear="true" priority="0.9"/>
+  </elements>
+
+</CPL:CPLModel>

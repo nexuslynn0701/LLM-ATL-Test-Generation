@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sub1"/>
+    <subActions id="sub2"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:alice@example.com">
+          <contents xsi:type="CPL:Location" url="sip:bob@example.com" priority="1" clear="yes"/>
+        </addresses>
+        <addresses is="sip:charlie@example.com">
+          <contents xsi:type="CPL:SubCall" ref="sub1"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:SubCall" ref="sub2"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="SIPPhone">
+          <contents xsi:type="CPL:Reject" status="603" reason="Declined"/>
+        </strings>
+        <strings is="SoftPhone">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+            <busy>
+              <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="yes"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Location" url="sip:secretary@example.com" priority="1" clear="yes"/>
+            </noAnswer>
+            <redirection>
+              <contents xsi:type="CPL:Location" url="sip:manager@example.com" priority="1" clear="yes"/>
+            </redirection>
+            <failure>
+              <contents xsi:type="CPL:Location" url="sip:admin@example.com" priority="1" clear="yes"/>
+            </failure>
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:default@example.com" priority="1" clear="yes"/>
+            </default>
+          </contents>
+        </strings>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+</CPL:CPLModel>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryPkg"
+    nsURI="http://example.org/library"
+    nsPrefix="lib">
+
+  <!-- Classifiers index:
+       0: Library (EClass)
+       1: Book (EClass)
+       2: KindOfItem (EClass) - to trigger createSort (ePackage.name != 'ecore')
+       3: Genre (EEnum)
+  -->
+
+  <!-- EClass 0: Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="libraryName"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="books"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- EClass 1: Book -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book">
+    <!-- title attribute, many-valued, non-ID, with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="0"
+        upperBound="-1"
+        iD="false"
+        defaultValueLiteral="Untitled"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- pages attribute, single-valued int, lowerBound 0 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="pages"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- ref to Library, non-containment, opposite of Library.books -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.1"/>
+    <!-- ref to Genre enum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="genre"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- EClass 2: KindOfItem (no features, used to trigger createSort via supertype) -->
+  <eClassifiers xsi:type="ecore:EClass" name="KindOfItem"/>
+
+  <!-- EEnum 3: Genre with two literals -->
+  <eClassifiers xsi:type="eccore:EEnum" name="Genre">
+    <eLiterals name="FICTION" value="0" literal="FICTION"/>
+    <eLiterals name="NON_FICTION" value="1" literal="NON_FICTION"/>
+  </eClassifiers>
+
+</ecore:EPackage>

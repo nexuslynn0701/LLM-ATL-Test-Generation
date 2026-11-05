@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="metamodelA"
+    nsURI="http://example/metamodelA"
+    nsPrefix="mma">
+
+  <!-- Root EPackage (index 0) -->
+  <eSubpackages name="subpkgB" nsURI="http://example/metamodelA/subpkgB" nsPrefix="mmb">
+    <!-- This nested EPackage is index 1 in eClassifiers/eSubpackages order of root:
+         root.eSubpackages[0] == //@eSubpackages.0, but for cross refs to classifiers
+         we only need classifiers paths within same package. -->
+    <eClassifiers xsi:type="ecore:EClass" name="Person">
+      <!-- Attribute with String type, ID, default value -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="name"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1"
+          upperBound="1"
+          defaultValueLiteral="unknown"
+          iD="true"/>
+      <!-- Attribute with Integer type -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="age"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          lowerBound="0"
+          upperBound="1"/>
+      <!-- Reference to Address (classifier 2 in this subpackage), no opposite -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="homeAddress"
+          eType="//@eSubpackages.0/@eClassifiers.2"
+          lowerBound="0"
+          upperBound="1"
+          containment="true"/>
+      <!-- Reference with opposite: employerCompany & employees -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="employerCompany"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.0"
+          lowerBound="0"
+          upperBound="-1"
+          containment="false"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="Company">
+      <!-- Opposite reference back to Person -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="employees"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.3"
+          lowerBound="0"
+          upperBound="-1"
+          containment="false"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="Address">
+      <!-- Attribute with custom EDataType defined in this package (index 3) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="streetCode"
+          eType="//@eSubpackages.0/@eClassifiers.3"
+          lowerBound="0"
+          upperBound="1"
+          defaultValueLiteral="SC-0"/>
+    </eClassifiers>
+
+    <!-- Custom EDataType used by Address.streetCode -->
+    <eClassifiers xsi:type="ecore:EDataType" name="StreetCodeType" instanceTypeName="java.lang.String"/>
+
+    <!-- Enumeration with three literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Status">
+      <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+      <eLiterals name="INACTIVE" value="1" literal="INACTIVE"/>
+      <eLiterals name="PENDING" value="2" literal="PENDING"/>
+    </eClassifiers>
+
+  </eSubpackages>
+
+  <!-- Second EPackage at root level to exercise multiple root packages -->
+  <eSubpackages name="pkgC" nsURI="http://example/metamodelA/pkgC" nsPrefix="mmc">
+    <!-- Single class with an attribute typed by the Status enum in subpkgB -->
+    <eClassifiers xsi:type="ecore:EClass" name="Order">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="status"
+          eType="//@eSubpackages.0/@eClassifiers.4"
+          lowerBound="1"
+          upperBound="1"
+          defaultValueLiteral="ACTIVE"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

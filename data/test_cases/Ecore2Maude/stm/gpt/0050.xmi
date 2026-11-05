@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyPkg"
+    nsURI="http://company/example/0050"
+    nsPrefix="company">
+
+  <!-- 0: EClass Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="subordinates"
+        upperBound="-1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 1: EClass Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="deptName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="head"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 2: abstract EClass ProjectElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="ProjectElement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 3: EClass Project extends ProjectElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tasks"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 4: EClass Task extends ProjectElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignee"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependsOn"
+        upperBound="-1"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 5: EEnum EmploymentType -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmploymentType">
+    <eLiterals name="FULL_TIME" value="0" literal="FULL_TIME"/>
+    <eLiterals name="PART_TIME" value="1" literal="PART_TIME"/>
+    <eLiterals name="CONTRACTOR" value="2" literal="CONTRACTOR"/>
+  </eClassifiers>
+
+  <!-- 6: EClass Contract -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contract">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type"
+        lowerBound="1"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employee"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 7: EDataType Rating (custom) -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Rating"
+      instanceClassName="int"/>
+
+  <!-- 8: EClass PerformanceReview with EAttribute using custom EDataType -->
+  <eClassifiers xsi:type="ecore:EClass" name="PerformanceReview">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="score"
+        lowerBound="1"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="reviewed"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+</ecore:EPackage>

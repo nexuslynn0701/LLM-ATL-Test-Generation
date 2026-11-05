@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainRouting">
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:user@domain.com"/>
+        <addresses contains="company.com"/>
+        <notPresent>
+          <contents xsi:type="CPL:TimeSwitch" tzid="America/New_York" tzurl="http://timezone.example.com">
+            <times dtstart="20240101T090000" dtend="20240101T170000" interval="1" wkst="MO"/>
+            <otherwise>
+              <contents xsi:type="CPL:Location" url="sip:backup@voicemail.com" priority="1" clear="yes"/>
+            </otherwise>
+          </contents>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:StringSwitch" field="subject">
+            <strings is="urgent"/>
+            <strings contains="important"/>
+            <notPresent>
+              <contents xsi:type="CPL:PrioritySwitch">
+                <priorities less="5" greater="1"/>
+                <otherwise>
+                  <contents xsi:type="CPL:LanguageSwitch">
+                    <languages matches="en"/>
+                    <otherwise>
+                      <contents xsi:type="CPL:SubCall" ref="defaultHandler"/>
+                    </otherwise>
+                  </contents>
+                </otherwise>
+              </contents>
+            </notPresent>
+          </contents>
+        </otherwise>
+      </contents>
+    </subActions>
+  </elements>
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+    <busy>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:Redirect" permanent="no"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:Location" url="sip:newlocation@redirect.com" priority="2" clear="yes"/>
+    </redirection>
+    <failure>
+      <contents xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+    </failure>
+    <default contents="//@elements.2"/>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:admin@company.com" priority="3" clear="no"/>
+  <elements xsi:type="CPL:SubCall" ref="emergencyHandler"/>
+  <elements xsi:type="CPL:Redirect" permanent="yes"/>
+</CPL:CPLModel>

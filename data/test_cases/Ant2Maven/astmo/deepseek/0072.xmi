@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataProcessor"
+    basedir="."
+    description="Data processing build">
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/lib"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" optimize="false" deprecation="true"/>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/dataprocessor.jar" basedir="build/classes" compress="true"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="build" failonerror="false"/>
+    <tasks xsi:type="Ant:Delete" file="dist/dataprocessor.jar" quiet="true"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes" debug="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/test-suite.jar" basedir="build/test-classes"/>
+  </targets>
+  <targets xmi:id="docs" name="docs">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="build/docs" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Data Processor API"/>
+  </targets>
+  <targets xmi:id="deploy" name="deploy">
+    <tasks xsi:type="Ant:Copy" file="dist/dataprocessor.jar" todir="/opt/apps/lib" overwrite="true"/>
+    <tasks xsi:type="Ant:Copy" file="config/app.properties" todir="/opt/apps/conf" filtering="true"/>
+  </targets>
+  <targets xmi:id="all" name="all">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" fork="true" debug="true">
+      <inExcludes xsi:type="Ant:Excludes" name="**/*Test.java"/>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/full-build.jar" basedir="build/classes" encoding="UTF-8"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="version" value="2.1.0"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.number" value="42"/>
+  <properties xsi:type="Ant:PropertyLocation" name="home.dir" location="/usr/local/app"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+  <path id="compile.path">
+    <pathElement path="lib/commons.jar" location="lib/commons.jar"/>
+    <pathElement path="lib/log4j.jar" location="lib/log4j.jar"/>
+  </path>
+  <path id="test.path">
+    <pathElement path="lib/junit.jar" location="lib/junit.jar"/>
+  </path>
+</Ant:Project>

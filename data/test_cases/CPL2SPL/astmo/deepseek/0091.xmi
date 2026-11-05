@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1"/>
+    <subActions id="sa2"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="host">
+        <addresses is="192.168.1.100"/>
+        <addresses is="10.0.0.1"/>
+        <notPresent>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+            <busy/>
+            <noAnswer/>
+            <failure/>
+            <default>
+              <contents xsi:type="CPL:SubCall" ref="sa2"/>
+            </default>
+          </contents>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="helperCall"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </redirection>
+    <failure/>
+    <default>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </default>
+  </elements>
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="false"/>
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses is="user1@domain.com"/>
+    <addresses is="user2@domain.com" contains="example"/>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa2"/>
+    </notPresent>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <strings is="urgent"/>
+    <strings is="normal"/>
+    <notPresent/>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:default@backup.com" priority="10" clear="yes"/>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cpL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cpL="http://cpl/1.0">
+  <elements xsi:type="cpL:CPL">
+    <subActions id="forwarding"/>
+    <incoming>
+      <contents xsi:type="cpL:AddressSwitch" field="origin" subField="host">
+        <addresses is="192.168.1.1"/>
+        <notPresent>
+          <contents xsi:type="cpL:Proxy" recurse="no" ordering="sequential">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default contents="//@elements.1"/>
+          </contents>
+        </notPresent>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="cpL:StringSwitch" field="subject">
+        <strings contains="urgent"/>
+        <notPresent>
+          <contents xsi:type="cpL:SubCall" ref="forwarding"/>
+        </notPresent>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="cpL:Location" url="sip:admin@example.com" priority="0" clear="yes"/>
+  <elements xsi:type="cpL:Redirect" permanent="true"/>
+  <elements xsi:type="cpL:Reject" status="503" reason="Service Unavailable"/>
+  <elements xsi:type="cpL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.1"/>
+  </elements>
+  <elements xsi:type="cpL:AddressSwitch" field="destination" subField="user">
+    <addresses is="bob"/>
+    <otherwise>
+      <contents xsi:type="cpL:PrioritySwitch">
+        <priorities greater="5"/>
+      </contents>
+    </otherwise>
+  </elements>
+  <elements xsi:type="cpL:StringSwitch" field="call-id">
+    <strings is="test123"/>
+  </elements>
+  <elements xsi:type="cpL:SubCall" ref="emergency"/>
+</cpL:CPLModel>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL configuration (triggers CPL2Program, Incoming2Method, Outgoing2Method) -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions for SubCall2Return -->
+    <subActions id="saMainSub"/>
+    <subActions id="saSecondary"/>
+
+    <!-- Incoming using simple Proxy as contents (Proxy2Return, Location2URIConstant via location.location) -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- locations for this proxy: will be rootCPL.locations (empty), so ForwardExp uses OclUndefined -->
+      </contents>
+    </incoming>
+
+    <!-- Outgoing using AddressSwitch as contents (AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault) -->
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <!-- SwitchedAddress with simple Proxy contents (Proxy2Return) -->
+        <addresses is="sip:alice@example.com" contains="user" subDomainOf="example.com">
+          <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+            <!-- locations for this proxy come from location element below -->
+          </contents>
+        </addresses>
+        <!-- SwitchedAddress with Redirect contents (Redirect2Return) -->
+        <addresses is="sip:bob@example.com">
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </addresses>
+        <!-- NotPresent and Otherwise (rules R6, R18) with Reject contents (filtered out) -->
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Location providing URI for nested proxies and redirect (Location2URIConstant, locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" clear="yes" priority="1">
+    <!-- This SubCall is the statement for the Location (SubCall2Return) -->
+    <contents xsi:type="CPL:SubCall" ref="saMainSub"/>
+  </elements>
+
+  <!-- Top-level Redirect using same Location (Redirect2Return, Location2URIConstant) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- Top-level SubCall to another SubAction (SubCall2Return, different ref) -->
+  <elements xsi:type="CPL:SubCall" ref="saSecondary"/>
+
+  <!-- Top-level complex Proxy with busy/noAnswer/redirection/failure/default branches (Proxy2Select and Busy/NoAnswer/Redirection/Failure/Default related rules) -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="parallel">
+    <!-- For this Proxy, locations come from the Location element (contents SubCall) above -->
+    <busy>
+      <!-- Busy has Location contents, which is filtered out in Busy2SelectCase -->
+      <contents xsi:type="CPL:Location" url="sip:busy@example.com" clear="no" priority="5"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer has simple Proxy contents (Proxy2Return) -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="sequential"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection has AddressSwitch contents (AddressSwitch2SelectStat) -->
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="sip:redirect@example.org">
+          <!-- Contents is TimeSwitch; its statements are filtered out -->
+          <contents xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org">
+            <times dtstart="20260101T000000Z" interval="1" wkst="MO"/>
+          </contents>
+        </addresses>
+        <notPresent/>
+        <otherwise/>
+      </contents>
+    </redirection>
+    <failure>
+      <!-- Failure triggers Failure2ErrorResponse -->
+    </failure>
+    <default>
+      <!-- Default has StringSwitch contents (StringSwitch2SelectStat) -->
+      <contents xsi:type="CPL:StringSwitch" field="custom-header">
+        <!-- No switched strings; only declaration stat is generated -->
+      </contents>
+    </default>
+  </elements>
+
+  <!-- Top-level StringSwitch with SwitchedString contents (only R16 triggered here) -->
+  <elements xsi:type="CPL:StringSwitch" field="another-field">
+    <strings is="match-text" contains="fragment"/>
+  </elements>
+
+  <!-- Top-level LanguageSwitch to ensure different NodeContainer in contents chains (although filtered in many rules) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+  </elements>
+
+  <!-- Top-level TimeSwitch to exercise SwitchedTime and attribute variety (filtered as statements) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <times dtstart="20260101T080000Z" dtend="20260101T170000Z" duration="PT9H"
+           freq="DAILY" until="20261231T170000Z" count="10" interval="1"
+           bySecond="0" byMinute="0" byHour="8" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1" byYearDay="1" byWeekNo="1" byMonth="1" wkst="MO"
+           bySetPos="1"/>
+  </elements>
+
+  <!-- Top-level PrioritySwitch to show it appears but is filtered out as a statement -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.8" equal="0.5"/>
+  </elements>
+
+</CPL:CPLModel>

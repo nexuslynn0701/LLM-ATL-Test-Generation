@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.com/companyModel"
+    nsPrefix="cm">
+
+  <!-- 0: Primitive alias datatype -->
+  <eClassifiers xsi:type="ecore:EDataType" name="AliasString"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmploymentType">
+    <eLiterals name="FULL_TIME" value="0" literal="FULL_TIME"/>
+    <eLiterals name="PART_TIME" value="1" literal="PART_TIME"/>
+    <eLiterals name="CONTRACTOR" value="2" literal="CONTRACTOR"/>
+  </eClassifiers>
+
+  <!-- 2: Enum with fewer literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ProjectStatus">
+    <eLiterals name="PLANNED" value="0" literal="PLANNED"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="COMPLETED" value="2" literal="COMPLETED"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract base class Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="identifier"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1" upperBound="1" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="//@eClassifiers.0"
+        lowerBound="1" upperBound="1" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0" upperBound="1" unique="true" ordered="true"/>
+  </eClassifiers>
+
+  <!-- 4: Employee extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="employeeId"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1" upperBound="1" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="employmentType"
+        eType="//@eClassifiers.1"
+        lowerBound="1" upperBound="1" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.4"
+        lowerBound="0" upperBound="1" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 5: Contractor extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contractor" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="contractId"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1" upperBound="1" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="hourlyRate"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        lowerBound="0" upperBound="1" unique="true" ordered="true"/>
+  </eClassifiers>
+
+  <!-- 6: Department class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1" upperBound="1" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description"
+        eType="//@eClassifiers.0"
+        lowerBound="0" upperBound="1" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        eType="//@eClassifiers.4"
+        lowerBound="0" upperBound="-1" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="contractors"
+        eType="//@eClassifiers.5"
+        lowerBound="0" upperBound="-1" containment="true" resolveProxies="false"/>
+  </eClassifiers>
+
+  <!-- 7: Project class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="projectId"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1" upperBound="1" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        eType="//@eClassifiers.2"
+        lowerBound="1" upperBound="1" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lead"
+        eType="//@eClassifiers.4"
+        lowerBound="0" upperBound="1" containment="false" resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team"
+        eType="//@eClassifiers.3"
+        lowerBound="0" upperBound="-1" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 8: Company root container -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1" upperBound="1" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+        eType="//@eClassifiers.6"
+        lowerBound="0" upperBound="-1" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+        eType="//@eClassifiers.7"
+        lowerBound="0" upperBound="-1" containment="true" resolveProxies="false"/>
+  </eClassifiers>
+
+  <!-- 9: Operations and parameters on Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="HRUtilities" abstract="false" interface="false">
+    <eOperations name="calculateAnnualCost"
+        ordered="true" unique="true" lowerBound="0" upperBound="1">
+      <eParameters name="emp"
+          ordered="true" unique="true" lowerBound="1" upperBound="1"
+          eType="//@eClassifiers.4"/>
+      <eParameters name="weeks"
+          ordered="true" unique="true" lowerBound="1" upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eType eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

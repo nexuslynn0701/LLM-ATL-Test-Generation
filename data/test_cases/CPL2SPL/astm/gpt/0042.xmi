@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.1"/>
+    <outgoing contents="//@elements.2"/>
+    <incoming contents="//@elements.3"/>
+  </elements>
+
+  <!-- 1: SubAction whose contents is a SubCall (tests SubAction2Function + SubCall2Return) -->
+  <elements xsi:type="CPL:SubAction" id="subA">
+    <contents xsi:type="CPL:SubCall" ref="subB"/>
+  </elements>
+
+  <!-- 2: Outgoing method with simple Proxy as statement (tests Outgoing2Method + Proxy2Return) -->
+  <elements xsi:type="CPL:Outgoing" contents="//@elements.4"/>
+
+  <!-- 3: Incoming method with AddressSwitch as statement (tests Incoming2Method + AddressSwitch2SelectStat + SwitchedAddress2SelectCase + NotPresent2ErrorResponse + Otherwise2SelectDefault) -->
+  <elements xsi:type="CPL:Incoming" contents="//@elements.5"/>
+
+  <!-- 4: Simple Proxy (isSimple = true, due to no child handlers) with Location in root for URI -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- locations come from Location element 6, via locations helper -->
+  </elements>
+
+  <!-- 5: AddressSwitch, complex structure -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="user1" contains="x" subDomainOf="dom1">
+      <!-- SwitchedAddress contents: complex Proxy to test Proxy2Select and Busy/NoAnswer/Redirection/Failure/Default cases -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy contents="//@elements.7"/>
+        <noAnswer contents="//@elements.8"/>
+        <redirection contents="//@elements.9"/>
+        <failure/>
+        <default contents="//@elements.10"/>
+      </contents>
+    </addresses>
+    <!-- NotPresent branch for AddressSwitch (tests NotPresent2ErrorResponse) -->
+    <notPresent/>
+    <!-- Otherwise branch for AddressSwitch (tests Otherwise2SelectDefault) -->
+    <otherwise contents="//@elements.11"/>
+  </elements>
+
+  <!-- 6: Location used by Proxies and Redirect for URIConstant and Locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes">
+    <!-- contents here is another Location (to exercise Location.statement helper returning inner contents) -->
+    <contents xsi:type="CPL:Location" url="sip:inner@example.com" priority="5" clear="no"/>
+  </elements>
+
+  <!-- 7: Reject inside Busy branch (tests Reject as a terminal statement) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 8: TimeSwitch inside NoAnswer branch (no specific SPL rule but tests filtering in statements helpers) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz" >
+    <times dtstart="20250101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 9: Redirect inside Redirection branch (tests Redirect2Return, Location-based contact) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 10: LanguageSwitch inside Default branch (tests filtering in statements helpers) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+  </elements>
+
+  <!-- 11: SubAction referenced by SubCall in element 1 (subB), contents is a PrioritySwitch -->
+  <elements xsi:type="CPL:SubAction" id="subB">
+    <contents xsi:type="CPL:PrioritySwitch">
+      <priorities less="0.3" greater="0.7" equal="0.5">
+        <!-- contents of SwitchedPriority is simple Proxy to test nested Proxy2Return via statement helper -->
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+      </priorities>
+    </contents>
+  </elements>
+
+</CPL:CPLModel>

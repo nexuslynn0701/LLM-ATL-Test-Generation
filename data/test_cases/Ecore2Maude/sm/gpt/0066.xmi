@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.org/companyModel"
+    nsPrefix="cmp">
+
+  <!-- 0: Primitive-like data type for codes -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="CodeType"
+                instanceClassName="java.lang.String"
+                serializable="true"/>
+
+  <!-- 1: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="DeptKind">
+    <eLiterals name="HR" value="0" literal="HR"/>
+    <eLiterals name="ENGINEERING" value="1" literal="ENGINEERING"/>
+    <eLiterals name="SALES" value="2" literal="SALES"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract super class Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 3: Interface Contactable -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contactable" abstract="false" interface="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="email"
+                         lowerBound="0"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 4: Concrete class Employee, subtype of Person and Contactable -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Employee"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.2 //@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="salary"
+                         lowerBound="0"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="manager"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eReferenceType="//@eClassifiers.4">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.4"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 5: Concrete class Contractor, subtype of Person and Contactable -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Contractor"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.2 //@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="hourlyRate"
+                         lowerBound="0"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="0"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 6: Department class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         lowerBound="1"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType" href="#//@eClassifiers.0"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="kind"
+                         lowerBound="1"
+                         upperBound="1">
+      <eType xsi:type="ecore:EEnum" href="#//@eClassifiers.1"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="employees"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="false"
+                         eReferenceType="//@eClassifiers.4">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.4"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="contractors"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="false"
+                         eReferenceType="//@eClassifiers.5">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.5"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 7: Project class with bidirectional reference to Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="leadDepartment"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eReferenceType="//@eClassifiers.6">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.6"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+</ecore:EPackage>

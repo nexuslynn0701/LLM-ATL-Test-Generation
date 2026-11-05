@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="testpkg"
+    nsURI="http://example.org/testpkg"
+    nsPrefix="tp">
+
+  <!-- 0: Root EClass with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootA">
+    <!-- Attribute with explicit EString type, iD, default value, non-default bounds -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="idAttr"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="root-id"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute with Boolean type and no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="flagAttr"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Attribute with Int type and default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="countAttr"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        defaultValueLiteral="5"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference to ChildB, containment, single-valued, with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="mainChild"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+    <!-- Non-containment, many reference to LeafC -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="otherLeaves"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 1: Child class, extends RootA, contains opposite reference and its own attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="ChildB">
+    <!-- Supertype: RootA -->
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+    <!-- Opposite side of mainChild -->
+    <eStructuralFeatures xsi:type="eccore:EReference"
+        name="parent"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.3"/>
+    <!-- Reference with upperBound="*" (-1) to LeafC, non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="allLeaves"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.2"/>
+    <!-- Attribute without explicit eType (will be treated as NoType) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="untypeAttr"
+        ordered="false"
+        unique="false"
+        lowerBound="0"
+        upperBound="1"/>
+  </eClassifiers>
+
+  <!-- 2: Leaf class, no supertypes, attributes with various primitive types -->
+  <eClassifiers xsi:type="ecore:EClass" name="LeafC">
+    <!-- EString attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="nameAttr"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="leaf-name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- EInt attribute, many-valued -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="valuesAttr"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- EBooleanObject attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="enabledAttr"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+  </eClassifiers>
+
+  <!-- 3: Simple EDataType -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ExtraType"/>
+
+  <!-- 4: Enumeration with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ColorEnum">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+    <eLiterals name="BLUE" value="2" literal="BLUE"/>
+  </eClassifiers>
+
+  <!-- 5: EClass using the enum type in attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="ColoredItem">
+    <!-- Enum-typed attribute, single-valued, with default literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="mainColor"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="RED"
+        eType="//@eClassifiers.4"/>
+    <!-- Enum-typed attribute, many-valued, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="allColors"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+</ecore:EPackage>

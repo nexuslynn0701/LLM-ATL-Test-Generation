@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuildPipeline"
+    basedir="workspace"
+    description="End-to-end build, test and packaging pipeline"
+    default="buildTarget">
+
+  <!-- Properties to exercise all Ant Property variants -->
+  <properties xsi:type="Ant:PropertyValue" name="java.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="workspace/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Standalone task definition (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple task kinds -->
+  <targets xmi:id="buildTarget" name="build">
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/target/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src/main/java"
+           destdir="workspace/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/target/fullbuild.jar"
+           basedir="workspace/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="workspace/META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Secondary target with Delete to clean build artifacts -->
+  <targets xmi:id="cleanTarget" name="clean">
+    <tasks xsi:type="Ant:Delete"
+           dir="workspace/target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes="**/.keep"
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Auxiliary target using Javadoc and Tstamp -->
+  <targets xmi:id="docsTarget" name="generate-docs">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd'T'HH:mm:ss"
+              offset="0"
+              unit="hour"
+              locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="workspace/src/main/java"
+           destdir="workspace/target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="FullBuild API Documentation"/>
+  </targets>
+
+</Ant:Project>

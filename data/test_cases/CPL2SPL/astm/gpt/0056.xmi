@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL element to trigger CPL2Program -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions to trigger SubAction2Function and SubCall2Return -->
+    <subActions xsi:type="CPL:SubAction" id="actSimple">
+      <!-- Simple Proxy as contents -> Proxy2Return (isSimple = true) -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- No child branches => isSimple = true -->
+      </contents>
+    </subActions>
+
+    <subActions xsi:type="CPL:SubAction" id="actComplex">
+      <!-- Complex Proxy as contents -> Proxy2Select (isSimple = false) -->
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+        <!-- Make proxy complex by adding all branches -->
+        <busy>
+          <!-- Busy has contents = Redirect to exercise Busy2SelectCase + Redirect2Return -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer has contents = SubCall to actSimple -->
+          <contents xsi:type="CPL:SubCall" ref="actSimple"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection has contents = Reject -->
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+        </redirection>
+        <failure>
+          <!-- Failure with contents = Location (will be ignored as statement, but Failure2ErrorResponse used via top-level Failure) -->
+          <contents xsi:type="CPL:Location" url="sip:fail@example.com" clear="yes"/>
+        </failure>
+        <default>
+          <!-- Default has contents = TimeSwitch to be ignored as statement but Default2SelectDefault executed -->
+          <contents xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org">
+            <times dtstart="20250101T000000Z" interval="15" wkst="MO"/>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Incoming and Outgoing to trigger Incoming2Method and Outgoing2Method -->
+    <incoming>
+      <!-- contents = SubCall, which will trigger SubCall2Return -->
+      <contents xsi:type="CPL:SubCall" ref="actComplex"/>
+    </incoming>
+
+    <outgoing>
+      <!-- contents = Proxy (simple) to be used as statement in Outgoing2Method -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+    </outgoing>
+  </elements>
+
+  <!-- Top-level Location for Proxy and Redirect location resolution & Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" priority="1" clear="true"/>
+
+  <!-- Top-level Redirect (with location via locations helper) to trigger Redirect2Return -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- Top-level SubCall to actSimple to trigger another SubCall2Return -->
+  <elements xsi:type="CPL:SubCall" ref="actSimple"/>
+
+  <!-- Top-level AddressSwitch to trigger AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- One switched address, with contents = Proxy (complex) to exercise nested Proxy2Select -->
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- Make this proxy complex as well -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </addresses>
+    <!-- notPresent and otherwise branches -->
+    <notPresent>
+      <!-- contents left undefined to test empty case handling; NotPresent2ErrorResponse triggered -->
+    </notPresent>
+    <otherwise>
+      <!-- contents = SubCall to actComplex, will be transformed via SubCall2Return and used by Otherwise2SelectDefault -->
+      <contents xsi:type="CPL:SubCall" ref="actComplex"/>
+    </otherwise>
+  </elements>
+
+  <!-- Top-level StringSwitch to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents xsi:type="CPL:Location" url="sip:string@example.com" clear="no"/>
+  </elements>
+
+  <!-- Top-level LanguageSwitch to be used as contents in various places (ignored as statement) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en-US"/>
+  </elements>
+
+  <!-- Top-level TimeSwitch (already used above inside default of actComplex) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.paris.example.org">
+    <times dtstart="20250101T080000Z" interval="30" wkst="MO"/>
+  </elements>
+
+  <!-- Top-level PrioritySwitch (not directly transformed, but participates via contents checks) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.2" equal="0.5" greater="0.8"/>
+  </elements>
+
+</CPL:CPLModel>

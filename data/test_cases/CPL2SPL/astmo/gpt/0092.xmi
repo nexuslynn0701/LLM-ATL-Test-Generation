@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions -->
+    <subActions id="saA">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- non‑simple proxy (has busy/noAnswer/redirection/failure/default) -->
+        <busy>
+          <contents xsi:type="CPL:SubCall"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall"/>
+        </redirection>
+        <failure>
+          <contents xsi:type="CPL:Reject" status="403" reason="forbidden"/>
+        </failure>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <addresses is="userA" contains="x" subDomainOf="domA">
+              <contents xsi:type="CPL:SubCall"/>
+            </addresses>
+            <addresses is="userB" contains="y" subDomainOf="domB">
+              <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+                <!-- simple proxy -->
+              </contents>
+            </addresses>
+            <notPresent>
+              <contents xsi:type="CPL:Reject" status="404" reason="not_found"/>
+            </notPresent>
+            <otherwise>
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+
+    <subActions id="saB">
+      <contents xsi:type="CPL:SubCall"/>
+    </subActions>
+
+    <!-- Incoming and Outgoing -->
+    <outgoing/>
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <!-- simple proxy used inside Incoming (also to trigger R7) -->
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- Top‑level SubActions (targets for SubCall.ref) -->
+  <elements xsi:type="CPL:SubAction" id="mainSub">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <!-- non‑simple proxy to exercise R8/R24/R25/R26/R33 -->
+      <busy>
+        <contents xsi:type="CPL:SubCall"/>
+      </busy>
+      <noAnswer>
+        <contents xsi:type="CPL:Redirect" permanent="true"/>
+      </noAnswer>
+      <redirection>
+        <contents xsi:type="CPL:SubCall"/>
+      </redirection>
+      <failure/>
+      <default>
+        <contents xsi:type="CPL:SubCall"/>
+      </default>
+    </contents>
+  </elements>
+
+  <elements xsi:type="CPL:SubAction" id="auxSub">
+    <contents xsi:type="CPL:AddressSwitch" field="destination">
+      <addresses is="dest1" contains="a" subDomainOf="dom1">
+        <contents xsi:type="CPL:Redirect" permanent="false"/>
+      </addresses>
+      <notPresent>
+        <contents xsi:type="CPL:SubCall"/>
+      </notPresent>
+      <otherwise>
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+          <!-- simple proxy -->
+        </contents>
+      </otherwise>
+    </contents>
+  </elements>
+
+  <!-- Locations for proxies and redirects (used by Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:userA@example.com" clear="yes"/>
+  <elements xsi:type="CPL:Location" url="sip:userB@example.org" clear="no"/>
+
+  <!-- SubCalls referring to SubActions by string id -->
+  <elements xsi:type="CPL:SubCall" ref="mainSub"/>
+  <elements xsi:type="CPL:SubCall" ref="auxSub"/>
+
+  <!-- Redirects (one permanent, one temporary) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+</CPL:CPLModel>

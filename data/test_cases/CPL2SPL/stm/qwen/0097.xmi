@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainSub">
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="user@example.com"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:StringSwitch" field="subject">
+            <strings contains="meeting"/>
+            <otherwise>
+              <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential" timeout="30">
+                <busy>
+                  <contents xsi:type="CPL:Location" url="sip:busy@example.com" clear="true" priority="medium"/>
+                </busy>
+                <noAnswer>
+                  <contents xsi:type="CPL:Redirect" permanent="true"/>
+                </noAnswer>
+                <default contents="//@elements.1"/>
+              </Proxy>
+            </otherwise>
+          </StringSwitch>
+        </otherwise>
+      </AddressSwitch>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" tzid="UTC">
+        <times dtstart="20240101T090000Z" interval="1" wkst="MO"/>
+        <otherwise>
+          <contents xsi:type="CPL:LanguageSwitch">
+            <languages matches="en"/>
+            <otherwise>
+              <contents xsi:type="CPL:PrioritySwitch">
+                <priorities greater="5"/>
+                <otherwise>
+                  <contents xsi:type="CPL:Location" url="sip:fallback@example.com" clear="false" priority="low"/>
+                </otherwise>
+              </PrioritySwitch>
+            </otherwise>
+          </LanguageSwitch>
+        </otherwise>
+      </TimeSwitch>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:default@example.com" clear="true" priority="high"/>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction"/>
+</CPL:CPLModel>

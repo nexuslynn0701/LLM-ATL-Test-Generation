@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cpml:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <incoming/>
+    <outgoing/>
+    <subActions id="checkNetwork"/>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="checkNetwork"/>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <busy>
+      <contents xsi:type="CPL:Redirection"/>
+    </busy>
+    <noAnswer/>
+    <default>
+      <contents xsi:type="CPL:Failure"/>
+    </default>
+  </elements>
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="sip:alice@example.com"/>
+    <notPresent/>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <redirection/>
+        <default/>
+      </contents>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="user-agent">
+    <strings is="CustomClient"/>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" tzid="America/New_York">
+    <times dtstart="20250101T000000" interval="1" wkst="MO"/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="3"/>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:backup@voip.com" clear="yes"/>
+</cpml:CPLModel>

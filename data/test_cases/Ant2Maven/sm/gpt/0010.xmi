@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="."
+    description="Build, test, and package a small library."
+    default="build-main">
+
+  <!-- Default build target: compile sources, prepare build dir, package jar -->
+  <targets xmi:id="build-main" name="build-main" description="Compile and package the main artifact">
+    <tasks xsi:type="Ant:Mkdir" dir="out/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="out/classes" debug="true" optimize="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="out/lib/library-main.jar" basedir="out/classes" compress="true"/>
+  </targets>
+
+  <!-- Separate test target with its own lifecycle -->
+  <targets xmi:id="run-tests" name="run-tests" description="Compile test sources and execute test jar">
+    <tasks xsi:type="Ant:Mkdir" dir="out/test-classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="out/test-classes" debug="false" optimize="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="out/lib/library-tests.jar" basedir="out/test-classes" compress="false" encoding="UTF-8"/>
+    <tasks xsi:type="Ant:Delete" dir="out/temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+  </targets>
+
+  <!-- Cleanup target to remove all generated artifacts -->
+  <targets xmi:id="clean-all" name="clean-all" description="Clean all build outputs">
+    <tasks xsi:type="Ant:Delete" dir="out" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" defaultexcludes="false"/>
+  </targets>
+
+</Ant:Project>

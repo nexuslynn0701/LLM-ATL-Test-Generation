@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-root"
+    description="Ant project with multiple targets and tasks for Ant2Maven testing"
+    default="build-main">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by tasks, per safety rules) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/app-main.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/dist"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile="config/includes.txt"
+           excludes="**/*.keep"
+           excludesfile="config/excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <targets xmi:id="build-docs" name="build-docs" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Project API"/>
+  </targets>
+
+  <targets xmi:id="prepare-resources" name="prepare-resources" description="Prepare resources">
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/resources"/>
+    <tasks xsi:type="Ant:Copy"
+           file="src/main/resources/application.properties"
+           presservelastmodified="true"
+           tofile="target/resources/application.properties"
+           todir="target/resources"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+  </targets>
+
+</Ant:Project>

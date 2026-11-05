@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="src"
+    description="Build and package shared library"
+    default="main">
+  <!-- Properties: all four concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="build.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition (not referenced by tasks) -->
+  <taskdef name="custom.buildstep" classname="com.example.ant.CustomBuildStep"/>
+
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="main" name="main">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="target/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/library.jar"
+        basedir="target/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+        id="mkdir-output"
+        taskname="mkdir"
+        description="Create output directory"
+        dir="target/output"/>
+    <tasks xsi:type="Ant:Delete"
+        id="cleanup-temp"
+        taskname="delete"
+        description="Remove temporary files"
+        dir="target/tmp"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="false"
+        includes="**/*.tmp"
+        includesfile="config/includes.txt"
+        excludes="**/keep/**"
+        excludesfile="config/excludes.txt"
+        defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Javadoc"
+        id="api-docs"
+        taskname="javadoc"
+        description="Generate API documentation"
+        sourcepath="src/main/java"
+        destdir="target/apidocs"
+        packagenames="com.example.library.*"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Library API"/>
+  </targets>
+
+  <!-- Secondary target with a different task mix -->
+  <targets xmi:id="prepare" name="prepare">
+    <tasks xsi:type="Ant:Mkdir"
+        id="mkdir-temp"
+        taskname="mkdir"
+        description="Create temporary directory"
+        dir="target/tmp"/>
+    <tasks xsi:type="Ant:Delete"
+        id="delete-old-jar"
+        taskname="delete"
+        description="Delete previous jar artifact"
+        file="target/old-library.jar"
+        verbose="false"
+        quiet="true"
+        failonerror="false"
+        includeEmptyDirs="false"
+        defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/library-sources.jar"
+        basedir="src/main/java"
+        compress="false"
+        encoding="UTF-8"
+        manifest="META-INF/SOURCES.MF"/>
+  </targets>
+</Ant:Project>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainRules"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:alice@example.com"/>
+        <notPresent>
+          <contents xsi:type="CPL:StringSwitch" field="subject">
+            <strings contains="urgent"/>
+            <otherwise>
+              <contents xsi:type="CPL:LanguageSwitch">
+                <languages matches="en"/>
+                <otherwise>
+                  <contents xsi:type="CPL:TimeSwitch" dtstart="20250101T090000" dtend="20250101T170000" duration="PT8H" interval="1" wkst="MO"/>
+                </otherwise>
+              </contents>
+            </otherwise>
+          </contents>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:PrioritySwitch">
+            <priorities less="5"/>
+            <priorities greater="3"/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" dtstart="20250101T080000" interval="1" wkst="MO"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="voicemailHandler"/>
+  <elements xsi:type="CPL:Location" url="sip:secretary@example.com" priority="1" clear="yes"/>
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+    <busy>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:Location" url="sip:backup@example.com" priority="2" clear="no"/>
+    </redirection>
+    <failure>
+      <contents xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+    </failure>
+    <default contents="//@elements.1"/>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+  <elements xsi:type="CPL:AddressSwitch" field="destination" subField="user">
+    <addresses is="sip:bob@example.com" contains="bob"/>
+    <addresses subDomainOf="example.com"/>
+    <notPresent>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities equal="5"/>
+      </contents>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="defaultRouting"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="caller-id">
+    <strings is="+1234567890"/>
+    <strings contains="anonymous"/>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:assistant@example.com" priority="3" clear="no"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="fr"/>
+    <languages matches="de"/>
+    <notPresent>
+      <contents xsi:type="CPL:TimeSwitch" dtstart="20250101T000000" interval="2" wkst="MO"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" tzid="America/New_York" dtstart="20250101T000000" interval="1" wkst="SU" byDay="MO,TU,WE,TH,FR" byHour="9,17">
+    <times dtstart="20250101T090000" dtend="20250101T120000" duration="PT3H" interval="1" wkst="MO"/>
+    <times dtstart="20250101T130000" duration="PT4H" interval="1" wkst="MO" byDay="MO,WE,FR"/>
+    <notPresent>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <default contents="//@elements.9"/>
+      </contents>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="businessHoursHandler"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="3" greater="7"/>
+    <priorities equal="5"/>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:manager@example.com" priority="4" clear="yes"/>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

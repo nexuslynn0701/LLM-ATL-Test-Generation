@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <!-- elements[0]: Root CPL with one SubAction, one Outgoing, one Incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction sa1 contains a simple Proxy pSimple -->
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" recurse="r1" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+    <!-- Outgoing o1 contains complex Proxy pComplex -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="r2" ordering="serial">
+        <busy>
+          <!-- Busy contains SubCall scBusy -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </outgoing>
+    <!-- Incoming i1 contains Reject (no statements generated) -->
+    <incoming>
+      <contents xsi:type="CPL:Reject" status="s1" reason="r1"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1]: Location loc1 (used by simple Proxy pSimple via locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:user1@example.com" priority="1" clear="true"/>
+
+  <!-- elements[2]: Location loc2 (used by Redirect red1 via locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:user2@example.com" priority="2" clear="false"/>
+
+  <!-- elements[3]: AddressSwitch as1 with one SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="subF">
+    <!-- SwitchedAddress saAddr1 containing simple Proxy pSimple2 -->
+    <addresses is="addr1" contains="c1" subDomainOf="sd1">
+      <contents xsi:type="CPL:Proxy" recurse="r3" ordering="parallel">
+        <!-- simple proxy without locations: Location2URIConstant will yield OclUndefined -->
+      </contents>
+    </addresses>
+    <!-- NotPresent np1 containing SubCall scNP -->
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </notPresent>
+    <!-- Otherwise ow1 containing Redirect red1 -->
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[4]: SubCall scTop referring to SubAction sa1 -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[5]: Redirect redTop (independent of switches), uses loc2 via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- elements[6]: StringSwitch (no contents used as statements anywhere) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField">
+    <strings is="match1" contains="cont1"/>
+  </elements>
+
+  <!-- elements[7]: LanguageSwitch (only to trigger NotPresent2ErrorResponse via notPresent) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- elements[8]: TimeSwitch (no contents, just to vary structure) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="tz1" tzurl="url1">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- elements[9]: PrioritySwitch (no contents, just to vary structure) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="1" greater="2" equal="3"/>
+  </elements>
+</CPL:CPLModel>

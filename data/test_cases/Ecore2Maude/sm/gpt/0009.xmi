@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryModel"
+    nsURI="http://example.org/libraryModel"
+    nsPrefix="lib">
+
+  <!-- 0: Primitive-like data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ISBN" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum defining possible roles -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RoleKind">
+    <eLiterals name="ADMIN" value="0" literal="ADMIN"/>
+    <eLiterals name="LIBRARIAN" value="1" literal="LIBRARIAN"/>
+    <eLiterals name="MEMBER" value="2" literal="MEMBER"/>
+  </eClassifiers>
+
+  <!-- 2: Enum defining loan status -->
+  <eClassifiers xsi:type="ecore:EEnum" name="LoanStatus">
+    <eLiterals name="OPEN" value="0" literal="OPEN"/>
+    <eLiterals name="CLOSED" value="1" literal="CLOSED"/>
+    <eLiterals name="OVERDUE" value="2" literal="OVERDUE"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract base class for all people -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullName" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: User extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="User" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role" lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="loans" upperBound="-1"
+        containment="false" eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 5: Staff extends User -->
+  <eClassifiers xsi:type="ecore:EClass" name="Staff" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="employeeNumber" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 6: Member extends User -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="memberSince" lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+  </eClassifiers>
+
+  <!-- 7: Book class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isbn" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pages" lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="loans" upperBound="-1"
+        containment="false" eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 8: Loan class with opposite references to User and Book -->
+  <eClassifiers xsi:type="ecore:EClass" name="Loan" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status" lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="days" lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="user" lowerBound="1"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="book" lowerBound="1"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 9: Library aggregates books, users, and loans -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books" upperBound="-1"
+        containment="true" eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="users" upperBound="-1"
+        containment="true" eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="loans" upperBound="-1"
+        containment="true" eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 10: TechnicalBook extends Book -->
+  <eClassifiers xsi:type="ecore:EClass" name="TechnicalBook" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.7">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="field" lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 11: Novel extends Book -->
+  <eClassifiers xsi:type="ecore:EClass" name="Novel" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.7">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="genre" lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 12: Map entry classifier for configuration -->
+  <eClassifiers xsi:type="ecore:EClass" name="StringToString" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 13: Root configuration package referencing Library and entries -->
+  <eClassifiers xsi:type="ecore:EClass" name="LibrarySystem" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library" lowerBound="1"
+        containment="true" eType="//@eClassifiers.9"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="properties" upperBound="-1"
+        containment="true" eType="//@eClassifiers.12"/>
+  </eClassifiers>
+
+  <!-- Root instance content as an example model -->
+  <eSubpackages name="instances" nsURI="http://example.org/libraryModel/instances" nsPrefix="libinst">
+    <!-- Instance classifiers are not needed; we use the existing meta-classes. This subpackage is only here to diversify structure. -->
+  </eSubpackages>
+
+</ecore:EPackage>

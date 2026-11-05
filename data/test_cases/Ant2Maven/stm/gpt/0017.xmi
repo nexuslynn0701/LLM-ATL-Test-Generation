@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Project with multiple targets and various predefined tasks"
+    default="buildTarget">
+
+  <!-- Properties using different concrete subclasses -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="config"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Unused TaskDef (allowed but not referenced) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default build target -->
+  <targets xmi:id="buildTarget" name="build" description="Compile, jar and clean intermediate files">
+    <!-- Ensure output directories exist -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/lib"/>
+
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="on"
+           fork="off"
+           optimize="on"
+           deprecation="off"/>
+
+    <!-- Package as JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/lib/app-core.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Remove temporary directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="includes.txt"
+           excludes="**/*.bak"
+           excludesfile="excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target exercising documentation task -->
+  <targets xmi:id="docTarget" name="doc" description="Generate project documentation">
+    <!-- Make docs directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/docs"/>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API Documentation"/>
+  </targets>
+
+</Ant:Project>

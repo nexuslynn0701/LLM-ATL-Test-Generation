@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="workspace"
+    description="Ant project for ATL Ant2Maven testing"
+    default="build-main">
+
+  <!-- Properties of all supported kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="ComplexAntProject"/>
+  <properties xsi:type="Ant:PropertyLocation" name="src.dir" location="workspace/src"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/project.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A standalone task definition (not referenced by tasks) -->
+  <taskdef name="custom.task" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target with several supported tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src"
+           destdir="workspace/bin"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/dist/complex-project.jar"
+           basedir="workspace/bin"
+           compress="true"
+           encoding="UTF-8"
+           manifest="workspace/dist/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="workspace/dist"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="workspace/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile="workspace/config/includes.txt"
+           excludes="**/*.log"
+           excludesfile="workspace/config/excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target to increase rule coverage -->
+  <targets xmi:id="docs" name="docs" description="Generate project documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="workspace/src"
+           destdir="workspace/docs/api"
+           packagenames="org.example.*,org.test.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntProject API"/>
+  </targets>
+
+</Ant:Project>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:alice@example.com" contains="alice"/>
+        <addresses is="sip:bob@example.com" contains="bob"/>
+        <notPresent>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:support@example.com" clear="YES"/>
+        </otherwise>
+      </contents>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:TimeSwitch" tzid="America/New_York" tzurl="http://tzurl.org">
+        <times dtstart="20240101T090000" dtend="20240101T170000" interval="1" wkst="MO"/>
+        <times dtstart="20240102T090000" duration="PT8H" interval="1" wkst="TU"/>
+        <notPresent>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="serial">
+            <busy/>
+            <noAnswer/>
+            <default contents="//@elements.3"/>
+          </contents>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="486" reason="Outside business hours"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings contains="urgent"/>
+        <strings is="meeting"/>
+        <notPresent>
+          <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="NO"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:PrioritySwitch">
+            <priorities less="3" greater="7" equal="5"/>
+            <notPresent>
+              <contents xsi:type="CPL:SubCall" ref="mainAction"/>
+            </notPresent>
+            <otherwise>
+              <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+                <default contents="//@elements.5"/>
+              </contents>
+            </otherwise>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="mainAction"/>
+  <elements xsi:type="CPL:Location" url="sip:proxy@example.com" clear="YES"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="serial">
+    <busy contents="//@elements.6"/>
+    <noAnswer contents="//@elements.6"/>
+    <default contents="//@elements.6"/>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="fr"/>
+    <notPresent>
+      <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="YES"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="mainAction"/>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

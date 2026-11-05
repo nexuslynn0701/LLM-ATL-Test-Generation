@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuild"
+    basedir="workspace/fullbuild"
+    description="End-to-end build with compilation, docs, packaging and cleanup"
+    default="buildTarget">
+
+  <!-- Properties to exercise all AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="java.version" value="17"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A standalone TaskDef (not referenced by tasks) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with many different tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="workspace/fullbuild/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/*Test.java"/>
+    </tasks>
+
+    <!-- Generate Javadocs -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="workspace/fullbuild/target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="FullBuild API"/>
+
+    <!-- Package as JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/fullbuild/target/fullbuild.jar"
+           basedir="workspace/fullbuild/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Create and clean directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/fullbuild/target/temp"/>
+    <tasks xsi:type="Ant:Delete" dir="workspace/fullbuild/target/temp" verbose="true"/>
+
+    <!-- Copy resources with filters, fileset, mapper -->
+    <tasks xsi:type="Ant:Copy"
+           todir="workspace/fullbuild/target/resources"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.*"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/*.bak"/>
+        </patternset>
+        <include name="config/**"/>
+        <exclude name="temp/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="projectName" value="FullBuild"/>
+        <filter token="env" value="prod"/>
+        <filtersfile file="config/extra-filters.properties"/>
+      </filterset>
+      <mapper type="glob"
+              classname="org.example.ant.CustomMapper"
+              classpath="lib/custom-mapper.jar"
+              classpathref=""
+              from="*.template"
+              to="*.cfg"/>
+    </tasks>
+  </targets>
+
+  <!-- Secondary target for testing transformation of additional tasks -->
+  <targets xmi:id="docsTarget" name="docs">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="workspace/fullbuild/target/site/manual"
+           packagenames="com.example.manual.*"
+           defaultexcludes="false"
+           author="false"
+           version="false"
+           use="false"
+           windowtitle="FullBuild Manual"/>
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/fullbuild/target/site/manual/assets"/>
+    <tasks xsi:type="Ant:Delete" file="workspace/fullbuild/target/old-docs.zip" quiet="true"/>
+  </targets>
+
+  <!-- Path with nested PathElement and FileSet to exercise path-related rules -->
+  <path id="compile.path">
+    <pathElement path="lib/core-lib.jar" location="lib"/>
+    <pathElement path="lib/util-lib.jar" location="lib"/>
+    <fileset dir="lib/optional">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+      </patternset>
+      <include name="extras/**"/>
+      <exclude name="sources/**"/>
+    </fileset>
+  </path>
+
+</Ant:Project>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="blog"
+    nsURI="http://example.org/blog"
+    nsPrefix="blog">
+
+  <!-- Classifiers order is important for index-based references -->
+  <!-- 0: Blog -->
+  <!-- 1: Post -->
+  <!-- 2: Comment -->
+  <!-- 3: EString (local data type) -->
+  <!-- 4: Rating (enum) -->
+
+  <!-- Blog class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Blog">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="posts"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Post class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Post">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="content"
+        eType="//@eClassifiers.3"
+        lowerBound="0"
+        upperBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="rating"
+        eType="//@eClassifiers.4"
+        lowerBound="0"
+        upperBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="blog"
+        eType="//@eClassifiers.0"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="comments"
+        eType="//@eClassifiers.2"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Comment class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Comment">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="text"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="likes"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0"
+        upperBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="post"
+        eType="//@eClassifiers.1"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Local string datatype to trigger attDataType() non-primitive branch -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="LocalString"
+      instanceClassName="java.lang.String"/>
+
+  <!-- Rating enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Rating">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+</ecore:EPackage>

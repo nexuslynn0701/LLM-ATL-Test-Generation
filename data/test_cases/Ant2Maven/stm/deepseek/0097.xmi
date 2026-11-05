@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildApplication"
+    description="Main build project"
+    basedir="."
+    default="deploy">
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Copy" todir="target/classes/resources" flatten="true" includeEmptyDirs="false"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run unit tests" ifCondition="run.tests">
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="target/test-classes" debug="true"/>
+    <tasks xsi:type="Ant:Delete" dir="target/test-reports" failonerror="false"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create distribution archive">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app-1.0.jar" basedir="target/classes" compress="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist/docs"/>
+  </targets>
+  <targets xmi:id="deploy" name="deploy">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="false" fork="true"/>
+    <tasks xsi:type="Ant:Copy" todir="deploy/lib" overwrite="true" filtering="true"/>
+    <tasks xsi:type="Ant:Delete" file="deploy/old.jar" verbose="true"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" unless="skip.clean">
+    <tasks xsi:type="Ant:Delete" dir="target" quiet="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" file="dist" failonerror="false"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="build"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+</Ant:Project>

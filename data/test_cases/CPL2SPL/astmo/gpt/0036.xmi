@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : root CPL, with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="subA">
+      <!-- SubAction contents is a non-simple Proxy (triggers R2 via Proxy.statement and R8) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- all children present to make proxy non-simple -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.2"/>
+      </contents>
+    </subActions>
+    <incoming xsi:type="CPL:Incoming">
+      <!-- Incoming contents is the same non-simple Proxy (triggers R3 via Proxy.statement and R8) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.2"/>
+      </contents>
+    </incoming>
+    <outgoing xsi:type="CPL:Outgoing">
+      <!-- Outgoing contents is the same non-simple Proxy (triggers R4 via Proxy.statement and R8) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.2"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1] : Location used by Redirect (for Location2URIConstant and locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:callee@example.com" clear="yes">
+    <!-- no contents, so statement helper returns OclUndefined and it is not used as a statement -->
+  </elements>
+
+  <!-- elements[2] : SubCall, referred to from Proxy default and Busy.contents/NoAnswer.contents/Redirection.contents -->
+  <elements xsi:type="CPL:SubCall" ref="subA"/>
+
+  <!-- elements[3] : Redirect (R14), also contributes to ResponseConstant counting -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- no explicit contents; its locations sequence is computed from ancestors and includes elements[1] -->
+  </elements>
+
+  <!-- elements[4] : AddressSwitch (R15, R17, R18), with SwitchedAddress and NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="from-user">
+    <!-- SwitchedAddress case, contents is SubCall (elements[2]) -->
+    <addresses is="user@example.com" contains="example.com" subDomainOf="example.com">
+      <contents xsi:type="CPL:SubCall" ref="subA"/>
+    </addresses>
+    <!-- NotPresent branch, no contents needed (R6) -->
+    <notPresent/>
+    <!-- Otherwise branch, contents is SubCall (elements[2]) -->
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="subA"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[5] : simple Proxy (R7) with Location as its location (through locations helper) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+    <!-- No busy/noAnswer/redirection/failure/default: isSimple = true -->
+    <!-- Its locations will include elements[1] via the helper chain -->
+  </elements>
+
+  <!-- elements[6] : StringSwitch (R16), not used as a statement (no contents in any container) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField">
+    <!-- no strings children; this rule only needs the VariableDeclaration -->
+  </elements>
+
+</CPL:CPLModel>

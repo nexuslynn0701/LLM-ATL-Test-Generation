@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmi:id="cpl_root">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="30">
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="User busy"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="destination">
+            <addresses is="user@example.com">
+              <contents xsi:type="CPL:Location" url="sip:primary@example.com" clear="true" priority="1"/>
+            </addresses>
+            <addresses contains="example.org">
+              <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential" timeout="20">
+                <default>
+                  <contents xsi:type="CPL:Reject" status="404" reason="Not found"/>
+                </default>
+              </contents>
+            </addresses>
+            <notPresent/>
+            <otherwise>
+              <contents xsi:type="CPL:StringSwitch" field="user-agent">
+                <strings is="mobile"/>
+                <strings contains="bot"/>
+              </strings>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" tzid="UTC">
+        <times dtstart="20230101T090000" dtend="20230101T170000" interval="1" wkst="MO"/>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities greater="5"/>
+        <priorities equal="3"/>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction"/>
+  <elements xsi:type="CPL:Location" url="sip:fallback@example.com" clear="false" priority="0"/>
+  <elements xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+</CPL:CPLModel>

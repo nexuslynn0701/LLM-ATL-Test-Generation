@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example.org/root"
+    nsPrefix="root">
+
+  <!-- Subpackage, exercises eSuperPackage / eSubpackages -->
+  <eSubpackages name="subPkg"
+                nsURI="http://example.org/sub"
+                nsPrefix="sub">
+    <!-- C2_Sub: superclass with no super types, no features -->
+    <eClassifiers xsi:type="ecore:EClass" name="Standalone"/>
+
+    <!-- C3_Sub: inherits from C2_Sub, has 2 attributes, 1 reference -->
+    <eClassifiers xsi:type="ecore:EClass" name="Detail">
+      <!-- attribute with String type and default value, not ID -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="description"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           defaultValueLiteral="default &quot;desc&quot;"/>
+      <!-- attribute with Boolean type, is ID -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="active"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                           lowerBound="1"
+                           upperBound="1"
+                           iD="true"/>
+      <!-- reference to C1_Root, no opposite, not containment -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="mainRoot"
+                           eType="//@eClassifiers.0"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- C1_Root: abstract, has attributes and references, supertype chain -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseEntity"
+                abstract="true"
+                interface="false">
+    <!-- attribute with Int type, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"/>
+    <!-- reference to C2_Sub, opposite set later in C3_Root, containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="details"
+                         eType="//@eSubpackages.0/@eClassifiers.1"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- C2_Root: concrete subclass of C1_Root, has enum-typed attribute and single reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="SpecialEntity"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.0">
+    <!-- attribute typed by locally defined EEnum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         eType="//@eClassifiers.3"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="NEW"/>
+    <!-- reference with opposite to be defined in C3_Root, non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="partner"
+                         eType="//@eClassifiers.2"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"/>
+  </eClassifiers>
+
+  <!-- C3_Root: concrete subclass chain C1->C2->C3, has 1 attribute, 2 references (one opposite) -->
+  <eClassifiers xsi:type="ecore:EClass" name="PartnerEntity"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.1">
+    <!-- attribute with Float type and default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="ratio"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="3.14"/>
+    <!-- reference back to SpecialEntity as opposite of partner -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         eType="//@eClassifiers.1"
+                         lowerBound="1"
+                         upperBound="-1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+    <!-- containment reference to C2_Sub (Detail), no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="moreDetails"
+                         eType="//@eSubpackages.0/@eClassifiers.1"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"/>
+  </eClassifiers>
+
+  <!-- EEnum used by an attribute, with 2 literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ARCHIVED" value="1" literal="ARCHIVED"/>
+  </eClassifiers>
+
+</ecore:EPackage>

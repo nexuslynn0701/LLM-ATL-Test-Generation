@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="alice@example.com"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+            <default contents="//@elements.1"/>
+          </default>
+        </otherwise>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="CPL-Client/1.0"/>
+      </strings>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:SubCall" ref="mainAction"/>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:bob@example.com" clear="yes"/>
+  <elements xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+</CPL:CPLModel>

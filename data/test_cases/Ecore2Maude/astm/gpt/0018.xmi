@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="metamodel18"
+    nsURI="http://example.org/metamodel18"
+    nsPrefix="mm18">
+
+  <!-- Subpackage -->
+  <eSubpackages name="subpkg"
+      nsURI="http://example.org/metamodel18/sub"
+      nsPrefix="mm18sub">
+    <!-- Subpackage classifiers -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubRoot">
+      <!-- No features, to trigger empty lists for refs/atts -->
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="SubChild"
+                  eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subFlag"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root package classifiers -->
+  <!-- 0: Enum with several literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ColorEnum">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+    <eLiterals name="BLUE" value="2" literal="BLUE"/>
+  </eClassifiers>
+
+  <!-- 1: Abstract base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseItem" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         iD="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="Unnamed &quot;Item&quot;"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 2: Concrete class extending BaseItem, with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="ContainerItem"
+                eSuperTypes="//@eClassifiers.1">
+    <!-- Primitive attributes with various types and defaults -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="count"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="42"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Enum-typed attribute with default literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="color"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="GREEN"
+                         eType="//@eClassifiers.0"/>
+    <!-- Reference to ContainedItem (containment, many) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.3"/>
+    <!-- Non-containment reference to SubRoot in subpackage -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subRootRef"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 3: Contained class with bidirectional reference back to ContainerItem -->
+  <eClassifiers xsi:type="ecore:EClass" name="ContainedItem">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Opposite references between ContainerItem and ContainedItem -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.3"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- Complete opposite side on ContainerItem (must appear after ContainedItem definition) -->
+  <eClassifiers xsi:type="ecore:EClass" name="ContainerItemExtension"
+                eSuperTypes="//@eClassifiers.2">
+    <!-- just to exercise extra superclass chain and empty features -->
+  </eClassifiers>
+
+  <!-- Fix eOpposite for children/owner now that both classes exist -->
+  <eClassifiers xsi:type="ecore:EClass" name="ContainerItem" abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="count"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="42"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="color"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="GREEN"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         eOpposite="//@eClassifiers.3/@eStructuralFeatures.1"
+                         eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subRootRef"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+</ecore:EPackage>

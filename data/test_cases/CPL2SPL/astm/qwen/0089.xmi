@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmi:id="_cpl">
+    <subActions id="mainAction" xmi:id="_subAction">
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential" xmi:id="_proxyComplex">
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy Now"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="true"/>
+        </default>
+      </contents>
+    </subActions>
+    <incoming xmi:id="_incoming">
+      <contents xsi:type="CPL:AddressSwitch" field="origin" xmi:id="_addrSwitch">
+        <addresses is="sip:alice@example.com">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" xmi:id="_proxySimple"/>
+        </addresses>
+        <addresses contains="example.org"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing xmi:id="_outgoing">
+      <contents xsi:type="CPL:StringSwitch" field="user-agent" xmi:id="_strSwitch">
+        <strings is="CPL-Client/1.0"/>
+        <strings contains="mobile"/>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction" xmi:id="_subCall"/>
+  <elements xsi:type="CPL:Location" url="sip:fallback@example.net" clear="false" xmi:id="_locFallback"/>
+  <elements xsi:type="CPL:Reject" status="603" reason="Decline" xmi:id="_rejectGlobal"/>
+</CPL:CPLModel>

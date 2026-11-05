@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryPkg"
+    nsURI="http://example.org/libraryPkg"
+    nsPrefix="lib">
+
+  <!-- 0: Base named element -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1: Abstract Person with operations and attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person"
+      abstract="true"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="internalCode"
+        transient="true"
+        derived="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eOperations name="getDisplayName"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eParameters name="prefix"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 2: Author extends Person, with EReference to Book and bidirectional ref with Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Author"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pseudonym"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- non-containment many ref to Book -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books"
+        upperBound="-1"
+        eType="//@eClassifiers.4"/>
+    <!-- container reference to Library (opposite library.authors) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library"
+        eType="//@eClassifiers.3"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 3: Library containing Books, Authors, and Members; one ID attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="location"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- containment of books -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.4"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.0"/>
+    <!-- containment of authors -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="authors"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.2"/>
+    <!-- containment of members -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="members"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.5"
+        eOpposite="//@eClassifiers.5/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 4: Book with container Library and cross refs to Author and Genre -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="year"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- container Library (opposite library.books) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library"
+        eType="//@eClassifiers.3"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.1"/>
+    <!-- non-containment many ref to Author -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="authors"
+        upperBound="-1"
+        eType="//@eClassifiers.2"/>
+    <!-- reference to a Genre enum literal via attribute "genreLiteral" (string) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="genreLiteral"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 5: Member extends Person and is contained in Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="email"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- container Library (opposite library.members) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library"
+        eType="//@eClassifiers.3"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.3"/>
+    <!-- borrowedBooks is a non-containment ref to Book -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="borrowedBooks"
+        upperBound="-1"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 6: Loan as separate ModElement-like class (not extending Person) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Loan">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="startDate"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dueDate"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="book"
+        lowerBound="1"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="borrower"
+        lowerBound="1"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 7: Enum for Genre with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Genre">
+    <eLiterals name="FICTION" value="0" literal="FICTION"/>
+    <eLiterals name="NON_FICTION" value="1" literal="NON_FICTION"/>
+    <eLiterals name="SCIENCE" value="2" literal="SCIENCE"/>
+  </eClassifiers>
+
+  <!-- 8: DataType for an external identifier -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ExternalId"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 9: Class using the ExternalId type and an operation without parameters -->
+  <eClassifiers xsi:type="ecore:EClass" name="ExternalRecord"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="externalId"
+        lowerBound="1"
+        eType="//@eClassifiers.8"/>
+    <eOperations name="refresh"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+</ecore:EPackage>

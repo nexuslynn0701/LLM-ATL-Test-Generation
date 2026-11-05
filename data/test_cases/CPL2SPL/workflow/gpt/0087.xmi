@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction whose id is referenced by SubCall -->
+    <subActions id="sa_main">
+      <!-- contents: complex Proxy (non-simple) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple Proxy inside Busy (isSimple = true) -->
+        <busy>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <!-- Location inside simple Proxy to trigger Location2URIConstant -->
+            <contents xsi:type="CPL:Location" url="sip:simple@proxy.com" clear="true"/>
+          </contents>
+        </busy>
+        <!-- NoAnswer with SubCall contents -->
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </noAnswer>
+        <!-- Redirection with Redirect contents -->
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="true">
+            <!-- Location under Redirect to trigger Location2URIConstant -->
+            <contents xsi:type="CPL:Location" url="sip:redirect@domain.com" clear="true"/>
+          </contents>
+        </redirection>
+        <!-- Failure with Location (ignored as statement but counted as Failure) -->
+        <failure>
+          <contents xsi:type="CPL:Location" url="sip:failure@domain.com" clear="true"/>
+        </failure>
+        <!-- Default with SubCall contents -->
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Outgoing referencing AddressSwitch -->
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <!-- SwitchedAddress with simple Proxy contents -->
+        <addresses is="addr1" contains="c1" subDomainOf="sd1">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <!-- Location inside simple Proxy to trigger Location2URIConstant -->
+            <contents xsi:type="CPL:Location" url="sip:switched@addr.com" clear="true"/>
+          </contents>
+        </addresses>
+
+        <!-- NotPresent with Redirect contents -->
+        <notPresent>
+          <contents xsi:type="CPL:Redirect" permanent="false">
+            <!-- Location inside Redirect to trigger Location2URIConstant -->
+            <contents xsi:type="CPL:Location" url="sip:notpresent@domain.com" clear="true"/>
+          </contents>
+        </notPresent>
+
+        <!-- Otherwise with complex Proxy contents -->
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <!-- Complex Proxy with only Busy (isSimple = false) -->
+            <busy>
+              <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+            </busy>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+
+    <!-- Incoming with Reject contents (no statements generated) -->
+    <incoming>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+    </incoming>
+  </elements>
+
+  <!-- Top-level Location, used by Proxies via locations helper (ignored as statement) -->
+  <elements xsi:type="CPL:Location" url="sip:toplevel@domain.com" clear="true"/>
+
+  <!-- Top-level SubCall referencing SubAction via string ref -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- Top-level Redirect (permanent=false) with its own Location -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:topredirect@domain.com" clear="true"/>
+  </elements>
+
+  <!-- Top-level Proxy: simple, using Location2URIConstant via locations -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- No children: simple Proxy, will use locations from CPL (empty) -->
+  </elements>
+
+  <!-- Top-level AddressSwitch to add another AddressSwitch instance -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <!-- SwitchedAddress without contents -->
+    <addresses is="addr2" contains="c2" subDomainOf="sd2"/>
+  </elements>
+
+</CPL:CPLModel>

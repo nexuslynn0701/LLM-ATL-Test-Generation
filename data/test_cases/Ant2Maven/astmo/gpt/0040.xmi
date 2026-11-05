@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-root"
+    description="Ant project with multiple tasks and properties"
+    default="buildTarget">
+
+  <!-- Path with PathElement and FileSet (no refid, no nested path) -->
+  <path id="mainPath">
+    <pathElement path="lib/somelib.jar" location="lib/somelib.jar"/>
+    <fileset dir="resources">
+      <include name="**/*.properties"/>
+      <exclude name="**/temp/**"/>
+    </fileset>
+  </path>
+
+  <!-- Properties of all four concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Standalone TaskDef (not referenced by any task) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="buildTarget" name="buildTarget" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- ClassPath with PathElement and FileSet (no refid) -->
+      <classPath refid="compileClasspath">
+        <pathElement path="lib/compile.jar" location="lib/compile.jar"/>
+        <fileset dir="lib">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classPath>
+      <!-- InExcludes patterns -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/app.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <tasks xsi:type="Ant:Mkdir" dir="target/logs"/>
+
+    <tasks xsi:type="Ant:Copy"
+           file="config/app.properties"
+           presservelastmodified="true"
+           tofile="target/config/app.properties"
+           todir="target/config"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="false">
+      <!-- FileSet used by Copy -->
+      <fileset dir="config">
+        <include name="**/*.properties"/>
+      </fileset>
+      <!-- FilterSet with Filter and FiltersFile -->
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="app.name" value="ComplexAntProject"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <!-- Mapper -->
+      <mapper type="glob" from="*.properties" to="*.cfg"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Delete"
+           file="target/temp.txt"
+           dir="target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           includesfile="config/includes.txt"
+           excludes="**/*.bak"
+           excludesfile="config/excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <targets xmi:id="docTarget" name="docTarget" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntProject API"/>
+  </targets>
+
+  <targets xmi:id="timestampTarget" name="timestampTarget" description="Timestamp properties">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

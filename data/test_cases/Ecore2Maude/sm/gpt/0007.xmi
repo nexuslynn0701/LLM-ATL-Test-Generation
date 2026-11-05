@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cpx">
+
+  <!-- 0: Simple data type (non-primitive) -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="CustomString"
+      instanceClassName="java.lang.String"
+      serializable="true"/>
+
+  <!-- 1: Enum with three literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind" serializable="true">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract base class with attributes & operations -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true" interface="false">
+    <!-- id attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"
+        defaultValueLiteral=""/>
+    <!-- status as EEnum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.1"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"/>
+    <!-- sample operation -->
+    <eOperations name="computeKey" ordered="true" unique="true" lowerBound="0" upperBound="1">
+      <eParameters name="seed"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 3: Concrete subclass with containment and non-containment refs -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="ContainerElement"
+      abstract="false"
+      interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <!-- contained children -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.4"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"/>
+    <!-- cross reference to base -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="primaryChild"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.4"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"/>
+    <!-- structural feature: custom data type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="label"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.0"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"/>
+    <!-- operation with exception and parameter -->
+    <eOperations name="resetStatus"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1">
+      <eParameters name="newStatus"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          eType="//@eClassifiers.1"/>
+      <eExceptions href="//@eClassifiers.2"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 4: Leaf element, subclass of BaseElement -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="LeafElement"
+      abstract="false"
+      interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="value"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"/>
+  </eClassifiers>
+
+  <!-- 5: Map entry class -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="MetaInfo"
+      abstract="false"
+      interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="key"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="value"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"/>
+  </eClassifiers>
+
+  <!-- 6: Class with many attributes and references to exercise features -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Project"
+      abstract="false"
+      interface="false">
+    <!-- name -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"/>
+    <!-- version integer -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="version"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"
+        defaultValueLiteral="1"/>
+    <!-- containment of ContainerElement -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="root"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.3"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"/>
+    <!-- containment of LeafElement list -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="allLeaves"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.4"
+        changeable="true"
+        volatile="false"
+        transient="false"
+        unsettable="false"
+        derived="false"/>
+  </eClassifiers>
+
+</ecore:EPackage>

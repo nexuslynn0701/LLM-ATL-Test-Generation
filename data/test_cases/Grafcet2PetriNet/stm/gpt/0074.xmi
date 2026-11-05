@@ -1,0 +1,55 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexSequentialBranchingGrafcet" location="file:///models/grafcet0074.gcf">
+    <!-- Elements: steps and transitions -->
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="1;1;0" isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="PreBranchStep" location="2;1;0" isInitial="false" isActive="false" action="prepareBranching"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="BranchStepA" location="3;1;0" isInitial="false" isActive="false" action="executeBranchA"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="BranchStepB" location="3;2;0" isInitial="false" isActive="false" action="executeBranchB"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s4" name="MergeStep" location="4;1;0" isInitial="false" isActive="false" action="mergeBranches"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s5" name="FinalStep" location="5;1;0" isInitial="false" isActive="false" action="shutdownSystem"/>
+    <!-- Additional intermediate step for a second branch later -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s6" name="SecondaryInit" location="2;3;0" isInitial="false" isActive="false" action="secondaryInit"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s7" name="SecondaryEnd" location="4;3;0" isInitial="false" isActive="false" action="secondaryEnd"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="T_Init_to_PreBranch" location="1.5;1;0" condition="startSignal"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="T_PreBranch_to_BranchA" location="2.5;1;0" condition="modeA"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="T_PreBranch_to_BranchB" location="2.5;2;0" condition="modeB"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" name="T_Branches_to_Merge" location="3.5;1.5;0" condition="branchesDone"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t4" name="T_Merge_to_Final" location="4.5;1;0" condition="readyToShutdown"/>
+    <!-- Transition with multiple incoming steps (merge of main and secondary paths) -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t5" name="T_SecondaryInit_to_SecondaryEnd" location="3;3;0" condition="secondaryPath"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t6" name="T_Final_and_SecondaryEnd_to_Init" location="5.5;1.5;0" condition="restartAllowed"/>
+
+    <!-- Connections: StepToTransition and TransitionToStep -->
+    <!-- Main sequential path Init -> PreBranch -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="C_Init_to_T0" location="1.25;1;0" from="/0/@elements.0" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c1" name="C_T0_to_PreBranch" location="1.75;1;0" from="/0/@elements.8" to="/0/@elements.1"/>
+
+    <!-- Branching from PreBranch to BranchA and BranchB -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c2" name="C_PreBranch_to_T1" location="2.25;1;0" from="/0/@elements.1" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c3" name="C_T1_to_BranchA" location="2.75;1;0" from="/0/@elements.9" to="/0/@elements.2"/>
+
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c4" name="C_PreBranch_to_T2" location="2.25;2;0" from="/0/@elements.1" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c5" name="C_T2_to_BranchB" location="2.75;2;0" from="/0/@elements.10" to="/0/@elements.3"/>
+
+    <!-- Merge BranchA and BranchB into MergeStep via a single transition with two incoming StepToTransition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c6" name="C_BranchA_to_T3" location="3.25;1;0" from="/0/@elements.2" to="/0/@elements.11"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c7" name="C_BranchB_to_T3" location="3.25;2;0" from="/0/@elements.3" to="/0/@elements.11"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c8" name="C_T3_to_Merge" location="3.75;1.5;0" from="/0/@elements.11" to="/0/@elements.4"/>
+
+    <!-- MergeStep to FinalStep -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c9" name="C_Merge_to_T4" location="4.25;1;0" from="/0/@elements.4" to="/0/@elements.12"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c10" name="C_T4_to_Final" location="4.75;1;0" from="/0/@elements.12" to="/0/@elements.5"/>
+
+    <!-- Secondary path: SecondaryInit -> T5 -> SecondaryEnd -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c11" name="C_SecondaryInit_to_T5" location="2.75;3;0" from="/0/@elements.6" to="/0/@elements.13"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c12" name="C_T5_to_SecondaryEnd" location="3.25;3;0" from="/0/@elements.13" to="/0/@elements.7"/>
+
+    <!-- Transition with multiple incoming steps: from FinalStep and SecondaryEnd back to InitStep -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c13" name="C_Final_to_T6" location="5.25;1;0" from="/0/@elements.5" to="/0/@elements.14"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c14" name="C_SecondaryEnd_to_T6" location="5.25;2;0" from="/0/@elements.7" to="/0/@elements.14"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c15" name="C_T6_to_Init" location="5.75;1.5;0" from="/0/@elements.14" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

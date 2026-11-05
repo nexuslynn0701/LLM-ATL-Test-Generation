@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="MyRootPkg"
+    nsURI="http://myrootpkg/1.0"
+    nsPrefix="mr">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="SubPkg"
+                nsURI="http://myrootpkg/sub/1.0"
+                nsPrefix="sub">
+
+    <!-- 0: EClass Person in subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="Person">
+      <!-- attributes -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="identifier"
+                           lowerBound="1"
+                           upperBound="1"
+                           iD="true"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="nickname"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           defaultValueLiteral="guest"/>
+      <!-- reference to Book (classifier 2 of this subpackage), non-containment, opposite author -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="books"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="false"
+                           eType="//@eSubpackages.0/@eClassifiers.2"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.2/@eStructuralFeatures.1"/>
+    </eClassifiers>
+
+    <!-- 1: EClass Writer subclass of Person -->
+    <eClassifiers xsi:type="ecore:EClass" name="Writer">
+      <eSuperTypes>//@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+      <!-- attribute with Int type to exercise numeric bounds -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="rating"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                           defaultValueLiteral="5"/>
+      <!-- containment reference to Book -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="ownedBooks"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="true"
+                           eType="//@eSubpackages.0/@eClassifiers.2"/>
+    </eClassifiers>
+
+    <!-- 2: EClass Book -->
+    <eClassifiers xsi:type="ecore:EClass" name="Book">
+      <!-- attribute with Boolean type -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="published"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                           defaultValueLiteral="true"/>
+      <!-- reference back to Person as opposite of books -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="author"
+                           lowerBound="1"
+                           upperBound="1"
+                           containment="false"
+                           eType="//@eSubpackages.0/@eClassifiers.0"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.2"/>
+    </eClassifiers>
+
+    <!-- 3: EEnum Genre with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Genre">
+      <eLiterals name="Fiction" value="0" literal="Fiction"/>
+      <eLiterals name="NonFiction" value="1" literal="NonFiction"/>
+    </eClassifiers>
+
+    <!-- 4: EClass Library with attribute of enum type -->
+    <eClassifiers xsi:type="ecore:EClass" name="Library">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="mainGenre"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           eType="//@eSubpackages.0/@eClassifiers.3"
+                           defaultValueLiteral="Fiction"/>
+      <!-- reference to Book without opposite to exercise null maybeRefSort -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="collection"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="false"
+                           eType="//@eSubpackages.0/@eClassifiers.2"/>
+    </eClassifiers>
+
+  </eSubpackages>
+
+  <!-- 0: EClass RootEntity directly in root package -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootEntity" abstract="true">
+    <!-- attribute in root package -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rootCode"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- reference to Library in subpackage -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="topLibrary"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eSubpackages.0/@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 1: EEnum Priority declared in root package -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Priority">
+    <eLiterals name="Low" value="0" literal="Low"/>
+    <eLiterals name="High" value="1" literal="High"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <!-- SubAction contents: complex Proxy (non-simple) via contents reference below -->
+    </subActions>
+    <incoming>
+      <!-- Incoming contents: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing contents: Redirect -->
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by both proxies and Redirect (via locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true" priority="1"/>
+
+  <!-- SubCall used inside Busy (ref is plain string; no actual SubAction with that id) -->
+  <elements xsi:type="CPL:SubCall" ref="nonExistingSubAction"/>
+
+  <!-- Complex Proxy used as contents of SubAction sa1 and inside Busy -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <!-- Attach locations (for Location2URIConstant in both Proxy rules and Redirect rule) -->
+    <contents xsi:type="CPL:Location" url="sip:proxy@example.com" clear="false" priority="2"/>
+    <!-- Non-simple: all handler branches present, some with contents -->
+    <busy contents="//@elements.2"/>
+    <noAnswer/>
+    <redirection>
+      <!-- Redirection contents: SubCall (statement via SubCall2Return) -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </redirection>
+    <failure/>
+    <default>
+      <!-- Default contents: AddressSwitch (to exercise switch rules inside Default) -->
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <!-- SwitchedAddress with contents SubCall -->
+        <addresses is="sip:addr1@example.com">
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </addresses>
+        <!-- notPresent and otherwise empty -->
+        <notPresent/>
+        <otherwise/>
+      </contents>
+    </default>
+  </elements>
+
+  <!-- AddressSwitch top-level, different from the one in Default -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <!-- SwitchedAddress without contents -->
+    <addresses is="sip:dst@example.net"/>
+    <!-- notPresent with contents Redirect -->
+    <notPresent>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </notPresent>
+    <!-- otherwise with contents simple Proxy -->
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential"/>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

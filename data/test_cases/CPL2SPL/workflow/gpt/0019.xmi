@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: CPL root with one SubAction and one Outgoing to satisfy R1/R3/R4 etc. -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa_main">
+      <!-- SubAction contents is a Location so that SubAction2Function produces no statements -->
+      <contents xsi:type="CPL:Location" url="sip:sa_main@example.com" clear="true">
+        <!-- Location contents is a simple Proxy so Location.statement is that Proxy -->
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential"/>
+      </contents>
+    </subActions>
+    <outgoing>
+      <!-- Outgoing contents is a simple Proxy whose ordering is parallel to trigger ForwardExp.isParallel=true -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by complex Proxy (index 2) to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:complex@example.com" clear="true"/>
+
+  <!-- 2: Complex Proxy (non-simple) to trigger Proxy2Select and Location2URIConstant through its locations -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- attach a Location so locations helper returns it -->
+    <contents xsi:type="CPL:Location" url="sip:ignored@example.com" clear="true"/>
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <!-- default refers to SubCall at index 5 -->
+    <default contents="//@elements.5"/>
+  </elements>
+
+  <!-- 3: AddressSwitch with SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- One SwitchedAddress with contents = SubCall at index 5 -->
+    <addresses is="user@example.com" contains="user" subDomainOf="example.com">
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </addresses>
+    <!-- notPresent and otherwise children (no contents) -->
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 4: Redirect that uses Location at index 1 to trigger Location2URIConstant in Redirect2Return -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- give it a location as container so locations->first() is defined -->
+    <contents xsi:type="CPL:Location" url="sip:redirect@example.com" clear="true"/>
+  </elements>
+
+  <!-- 5: SubCall referring to SubAction id 'sa_main' -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+</CPL:CPLModel>

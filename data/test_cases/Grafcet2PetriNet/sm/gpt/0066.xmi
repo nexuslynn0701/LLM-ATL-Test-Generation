@@ -1,0 +1,60 @@
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_G0" name="ComplexGrafcet" location="model/Grafcet0066.gcf">
+
+    <!-- Elements: Steps and Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_S0" name="InitStep" location="model/Grafcet0066.gcf#S0" isInitial="true" isActive="true" action="initialize_system()"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S1" name="CheckSensors" location="model/Grafcet0066.gcf#S1" isInitial="false" isActive="false" action="check_sensors()"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S2" name="ProcessData" location="model/Grafcet0066.gcf#S2" isInitial="false" isActive="false" action="process_data()"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S3" name="ErrorHandler" location="model/Grafcet0066.gcf#S3" isInitial="false" isActive="false" action="handle_error()"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S4" name="Finalize" location="model/Grafcet0066.gcf#S4" isInitial="false" isActive="false" action="finalize_cycle()"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T0" name="T_InitToCheck" location="model/Grafcet0066.gcf#T0" condition="system_ready"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T1" name="T_CheckToProcess" location="model/Grafcet0066.gcf#T1" condition="sensors_ok"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T2" name="T_ProcessToFinalize" location="model/Grafcet0066.gcf#T2" condition="processing_done and not error_detected"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T3" name="T_ErrorDetected" location="model/Grafcet0066.gcf#T3" condition="error_detected"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T4" name="T_RecoveryToCheck" location="model/Grafcet0066.gcf#T4" condition="recovery_done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T5" name="T_FinalToInit" location="model/Grafcet0066.gcf#T5" condition="restart_cycle"/>
+
+    <!-- Connections: StepToTransition and TransitionToStep -->
+    <!-- InitStep -> T_InitToCheck -> CheckSensors -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C0" name="C_Init_to_T0" location="model/Grafcet0066.gcf#C0"
+        from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C1" name="C_T0_to_Check" location="model/Grafcet0066.gcf#C1"
+        from="/0/@elements.5" to="/0/@elements.1"/>
+
+    <!-- CheckSensors -> T_CheckToProcess -> ProcessData -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C2" name="C_Check_to_T1" location="model/Grafcet0066.gcf#C2"
+        from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C3" name="C_T1_to_Process" location="model/Grafcet0066.gcf#C3"
+        from="/0/@elements.6" to="/0/@elements.2"/>
+
+    <!-- ProcessData -> T_ProcessToFinalize -> Finalize -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C4" name="C_Process_to_T2" location="model/Grafcet0066.gcf#C4"
+        from="/0/@elements.2" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C5" name="C_T2_to_Finalize" location="model/Grafcet0066.gcf#C5"
+        from="/0/@elements.7" to="/0/@elements.4"/>
+
+    <!-- ProcessData -> T_ErrorDetected -> ErrorHandler (error branch) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C6" name="C_Process_to_T3" location="model/Grafcet0066.gcf#C6"
+        from="/0/@elements.2" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C7" name="C_T3_to_Error" location="model/Grafcet0066.gcf#C7"
+        from="/0/@elements.8" to="/0/@elements.3"/>
+
+    <!-- ErrorHandler -> T_RecoveryToCheck -> CheckSensors (loop back after recovery) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C8" name="C_Error_to_T4" location="model/Grafcet0066.gcf#C8"
+        from="/0/@elements.3" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C9" name="C_T4_to_Check" location="model/Grafcet0066.gcf#C9"
+        from="/0/@elements.9" to="/0/@elements.1"/>
+
+    <!-- Finalize -> T_FinalToInit -> InitStep (full cycle loop) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C10" name="C_Final_to_T5" location="model/Grafcet0066.gcf#C10"
+        from="/0/@elements.4" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C11" name="C_T5_to_Init" location="model/Grafcet0066.gcf#C11"
+        from="/0/@elements.10" to="/0/@elements.0"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

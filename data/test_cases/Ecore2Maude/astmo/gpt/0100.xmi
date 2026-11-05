@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg0100"
+    nsURI="http://root/pkg/0100"
+    nsPrefix="root0100">
+
+  <!-- Root-level EEnum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ColorEnum">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="BLUE" value="1" literal="BLUE"/>
+  </eClassifiers>
+
+  <!-- Root-level EDataType to differ from examples -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomNumber" instanceClassName="int"/>
+
+  <!-- Root-level EClass with super type and features -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootEntity">
+    <!-- Attribute: string-typed, ID, with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="rootId"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="ROOT-DEFAULT"/>
+    <!-- Attribute: enum-typed, non-ID, with default literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="color"
+        eType="//@eClassifiers.0"
+        iD="false"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="RED"/>
+    <!-- Reference to subpackage class, no opposite, non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="mainChild"
+        eType="//@eSubpackages.0/@eClassifiers.1"
+        containment="false"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"/>
+  </eClassifiers>
+
+  <!-- Subpackage to exercise superPackage/subPackages logic -->
+  <eSubpackages name="subPkg0100"
+      nsURI="http://root/pkg/0100/sub"
+      nsPrefix="sub0100">
+
+    <!-- Enum local to subpackage -->
+    <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+      <eLiterals name="NEW" value="0" literal="NEW"/>
+      <eLiterals name="DONE" value="1" literal="DONE"/>
+    </eClassifiers>
+
+    <!-- Base class in subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="BaseItem">
+      <!-- Simple int attribute, no default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="baseCode"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          iD="false"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"/>
+    </eClassifiers>
+
+    <!-- Derived class extending BaseItem -->
+    <eClassifiers xsi:type="ecore:EClass" name="DetailItem" eSuperTypes="//@eSubpackages.0/@eClassifiers.1">
+      <!-- Enum attribute using local enum -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="status"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          iD="false"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="NEW"/>
+      <!-- Reference back to RootEntity, bidirectional, containment on this side -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="owner"
+          eType="//@eClassifiers.2"
+          eOpposite="//@eClassifiers.2/@eStructuralFeatures.2"
+          containment="true"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"/>
+    </eClassifiers>
+
+  </eSubpackages>
+</ecore:EPackage>

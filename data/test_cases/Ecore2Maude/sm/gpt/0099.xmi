@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libModel"
+    nsURI="http://example.org/libModel"
+    nsPrefix="lib">
+
+  <!-- 0: Primitive alias for String -->
+  <eClassifiers xsi:type="ecore:EDataType" name="TextType" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Primitive alias for Integer -->
+  <eClassifiers xsi:type="ecore:EDataType" name="NumberType" instanceClassName="int"/>
+
+  <!-- 2: Enum for item kinds -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ItemKind">
+    <eLiterals name="BOOK" value="0" literal="BOOK"/>
+    <eLiterals name="MAGAZINE" value="1" literal="MAGAZINE"/>
+    <eLiterals name="DVD" value="2" literal="DVD"/>
+  </eClassifiers>
+
+  <!-- 3: Enum for member categories -->
+  <eClassifiers xsi:type="ecore:EEnum" name="MemberCategory">
+    <eLiterals name="ADULT" value="0" literal="ADULT"/>
+    <eLiterals name="CHILD" value="1" literal="CHILD"/>
+    <eLiterals name="SENIOR" value="2" literal="SENIOR"/>
+  </eClassifiers>
+
+  <!-- 4: Root Library class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sections" upperBound="-1"
+        containment="true" eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="members" upperBound="-1"
+        containment="true" eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="allItems" upperBound="-1"
+        containment="true" eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 5: Section class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Section">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="items" upperBound="-1"
+        containment="true" eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 6: Abstract Item -->
+  <eClassifiers xsi:type="ecore:EClass" name="Item" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="year"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="homeSection"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="currentBorrower"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 7: Member class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="memberId" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="category"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="borrowedItems" upperBound="-1"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 8: Book subclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book" eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isbn" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pages"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 9: Magazine subclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Magazine" eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="issue" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 10: DVD subclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="DVD" eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="regionCode"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+</ecore:EPackage>

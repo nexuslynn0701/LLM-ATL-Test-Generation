@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="ParallelBranchesWithMerge">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="Init" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="BranchA" isInitial="false" isActive="false" action="computeA"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="BranchB" isInitial="false" isActive="false" action="computeB"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="Join" isInitial="false" isActive="false" action="mergeResults"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="Final" isInitial="false" isActive="false" action="finalize"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t001" name="Split" condition="startParallel"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="ToA" condition="pathAReady"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="ToB" condition="pathBReady"/>
+    <elements xsi:type="Grafcet:Transition" location="t004" name="Merge" condition="bothDone"/>
+    <elements xsi:type="Grafcet:Transition" location="t005" name="FinishAll" condition="joined"/>
+    <!-- Connections: Split from Init to Split transition, then to BranchA and BranchB -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="initToSplit" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c002" name="splitToBranchA" from="/0/@elements.5" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c003" name="splitToBranchB" from="/0/@elements.5" to="/0/@elements.2"/>
+    <!-- Path A: BranchA -> ToA -> Join -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c004" name="branchAToTransition" from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c005" name="transitionAToJoin" from="/0/@elements.6" to="/0/@elements.3"/>
+    <!-- Path B: BranchB -> ToB -> Join -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c006" name="branchBToTransition" from="/0/@elements.2" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c007" name="transitionBToJoin" from="/0/@elements.7" to="/0/@elements.3"/>
+    <!-- Join -> Merge -> Final -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c008" name="joinToMerge" from="/0/@elements.3" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c009" name="mergeToFinal" from="/0/@elements.8" to="/0/@elements.4"/>
+    <!-- Feedback loop from Final back to Init using FinishAll transition -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c010" name="finalToFinishAll" from="/0/@elements.4" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c011" name="finishAllToInit" from="/0/@elements.9" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" recurse="r1" ordering="parallel">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:sa1@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </subActions>
+    <subActions id="sa2">
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="r2" ordering="sequential">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:out@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="r3" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa1Ref"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="sa2Ref"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure>
+          <contents xsi:type="CPL:SubCall" ref="sa1Ref"/>
+        </failure>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa2Ref"/>
+        </default>
+      </contents>
+    </incoming>
+  </elements>
+
+  <elements xsi:type="CPL:SubCall" ref="sa1Ref"/>
+
+  <elements xsi:type="CPL:Location" url="sip:top@example.com" clear="yes"/>
+
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <elements xsi:type="CPL:Proxy" recurse="r4" ordering="parallel">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="sa1Ref"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:SubCall" ref="sa2Ref"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:SubCall" ref="sa1Ref"/>
+    </redirection>
+    <failure/>
+    <default>
+      <contents xsi:type="CPL:Proxy" recurse="r5" ordering="sequential">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:nested@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </default>
+  </elements>
+
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="subf">
+    <addresses is="addr1" contains="c1" subDomainOf="sd1">
+      <contents xsi:type="CPL:SubCall" ref="sa1Ref"/>
+    </addresses>
+    <addresses is="addr2" contains="c2" subDomainOf="sd2">
+      <contents xsi:type="CPL:Proxy" recurse="r6" ordering="parallel">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:addr2@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa2Ref"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="sa1Ref"/>
+    </otherwise>
+  </elements>
+
+  <elements xsi:type="CPL:StringSwitch" field="header-field"/>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz">
+    <times dtstart="20250101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="1" greater="2" equal="3"/>
+  </elements>
+</CPL:CPLModel>

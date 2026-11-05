@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibBuilder"
+    basedir="lib-src"
+    description="Library build and packaging project"
+    default="buildTarget">
+
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="lib.name" value="utility-lib"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.output" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition and related attribute to trigger TaskDef / Attribut rules -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+  <taskdef name="reportTask" classname="com.example.ant.ReportTask"/>
+
+  <!-- Default target with several tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources and create jar">
+    <!-- Compile task with includes/excludes to trigger Javac and InExcludes-related rules -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="build.sources" unless="skip.sources"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="build.exclude.internal" unless=""/>
+    </tasks>
+
+    <!-- Documentation task to trigger Javadoc rule -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.util.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Utility Library API"/>
+
+    <!-- Jar task to trigger Jar rule -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/utility-lib.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- File operations: mkdir, copy with nested structures, delete -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/output"/>
+    <tasks xsi:type="Ant:Copy" todir="build/output" overwrite="true" includeEmptyDirs="false">
+      <fileset dir="build/classes">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.class" ifCondition="" unless=""/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/test/**" ifCondition="" unless=""/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="libName" value="utility-lib"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.class" to="*.bin"/>
+    </tasks>
+    <tasks xsi:type="Ant:Delete" dir="build/tmp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+
+    <!-- Management properties task: Tstamp -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyyMMdd-HHmmss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+
+    <!-- Java execution task to trigger Java rule (without classPath ref) -->
+    <tasks xsi:type="Ant:Java" classname="com.example.tools.Runner" jar="dist/tools.jar" fork="true"/>
+  </targets>
+
+  <!-- Additional target without description to exercise project-without-description rule via non-default Project later if reused -->
+  <targets xmi:id="cleanTarget" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build"/>
+  </targets>
+
+</Ant:Project>

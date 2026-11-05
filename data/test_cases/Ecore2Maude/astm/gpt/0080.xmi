@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example.org/root"
+    nsPrefix="root">
+
+  <!-- Subpackage to trigger super/sub package equations -->
+  <eSubpackages name="subPkg"
+                nsURI="http://example.org/sub"
+                nsPrefix="sub">
+    <!-- Class in subpackage, with an EEnum and literals and attributes -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubPerson">
+      <!-- Attribute without explicit type (eAttributeType derived & empty) to hit @NoType -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="untypedId"
+                           iD="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           defaultValueLiteral=""/>
+    </eClassifiers>
+
+    <!-- Enumeration with two literals to activate Enum* rules/list variants -->
+    <eClassifiers xsi:type="ecore:EEnum" name="SubStatus">
+      <eLiterals name="NEW" value="0" literal="NEW"/>
+      <eLiterals name="ARCHIVED" value="1" literal="ARCHIVED"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers directly in root package -->
+  <!-- 0: Class with single attribute, single reference, no supertypes -->
+  <eClassifiers xsi:type="ecore:EClass" name="User">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         iD="false"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         defaultValueLiteral="anonymous"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="primaryAccount"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 1: Class with supertype, multiple attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Account"
+                eSuperTypes="//@eClassifiers.0">
+    <!-- Attribute with Boolean type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         iD="false"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Attribute with Int type and specific default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="limit"
+                         iD="false"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         defaultValueLiteral="1000"/>
+    <!-- Reference to same package class, multiplicity * to hit upperBound = -1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="transactions"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="false"
+                         unique="false"
+                         containment="true"
+                         eType="//@eClassifiers.2"/>
+    <!-- Bidirectional, non-containment reference pair to trigger opposite and maybeRefSort -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eType="//@eClassifiers.0"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- Complete the opposite on User.primaryAccount -->
+  <eClassifiers xsi:type="ecore:EClass" name="User"
+                eSuperTypes="">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         iD="false"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         defaultValueLiteral="anonymous"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="primaryAccount"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         eType="//@eClassifiers.1"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <!-- 2: Class for transactions, used as reference target -->
+  <eClassifiers xsi:type="ecore:EClass" name="Transaction">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="amount"
+                         iD="false"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+                         defaultValueLiteral="0.0"/>
+  </eClassifiers>
+
+  <!-- 3: Enumeration with three literals and attribute with enum type & default -->
+  <eClassifiers xsi:type="ecore:EEnum" name="AccountType">
+    <eLiterals name="CHECKING" value="0" literal="CHECKING"/>
+    <eLiterals name="SAVINGS" value="1" literal="SAVINGS"/>
+    <eLiterals name="INVESTMENT" value="2" literal="INVESTMENT"/>
+  </eClassifiers>
+
+  <!-- 4: Class using enum type and also referring to subpackage class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Profile">
+    <!-- Attribute with enum type and default enum literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="preferredAccountType"
+                         iD="false"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="//@eClassifiers.3"
+                         defaultValueLiteral="SAVINGS"/>
+    <!-- Reference to class in subpackage, no opposite, to exercise nullMaybeOp on reference -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subPerson"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntBuild"
+    basedir="workspace"
+    description="Complex Ant build with various tasks and properties."
+    default="buildTarget">
+
+  <!-- Project-level path (no internal references used) -->
+  <path id="main.path">
+    <pathElement path="lib/a.jar" location="lib/a.jar"/>
+    <pathElement path="lib/b.jar" location="lib/b.jar"/>
+    <fileset dir="lib">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/unused/**"/>
+      </patternset>
+      <include name="**/*.jar"/>
+      <exclude name="**/old/**"/>
+    </fileset>
+  </path>
+
+  <!-- Properties covering all property kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="ComplexAntBuild"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="build"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition (standalone, not referenced by tasks) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: buildTarget -->
+  <targets xmi:id="buildTarget" name="build" description="Main build target">
+    <!-- Compile step with includes/excludes and classpath -->
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+      <classPath refid="compile.classpath">
+        <pathElement path="lib/compile1.jar" location="lib/compile1.jar"/>
+        <fileset dir="lib/compile">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Documentation generation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src"
+           destdir="build/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntBuild API"/>
+
+    <!-- Packaging step -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/complex-ant-build.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Create distribution directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+
+    <!-- Copy resources with filters and mapper -->
+    <tasks xsi:type="Ant:Copy" todir="build/resources" overwrite="true" filtering="true" flatten="false" includeEmptyDirs="true">
+      <fileset dir="resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="resources/includes.txt"/>
+        </patternset>
+        <exclude name="**/temp/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="projectName" value="ComplexAntBuild"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.tpl" to="*.txt"/>
+    </tasks>
+
+    <!-- Cleanup intermediate build directory -->
+    <tasks xsi:type="Ant:Delete" dir="build/tmp" verbose="true" quiet="false" failonerror="false" includeEmptyDirs="true" defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target: cleanTarget -->
+  <targets xmi:id="cleanTarget" name="clean" description="Clean build artifacts">
+    <!-- Delete distribution and classes -->
+    <tasks xsi:type="Ant:Delete" dir="dist" verbose="true" quiet="false" failonerror="false" includeEmptyDirs="true" defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="false" includeEmptyDirs="true" defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target: propertiesTarget demonstrating Tstamp -->
+  <targets xmi:id="propsTarget" name="prepareProps" description="Prepare timestamped properties">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

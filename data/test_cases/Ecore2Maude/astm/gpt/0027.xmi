@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMeta"
+    nsURI="http://example/rootMeta"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise superPackage/subpackages and pack.maudeMaybePackSort -->
+  <eSubpackages name="subMeta"
+      nsURI="http://example/subMeta"
+      nsPrefix="sub">
+    <!-- Class in subpackage for cross-package references/supertypes -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubBase">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="subFlag"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+          iD="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifier 0: root abstract class with attributes and ref to same package -->
+  <eClassifiers xsi:type="ecore:EClass" name="Base">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="baseId"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="true"
+        defaultValueLiteral="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title text"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"
+        defaultValueLiteral="&quot;Untitled&quot;"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="selfRef"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.0"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Classifier 1: concrete class extending Base, with various attributes and refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="Detail">
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+    <!-- Attribute using EString, with special chars in default to trigger escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="description"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"
+        defaultValueLiteral="Line1 &quot;A&quot; and `B`"/>
+    <!-- Attribute using EBooleanObject to select Bool mapping -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        lowerBound="0"
+        upperBound="1"
+        ordered="false"
+        unique="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"
+        iD="false"
+        defaultValueLiteral="true"/>
+    <!-- Attribute using EDoubleObject to select Float mapping -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="ratio"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDoubleObject"
+        iD="false"
+        defaultValueLiteral="3.14"/>
+    <!-- Multi-valued attribute with no default to avoid AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="tags"
+        lowerBound="0"
+        upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"/>
+    <!-- Reference to class in subpackage to exercise cross-package type -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="subBase"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eSubpackages.0/@eClassifiers.0"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Classifier 2: another class to participate in bidirectional reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Container">
+    <!-- Containment ref with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="details"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="true"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.4"/>
+  </eClassifiers>
+
+  <!-- Add opposite end inside Detail (index 4 among its structural features) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Detail">
+    <!-- duplicate definition avoided: this is only to show position;
+         actual Detail is defined above with all its features -->
+  </eClassifiers>
+
+  <!-- Fix Detail by adding the opposite reference as 5th feature (index 4) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Detail">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.2"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- Classifier 3: EEnum with multiple literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Priority">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- Classifier 4: class that uses the enum as attribute type -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <!-- Use enum type directly (non-primitive) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.3"
+        iD="false"
+        defaultValueLiteral="MEDIUM"/>
+    <!-- Attribute with no eAttributeType set, to hit @NoType in attDataType -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="untyped"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"/>
+  </eClassifiers>
+
+</ecore:EPackage>

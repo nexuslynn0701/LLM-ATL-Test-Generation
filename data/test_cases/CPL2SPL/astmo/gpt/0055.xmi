@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- contents -> complex Proxy (non-simple) -->
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="true" ordering="parallel">
+        <!-- non-simple: all branches present, some with contents -->
+        <busy>
+          <!-- Busy with contents = SubCall to saMain -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <!-- Default with contents = Redirect (permanent) -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </default>
+      </contents>
+    </subActions>
+    <!-- Incoming with contents = simple Proxy -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" timeout="15" recurse="false" ordering="sequential">
+        <!-- simple proxy: no branches -->
+      </contents>
+    </incoming>
+    <!-- Outgoing with contents = AddressSwitch -->
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+        <!-- SwitchedAddress with contents = SubCall to saMain -->
+        <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com">
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </addresses>
+        <!-- NotPresent with contents = Reject -->
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+        </notPresent>
+        <!-- Otherwise with contents = Redirect (temporary) -->
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by Proxies and Redirects (locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:bob@example.org" priority="0.5" clear="yes"/>
+
+  <!-- 2: Standalone simple Proxy (no branches) -->
+  <elements xsi:type="CPL:Proxy" timeout="10" recurse="true" ordering="parallel">
+    <!-- simple: no busy/noAnswer/redirection/failure/default -->
+  </elements>
+
+  <!-- 3: Standalone Redirect, temporary -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+</CPL:CPLModel>

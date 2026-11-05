@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.1"/>
+    <outgoing contents="//@elements.3"/>
+  </elements>
+
+  <!-- SubAction used by the SubCall; contents is a complex Proxy -->
+  <elements xsi:type="CPL:SubAction" id="saMain">
+    <contents xsi:type="CPL:Proxy" timeout="20" recurse="yes" ordering="parallel">
+      <busy>
+        <contents xsi:type="CPL:SubCall" ref="saMain"/>
+      </busy>
+      <noAnswer>
+        <contents xsi:type="CPL:Reject" status="408" reason="No Answer"/>
+      </noAnswer>
+      <redirection>
+        <contents xsi:type="CPL:Redirect" permanent="false"/>
+      </redirection>
+      <failure/>
+      <default>
+        <contents xsi:type="CPL:AddressSwitch" field="origin">
+          <addresses>
+            <contents xsi:type="CPL:SwitchedAddress" is="sip:alice@example.com">
+              <contents xsi:type="CPL:Proxy" timeout="15" recurse="no" ordering="serial"/>
+            </contents>
+            <contents xsi:type="CPL:SwitchedAddress" is="sip:bob@example.org"/>
+          </addresses>
+          <notPresent/>
+          <otherwise>
+            <contents xsi:type="CPL:Redirect" permanent="true"/>
+          </otherwise>
+        </contents>
+      </default>
+    </contents>
+  </elements>
+
+  <!-- Location to provide URI for Proxies and Redirects -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" priority="1" clear="yes"/>
+
+  <!-- Outgoing with simple Proxy as contents -->
+  <elements xsi:type="CPL:Outgoing">
+    <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="serial"/>
+  </elements>
+
+</CPL:CPLModel>

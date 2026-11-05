@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://rootpkg"
+    nsPrefix="root">
+
+  <!-- Root package classifiers:
+       0: EClass Person
+       1: EClass Employee (extends Person)
+       2: EEnum Role
+       3: EEnumLiteral StandaloneAdmin
+       4: EEnumLiteral StandaloneUser
+       5: EDataType CodeType -->
+
+  <!-- EClass Person with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="false" interface="false">
+    <!-- String ID attribute with default value, tests AttEqIsId and AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        iD="true"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="pid-default"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Int age attribute with default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="30"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Enum attribute using Role -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="role"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.2"/>
+    <!-- Containment reference to Employee, with opposite back -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        containment="true"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- EClass Employee extending Person, with opposite ref back to Person and an EDataType-typed attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- Non-containment reference back to Person (manager), opposite of Person.employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="manager"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        containment="false"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.3"/>
+    <!-- Attribute of custom EDataType -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="0"
+        upperBound="1"
+        ordered="false"
+        unique="false"
+        defaultValueLiteral="E001"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- EEnum Role with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Role">
+    <eLiterals xsi:type="ecore:EEnumLiteral" name="ROLE_ADMIN" value="0" literal="ROLE_ADMIN"/>
+    <eLiterals xsi:type="ecore:EEnumLiteral" name="ROLE_USER" value="1" literal="ROLE_USER"/>
+  </eClassifiers>
+
+  <!-- Explicit EEnumLiterals as stand-alone ENamedElements (for transformation coverage) -->
+  <eClassifiers xsi:type="ecore:EClass" name="StandaloneAdminLiteralHolder">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="enumLiteralAdmin"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="StandaloneUserLiteralHolder">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="enumLiteralUser"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- Custom EDataType used by Employee.code -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CodeType" instanceTypeName="java.lang.String"/>
+
+  <!-- Nested subpackage to exercise metamodelName and package hierarchy rules -->
+  <eSubpackages name="subpkg" nsURI="http://rootpkg/sub" nsPrefix="sub">
+    <!-- Subpackage classifiers:
+         0: EClass Department
+         1: EClass Project (extends Department)
+         2: EEnum Status
+         3: EDataType DummyType -->
+
+    <!-- EClass Department with a reference to Project -->
+    <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="name"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="DefaultDept"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="projects"
+          lowerBound="0"
+          upperBound="-1"
+          ordered="true"
+          unique="true"
+          containment="true"
+          eType="//@eSubpackages.0/@eClassifiers.1"/>
+    </eClassifiers>
+
+    <!-- EClass Project extending Department -->
+    <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="true" interface="false"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="budget"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="1000.0"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    </eClassifiers>
+
+    <!-- EEnum Status -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Status">
+      <eLiterals xsi:type="ecore:EEnumLiteral" name="OPEN" value="0" literal="OPEN"/>
+      <eLiterals xsi:type="ecore:EEnumLiteral" name="CLOSED" value="1" literal="CLOSED"/>
+    </eClassifiers>
+
+    <!-- Extra EDataType in subpackage -->
+    <eClassifiers xsi:type="ecore:EDataType" name="DummyType" instanceTypeName="int"/>
+  </eSubpackages>
+
+</ecore:EPackage>

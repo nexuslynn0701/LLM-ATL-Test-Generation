@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL as top-level element -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction sa1 with complex Proxy p1 as contents -->
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="parallel">
+        <!-- complex proxy: all branches present -->
+        <busy>
+          <!-- Busy contents is a SubCall with plain string ref -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </subActions>
+
+    <!-- Outgoing method: contents is a simple Proxy p2, using Location loc1 -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <!-- simple proxy: all sub-branches undefined, but has a Location in locations chain -->
+        <default contents="//@elements.1"/>
+      </contents>
+    </outgoing>
+
+    <!-- Incoming method: contents is a SubCall with plain string ref -->
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location used by proxies (to trigger Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:example@example.com" priority="1" clear="true"/>
+
+  <!-- 2: Redirect (non-permanent) using same Location chain -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+</CPL:CPLModel>

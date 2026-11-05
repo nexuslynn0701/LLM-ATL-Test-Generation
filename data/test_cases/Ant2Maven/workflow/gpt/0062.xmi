@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiStageBuild"
+    basedir="workspace"
+    description="Build, package and clean artifacts"
+    default="buildTarget">
+
+  <!-- Mixed property kinds to exercise property rules -->
+  <properties xsi:type="Ant:PropertyValue" name="compiler.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="workspace/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Standalone task definition -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <tasks xsi:type="Ant:Mkdir"
+           dir="workspace/target/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src"
+           destdir="workspace/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/dist/app-main.jar"
+           basedir="workspace/target/classes"
+           compress="true"
+           encoding="UTF-8"/>
+  </targets>
+
+  <!-- Additional target with archive and cleanup tasks -->
+  <targets xmi:id="packageTarget" name="package">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/dist/app-sources.jar"
+           basedir="workspace/src"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="workspace/temporary"/>
+  </targets>
+
+</Ant:Project>

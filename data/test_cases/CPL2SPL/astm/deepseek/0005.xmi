@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <subActions id="sub1">
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="sip:alice@example.com">
+          <contents xsi:type="CPL:Location" url="sip:bob@example.com" clear="yes"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="urgent">
+          <contents xsi:type="CPL:SubCall" ref="sub1"/>
+        </strings>
+        <notPresent>
+          <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="yes"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+</CPL:CPLModel>

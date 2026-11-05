@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="testpkg"
+    nsURI="http://testpkg/1.0"
+    nsPrefix="tp">
+
+  <!-- 0: Root package "testpkg" -->
+
+  <!-- 1: Subpackage "subpkg" with a class -->
+  <eSubpackages name="subpkg" nsURI="http://testpkg/sub" nsPrefix="tpsub">
+    <!-- classifiers inside subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClass">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="subAttr"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- 2: EClass Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- String attribute with default value (triggers AttEqSpecificDefaultValue) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="unknown"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Int attribute with default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Boolean attribute marked as ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="true"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Attribute typed by user EDataType (index 6 below) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.6"/>
+    <!-- Reference to Address (index 3), multiplicity *, containment, with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="addresses"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.3"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 3: EClass Address, superclass of OfficeAddress (index 4) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- supertype Person to exercise createSort and non-ecore package condition -->
+    <eSuperTypes>//@eClassifiers.2</eSuperTypes>
+    <!-- Reference back to Person with opposite and required multiplicity -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="person"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.2"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.4"/>
+    <!-- attribute typed by enum Status (index 5) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 4: EClass OfficeAddress, subclass of Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="OfficeAddress">
+    <eSuperTypes>//@eClassifiers.3</eSuperTypes>
+    <!-- reference to SubClass from subpackage -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="subRef"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 5: EEnum Status with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="OLD" value="1" literal="OLD"/>
+  </eClassifiers>
+
+  <!-- 6: Custom EDataType -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CodeType"/>
+
+</ecore:EPackage>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project-root"
+    description="Full build lifecycle for ComplexBuild"
+    default="buildTarget">
+
+  <!-- Properties to exercise all AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="java.version" value="17"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="output/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A standalone TaskDef (not referenced by any NewTask) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple different tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="output/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Package into jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/complexbuild.jar"
+           basedir="output/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="output/test-results"/>
+    <!-- Clean temporary files -->
+    <tasks xsi:type="Ant:Delete"
+           dir="output/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile="config/includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target to ensure multiple Goal creations -->
+  <targets xmi:id="docsTarget" name="generateDocs">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="dist/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API Documentation"/>
+  </targets>
+
+</Ant:Project>

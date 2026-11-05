@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one Incoming, one Outgoing, and one SubAction -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="saMain">
+      <!-- SubAction contents: complex Proxy (non-simple) at index 8 -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <busy xsi:type="CPL:Busy">
+          <!-- Busy contents: SubCall at index 2 -->
+          <contents xsi:type="CPL:SubCall" ref="saAux"/>
+        </busy>
+        <noAnswer xsi:type="CPL:NoAnswer">
+          <!-- NoAnswer contents: Redirect at index 7 -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection xsi:type="CPL:Redirection">
+          <!-- Redirection contents: SubCall at index 2 -->
+          <contents xsi:type="CPL:SubCall" ref="saAux"/>
+        </redirection>
+        <failure xsi:type="CPL:Failure"/>
+        <default xsi:type="CPL:Default">
+          <!-- Default contents: AddressSwitch at index 5 -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <!-- AddressSwitch notPresent, otherwise, and addresses -->
+            <notPresent xsi:type="CPL:NotPresent">
+              <!-- NotPresent contents: Reject at index 6 -->
+              <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+            </notPresent>
+            <otherwise xsi:type="CPL:Otherwise">
+              <!-- Otherwise contents: simple Proxy at index 9 -->
+              <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+                <!-- simple Proxy has no children: isSimple = true -->
+              </contents>
+            </otherwise>
+            <!-- two SwitchedAddress children -->
+            <addresses xsi:type="CPL:SwitchedAddress" is="userA" contains="contA" subDomainOf="domA">
+              <!-- SwitchedAddress contents: Location at index 3 -->
+              <contents xsi:type="CPL:Location" url="sip:userA@example.com" priority="1" clear="yes"/>
+            </addresses>
+            <addresses xsi:type="CPL:SwitchedAddress" is="userB" contains="contB" subDomainOf="domB">
+              <!-- SwitchedAddress contents: SubCall at index 2 -->
+              <contents xsi:type="CPL:SubCall" ref="saAux"/>
+            </addresses>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+
+    <outgoing xsi:type="CPL:Outgoing">
+      <!-- Outgoing contents: SubCall at index 2 -->
+      <contents xsi:type="CPL:SubCall" ref="saAux"/>
+    </outgoing>
+
+    <incoming xsi:type="CPL:Incoming">
+      <!-- Incoming contents: Location at index 4 -->
+      <contents xsi:type="CPL:Location" url="sip:in@example.com" priority="5" clear="no"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Second CPL with one SubAction (no in/out to vary coverage) -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="saAux">
+      <!-- SubAction contents: Redirect at index 7 -->
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </subActions>
+  </elements>
+
+  <!-- 2: Top-level SubCall referring to saAux (for R13 & OCL9) -->
+  <elements xsi:type="CPL:SubCall" ref="saAux"/>
+
+  <!-- 3: Top-level Location used by SwitchedAddress 0 -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" priority="10" clear="yes"/>
+
+  <!-- 4: Top-level Location used by Incoming contents -->
+  <elements xsi:type="CPL:Location" url="sip:route@example.net" priority="2" clear="yes"/>
+
+  <!-- 5: Top-level AddressSwitch with its own addresses/notPresent/otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination" subField="contact">
+    <!-- notPresent for this AddressSwitch -->
+    <notPresent xsi:type="CPL:NotPresent">
+      <!-- NotPresent contents: Failure to cover Failure2ErrorResponse -->
+      <contents xsi:type="CPL:Failure"/>
+    </notPresent>
+    <!-- otherwise for this AddressSwitch -->
+    <otherwise xsi:type="CPL:Otherwise">
+      <!-- Otherwise contents: SubCall at index 2 -->
+      <contents xsi:type="CPL:SubCall" ref="saAux"/>
+    </otherwise>
+    <!-- one SwitchedAddress -->
+    <addresses xsi:type="CPL:SwitchedAddress" is="otherUser" contains="otherCont" subDomainOf="otherDom">
+      <!-- contents: Redirect at index 7 -->
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </addresses>
+  </elements>
+
+  <!-- 6: Top-level Reject used as contents of NotPresent in CPL0 -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 7: Top-level Redirect used in multiple places (SubAction2, NoAnswer, SwitchedAddress of 5) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 8: Top-level complex Proxy used as contents of SubAction in CPL0 -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <busy xsi:type="CPL:Busy"/>
+    <noAnswer xsi:type="CPL:NoAnswer"/>
+    <redirection xsi:type="CPL:Redirection"/>
+    <failure xsi:type="CPL:Failure"/>
+    <default xsi:type="CPL:Default"/>
+  </elements>
+
+  <!-- 9: Top-level simple Proxy used as contents of Otherwise in nested AddressSwitch -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="sequential"/>
+</CPL:CPLModel>

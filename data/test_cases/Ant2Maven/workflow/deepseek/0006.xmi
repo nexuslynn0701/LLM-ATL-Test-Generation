@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AdvancedBuild"
+    basedir="."
+    description="Build with custom tasks and file patterns"
+    default="deploy">
+  <properties xsi:type="Ant:PropertyValue" name="build.compiler" value="javac1.8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="dist.dir" location="dist"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false">
+      <inExcludes xsi:type="Ant:IncludesFile" name="**/*.java" ifCondition="true" unless="false"/>
+      <inExcludes xsi:type="Ant:ExcludesFile" name="**/test/**" ifCondition="true" unless="false"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="deploy" name="deploy">
+    <tasks xsi:type="Ant:Delete" dir="dist/backup" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="false" includes="**/*.tmp" includesfile="excludes.txt" excludes="**/*.bak" excludesfile="excludes.txt" defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Copy" file="README.md" tofile="dist/README.md" todir="dist" overwrite="true" filtering="false" flatten="true" includeEmptyDirs="true" presservelastmodified="true">
+      <fileset dir="src">
+        <include name="**/*.java"/>
+        <exclude name="**/*Test.java"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0"/>
+        <filtersfile file="filter.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.java" to="*.txt"/>
+    </tasks>
+    <tasks xsi:type="Ant:Java" classname="com.example.Main" jar="app.jar" fork="true">
+      <classPath refid="runtime.classpath">
+        <pathElement path="lib/core.jar" location="lib"/>
+        <fileset dir="lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+            <inexcludes xsi:type="Ant:Excludes" name="**/*-sources.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" offset="1" unit="hour" locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs" packagenames="com.example.*" defaultexcludes="true" author="true" version="true" use="true" windowtitle="API Documentation"/>
+  </targets>
+</Ant:Project>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- contents -> elements[1]: complex Proxy -->
+      <contents xmi:type="CPL:Proxy" xmi:idref="//@elements.1"/>
+    </subActions>
+    <incoming>
+      <!-- contents -> elements[2]: AddressSwitch -->
+      <contents xmi:type="CPL:AddressSwitch" xmi:idref="//@elements.2"/>
+    </incoming>
+    <outgoing>
+      <!-- contents -> elements[3]: simple Proxy -->
+      <contents xmi:type="CPL:Proxy" xmi:idref="//@elements.3"/>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1] : complex Proxy (not simple) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- all five branches to make proxy non-simple -->
+    <!-- Busy with SubCall (elements[4]) -->
+    <busy>
+      <contents xmi:type="CPL:SubCall" xmi:idref="//@elements.4"/>
+    </busy>
+    <!-- NoAnswer with Reject (elements[5]) -->
+    <noAnswer>
+      <contents xmi:type="CPL:Reject" xmi:idref="//@elements.5"/>
+    </noAnswer>
+    <!-- Redirection with Redirect (elements[6]) -->
+    <redirection>
+      <contents xmi:type="CPL:Redirect" xmi:idref="//@elements.6"/>
+    </redirection>
+    <!-- Failure with SubCall (elements[7]) -->
+    <failure>
+      <contents xmi:type="CPL:SubCall" xmi:idref="//@elements.7"/>
+    </failure>
+    <!-- Default with AddressSwitch (elements[2]) -->
+    <default>
+      <contents xmi:type="CPL:AddressSwitch" xmi:idref="//@elements.2"/>
+    </default>
+  </elements>
+
+  <!-- elements[2] : AddressSwitch with notPresent, otherwise, and one SwitchedAddress -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- SwitchedAddress with simple Proxy (elements[3]) -->
+    <addresses is="addr1" contains="c1" subDomainOf="sd1">
+      <contents xmi:type="CPL:Proxy" xmi:idref="//@elements.3"/>
+    </addresses>
+    <!-- NotPresent with Redirect (elements[6]) -->
+    <notPresent>
+      <contents xmi:type="CPL:Redirect" xmi:idref="//@elements.6"/>
+    </notPresent>
+    <!-- Otherwise with SubCall (elements[4]) -->
+    <otherwise>
+      <contents xmi:type="CPL:SubCall" xmi:idref="//@elements.4"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[3] : simple Proxy (isSimple = true) with no branches -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="serial"/>
+
+  <!-- elements[4] : SubCall referencing SubAction id "saMain" -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- elements[5] : Reject used under NoAnswer -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- elements[6] : Redirect (permanent) with a Location URL in its locations chain -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- Location providing URI for Redirect and for Proxies via locations helper -->
+    <locations url="sip:main@example.com" priority="1" clear="yes"/>
+  </elements>
+
+  <!-- elements[7] : SubCall also referencing "saMain" -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+</CPL:CPLModel>

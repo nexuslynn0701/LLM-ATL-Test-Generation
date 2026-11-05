@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction and both incoming and outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction whose contents is a simple Proxy using a Location -->
+    <subActions>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- Simple proxy: no handlers; its statement is a ReturnStat with ForwardExp -->
+      </contents>
+    </subActions>
+
+    <!-- Outgoing method: contents is complex Proxy (non-simple) using a Location -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy>
+          <!-- Busy.contents is a SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.1"/>
+      </contents>
+    </outgoing>
+
+    <!-- Incoming method: contents is a Redirect using the same Location -->
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </incoming>
+  </elements>
+
+  <!-- Top-level Location used by both proxies and redirect (triggers Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes" priority="1"/>
+
+  <!-- Top-level SubCall to test standalone SubCall2Return (ref is arbitrary string) -->
+  <elements xsi:type="CPL:SubCall" ref="otherAction"/>
+
+  <!-- Top-level Redirect (independent from CPL.incoming) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- Top-level Proxy: non-simple, ordering != parallel (so its ForwardExp is sequential) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.1"/>
+  </elements>
+
+  <!-- Top-level AddressSwitch with SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="addr1" contains="c1" subDomainOf="sd">
+      <!-- SwitchedAddress.contents is a simple Proxy using the Location -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy -->
+      </contents>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy -->
+      </contents>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise.contents is a simple Proxy using the Location -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy -->
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- Top-level StringSwitch with a field name -->
+  <elements xsi:type="CPL:StringSwitch" field="fieldName">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <!-- simple proxy -->
+    </contents>
+  </elements>
+
+</CPL:CPLModel>

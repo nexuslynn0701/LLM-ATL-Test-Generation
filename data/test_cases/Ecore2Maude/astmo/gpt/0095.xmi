@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="LibraryRoot"
+    nsURI="http://library/root"
+    nsPrefix="libroot">
+
+  <!-- Subpackage to exercise subPackages / superPackage -->
+  <eSubpackages name="LibrarySub"
+                nsURI="http://library/sub"
+                nsPrefix="libsub">
+    <!-- EClass in subpackage, used as super type -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubEntity">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subId"
+                           lowerBound="1"
+                           upperBound="1"
+                           iD="true">
+        <eType xsi:type="ecore:EDataType"
+               href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      </eStructuralFeatures>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers in root package (indices: 0=EClass,1=EClass,2=EEnum) -->
+  <!-- Root class with supertypes, attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book"
+                eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+    <!-- Attribute with String type, lowerBound=0, upperBound=1, default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="&quot;Unknown Title&quot;">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <!-- Attribute with Boolean type, custom name and bounds -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="isDigital"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+
+    <!-- Reference to Author, containment, single-valued -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="mainAuthor"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="true">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.1"/>
+    </eStructuralFeatures>
+
+    <!-- Non-containment reference with upperBound=-1 and opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="coAuthors"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.1">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.1"/>
+    </eStructuralFeatures>
+
+    <!-- Attribute typed by local EEnum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="genre"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="FICTION">
+      <eType xsi:type="ecore:EEnum" href="//@eClassifiers.2"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- Second class with references and attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Author">
+    <!-- Attribute with Integer type, upperBound=-1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         lowerBound="0"
+                         upperBound="-1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+
+    <!-- Opposite side of coAuthors reference (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="books"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.3">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.0"/>
+    </eStructuralFeatures>
+
+    <!-- Containment reference with no opposite, to test null opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="mainBook"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="true">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.0"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- Enumeration with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="GenreKind">
+    <eLiterals name="FICTION" value="0" literal="FICTION"/>
+    <eLiterals name="NON_FICTION" value="1" literal="NON_FICTION"/>
+  </eClassifiers>
+
+</ecore:EPackage>

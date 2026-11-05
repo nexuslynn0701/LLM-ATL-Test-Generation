@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: CPL root, with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="sa_main">
+      <!-- SubAction contents: complex Proxy (Proxy2Select) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- Busy branch with SubCall to sa_main (SubCall2Return via complex proxy statements) -->
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </busy>
+        <!-- NoAnswer branch, empty -->
+        <noAnswer/>
+        <!-- Redirection branch, empty -->
+        <redirection/>
+        <!-- Failure branch, empty -->
+        <failure/>
+        <!-- Default branch with Redirect (Redirect2Return via complex proxy statements) -->
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </default>
+      </contents>
+    </subActions>
+    <!-- single Outgoing, whose contents is a simple Proxy (Proxy2Return) -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+        <!-- simple proxy: no children set -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy and Redirect (for Location2URIConstant and locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true">
+    <!-- no nested contents -->
+  </elements>
+
+  <!-- 2: CPL with only Incoming, no SubActions (to vary R1/R3/R16/R17 usage) -->
+  <elements xsi:type="CPL:CPL">
+    <incoming/>
+  </elements>
+
+</CPL:CPLModel>

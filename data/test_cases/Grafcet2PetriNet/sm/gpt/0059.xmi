@@ -1,0 +1,81 @@
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcet" location="file://complex.grafcet">
+    <!-- Elements: Steps and Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="file://complex.grafcet#s0"
+              isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="ParallelStepA" location="file://complex.grafcet#s1"
+              isInitial="false" isActive="false" action="runBranchA"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="ParallelStepB" location="file://complex.grafcet#s2"
+              isInitial="false" isActive="false" action="runBranchB"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="JoinStep" location="file://complex.grafcet#s3"
+              isInitial="false" isActive="false" action="joinBranches"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s4" name="LoopStep" location="file://complex.grafcet#s4"
+              isInitial="false" isActive="false" action="iterateProcess"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s5" name="FinalStep" location="file://complex.grafcet#s5"
+              isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="ForkTransition" location="file://complex.grafcet#t0"
+              condition="startCommand"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="JoinTransition" location="file://complex.grafcet#t1"
+              condition="branchesCompleted"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="LoopTransition" location="file://complex.grafcet#t2"
+              condition="continueLoop"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" name="ExitTransition" location="file://complex.grafcet#t3"
+              condition="stopCommand"/>
+
+    <!-- Connections: StepToTransition and TransitionToStep -->
+    <!-- From initial step to fork transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="Init_to_Fork"
+                 location="file://complex.grafcet#c0"
+                 from="/0/@elements.0" to="/0/@elements.6"/>
+    <!-- Fork transition to parallel steps A and B -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c1" name="Fork_to_A"
+                 location="file://complex.grafcet#c1"
+                 from="/0/@elements.6" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c2" name="Fork_to_B"
+                 location="file://complex.grafcet#c2"
+                 from="/0/@elements.6" to="/0/@elements.2"/>
+
+    <!-- Parallel step A to join transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c3" name="A_to_Join"
+                 location="file://complex.grafcet#c3"
+                 from="/0/@elements.1" to="/0/@elements.7"/>
+    <!-- Parallel step B to join transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c4" name="B_to_Join"
+                 location="file://complex.grafcet#c4"
+                 from="/0/@elements.2" to="/0/@elements.7"/>
+
+    <!-- Join transition to join step -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c5" name="Join_to_JoinStep"
+                 location="file://complex.grafcet#c5"
+                 from="/0/@elements.7" to="/0/@elements.3"/>
+
+    <!-- Join step to loop transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c6" name="JoinStep_to_Loop"
+                 location="file://complex.grafcet#c6"
+                 from="/0/@elements.3" to="/0/@elements.8"/>
+    <!-- Loop transition back to LoopStep (entry to loop body) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c7" name="Loop_to_LoopStep"
+                 location="file://complex.grafcet#c7"
+                 from="/0/@elements.8" to="/0/@elements.4"/>
+
+    <!-- Loop step back to loop transition (closing the loop) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c8" name="LoopStep_to_Loop"
+                 location="file://complex.grafcet#c8"
+                 from="/0/@elements.4" to="/0/@elements.8"/>
+
+    <!-- Loop step to exit transition (exit from loop) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c9" name="LoopStep_to_Exit"
+                 location="file://complex.grafcet#c9"
+                 from="/0/@elements.4" to="/0/@elements.9"/>
+
+    <!-- Exit transition to final step -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c10" name="Exit_to_Final"
+                 location="file://complex.grafcet#c10"
+                 from="/0/@elements.9" to="/0/@elements.5"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

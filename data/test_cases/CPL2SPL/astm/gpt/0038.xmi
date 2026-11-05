@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL triggers CPL2Program, Incoming2Method, Outgoing2Method, SubAction2Function via subActions -->
+  <elements xsi:type="CPL:CPL">
+    <!-- Incoming and Outgoing containers -->
+    <incoming/>
+    <outgoing/>
+
+    <!-- SubActions for SubCall2Return resolution and SubAction2Function -->
+    <subActions id="saMain"/>
+    <subActions id="saBusy"/>
+
+  </elements>
+
+  <!-- 1: Location for Proxy2Return / Proxy2Select and Redirect2Return (Location2URIConstant used via locations) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true" priority="1"/>
+
+  <!-- 2: Simple Proxy (isSimple = true) inside Incoming: Proxy2Return + used as statement via helper -->
+  <elements xsi:type="CPL:Proxy" recurse="auto" ordering="sequential">
+    <!-- No busy/noAnswer/redirection/failure/default => isSimple = true -->
+  </elements>
+
+  <!-- 3: Complex Proxy (isSimple = false) inside Outgoing: Proxy2Select and Busy/NoAnswer/Redirection/Default rules -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- 4: SubCall used as nested statement (SubCall2Return) -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- 5: Reject as a terminal action (used as CPL!Node statement in some branches) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Call Rejected"/>
+
+  <!-- 6: Redirect (Redirect2Return) with permanent="true" and a location in its locations chain -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 7: AddressSwitch (AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com"/>
+    <addresses is="bob@example.org" contains="bob" subDomainOf="example.org"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 8: SwitchedAddress with contents pointing to Reject (statement) -->
+  <elements xsi:type="CPL:SwitchedAddress" is="carol@example.net" contains="carol" subDomainOf="example.net"
+            contents="//@elements.5"/>
+
+  <!-- 9: SwitchedAddress with contents pointing to SubCall (statement) -->
+  <elements xsi:type="CPL:SwitchedAddress" is="dave@example.net" contains="dave" subDomainOf="example.net"
+            contents="//@elements.4"/>
+
+  <!-- 10: NotPresent with contents pointing to Reject (NotPresent2ErrorResponse + inner statement ignored by guard) -->
+  <elements xsi:type="CPL:NotPresent"
+            contents="//@elements.5"/>
+
+  <!-- 11: Otherwise with contents pointing to SubCall (Otherwise2SelectDefault + inner statement) -->
+  <elements xsi:type="CPL:Otherwise"
+            contents="//@elements.4"/>
+
+  <!-- 12: StringSwitch to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="custom-header"/>
+
+  <!-- 13: LanguageSwitch used as contents somewhere (excluded from statements by guards) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <contents xsi:type="CPL:SubCall" ref="saBusy"/>
+  </elements>
+
+  <!-- 14: TimeSwitch used as contents somewhere (excluded from statements by guards) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 15: PrioritySwitch used as contents somewhere (excluded from statements by guards) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.5" greater="0.8" equal="0.6"/>
+  </elements>
+
+  <!-- 16: SwitchedString as possible contents target (not used directly by ATL but exercises metamodel) -->
+  <elements xsi:type="CPL:SwitchedString" is="header-value" contains="value"/>
+
+  <!-- 17: SwitchedLanguage (for completeness with LanguageSwitch) -->
+  <elements xsi:type="CPL:SwitchedLanguage" matches="en"/>
+
+  <!-- 18: SwitchedTime (for completeness with TimeSwitch attributes) -->
+  <elements xsi:type="CPL:SwitchedTime" dtstart="20240101T000000Z" interval="2" wkst="SU"/>
+
+  <!-- 19: SwitchedPriority (for completeness with PrioritySwitch) -->
+  <elements xsi:type="CPL:SwitchedPriority" less="0.1" greater="0.9" equal="0.5"/>
+
+</CPL:CPLModel>

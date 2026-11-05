@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="metaRoot"
+    nsURI="http://example.org/metaRoot"
+    nsPrefix="mr">
+
+  <!-- Root-level classifiers -->
+  <!-- 0 -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootEntity" abstract="false" interface="false">
+    <!-- Attr: no type (tests @NoType) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="untypedCode"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"/>
+    <!-- Attr: String, with default, non-unique, unordered -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        ordered="false"
+        unique="false"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="&quot;quoted&quot; text"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attr: Int, is ID, multi-valued -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="identifiers"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        defaultValueLiteral="5"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Ref: containment, no opposite, lower 1, upper -1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="elements"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 1 -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 2 -->
+  <eClassifiers xsi:type="ecore:EClass" name="ExternalType" abstract="true" interface="false"/>
+
+  <!-- Nested subpackage -->
+  <eSubpackages name="innerPkg"
+      nsURI="http://example.org/metaRoot/inner"
+      nsPrefix="mrInner">
+
+    <!-- 0: inner class, has supertype RootEntity and ExternalType -->
+    <eClassifiers xsi:type="ecore:EClass"
+        name="InnerItem"
+        abstract="false"
+        interface="false"
+        eSuperTypes="//@eClassifiers.0 //@eClassifiers.2">
+      <!-- Attr: Boolean -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="active"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          defaultValueLiteral="true"
+          iD="false"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      <!-- Attr: Enum, default literal -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="state"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          defaultValueLiteral="IN_PROGRESS"
+          iD="false"
+          eType="//@eClassifiers.1"/>
+      <!-- Ref: bidirectional, non-containment -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="owner"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          containment="false"
+          resolveProxies="true"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.0"/>
+    </eClassifiers>
+
+    <!-- 1: another inner class, opposite reference back -->
+    <eClassifiers xsi:type="ecore:EClass"
+        name="Container"
+        abstract="false"
+        interface="false">
+      <!-- Ref: opposite of InnerItem.owner, multi-valued containment -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="items"
+          ordered="false"
+          unique="false"
+          lowerBound="0"
+          upperBound="-1"
+          containment="true"
+          resolveProxies="true"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.2"/>
+      <!-- Attr: Float (via EDouble) without default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="ratio"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          iD="false"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    </eClassifiers>
+
+  </eSubpackages>
+</ecore:EPackage>

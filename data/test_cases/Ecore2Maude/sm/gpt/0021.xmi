@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://complex/example/0021"
+    nsPrefix="cplx">
+
+  <!-- 0: Primitive-like data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CodeType"
+                instanceClassName="java.lang.String"/>
+
+  <!-- 1: Simple enum with three literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract base entity with an ID attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="createdOn"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+  </eClassifiers>
+
+  <!-- 3: User class extending BaseElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="User" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="username"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 4: Project class extending BaseElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <!-- containment reference to Task, opposite set on Task.project -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="tasks"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.5"
+                         eOpposite="//@eClassifiers.5/@eStructuralFeatures.1"/>
+    <!-- simple non-containment reference to User -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         lowerBound="1"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 5: Task class extending BaseElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- container reference back to Project, opposite of Project.tasks -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="project"
+                         lowerBound="1"
+                         containment="false"
+                         resolveProxies="false"
+                         eType="//@eClassifiers.4"
+                         eOpposite="//@eClassifiers.4/@eStructuralFeatures.0"/>
+    <!-- many reference to User as assignees -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="assignees"
+                         upperBound="-1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.3"/>
+    <!-- attribute typed by enum StatusKind -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="1"
+                         eType="//@eClassifiers.1"/>
+    <!-- integer effort estimate -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="estimatedHours"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 6: AuditEntry class extending BaseElement with operation and parameter -->
+  <eClassifiers xsi:type="ecore:EClass" name="AuditEntry" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="message"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="severity"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- operation with one parameter -->
+    <eOperations name="formatMessage"
+                 eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eParameters name="prefix"
+                   eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

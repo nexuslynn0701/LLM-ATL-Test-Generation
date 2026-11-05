@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyPkg"
+    nsURI="http://company/example/0043"
+    nsPrefix="company">
+
+  <!-- 0: Primitive data type for salaries -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Money"
+      instanceClassName="double"/>
+
+  <!-- 1: Enum for employee roles -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmployeeRole">
+    <eLiterals name="DEV" value="0" literal="DEV"/>
+    <eLiterals name="MANAGER" value="1" literal="MANAGER"/>
+    <eLiterals name="HR" value="2" literal="HR"/>
+  </eClassifiers>
+
+  <!-- 2: Map entry type -->
+  <eClassifiers xsi:type="ecore:EClass" name="StringToString"
+      instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 3: Address class (no supertypes) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="street"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="city"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="zip"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: Abstract Person class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        iD="true"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- many-valued reference to addresses (containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="addresses"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 5: Employee extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <!-- A map of miscellaneous properties -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="properties"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 6: Department class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="code"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- bidirectional manager reference to Employee -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.5"
+        eOpposite="//@eClassifiers.5/@eStructuralFeatures.4"/>
+    <!-- containment of employees (opposite 'department') -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.5"
+        eOpposite="//@eClassifiers.5/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <!-- 7: Company root class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- containment of all departments -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.6"/>
+    <!-- optional headquarters address -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="hqAddress"
+        containment="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Now fix up Employee's cross-references with valid indices -->
+  <!-- We need Employee's features declared after we know Department's index,
+       so we redeclare its structural features here to use opposites properly. -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="properties"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+    <!-- opposite of Department.employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.6"
+        eOpposite="//@eClassifiers.6/@eStructuralFeatures.1"/>
+    <!-- opposite of Department.manager -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="managedDepartment"
+        eType="//@eClassifiers.6"
+        eOpposite="//@eClassifiers.6/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+</ecore:EPackage>

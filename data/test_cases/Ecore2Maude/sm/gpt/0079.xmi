@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryMgmt"
+    nsURI="http://example.org/libraryMgmt"
+    nsPrefix="libmgmt">
+
+  <!-- 0: Primitive data type alias -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Identifier" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum for member status -->
+  <eClassifiers xsi:type="ecore:EEnum" name="MemberStatus">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+    <eLiterals name="SUSPENDED" value="1" literal="SUSPENDED"/>
+    <eLiterals name="EXPIRED" value="2" literal="EXPIRED"/>
+  </eClassifiers>
+
+  <!-- 2: Base abstract entity -->
+  <eClassifiers xsi:type="ecore:EClass" name="Entity" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        eType="//@eClassifiers.0"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="createdOn"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+  </eClassifiers>
+
+  <!-- 3: Person as abstract superclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: Author -->
+  <eClassifiers xsi:type="ecore:EClass" name="Author" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="penName"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 5: Member -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="email"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 6: Library root -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books"
+        lowerBound="0" upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="members"
+        lowerBound="0" upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="borrowings"
+        lowerBound="0" upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 7: Book -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isbn"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pages"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- many-to-many not contained authors -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="authors"
+        lowerBound="0" upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 8: Borrowing record -->
+  <eClassifiers xsi:type="ecore:EClass" name="Borrowing" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dueDate"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="book"
+        lowerBound="1"
+        containment="false"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="borrower"
+        lowerBound="1"
+        containment="false"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 9: Address value-like class (no inheritance) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="street"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="city"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="zipCode"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

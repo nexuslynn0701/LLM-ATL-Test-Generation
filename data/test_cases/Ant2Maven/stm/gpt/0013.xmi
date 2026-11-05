@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="WebAppBuild"
+    basedir="."
+    description="Build and test a simple web application"
+    default="build_target">
+
+  <!-- Properties using different concrete Property kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="build/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="env"/>
+
+  <!-- Task definition, not referenced by any task -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default build target with a mixture of task types -->
+  <targets xmi:id="build_target" name="build" description="Compile sources and create jar">
+    <!-- Ensure output directory exists -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" optimize="false"/>
+    <!-- Package compiled classes into a jar -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/webapp.jar" basedir="build/classes" compress="true"/>
+  </targets>
+
+  <!-- Secondary target for cleaning build artifacts -->
+  <targets xmi:id="clean_target" name="clean" description="Remove all build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" file="dist/webapp.jar" verbose="true" quiet="false" failonerror="true"/>
+  </targets>
+
+</Ant:Project>

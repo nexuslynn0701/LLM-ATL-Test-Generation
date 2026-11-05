@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements.0 : root CPL -->
+  <elements xsi:type="CPL:CPL"/>
+
+  <!-- elements.1 : SubCall (top-level, ref is plain string) -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements.2 : Proxy corresponding to SubAction sa1 (simple proxy: no children; will use Location via locations helper) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+
+  <!-- elements.3 : Proxy corresponding to SubAction sa2 (non-simple proxy: has children) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.2"/>
+  </elements>
+
+  <!-- elements.4 : Proxy for outgoing (simple proxy) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+
+  <!-- elements.5 : Proxy for incoming (simple proxy) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+
+  <!-- elements.6 : Location providing URI for proxies and redirect -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+
+  <!-- elements.7 : AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1">
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <addresses is="addr2">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements.8 : StringSwitch (no effect on Location2URIConstant, but valid top-level) -->
+  <elements xsi:type="CPL:StringSwitch" field="hdrField"/>
+
+  <!-- elements.9 : Redirect using Location (triggers Location2URIConstant via Redirect2Return) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <!-- subActions[0] -->
+    <subActions xsi:type="CPL:SubAction" id="sa1">
+      <!-- contents -> simple Proxy (R7) -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default children -->
+      </contents>
+    </subActions>
+
+    <!-- subActions[1] -->
+    <subActions xsi:type="CPL:SubAction" id="sa2">
+      <!-- contents -> AddressSwitch (R15) -->
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="sf1">
+        <!-- addresses[0] with SubCall contents (R17 + R13) -->
+        <addresses is="addr1" contains="c1" subDomainOf="sd1">
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </addresses>
+        <!-- addresses[1] with Redirect contents (R17 + R14) -->
+        <addresses is="addr2" contains="c2" subDomainOf="sd2">
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </addresses>
+        <!-- notPresent with Failure contents (R6 + R5) -->
+        <notPresent>
+          <contents xsi:type="CPL:Failure"/>
+        </notPresent>
+        <!-- otherwise with Redirect contents (R18 + R14) -->
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </subActions>
+
+    <!-- subActions[2] -->
+    <subActions xsi:type="CPL:SubAction" id="sa3">
+      <!-- contents -> Location (no statements from R2) -->
+      <contents xsi:type="CPL:Location" url="sip:example3@example.com" priority="1" clear="yes"/>
+    </subActions>
+
+    <!-- one Incoming (R3) -->
+    <incoming>
+      <!-- contents -> Reject (no statements from R3) -->
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy here"/>
+    </incoming>
+
+    <!-- one Outgoing (R4, OCL4/23) -->
+    <outgoing>
+      <!-- contents -> complex Proxy (R8) -->
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="parallel">
+        <!-- busy with SubCall contents (R9 + R13 + R27,29,30,32) -->
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa2"/>
+        </busy>
+        <!-- noAnswer with Redirect contents (R10 + R14 + R28–32) -->
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <!-- redirection with SubCall contents (R11 + R13 + R28,31,32) -->
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </redirection>
+        <!-- failure with Redirect contents (R5 via nested Failure,32) -->
+        <failure>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </failure>
+        <!-- default with SubCall contents (R12 + R13 + OCL5) -->
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1] : SubCall referring sa1 (top-level for variety, used by rules but not required by any container) -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[2] : Location used by both Proxies and Redirects via locations helper (R7, R8, R14, R19) -->
+  <elements xsi:type="CPL:Location" url="sip:common@example.com" priority="2" clear="no"/>
+
+  <!-- elements[3] : Redirect (top-level) permanent=true to create MOVED_PERMANENTLY (R14,15,28,32) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

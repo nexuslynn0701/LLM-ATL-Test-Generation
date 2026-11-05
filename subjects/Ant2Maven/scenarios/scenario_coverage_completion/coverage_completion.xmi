@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="CoverageCompletionProject"
+    default="compile"
+    basedir=".">
+
+  <path id="main.path">
+    <pathElement path="lib/a.jar" location="lib/a.jar"/>
+  </path>
+
+  <taskdef xmi:id="taskdef_custom" name="customTask" classname="com.example.CustomTask" taskName="taskdef_custom">
+    <attributes name="enabled" value="true"/>
+  </taskdef>
+
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Java" classname="com.example.Main" fork="true">
+      <classPath refid="main.path">
+        <pathElement path="build/classes" location="build/classes"/>
+      </classPath>
+    </tasks>
+
+    <tasks xsi:type="Ant:Copy" todir="build/out">
+      <fileset dir="src/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+        </patternset>
+      </fileset>
+      <filterset begintoken="@@" endtoken="@@">
+        <filters token="version" value="1.0"/>
+        <filtersfile file="filters.properties"/>
+      </filterset>
+    </tasks>
+  </targets>
+</Ant:Project>

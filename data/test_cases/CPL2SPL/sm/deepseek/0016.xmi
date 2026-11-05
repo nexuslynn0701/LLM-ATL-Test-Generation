@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="main"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses contains="example.com"/>
+        <otherwise>
+          <contents xsi:type="CPL:TimeSwitch" tzid="UTC">
+            <times dtstart="20240101T000000" interval="P1D" wkst="MO"/>
+            <otherwise>
+              <contents xsi:type="CPL:Location" url="sip:backup@voip.com" priority="2" clear="yes"/>
+            </otherwise>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities less="5"/>
+        <notPresent>
+          <contents xsi:type="CPL:Redirect" permanent="no"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:StringSwitch" field="subject">
+            <strings contains="urgent"/>
+            <otherwise>
+              <contents xsi:type="CPL:SubCall" ref="voicemail"/>
+            </otherwise>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential" timeout="30">
+    <busy>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:Redirect" permanent="no"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:Failure"/>
+    </redirection>
+    <failure>
+      <contents xsi:type="CPL:LanguageSwitch">
+        <languages matches="en"/>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:en@voip.com" priority="1" clear="no"/>
+        </otherwise>
+      </contents>
+    </failure>
+    <default>
+      <contents xsi:type="CPL:Location" url="sip:default@voip.com" priority="1" clear="yes"/>
+    </default>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="voicemail">
+    <contents xsi:type="CPL:SwitchedTime" dtstart="20230101" interval="P1M" wkst="MO"/>
+  </elements>
+</CPL:CPLModel>

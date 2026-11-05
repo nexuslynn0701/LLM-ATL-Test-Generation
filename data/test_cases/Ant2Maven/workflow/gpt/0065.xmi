@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuildPipeline"
+    basedir="workspace"
+    description="End-to-end build, test, and package pipeline"
+    default="build-all">
+  <!-- Properties: value, location, file, env -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="FullBuildPipeline"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="workspace/target"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition (no taskName references) -->
+  <taskdef name="custom.report" classname="com.example.build.ReportTask"/>
+
+  <!-- Default target: comprehensive build -->
+  <targets xmi:id="build-all" name="build-all">
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/target"/>
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src"
+           destdir="workspace/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- Simple path (no refid, no nested path) -->
+      <classPath refid="">
+        <pathElement path="workspace/lib/core.jar" location="workspace/lib"/>
+      </classPath>
+      <!-- InExcludes directly on Javac (no nested PatternSet, no references) -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="" unless=""/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="" unless=""/>
+    </tasks>
+    <!-- Generate API documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="workspace/src"
+           destdir="workspace/target/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="FullBuildPipeline API Documentation"/>
+    <!-- Package compiled classes into a JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/target/fullbuildpipeline.jar"
+           basedir="workspace/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="workspace/manifest.mf"/>
+  </targets>
+
+  <!-- Auxiliary target: resources and filtering -->
+  <targets xmi:id="resources" name="resources">
+    <!-- Copy resources with simple FileSet and FilterSet -->
+    <tasks xsi:type="Ant:Copy"
+           todir="workspace/target/resources"
+           file=""
+           presservelastmodified=""
+           tofile=""
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="workspace/resources">
+        <!-- Direct include/exclude (no PatternSet) -->
+        <include name="**/*.properties" ifCondition="" unless=""/>
+        <exclude name="**/secret/**" ifCondition="" unless=""/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="FullBuildPipeline"/>
+        <filtersfile file="workspace/config/filters.properties"/>
+      </filterset>
+      <mapper type="glob"
+              classname=""
+              classpath=""
+              classpathref=""
+              from="*.properties"
+              to="*.filtered.properties"/>
+    </tasks>
+    <!-- Timestamp management task (no formats, but mapped) -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="clean" name="clean">
+    <!-- Delete build directory (dir attribute used) -->
+    <tasks xsi:type="Ant:Delete"
+           dir="workspace/target"
+           file=""
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes=""
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

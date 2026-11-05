@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-src"
+    description="Ant build with multiple targets and tasks"
+    default="buildTarget">
+
+  <!-- Properties exercising PropertyValue, PropertyLocation, PropertyFile, PropertyEnv -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="ComplexAntProject"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- One standalone TaskDef (not referenced by any NewTask as per restrictions) -->
+  <taskdef name="custom.task" classname="com.example.CustomAntTask"/>
+
+  <!-- Default target with several different tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile, jar and clean build directory">
+    <!-- Compile sources using Javac with inExcludes and a simple ClassPath -->
+    <tasks xsi:type="Ant:Javac" srcdir="project-src/main/java" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="true">
+      <!-- Include all java files except test packages -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi-type="Ant:Excludes" name="**/test/**"/>
+      <!-- Simple ClassPath with one PathElement and one FileSet with PatternSet -->
+      <classPath refid="compileClasspath">
+        <pathElement path="lib/runtime.jar" location="lib/runtime.jar"/>
+        <fileset dir="lib/extra">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+          </patternset>
+          <include name="**/optional/*.jar"/>
+          <exclude name="**/obsolete/*.jar"/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="project-src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.**"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntProject API"/>
+
+    <!-- Package into JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/complex-ant-project.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Create and then clean directories using Mkdir and Delete -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/temp"/>
+    <tasks xsi:type="Ant:Delete" dir="build/temp" verbose="true" quiet="false" failonerror="true"/>
+
+    <!-- Copy resources with FileSet, FilterSet, and Mapper -->
+    <tasks xsi:type="Ant:Copy" todir="build/resources" overwrite="true" includeEmptyDirs="true" flatten="false">
+      <fileset dir="project-src/main/resources">
+        <include name="**/*.*"/>
+        <exclude name="**/*.bak"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexAntProject"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.template" to="*.conf"/>
+    </tasks>
+  </targets>
+
+  <!-- Secondary target with Java, Tstamp, and Delete tasks -->
+  <targets xmi:id="runTarget" name="run" description="Run the application and clean logs">
+    <!-- Timestamp generation task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+
+    <!-- Java execution task with its own ClassPath -->
+    <tasks xsi:type="Ant:Java" classname="com.example.Main" jar="dist/complex-ant-project.jar" fork="true">
+      <classPath refid="runtimeClasspath">
+        <pathElement path="dist/complex-ant-project.jar" location="dist/complex-ant-project.jar"/>
+        <fileset dir="lib/runtime">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Delete old log directory -->
+    <tasks xsi:type="Ant:Delete" dir="logs/old" verbose="false" quiet="true" includeEmptyDirs="true" defaultexcludes="yes"/>
+  </targets>
+
+</Ant:Project>

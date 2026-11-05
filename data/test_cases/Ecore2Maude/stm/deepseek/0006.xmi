@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore" name="WorkflowPackage" nsURI="http://workflow/1.0" nsPrefix="wf">
+  <eClassifiers xsi:type="ecore:EClass" name="WorkflowElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AtomicTask" eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="executedBy" lowerBound="1" eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="nextTasks" upperBound="-1" eType="//@eClassifiers.1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Actor">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" defaultValueLiteral="0"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Condition">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="expression" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DecisionNode" eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="condition" lowerBound="1" eType="//@eClassifiers.4" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="trueBranch" eType="//@eClassifiers.5" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="falseBranch" eType="//@eClassifiers.5" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CompositeTask" eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="subtasks" upperBound="-1" eType="//@eClassifiers.1" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="LoopTask" eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxIterations" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" defaultValueLiteral="10"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="bodyTask" lowerBound="1" eType="//@eClassifiers.1" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EDataType" name="WorkflowStatus" serializable="false">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="WellFormedInstanceTypeName"/>
+    </eAnnotations>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+    <eLiterals name="PENDING" value="0" literal="pending"/>
+    <eLiterals name="RUNNING" value="1" literal="running"/>
+    <eLiterals name="COMPLETED" value="2" literal="completed"/>
+    <eLiterals name="FAILED" value="3" literal="failed"/>
+  </eClassifiers>
+</ecore:EPackage>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents: complex Proxy (not simple) -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- Simple Proxy inside busy (will trigger Proxy2Return via Busy2SelectCase) -->
+        <busy>
+          <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential"/>
+        </busy>
+        <!-- NotPresent & Failure as children of complex Proxy to exercise their rules -->
+        <noAnswer>
+          <contents xsi:type="CPL:NotPresent"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Failure"/>
+        </redirection>
+        <failure/>
+        <!-- Default points to SubCall element at index 2 -->
+        <default contents="//@elements.2"/>
+      </contents>
+    </subActions>
+
+    <!-- Incoming method whose contents is a simple Proxy -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential"/>
+    </incoming>
+
+    <!-- Outgoing method whose contents is the AddressSwitch at index 4 -->
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch"/>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by Redirect2Return and by simple Proxies via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:location@example.com" clear="true"/>
+
+  <!-- SubCall referencing the SubAction id "saMain" -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- Redirect (permanent=false) using the Location above through locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- AddressSwitch with one SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="sip:alice@example.com"/>
+    <notPresent/>
+    <!-- Otherwise contents is the Reject (index 6) -->
+    <otherwise contents="//@elements.6"/>
+  </elements>
+
+  <!-- Reject used from Otherwise -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- Simple Proxy at top level (no children) -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel"/>
+
+</CPL:CPLModel>

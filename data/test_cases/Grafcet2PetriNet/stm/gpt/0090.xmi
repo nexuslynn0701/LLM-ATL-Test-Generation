@@ -1,0 +1,43 @@
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="g1" name="ComplexGrafcet" location="loc:grafcet:1">
+
+    <!-- Elements -->
+    <elements xsi:type="Grafcet:Step" xmi:id="s1" name="InitialStepA" location="loc:step:1" isInitial="true" isActive="true" action="startMotor"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s2" name="IntermediateStepB" location="loc:step:2" isInitial="false" isActive="false" action="checkSensor"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s3" name="IntermediateStepC" location="loc:step:3" isInitial="false" isActive="false" action="logData"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s4" name="FinalStepD" location="loc:step:4" isInitial="false" isActive="false" action="shutdown"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t1" name="Trans1" location="loc:trans:1" condition="sensorOK"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t2" name="Trans2" location="loc:trans:2" condition="dataReady"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t3" name="Trans3" location="loc:trans:3" condition="timeout"/>
+
+    <!-- Connections -->
+    <!-- Simple chain: s1 -> t1 -> s2 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c1" name="S1_to_T1" location="loc:conn:1"
+        from="/0/@elements.0" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c2" name="T1_to_S2" location="loc:conn:2"
+        from="/0/@elements.4" to="/0/@elements.1"/>
+
+    <!-- Branch from s2 to t2 and t3 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c3" name="S2_to_T2" location="loc:conn:3"
+        from="/0/@elements.1" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c4" name="S2_to_T3" location="loc:conn:4"
+        from="/0/@elements.1" to="/0/@elements.6"/>
+
+    <!-- Merge: t2 -> s3, t3 -> s3 -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c5" name="T2_to_S3" location="loc:conn:5"
+        from="/0/@elements.5" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c6" name="T3_to_S3" location="loc:conn:6"
+        from="/0/@elements.6" to="/0/@elements.2"/>
+
+    <!-- Final chain: s3 -> t2 (reused) -> s4 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c7" name="S3_to_T2" location="loc:conn:7"
+        from="/0/@elements.2" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c8" name="T2_to_S4" location="loc:conn:8"
+        from="/0/@elements.5" to="/0/@elements.3"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

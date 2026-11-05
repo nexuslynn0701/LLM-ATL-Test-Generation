@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="mmRoot13"
+    nsURI="http://mm13/root"
+    nsPrefix="mm13">
+
+  <!-- Root-level classifiers -->
+  <!-- 0: EClass RootBase -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootBase" abstract="true" interface="false">
+    <!-- Supertype chain will be used by subclasses -->
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        iD="true"/>
+  </eClassifiers>
+
+  <!-- 1: EClass RootEntity -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootEntity" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- Attribute with String type, default literal to trigger AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="Untitled &quot;Root&quot;"
+        iD="false"/>
+    <!-- Int attribute, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"/>
+    <!-- Boolean attribute, default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="true"
+        iD="false"/>
+    <!-- Reference to ChildItem (classifier 4), multiplicity * with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="items"
+        eType="//@eClassifiers.4"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 2: EEnum StatusKind -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 3: EClass EnumerationHolder -->
+  <eClassifiers xsi:type="ecore:EClass" name="EnumerationHolder" abstract="false" interface="false">
+    <!-- Enum-typed attribute, with default value literal to trigger enum default handling -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        eType="//@eClassifiers.2"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="IN_PROGRESS"
+        iD="false"/>
+    <!-- String attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 4: EClass ChildItem -->
+  <eClassifiers xsi:type="ecore:EClass" name="ChildItem" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- Opposite reference back to RootEntity (classifier 1) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+        eType="//@eClassifiers.1"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.3"/>
+    <!-- Reference to sibling ChildItem (self-type, * multiplicity, no opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="siblings"
+        eType="//@eClassifiers.4"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"/>
+    <!-- Attribute with Float-like type (EDouble) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="weight"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 5: EDataType CustomString (non-primitive name to hit @DataType branch) -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomStringType" instanceClassName="java.lang.String"/>
+
+  <!-- 6: EClass DataTypeUser -->
+  <eClassifiers xsi:type="ecore:EClass" name="DataTypeUser" abstract="false" interface="false">
+    <!-- Attribute using custom EDataType, tests '@DataType' branch -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="customValue"
+        eType="//@eClassifiers.5"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 7: EEnum SingleLiteralEnum (size=1 to trigger single-literal path) -->
+  <eClassifiers xsi:type="ecore:EEnum" name="SingleLiteralEnum">
+    <eLiterals name="ONLY" value="0" literal="ONLY"/>
+  </eClassifiers>
+
+  <!-- 8: EClass SingleEnumUser -->
+  <eClassifiers xsi:type="ecore:EClass" name="SingleEnumUser" abstract="false" interface="false">
+    <!-- Enum attribute with no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="flag"
+        eType="//@eClassifiers.7"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 9: EClass NoFeatureClass (to test empty attributes/references lists) -->
+  <eClassifiers xsi:type="ecore:EClass" name="NoFeatureClass" abstract="false" interface="false"/>
+
+  <!-- 10: EClass MultiSuperClass extends RootBase and EnumerationHolder -->
+  <eClassifiers xsi:type="ecore:EClass" name="MultiSuperClass" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0 //@eClassifiers.3">
+    <!-- Reference to NoFeatureClass, upperBound=1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target"
+        eType="//@eClassifiers.9"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 11: EClass MultiValuedAttrClass with upperBound = -1 -->
+  <eClassifiers xsi:type="ecore:EClass" name="MultiValuedAttrClass" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tags"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0"
+        upperBound="-1"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- Subpackage to exercise superPackage/subpackages rules -->
+  <eSubpackages name="mmSub13" nsURI="http://mm13/sub" nsPrefix="mms13">
+    <!-- 0: EClass SubRoot -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubRoot" abstract="false" interface="false">
+      <!-- simple attribute -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1"
+          upperBound="1"
+          iD="false"/>
+    </eClassifiers>
+
+    <!-- 1: EClass CrossPackageRef, reference to parent package's RootEntity (index 1 in root) -->
+    <eClassifiers xsi:type="ecore:EClass" name="CrossPackageRef" abstract="false" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="rootRef"
+          eType="//@eClassifiers.1"
+          lowerBound="0"
+          upperBound="1"
+          containment="false"
+          resolveProxies="true"/>
+    </eClassifiers>
+
+    <!-- 2: EEnum SubEnum with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="SubEnum">
+      <eLiterals name="LOW" value="0" literal="LOW"/>
+      <eLiterals name="HIGH" value="1" literal="HIGH"/>
+    </eClassifiers>
+
+    <!-- 3: Class that uses SubEnum with default -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubEnumUser" abstract="false" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="level"
+          eType="//@eSubpackages.0/@eClassifiers.2"
+          lowerBound="0"
+          upperBound="1"
+          defaultValueLiteral="HIGH"
+          iD="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

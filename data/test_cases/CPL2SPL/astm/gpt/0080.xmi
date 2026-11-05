@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with incoming & outgoing and multiple subactions -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions -->
+    <subActions id="saSimple">
+      <!-- contents references a simple Proxy (elements[4]) -->
+      <contents href="//@elements.4"/>
+    </subActions>
+    <subActions id="saComplex">
+      <!-- contents references a complex Proxy (elements[5]) -->
+      <contents href="//@elements.5"/>
+    </subActions>
+
+    <!-- Incoming & Outgoing methods -->
+    <incoming>
+      <!-- contents references a Redirect (elements[3]) -->
+      <contents href="//@elements.3"/>
+    </incoming>
+    <outgoing>
+      <!-- contents references an AddressSwitch (elements[6]) -->
+      <contents href="//@elements.6"/>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by simple Proxy and Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:user1@example.com" clear="true" priority="1">
+    <!-- Give it its own inner Location to exercise Location.statement indirection -->
+    <contents href="//@elements.8"/>
+  </elements>
+
+  <!-- Redirect (uses locations from above) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- Simple Proxy (isSimple = true: no busy/noAnswer/redirection/failure/default) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+
+  <!-- Complex Proxy (isSimple = false: has all branches, some with contents) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- Complex proxy gets its locations via this inner Location -->
+    <default>
+      <!-- default branch contains a SubCall (elements[9]) -->
+      <contents href="//@elements.9"/>
+    </default>
+    <busy>
+      <!-- busy branch contains a Reject (elements[7]) -->
+      <contents href="//@elements.7"/>
+    </busy>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+  </elements>
+
+  <!-- AddressSwitch used in Outgoing -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- one SwitchedAddress with inner Proxy contents -->
+    <addresses is="alice@example.com" contains="local" subDomainOf="example.com">
+      <!-- contents references simple Proxy (elements[4]) -->
+      <contents href="//@elements.4"/>
+    </addresses>
+    <!-- one SwitchedAddress with inner Reject contents -->
+    <addresses is="bob@example.org" contains="remote" subDomainOf="example.org">
+      <!-- contents references Reject (elements[7]) -->
+      <contents href="//@elements.7"/>
+    </addresses>
+    <!-- notPresent and otherwise branches -->
+    <notPresent/>
+    <otherwise>
+      <!-- otherwise default branch contains a SubCall (elements[10]) -->
+      <contents href="//@elements.10"/>
+    </otherwise>
+  </elements>
+
+  <!-- Reject used in several branches -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy"/>
+
+  <!-- Inner Location to be pointed by outer Location.contents -->
+  <elements xsi:type="CPL:Location" url="sip:nested@example.net" clear="false" priority="2"/>
+
+  <!-- SubCall for saSimple -->
+  <elements xsi:type="CPL:SubCall" ref="saSimple"/>
+
+  <!-- SubCall for saComplex -->
+  <elements xsi:type="CPL:SubCall" ref="saComplex"/>
+
+</CPL:CPLModel>

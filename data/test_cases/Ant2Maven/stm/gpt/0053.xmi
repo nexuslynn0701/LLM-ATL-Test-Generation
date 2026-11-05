@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiPhaseBuild"
+    basedir="."
+    description="Build and package with clean step"
+    default="buildTarget">
+
+  <!-- Default build target: mkdir + compile + jar -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources and create jar">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multiphase-build.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Additional target: clean distribution directory -->
+  <targets xmi:id="cleanTarget" name="clean" description="Remove build and dist output">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""/>
+    <tasks xsi:type="Ant:Delete"
+           dir="dist"
+           verbose="false"
+           quiet="true"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludesfile="dist-excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

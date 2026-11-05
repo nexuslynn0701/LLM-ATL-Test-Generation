@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.1"/>
+    <subActions contents="//@elements.2"/>
+    <incoming contents="//@elements.3"/>
+    <outgoing contents="//@elements.4"/>
+  </elements>
+
+  <!-- 1: SubAction A with SubCall inside -->
+  <elements xsi:type="CPL:SubAction" id="SA_call">
+    <contents xsi:type="CPL:SubCall" ref="SA_proxy"/>
+  </elements>
+
+  <!-- 2: SubAction B with simple Proxy (triggers Proxy2Return) -->
+  <elements xsi:type="CPL:SubAction" id="SA_proxy">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+    </contents>
+  </elements>
+
+  <!-- 3: Incoming with Redirect as contents -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 4: Outgoing with complex Proxy as contents -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- 5: Complex Proxy's Busy branch with AddressSwitch -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="fromUser">
+    <addresses contents="//@elements.7"/>
+    <notPresent/>
+    <otherwise contents="//@elements.11"/>
+  </elements>
+
+  <!-- 6: Complex Proxy's NoAnswer branch with StringSwitch -->
+  <elements xsi:type="CPL:StringSwitch" field="eventType">
+    <!-- no contents, just declaration in SPL -->
+  </elements>
+
+  <!-- 7: SwitchedAddress with simple Proxy as contents -->
+  <elements xsi:type="CPL:SwitchedAddress" is="alice@example.com" contains="alice" subDomainOf="example.com">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <!-- simple proxy -->
+    </contents>
+  </elements>
+
+  <!-- 8: Complex Proxy's Redirection branch with Location -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.com" priority="1" clear="yes">
+    <!-- no nested contents: location is terminal here -->
+  </elements>
+
+  <!-- 9: Complex Proxy's Failure branch with Failure node -->
+  <elements xsi:type="CPL:Failure">
+    <!-- no contents -->
+  </elements>
+
+  <!-- 10: Complex Proxy's Default branch with Redirect (temporary) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 11: Otherwise of AddressSwitch with SubCall -->
+  <elements xsi:type="CPL:SubCall" ref="SA_proxy"/>
+</CPL:CPLModel>

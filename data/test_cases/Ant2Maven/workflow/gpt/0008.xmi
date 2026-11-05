@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="src"
+    description="Build and package shared library"
+    default="build-main">
+  <!-- Properties exercising all Ant Property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition and attribute -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+  <taskdef name="secondary.task" classname="com.example.ant.SecondaryTask"/>
+  <targets xmi:id="build-main" name="build-main">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="target/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false">
+      <classPath refid="">
+        <pathElement path="lib/runtime.jar" location="lib"/>
+        <fileset dir="lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar" ifCondition="" unless=""/>
+            <inexcludes xsi:type="Ant:Excludes" name="**/*-tests.jar" ifCondition="" unless=""/>
+          </patternset>
+          <include name="core/*.jar" ifCondition="" unless=""/>
+          <exclude name="legacy/*.jar" ifCondition="" unless=""/>
+        </fileset>
+      </classPath>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="" unless=""/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/experimental/**" ifCondition="" unless=""/>
+    </tasks>
+
+    <!-- Package compiled classes into a JAR -->
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/library.jar"
+        basedir="target/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+
+    <!-- Copy resources using FileSet, FilterSet and Mapper -->
+    <tasks xsi:type="Ant:Copy"
+        file=""
+        presservelastmodified="true"
+        tofile=""
+        todir="target/dist/resources"
+        overwrite="true"
+        filtering="true"
+        flatten="false"
+        includeEmptyDirs="false">
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="includes.list" ifCondition="" unless=""/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list" ifCondition="" unless=""/>
+        </patternset>
+        <include name="config/**" ifCondition="" unless=""/>
+        <exclude name="temp/**" ifCondition="" unless=""/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="LibraryBuild"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="" classpath="" classpathref="" from="*.txt" to="*.cfg"/>
+    </tasks>
+
+    <!-- Delete temporary files -->
+    <tasks xsi:type="Ant:Delete"
+        file="target/tmp"
+        dir="target/tmp"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="false"
+        includes="**/*"
+        includesfile=""
+        excludes="**/*.lock"
+        excludesfile=""
+        defaultexcludes="true"/>
+
+    <!-- Javadoc generation -->
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src/main/java"
+        destdir="target/apidocs"
+        packagenames="com.example.library.*"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Library API Documentation"/>
+  </targets>
+
+  <!-- Secondary target with additional tasks -->
+  <targets xmi:id="cleanup" name="cleanup">
+    <!-- Timestamp task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss" offset="" unit="" locale=""/>
+      <format property="release.date" pattern="yyyy-MM-dd" offset="" unit="" locale=""/>
+    </tasks>
+
+    <!-- Java execution with ClassPath -->
+    <tasks xsi:type="Ant:Java"
+        classname="com.example.tools.Verifier"
+        jar=""
+        fork="true">
+      <classPath refid="">
+        <pathElement path="lib/tools.jar" location="lib"/>
+        <fileset dir="lib/tools">
+          <include name="**/*.jar" ifCondition="" unless=""/>
+        </fileset>
+      </classPath>
+    </tasks>
+  </targets>
+</Ant:Project>

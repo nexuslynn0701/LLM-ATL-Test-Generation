@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project-src"
+    description="Comprehensive Ant project for transformation testing"
+    default="buildTarget">
+
+  <!-- One property of each concrete kind -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="conf/config.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A standalone taskdef (not referenced by tasks) -->
+  <taskdef name="customTask" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target with several supported tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources and package JAR">
+    <!-- Compile with includes/excludes and a classpath that has pathElements and a fileset -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="hasSources" unless="skipCompile"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="excludeInternal" unless=""/>
+      <inExcludes xsi:type="Ant:IncludesFile" name="include-list.txt" ifCondition="" unless="noIncludeFile"/>
+      <inExcludes xsi:type="Ant:ExcludesFile" name="exclude-list.txt" ifCondition="hasExcludesFile" unless=""/>
+      <classPath refid="compile.classpath">
+        <pathElement path="lib/dependency1.jar" location="lib/dependency1.jar"/>
+        <pathElement path="lib/dependency2.jar" location="lib/dependency2.jar"/>
+        <fileset dir="lib/optional">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar" ifCondition="" unless=""/>
+            <inexcludes xsi:type="Ant:Excludes" name="**/old/**" ifCondition="" unless=""/>
+          </patternset>
+          <include name="**/extra-*.jar" ifCondition="" unless="skipExtras"/>
+          <exclude name="**/beta/**" ifCondition="excludeBeta" unless=""/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Javadoc task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="org.example.*,org.test.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Project API"/>
+
+    <!-- Jar packaging -->
+    <tasks xsi:type="Ant:Jar" jarfile="target/artifacts/example.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Filtered resource copy using FileSet, FilterSet and Mapper -->
+    <tasks xsi:type="Ant:Copy" todir="target/resources" overwrite="true" filtering="true" flatten="false" includeEmptyDirs="true">
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties" ifCondition="" unless=""/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/secret/**" ifCondition="" unless=""/>
+        </patternset>
+        <include name="**/*.xml" ifCondition="includeXml" unless=""/>
+        <exclude name="**/*.bak" ifCondition="" unless=""/>
+      </fileset>
+      <filterset starttoken="@@" endtoken="@@">
+        <filter token="project.name" value="ComplexBuild"/>
+        <filtersfile file="conf/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="org.example.ant.RenameMapper" classpath="lib/rename-mapper.jar" classpathref="" from="*.template" to="*.cfg"/>
+    </tasks>
+
+    <!-- Timestamp task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" offset="0" unit="hour" locale="en_US"/>
+      <format property="build.date" pattern="yyyy-MM-dd" offset="1" unit="day" locale="en_US"/>
+    </tasks>
+
+    <!-- Create directories and then clean a temporary folder -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/tmp"/>
+    <tasks xsi:type="Ant:Delete" dir="target/tmp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="**/*" excludes="**/*.keep" defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target with path and path-related content -->
+  <targets xmi:id="pathSetupTarget" name="preparePaths" description="Prepare reusable paths">
+    <tasks xsi:type="Ant:Javac" srcdir="src/other" destdir="target/other-classes">
+      <classPath refid="runtime.classpath">
+        <!-- Nested Path object (to exercise Path->Path containment and its contents) -->
+        <path id="nested.path" refid="">
+          <pathElement path="lib/nested1.jar" location="lib/nested1.jar"/>
+          <fileset dir="lib/nested">
+            <include name="**/*.jar" ifCondition="" unless=""/>
+          </fileset>
+        </path>
+        <pathElement path="lib/runtime1.jar" location="lib/runtime1.jar"/>
+        <fileset dir="lib/runtime">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar" ifCondition="" unless=""/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+  </targets>
+
+</Ant:Project>

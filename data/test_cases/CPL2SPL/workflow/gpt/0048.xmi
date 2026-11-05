@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction and one Outgoing using a complex Proxy -->
+  <elements xsi:type="CPL:CPL"/>
+
+  <!-- 1: SubAction referenced by SubCall via plain string ref -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- 2: Proxy that uses branches with contents references -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </redirection>
+    <failure/>
+    <default>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </default>
+  </elements>
+
+  <!-- 3: Outgoing using a simple Proxy (no branches) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- simple proxy: no branches; will use location from Location element below -->
+  </elements>
+
+  <!-- 4: Location used by the simple Proxy to trigger Location2URIConstant via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes"/>
+
+  <!-- 5: SubCall, independent (also used in some branches above via ref) -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- 6: Redirect, independent -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 7: AddressSwitch with one SwitchedAddress and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1"/>
+    <notPresent/>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+        <!-- simple proxy inside otherwise -->
+      </contents>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

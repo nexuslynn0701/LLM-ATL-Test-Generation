@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saComplex">
+      <!-- SubAction contents: complex Proxy (triggers Proxy2Select) -->
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="no" ordering="sequential">
+        <!-- Complex proxy has all branches, thus not isSimple -->
+        <busy>
+          <!-- Busy contents: simple Proxy (triggers Busy2SelectCase + Proxy2Return) -->
+          <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="parallel">
+            <!-- Simple Proxy: no branches, isSimple = true -->
+          </contents>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents: SubCall (triggers NoAnswer2SelectCase + SubCall2Return) -->
+          <contents xsi:type="CPL:SubCall" ref="saSimple"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents: Redirect (triggers Redirection2SelectCase + Redirect2Return) -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure>
+          <!-- Failure contents: SubCall (to trigger Failure2ErrorResponse via rule R5 independently) -->
+          <contents xsi:type="CPL:SubCall" ref="saSimple"/>
+        </failure>
+        <default>
+          <!-- Default contents: Location (blocked as statement, tests the guard path) -->
+          <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="true"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Incoming contents: Redirect (triggers Incoming2Method + Redirect2Return using same locations) -->
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </incoming>
+
+    <!-- Outgoing contents: TimeSwitch (tests empty statements in Outgoing2Method) -->
+    <outgoing>
+      <contents xsi:type="CPL:TimeSwitch" tzid="UTC">
+        <times dtstart="20250101T000000Z" interval="1" wkst="MO"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Simple SubAction used by SubCall.ref = "saSimple" -->
+  <elements xsi:type="CPL:SubAction" id="saSimple">
+    <!-- contents: simple Proxy (triggers SubAction2Function + Proxy2Return) -->
+    <contents xsi:type="CPL:Proxy" timeout="15" recurse="yes" ordering="parallel">
+      <!-- Simple: no branches -->
+    </contents>
+  </elements>
+
+  <!-- 2: Location used as first location for root CPL (for Proxy and Redirect rules) -->
+  <elements xsi:type="CPL:Location" url="sip:rootloc@example.com" priority="1" clear="true">
+    <!-- contents: Redirect to test Location.statement resolution path (blocked as statement) -->
+    <contents xsi:type="CPL:Redirect" permanent="false"/>
+  </elements>
+
+  <!-- 3: AddressSwitch with SwitchedAddress, NotPresent, Otherwise (R15, R17, R18, R6) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- SwitchedAddress case: contents simple Proxy (R17 + Proxy2Return) -->
+    <addresses is="sip:case1@example.com">
+      <contents xsi:type="CPL:Proxy" timeout="5" recurse="yes" ordering="parallel"/>
+    </addresses>
+    <!-- NotPresent branch (R6) with contents Reject (blocked as statement) -->
+    <notPresent>
+      <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+    </notPresent>
+    <!-- Otherwise default branch (R18) with contents SubCall (R13) -->
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="saComplex"/>
+    </otherwise>
+  </elements>
+
+  <!-- 4: StringSwitch (R16) -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents xsi:type="CPL:Redirect" permanent="true"/>
+  </elements>
+
+  <!-- 5: LanguageSwitch used as top-level (R1 ignores it but tests guards) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+  </elements>
+
+  <!-- 6: PrioritySwitch used as top-level (again, tests guard paths) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities/>
+  </elements>
+
+  <!-- 7: TimeSwitch as top-level (already used inside Outgoing; here as standalone) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Berlin" tzurl="http://tz.example.com/berlin">
+    <times dtstart="20250201T080000Z" interval="2" wkst="MO"/>
+  </elements>
+
+  <!-- 8: Standalone Redirect that will use locations from its container (CPLModel -> empty) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 9: Standalone Proxy with only failure branch to exercise Failure2ErrorResponse and Proxy2Select again -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="no" ordering="parallel">
+    <failure/>
+  </elements>
+
+</CPL:CPLModel>

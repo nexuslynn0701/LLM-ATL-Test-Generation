@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="CustomBuild"
+    basedir="."
+    description="Custom build with new task and includes file"
+    default="main">
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target"/>
+  <properties xsi:type="Ant:PropertyLocation" name="src.dir" location="src/main/java"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="mytask" classname="com.example.MyTask"/>
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:NewTask" taskName="//@taskdef.0">
+      <attributes name="outputDir" value="target/generated"/>
+      <attributes name="verbose" value="true"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="main" name="main">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes"/>
+    <tasks xsi:type="Ant:Copy" todir="target/resources">
+      <fileset dir="src/main/resources">
+        <include name="**/*.xml"/>
+        <includesFile name="included-files.txt"/>
+        <excludesFile name="excluded-files.txt"/>
+      </fileset>
+    </tasks>
+    <tasks xsi:type="Ant:Jar" jarfile="target/app.jar" basedir="target/classes"/>
+    <tasks xsi:type="Ant:Delete" dir="temp"/>
+  </targets>
+</Ant:Project>

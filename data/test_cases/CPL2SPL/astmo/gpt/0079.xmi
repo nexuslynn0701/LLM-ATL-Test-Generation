@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <!-- one SubAction -->
+    <subActions id="saMain">
+      <!-- SubAction.contents = Proxy (elements[6]) -->
+      <contents xsi:type="CPL:Proxy"
+                recurse="yes"
+                ordering="parallel"
+                busy="//@elements.6/@busy"
+                noAnswer="//@elements.6/@noAnswer"
+                redirection="//@elements.6/@redirection"
+                failure="//@elements.6/@failure"
+                default="//@elements.6/@default"/>
+    </subActions>
+
+    <!-- one Outgoing, contents = same Proxy (elements[6]) -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy"
+                recurse="yes"
+                ordering="parallel"
+                busy="//@elements.6/@busy"
+                noAnswer="//@elements.6/@noAnswer"
+                redirection="//@elements.6/@redirection"
+                failure="//@elements.6/@failure"
+                default="//@elements.6/@default"/>
+    </outgoing>
+
+    <!-- one Incoming, contents = same Proxy (elements[6]) -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy"
+                recurse="yes"
+                ordering="parallel"
+                busy="//@elements.6/@busy"
+                noAnswer="//@elements.6/@noAnswer"
+                redirection="//@elements.6/@redirection"
+                failure="//@elements.6/@failure"
+                default="//@elements.6/@default"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1]: Location used by complex Proxy and Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true">
+    <!-- no nested contents -->
+  </elements>
+
+  <!-- elements[2]: SubCall used inside Busy.contents -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- elements[3]: AddressSwitch with one SwitchedAddress and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- notPresent child (no contents) -->
+    <notPresent/>
+    <!-- otherwise child, contents = Reject (elements[7]) -->
+    <otherwise contents="//@elements.7"/>
+    <!-- addresses: one SwitchedAddress, contents = Redirect (elements[5]) -->
+    <addresses is="alice@example.com" contains="dom" subDomainOf="example.com" contents="//@elements.5"/>
+  </elements>
+
+  <!-- elements[4]: simple Proxy (isSimple = true) used inside Default.contents -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- no Busy/NoAnswer/Redirection/Failure/Default children => simple -->
+  </elements>
+
+  <!-- elements[5]: Redirect (used as SwitchedAddress.contents and as a top-level element) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- elements[6]: complex Proxy (not simple) referenced from CPL and SubAction -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- Busy with contents = SubCall (elements[2]) -->
+    <busy contents="//@elements.2"/>
+    <!-- NoAnswer with contents = AddressSwitch (elements[3]) -->
+    <noAnswer contents="//@elements.3"/>
+    <!-- Redirection with no contents -->
+    <redirection/>
+    <!-- Failure with no contents -->
+    <failure/>
+    <!-- Default with contents = simple Proxy (elements[4]) -->
+    <default contents="//@elements.4"/>
+  </elements>
+
+  <!-- elements[7]: Reject used as Otherwise.contents -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+</CPL:CPLModel>

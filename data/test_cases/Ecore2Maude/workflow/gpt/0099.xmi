@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ecore="http://ecore"
+  name="rootMeta"
+  nsURI="http://rootMetaURI"
+  nsPrefix="rootMetaPrefix">
+
+  <!-- 0: Root package with classes, enums, and a subpackage -->
+  <!-- Class 0: base with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseEntity" abstract="true">
+    <!-- Attribute 0: String, is ID, has default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true"
+                         defaultValueLiteral="DEF-ID"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute 1: EInt, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference 2: containment, to SubEntity, no opposite, bounds 0..* -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         ordered="true"
+                         unique="true"
+                         eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 1: Subclass of BaseEntity with its own attribute and reference (with opposite) -->
+  <eClassifiers xsi:type="ecore:EClass" name="SubEntity">
+    <!-- super type BaseEntity -->
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+    <!-- Attribute 0: EString, default literal with quotes to trigger escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="&quot;quoted&quot; text"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Reference 1: to BaseEntity, non-containment, with opposite 'children' -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="parent"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         ordered="true"
+                         unique="true"
+                         eType="//@eClassifiers.0"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 2: Enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 3: DataType used in subpackage -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomNumber" instanceTypeName="java.lang.Double"/>
+
+  <!-- 4: Enum with one literal -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityLevel">
+    <eLiterals name="HIGH" value="0" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 5: Simple class with no features to vary ClassEq* and EmptyList rules -->
+  <eClassifiers xsi:type="ecore:EClass" name="Marker"/>
+
+  <!-- Subpackage 0 under rootMeta -->
+  <eSubpackages name="subMeta"
+                nsURI="http://subMetaURI"
+                nsPrefix="subMetaPrefix">
+    <!-- 0 in subMeta: class referencing enum and datatype via attributes -->
+    <eClassifiers xsi:type="ecore:EClass" name="Config">
+      <!-- Attribute 0: enum StatusKind -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="status"
+                           lowerBound="0"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           eType="//@eClassifiers.2"/>
+      <!-- Attribute 1: local datatype CustomNumber -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="threshold"
+                           lowerBound="0"
+                           upperBound="1"
+                           ordered="true"
+                           unique="false"
+                           eType="//@eClassifiers.3"/>
+    </eClassifiers>
+
+    <!-- 1 in subMeta: class extending Config to trigger createSort on supertype in non-ecore package -->
+    <eClassifiers xsi:type="ecore:EClass" name="AdvancedConfig">
+      <eSuperTypes>//@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

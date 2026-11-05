@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL: has SubActions, Incoming, Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <busy contents="//@elements.5"/>
+        <noAnswer contents="//@elements.6"/>
+        <redirection contents="//@elements.7"/>
+        <failure/>
+        <default contents="//@elements.3"/>
+      </contents>
+    </subActions>
+    <subActions id="saRejectOnly">
+      <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:Location" url="sip:in@example.com" priority="1" clear="yes">
+        <contents xsi:type="CPL:SubCall" ref="saMain"/>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.4"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Simple location used by Proxy location helper -->
+  <elements xsi:type="CPL:Location" url="sip:loc1@example.com" priority="10" clear="no"/>
+
+  <!-- Redirect that will be reached from Busy (permanent=true) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- Redirect that will be reached from Default of complex Proxy (permanent=false) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- Redirect reached from Outgoing's simple Proxy via Default -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- Switch: AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="alice" contains="user" subDomainOf="example.com">
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </addresses>
+    <addresses is="bob" contains="user" subDomainOf="example.org">
+      <contents xsi:type="CPL:SubCall" ref="saRejectOnly"/>
+    </addresses>
+    <notPresent/>
+    <otherwise contents="//@elements.8"/>
+  </elements>
+
+  <!-- StringSwitch to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents xsi:type="CPL:SubCall" ref="saMain"/>
+  </elements>
+
+  <!-- SubCall as a top-level element -->
+  <elements xsi:type="CPL:SubCall" ref="saRejectOnly"/>
+
+</CPL:CPLModel>

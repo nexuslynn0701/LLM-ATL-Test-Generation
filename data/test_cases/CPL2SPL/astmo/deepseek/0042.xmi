@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="callForward"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="sip:alice@example.com">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <noAnswer/>
+            <default contents="//@elements.3"/>
+          </contents>
+        </addresses>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <busy contents="//@elements.4"/>
+        <redirection/>
+        <failure/>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="callForward"/>
+  <elements xsi:type="CPL:Location" url="sip:bob@voip.com" priority="1" clear=""/>
+  <elements xsi:type="CPL:SubCall" ref="callForward"/>
+  <elements xsi:type="CPL:Reject" status="600" reason="Busy Everywhere"/>
+  <elements xsi:type="CPL:StringSwitch" field="Subject">
+    <strings is="Urgent" contains="urgent"/>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" tzid="America/New_York">
+    <times dtstart="20250301T090000" dtend="20250301T170000" interval="1" wkst="MO"/>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <default contents="//@elements.2"/>
+      </contents>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

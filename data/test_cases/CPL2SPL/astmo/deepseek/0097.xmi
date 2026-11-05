@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sub1"/>
+    <subActions id="sub2"/>
+    <incoming/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="192.168.1.100"/>
+        <addresses is="10.0.0.1"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:support@example.com" priority="1" clear="yes"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="sub1"/>
+  <elements xsi:type="CPL:SubAction" id="sub2"/>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential" timeout="10">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="sub1"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+    </noAnswer>
+    <redirection/>
+    <failure>
+      <contents xsi:type="CPL:Location" url="sip:backup@example.com" priority="2" clear="no"/>
+    </failure>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="user-agent">
+    <strings contains="Mozilla"/>
+    <notPresent/>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:default@example.com" priority="1" clear="yes"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" priority="1" clear="yes"/>
+</CPL:CPLModel>

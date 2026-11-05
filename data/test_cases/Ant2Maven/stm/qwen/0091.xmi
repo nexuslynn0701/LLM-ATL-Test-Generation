@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleBuild"
+    default="package"
+    basedir="."
+    description="A sample Ant build for testing ATL transformation">
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target"/>
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <targets xmi:id="init" name="init" description="Initialize build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="${build.dir}"/>
+    <tasks xsi:type="Ant:Mkdir" dir="${build.dir}/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="${build.dir}/docs"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Javac" srcdir="${src.dir}" destdir="${build.dir}/classes" debug="true" deprecation="true"/>
+  </targets>
+  <targets xmi:id="doc" name="doc" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="${src.dir}"
+        destdir="${build.dir}/docs"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Sample API Documentation"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Package compiled classes into a JAR">
+    <tasks xsi:type="Ant:Jar"
+        jarfile="${build.dir}/sample.jar"
+        basedir="${build.dir}/classes"
+        compress="true"
+        manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="${build.dir}" quiet="true"/>
+  </targets>
+</Ant:Project>

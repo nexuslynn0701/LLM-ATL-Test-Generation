@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainRouting"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="host">
+        <addresses is="192.168.1.100" contains="example.com" subDomainOf="test.org"/>
+        <addresses is="10.0.0.1"/>
+        <notPresent>
+          <contents xsi:type="CPL:Location" url="sip:backup@voip.com" priority="1" clear="yes"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:TimeSwitch" tzid="America/New_York" tzurl="http://timezones.example.com/ny">
+            <times dtstart="20240101T090000" dtend="20240101T170000" duration="PT8H" freq="DAILY" until="20241231T235959" count="365" interval="1" wkst="MO"/>
+            <times dtstart="20250101T000000" interval="1" wkst="SU"/>
+            <notPresent>
+              <contents xsi:type="CPL:Redirect" permanent="false"/>
+            </notPresent>
+            <otherwise>
+              <contents xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+                <busy>
+                  <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+                </busy>
+                <noAnswer>
+                  <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="0" clear="no"/>
+                </noAnswer>
+                <default contents="//@elements.1"/>
+              </CPL:Proxy>
+            </otherwise>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="urgent" contains="meeting"/>
+        <strings is="spam"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:LanguageSwitch">
+            <languages matches="en"/>
+            <languages matches="fr"/>
+            <otherwise>
+              <contents xsi:type="CPL:Location" url="sip:default@company.com" priority="5" clear="yes"/>
+            </otherwise>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="mainRouting"/>
+  <elements xsi:type="CPL:Location" url="sip:admin@domain.com" priority="10" clear="yes"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <busy/>
+    <failure>
+      <contents xsi:type="CPL:Location" url="sip:failover@backup.net" priority="2" clear="no"/>
+    </failure>
+    <default contents="//@elements.2"/>
+  </elements>
+  <elements xsi:type="CPL:AddressSwitch" field="contact" subField="user">
+    <addresses contains="support"/>
+    <addresses is="billing" subDomainOf="payments.com"/>
+    <otherwise>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities less="5" greater="1" equal="3"/>
+        <priorities less="10"/>
+        <notPresent>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="mainRouting"/>
+        </otherwise>
+      </contents>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="user-agent">
+    <strings contains="iPhone"/>
+    <strings contains="Android"/>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:desktop@work.com" priority="3" clear="yes"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch">
+    <times dtstart="20240101T080000" interval="1" wkst="MO"/>
+    <times dtstart="20240101T180000" interval="1" wkst="FR"/>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <noAnswer>
+          <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+        </noAnswer>
+        <default contents="//@elements.3"/>
+      </CPL:Proxy>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

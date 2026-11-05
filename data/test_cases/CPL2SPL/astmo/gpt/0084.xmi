@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents: simple Proxy (triggers Proxy2Return) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+    <incoming>
+      <!-- Incoming contents: complex Proxy (triggers Proxy2Select, Busy/NoAnswer/Redirection, Default) -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy>
+          <!-- Busy contents: SubCall (triggers Busy2SelectCase + SubCall2Return) -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents: Redirect (triggers NoAnswer2SelectCase + Redirect2Return) -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents: SubCall (triggers Redirection2SelectCase + SubCall2Return) -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default contents: SubCall (triggers Default2SelectDefault + SubCall2Return) -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </default>
+      </contents>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing contents: AddressSwitch (triggers AddressSwitch2SelectStat etc.) -->
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <!-- notPresent branch with Failure (triggers NotPresent2ErrorResponse + Proxy-related OCLs) -->
+        <notPresent>
+          <contents xsi:type="CPL:Failure"/>
+        </notPresent>
+        <!-- otherwise branch with Redirect (triggers Otherwise2SelectDefault + Redirect2Return) -->
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </otherwise>
+        <!-- SwitchedAddress cases -->
+        <addresses is="case1"/>
+        <addresses is="case2">
+          <!-- SwitchedAddress contents: simple Proxy (triggers SwitchedAddress2SelectCase + Proxy2Return) -->
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential"/>
+        </addresses>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- One Location used by Proxies and Redirects (for Location2URIConstant, Locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes" priority="1"/>
+
+</CPL:CPLModel>

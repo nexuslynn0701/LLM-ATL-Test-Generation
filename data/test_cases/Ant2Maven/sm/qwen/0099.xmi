@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleBuild"
+    default="build-all"
+    basedir="."
+    description="A sample Ant project for testing ATL transformation">
+  <targets xmi:id="init" name="init" description="Initialize build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" deprecation="true"/>
+  </targets>
+  <targets xmi:id="doc" name="doc" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="docs/api"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Sample API Documentation"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create JAR file">
+    <tasks xsi:type="Ant:Jar"
+        jarfile="dist/app.jar"
+        basedir="build/classes"
+        compress="true"
+        manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="docs" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="build-all" name="build-all" description="Full build sequence">
+    <tasks xsi:type="Ant:Copy"
+        todir="build/resources"
+        overwrite="true"
+        filtering="true">
+      <fileset dir="resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/temp/**"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="VERSION" value="1.0.0"/>
+        <filter token="BUILD_DATE" value="2024-06-15"/>
+      </filterset>
+      <mapper type="glob" from="*.template" to="*"/>
+    </tasks>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/>
+      <format property="build.number" pattern="yyyyMMddHHmm" offset="0" unit="minute"/>
+    </tasks>
+  </targets>
+</Ant:Project>

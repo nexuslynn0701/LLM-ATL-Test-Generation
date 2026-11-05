@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyHR"
+    nsURI="http://company/hr/0042"
+    nsPrefix="hr">
+
+  <!-- 0: Primitive alias: String -->
+  <eClassifiers xsi:type="ecore:EDataType" name="StringAlias"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Primitive alias: Integer -->
+  <eClassifiers xsi:type="ecore:EDataType" name="IntAlias"
+      instanceClassName="int"/>
+
+  <!-- 2: Enum for employee roles -->
+  <eClassifiers xsi:type="eccore:EEnum" name="RoleKind">
+    <eLiterals name="DEVELOPER" value="0" literal="DEVELOPER"/>
+    <eLiterals name="MANAGER" value="1" literal="MANAGER"/>
+    <eLiterals name="HR" value="2" literal="HR"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 4: Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="deptCode"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="location"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 5: Employee extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tasks"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 6: Manager extends Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Manager" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="bonusPercentage"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+  </eClassifiers>
+
+  <!-- 7: Task -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="estHours"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependsOn"
+        upperBound="-1"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 8: Project -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team"
+        upperBound="-1"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 9: Utility class with attributes using many primitive Ecore types -->
+  <eClassifiers xsi:type="ecore:EClass" name="AuditEntry" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="when"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="severity"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="message"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+</ecore:EPackage>

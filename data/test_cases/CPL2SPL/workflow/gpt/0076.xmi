@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements.0 : main CPL with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- one SubAction -->
+    <subActions id="sa_main">
+      <!-- contents is a SubCall to exercise SubCall2Return -->
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </subActions>
+
+    <!-- Incoming with contents = Redirect (will be elements.3) -->
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </incoming>
+
+    <!-- Outgoing with contents = simple Proxy (elements.4) whose locations include elements.2 -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements.1 : SubCall not referenced by any SubAction (extra SubCall2Return coverage) -->
+  <elements xsi:type="CPL:SubCall" ref="otherAction"/>
+
+  <!-- elements.2 : Location used by Proxy and Redirect to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+
+  <!-- elements.3 : Redirect (permanent=false) whose locations include elements.2 -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <!-- make this Location the first in its locations sequence -->
+    <contents xsi:type="CPL:Location" url="sip:alt@example.org" priority="2" clear="no">
+      <!-- nested contents to ensure non-empty locations chain -->
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </contents>
+  </elements>
+
+  <!-- elements.4 : simple Proxy whose locations include elements.2 -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- give this Proxy an explicit Location so locations->first() is defined -->
+    <contents xsi:type="CPL:Location" url="sip:proxy@example.net" priority="3" clear="yes"/>
+  </elements>
+
+  <!-- elements.5 : AddressSwitch with SwitchedAddress and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="from-header">
+    <notPresent>
+      <!-- contents: SubCall to exercise Busy/NoAnswer-like patterns via switches -->
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </notPresent>
+    <otherwise>
+      <!-- contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="otherAction"/>
+    </otherwise>
+    <addresses is="addr1" contains="c1" subDomainOf="sd1">
+      <!-- contents: simple Proxy to reuse Proxy2Return with nested location -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <contents xsi:type="CPL:Location" url="sip:addr1@example.com" priority="4" clear="yes"/>
+      </contents>
+    </addresses>
+  </elements>
+
+</CPL:CPLModel>

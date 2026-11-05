@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="act1">
+      <contents xsi:type="CPL:Location" url="sip:user@host" priority="10" clear="yes">
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+      </contents>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="act2">
+      <contents xsi:type="CPL:Location" url="sip:other@host" priority="5" clear="yes">
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+          <busy/>
+          <noAnswer/>
+          <redirection/>
+          <failure/>
+          <default contents="//@elements.1"/>
+        </contents>
+      </contents>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="act1"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses xsi:type="CPL:SwitchedAddress" is="example.com" contains="example" subDomainOf="example.org"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="someField"/>
+</CPL:CPLModel>

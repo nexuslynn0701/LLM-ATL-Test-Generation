@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="CoverageProject"
+    default="build"
+    basedir="."
+    description="Test model covering multiple ATL rules">
+  <targets xmi:id="build" name="build" description="Main build target" ifCondition="debug">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="true" optimize="false" deprecation="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/application.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/reports"/>
+    <tasks xsi:type="Ant:Copy" file="README.txt" tofile="build/reports/README.txt" overwrite="false" filtering="true" flatten="true" includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Delete" dir="temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="*.tmp" excludes="important.tmp" defaultexcludes="no"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="My API"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="TODAY" pattern="yyyy-MM-dd" offset="0" unit="day" locale="en_US"/>
+      <format property="NOW" pattern="HH:mm:ss" offset="2" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts" unless="nokeep">
+    <tasks xsi:type="Ant:Delete" file="build" verbose="false" quiet="true" includes="**/*.class" excludesfile="exclude.txt"/>
+    <tasks xsi:type="Ant:Mkdir" dir="temp"/>
+    <tasks xsi:type="Ant:Copy" file="backup.txt" todir="temp" presservelastmodified="true" overwrite="true" includeEmptyDirs="true"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/usr/local/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+</Ant:Project>

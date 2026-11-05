@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    default="build"
+    basedir="."
+    description="A sample Ant project for transformation testing">
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <targets xmi:id="init" name="init" description="Initialize directories">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/javadoc"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile source code" ifCondition="do.compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="target/classes" debug="true" fork="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/test/**"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="doc" name="doc" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="target/javadoc"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Sample API Documentation"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Package compiled classes into JAR">
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/sample.jar"
+        basedir="target/classes"
+        compress="true"
+        manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="target" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="build" name="build" description="Full build cycle">
+    <tasks xsi:type="Ant:Copy"
+        todir="target/resources"
+        overwrite="true"
+        filtering="true">
+      <fileset dir="src/main/resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/secret.*"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="VERSION" value="1.0.0"/>
+      </filterset>
+    </tasks>
+  </targets>
+</Ant:Project>

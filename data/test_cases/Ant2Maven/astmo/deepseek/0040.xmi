@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Ant="Ant" name="DataProcessing" basedir="/opt/data" description="Data processing pipeline" default="process">
+  <properties xsi:type="Ant:PropertyValue" name="input.dir" value="/input"/>
+  <properties xsi:type="Ant:PropertyValue" name="output.dir" value="/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="/etc/config.xml"/>
+  <properties xsi:type="Ant:PropertyFile" file="/etc/default.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <targets xmi:id="init" name="init" description="Initialize directories">
+    <tasks xsi:type="Ant:Mkdir" dir="/opt/data/build"/>
+    <tasks xsi:type="Ant:Mkdir" dir="/opt/data/dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile sources">
+    <tasks xsi:type="Ant:Javac" srcdir="/opt/data/src" destdir="/opt/data/build" debug="true" fork="false" optimize="true" deprecation="false"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create JAR archive">
+    <tasks xsi:type="Ant:Jar" jarfile="/opt/data/dist/app.jar" basedir="/opt/data/build" compress="true" encoding="UTF-8"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="/opt/data/build" verbose="true" quiet="false" failonerror="true"/>
+    <tasks xsi:type="Ant:Delete" dir="/opt/data/dist" verbose="true" quiet="false" failonerror="true"/>
+  </targets>
+  <targets xmi:id="process" name="process" description="Main processing goal">
+    <tasks xsi:type="Ant:Javac" srcdir="/opt/data/generated" destdir="/opt/data/build" debug="false" fork="true" optimize="false" deprecation="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="/opt/data/dist/processor.jar" basedir="/opt/data/build" compress="false" encoding="ISO-8859-1"/>
+    <tasks xsi:type="Ant:Mkdir" dir="/opt/data/temp"/>
+    <tasks xsi:type="Ant:Delete" dir="/opt/data/temp" verbose="false" quiet="true" failonerror="false"/>
+  </targets>
+  <taskdef name="customTask" classname="com.example.CustomTask"/>
+</Ant:Project>

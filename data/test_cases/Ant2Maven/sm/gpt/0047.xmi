@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Project exercising multiple predefined Ant tasks"
+    default="t_compile">
+  <targets xmi:id="t_compile" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/complexbuild.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="t_docs" name="docs" description="Generate project documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+  </targets>
+  <targets xmi:id="t_files" name="file-management" description="Prepare and clean file structure">
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/temp"/>
+    <tasks xsi:type="Ant:Copy"
+           file="README.md"
+           presservelastmodified="true"
+           tofile="build/README.copy.md"
+           todir="build"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           includesfile="config/includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+  <targets xmi:id="t_timestamp" name="timestamp" description="Timestamp related operations">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyyMMdd-HHmmss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+  </targets>
+</Ant:Project>

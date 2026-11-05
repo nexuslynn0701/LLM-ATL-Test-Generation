@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingAndMerging">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="Init" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="ParallelA" isInitial="false" isActive="false" action="runA"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="ParallelB" isInitial="false" isActive="false" action="runB"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="Merge" isInitial="false" isActive="false" action="mergeResults"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="Finalize" isInitial="false" isActive="false" action="finalize"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t001" name="StartBranches" condition="startSignal"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="ACompleted" condition="aDone"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="BCompleted" condition="bDone"/>
+    <elements xsi:type="Grafcet:Transition" location="t004" name="CompleteProcess" condition="allDone"/>
+
+    <!-- Connections: branching from Init to two parallel steps via two transitions,
+         then merging them and finishing -->
+    <!-- Init -> StartBranches -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="initToStartBranches" from="/0/@elements.0" to="/0/@elements.5"/>
+    <!-- StartBranches -> ParallelA -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c002" name="startBranchesToParallelA" from="/0/@elements.5" to="/0/@elements.1"/>
+    <!-- StartBranches -> ParallelB -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c003" name="startBranchesToParallelB" from="/0/@elements.5" to="/0/@elements.2"/>
+
+    <!-- ParallelA -> ACompleted -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c004" name="parallelAToACompleted" from="/0/@elements.1" to="/0/@elements.6"/>
+    <!-- ACompleted -> Merge -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c005" name="aCompletedToMerge" from="/0/@elements.6" to="/0/@elements.3"/>
+
+    <!-- ParallelB -> BCompleted -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c006" name="parallelBToBCompleted" from="/0/@elements.2" to="/0/@elements.7"/>
+    <!-- BCompleted -> Merge -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c007" name="bCompletedToMerge" from="/0/@elements.7" to="/0/@elements.3"/>
+
+    <!-- Merge -> CompleteProcess -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c008" name="mergeToCompleteProcess" from="/0/@elements.3" to="/0/@elements.8"/>
+    <!-- CompleteProcess -> Finalize -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c009" name="completeProcessToFinalize" from="/0/@elements.8" to="/0/@elements.4"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

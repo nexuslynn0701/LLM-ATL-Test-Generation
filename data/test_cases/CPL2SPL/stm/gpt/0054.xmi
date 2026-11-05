@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL script with incoming/outgoing and multiple subActions -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="subMain">
+      <contents>//@elements.6</contents>
+      <contents>//@elements.7</contents>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="subBackup">
+      <contents>//@elements.8</contents>
+    </subActions>
+    <outgoing/>
+    <incoming/>
+  </elements>
+
+  <!-- 1: Simple Location node (also used inside switches) -->
+  <elements xsi:type="CPL:Location" url="sip:primary@example.com" priority="0.5" clear="yes"/>
+
+  <!-- 2: Redirect action -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 3: Reject action -->
+  <elements xsi:type="CPL:Reject" status="404" reason="NotFound"/>
+
+  <!-- 4: SubCall referencing a SubAction by name (string only) -->
+  <elements xsi:type="CPL:SubCall" ref="subMain"/>
+
+  <!-- 5: Proxy with all branches, default pointing to Location (index 1) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <busy>
+      <contents>//@elements.1</contents>
+    </busy>
+    <noAnswer>
+      <contents>//@elements.3</contents>
+    </noAnswer>
+    <redirection>
+      <contents>//@elements.2</contents>
+    </redirection>
+    <failure>
+      <contents>//@elements.3</contents>
+    </failure>
+    <default>
+      <contents>//@elements.1</contents>
+    </default>
+  </elements>
+
+  <!-- 6: AddressSwitch with NotPresent, Otherwise and several SwitchedAddress cases -->
+  <elements xsi:type="CPL:AddressSwitch" field="to" subField="user">
+    <notPresent>
+      <contents>//@elements.3</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.5</contents>
+    </otherwise>
+    <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com">
+      <contents>//@elements.1</contents>
+    </addresses>
+    <addresses is="sip:bob@example.org" contains="bob" subDomainOf="example.org">
+      <contents>//@elements.2</contents>
+    </addresses>
+  </elements>
+
+  <!-- 7: StringSwitch with multiple SwitchedString branches -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <notPresent>
+      <contents>//@elements.4</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.5</contents>
+    </otherwise>
+    <strings is="support" contains="help">
+      <contents>//@elements.1</contents>
+    </strings>
+    <strings is="sales" contains="quote">
+      <contents>//@elements.2</contents>
+    </strings>
+  </elements>
+
+  <!-- 8: LanguageSwitch with several language cases -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <contents>//@elements.3</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.5</contents>
+    </otherwise>
+    <languages matches="en-US">
+      <contents>//@elements.1</contents>
+    </languages>
+    <languages matches="fr-FR">
+      <contents>//@elements.2</contents>
+    </languages>
+  </elements>
+
+  <!-- 9: TimeSwitch with complex SwitchedTime attributes -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <notPresent>
+      <contents>//@elements.4</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.5</contents>
+    </otherwise>
+    <times dtstart="20260101T080000" dtend="20260101T180000" duration="PT10H"
+           freq="DAILY" until="20261231T235959" count="365" interval="1"
+           bySecond="0" byMinute="0" byHour="8,18" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1-31" byYearDay="" byWeekNo="" byMonth="1-12"
+           wkst="MO" bySetPos="">
+      <contents>//@elements.1</contents>
+    </times>
+    <times dtstart="20260101T000000" dtend="20260101T075959" duration="PT8H"
+           freq="DAILY" until="" count="" interval="1"
+           bySecond="" byMinute="" byHour="0-7" byDay="SA,SU"
+           byMonthDay="" byYearDay="" byWeekNo="" byMonth=""
+           wkst="MO" bySetPos="">
+      <contents>//@elements.3</contents>
+    </times>
+  </elements>
+
+  <!-- 10: PrioritySwitch with SwitchedPriority comparison cases -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <contents>//@elements.2</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.5</contents>
+    </otherwise>
+    <priorities less="0.3" greater="" equal="">
+      <contents>//@elements.3</contents>
+    </priorities>
+    <priorities less="" greater="0.7" equal="">
+      <contents>//@elements.2</contents>
+    </priorities>
+    <priorities less="" greater="" equal="0.5">
+      <contents>//@elements.1</contents>
+    </priorities>
+  </elements>
+
+</CPL:CPLModel>

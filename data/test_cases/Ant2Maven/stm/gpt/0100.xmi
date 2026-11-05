@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleMultiTargetProject"
+    basedir="."
+    description="Ant project with multiple targets and various predefined tasks."
+    default="mainTarget">
+
+  <!-- Optional property definitions to exercise property-related rules -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="conf/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A standalone taskdef (not referenced by any task) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target -->
+  <targets xmi:id="mainTarget" name="main" description="Main build target">
+    <tasks xsi:type="Ant:Mkdir" dir="build/main"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/main/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/main-app.jar"
+           basedir="build/main/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Additional target exercising documentation and file tasks -->
+  <targets xmi:id="docsTarget" name="docs" description="Generate project documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Sample Project API"/>
+    <tasks xsi:type="Ant:Copy"
+           file="README.md"
+           tofile="build/docs/README.md"
+           presservelastmodified="true"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+  </targets>
+
+  <!-- Cleanup target to exercise Delete and additional file operations -->
+  <targets xmi:id="cleanupTarget" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes="**/.git/**"
+           excludesfile=""
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/empty"/>
+    <tasks xsi:type="Ant:Copy"
+           todir="backup"
+           presservelastmodified="false"
+           overwrite="false"
+           filtering="false"
+           flatten="true"
+           includeEmptyDirs="true"/>
+  </targets>
+
+</Ant:Project>

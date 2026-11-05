@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- 0: Root CPL with one Outgoing containing a complex Proxy -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1"/>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer/>
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </redirection>
+        <failure/>
+        <default contents="//@elements.1"/>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location used by SubAction sa1 and by Redirect (via locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+
+  <!-- 2: AddressSwitch with SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1">
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:Reject" status="405" reason="Method Not Allowed"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure>
+          <contents xsi:type="CPL:Reject" status="500" reason="Server Error"/>
+        </failure>
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </default>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- 3: Simple Proxy whose contents is the Location (to trigger Location2URIConstant again) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <default contents="//@elements.1"/>
+  </elements>
+
+  <!-- 4: Standalone Redirect (will also use Location through locations helper) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+</CPL:CPLModel>

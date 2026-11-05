@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="compile"
+    basedir="/home/project"
+    description="Main build project">
+  <targets xmi:id="init" name="init" description="Initialize build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/docs"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile source code" depends="init">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" optimize="false" deprecation="true"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Package jar file" unless="skip.package">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/myapp.jar" basedir="build/classes" compress="true" encoding="UTF-8"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" failonerror="false" verbose="true"/>
+    <tasks xsi:type="Ant:Delete" file="dist/myapp.jar"/>
+  </targets>
+  <targets xmi:id="document" name="document" description="Generate documentation" ifCondition="generate.docs">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="TODAY" pattern="yyyy-MM-dd" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="build/docs" packagenames="com.myapp.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="My Application API"/>
+  </targets>
+</Ant:Project>

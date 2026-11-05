@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL node: triggers CPL2Program, Incoming2Method, Outgoing2Method -->
+  <elements xsi:type="CPL:CPL">
+    <subActions>
+      <!-- SubAction 0: empty contents (no statements in SubAction2Function) -->
+      <subActions id="sa_empty"/>
+      <!-- SubAction 1: contents = simple Proxy (Proxy2Return as statement) -->
+      <subActions id="sa_simpleProxy" contents="//@elements.3"/>
+      <!-- SubAction 2: contents = complex Proxy (Proxy2Select as statement) -->
+      <subActions id="sa_complexProxy" contents="//@elements.4"/>
+      <!-- SubAction 3: contents = SubCall (SubCall2Return as statement) -->
+      <subActions id="sa_subCall" contents="//@elements.5"/>
+    </subActions>
+
+    <!-- Incoming: contents = Location (filtered out, no statements) -->
+    <incoming>
+      <incoming/>
+    </incoming>
+
+    <!-- Outgoing: contents = Reject (filtered out, no statements) -->
+    <outgoing>
+      <outgoing/>
+    </outgoing>
+  </elements>
+
+  <!-- Location 1: used as first location for both proxies and Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:primary@example.com" clear="true"/>
+
+  <!-- Location 2: used as additional location for complex proxy -->
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" clear="false"/>
+
+  <!-- Simple Proxy 3: no children => isSimple = true, uses Location 1 -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" contents="//@elements.1"/>
+
+  <!-- Complex Proxy 4: has all branches, uses Location 2 -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential" contents="//@elements.2">
+    <busy>
+      <busy contents="//@elements.6"/>
+    </busy>
+    <noAnswer>
+      <noAnswer/>
+    </noAnswer>
+    <redirection>
+      <redirection contents="//@elements.7"/>
+    </redirection>
+    <failure>
+      <failure/>
+    </failure>
+    <default>
+      <default/>
+    </default>
+  </elements>
+
+  <!-- SubCall 5: references existing SubAction by id (SubCall2Return) -->
+  <elements xsi:type="CPL:SubCall" ref="sa_simpleProxy"/>
+
+  <!-- Reject 6: used as contents of Busy (statements filtered out by Busy2SelectCase) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="busy now"/>
+
+  <!-- Redirect 7: used as contents of Redirection (Redirect2Return as nested statement) -->
+  <elements xsi:type="CPL:Redirect" permanent="false" contents="//@elements.1"/>
+
+  <!-- AddressSwitch 8: uses NotPresent & Otherwise and SwitchedAddress -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- notPresent case: triggers NotPresent2ErrorResponse, used in AddressSwitch2SelectStat -->
+    <notPresent>
+      <notPresent/>
+    </notPresent>
+    <!-- otherwise: triggers Otherwise2SelectDefault, contents = SubCall -->
+    <otherwise>
+      <otherwise contents="//@elements.5"/>
+    </otherwise>
+    <!-- SwitchedAddress 0: contents = simple Proxy -->
+    <addresses>
+      <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com" contents="//@elements.3"/>
+    </addresses>
+    <!-- SwitchedAddress 1: contents = complex Proxy -->
+    <addresses>
+      <addresses is="sip:bob@example.com" contains="bob" subDomainOf="example.com" contents="//@elements.4"/>
+    </addresses>
+  </elements>
+
+  <!-- StringSwitch 9: triggers StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" contents="//@elements.6" field="Subject"/>
+
+  <!-- LanguageSwitch 10: appears as contents somewhere, but filtered from statements -->
+  <elements xsi:type="CPL:LanguageSwitch"/>
+
+  <!-- TimeSwitch 11: appears as contents somewhere, but filtered from statements -->
+  <elements xsi:type="CPL:TimeSwitch"/>
+
+  <!-- PrioritySwitch 12: appears as contents somewhere, but filtered from statements -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+
+</CPL:CPLModel>

@@ -1,0 +1,23 @@
+CRITICAL CONSTRAINTS for Ecore2Maude models (source is an Ecore metamodel):
+
+1. ALL cross-references MUST use index-based XMI path format:
+   eType="//@eClassifiers.2"        (3rd classifier, 0-based)
+   eSuperTypes="//@eClassifiers.0 //@eClassifiers.1"
+   DO NOT use name-based refs like eType="#//Address" — these cause crashes.
+
+2. EPackage namespace: use xmlns:ecore="http://ecore" (NOT the standard EMF URI)
+   <ecore:EPackage xmlns:ecore="http://ecore" name="myPkg" nsURI="myURI" nsPrefix="my">
+
+3. EDataType references for primitive types use the full EMF URI:
+   eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+   eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+
+4. Attribute values can be arbitrary strings. Class names can be random.
+
+5. CORRECT cross-reference example (3 classes, class 1 references class 0):
+   <eClassifiers xsi:type="ecore:EClass" name="ClassA"/>
+   <eClassifiers xsi:type="ecore:EClass" name="ClassB"
+       eSuperTypes="//@eClassifiers.0">
+     <eStructuralFeatures xsi:type="ecore:EReference" name="ref"
+         eType="//@eClassifiers.0" containment="true"/>
+   </eClassifiers>

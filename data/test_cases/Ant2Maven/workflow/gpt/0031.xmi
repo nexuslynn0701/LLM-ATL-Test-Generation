@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullLifecycleBuild"
+    basedir="project-root"
+    description="Build, document, package and clean the project"
+    default="build-all">
+  <!-- Ant properties to exercise property-mapping rules -->
+  <properties xsi:type="Ant:PropertyValue" name="project.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Custom task definition (TaskDef mapping rule) -->
+  <taskdef name="my.custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with a rich set of tasks -->
+  <targets xmi:id="build-all" name="build-all" description="Compile, generate docs, jar and prepare directories">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Project API"/>
+    <!-- Create Jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/full-lifecycle.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/distribution"/>
+    <!-- Copy resources into distribution directory -->
+    <tasks xsi:type="Ant:Copy"
+           file="src/main/resources/app.properties"
+           presservelastmodified="true"
+           tofile="target/distribution/app.properties"
+           todir="target/distribution"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+    <!-- Delete temporary build directory -->
+    <tasks xsi:type="Ant:Delete"
+           file="target/tmp/old-cache"
+           dir="target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="tmp/includes.txt"
+           excludes="**/*.bak"
+           excludesfile="tmp/excludes.txt"
+           defaultexcludes="true"/>
+    <!-- Timestamp management -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Additional target to exercise multiple goal creation -->
+  <targets xmi:id="clean-build" name="clean-build" description="Clean build outputs and recreate directories">
+    <tasks xsi:type="Ant:Delete"
+           file="target/full-lifecycle.jar"
+           dir="target"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="cleanup/includes.txt"
+           excludes="**/.git/**"
+           excludesfile="cleanup/excludes.txt"
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/tmp"/>
+  </targets>
+</Ant:Project>

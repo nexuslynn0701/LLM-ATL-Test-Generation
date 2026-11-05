@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AntMavenDemo"
+    basedir="demo-src"
+    description="Ant project to exercise Ant2Maven transformation rules"
+    default="build">
+  <!-- Properties of all four concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="AntMavenDemo"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="demo-target"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/demo.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- One simple task definition (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Path structure with nested elements and fileset -->
+  <path id="main.path">
+    <pathElement path="lib/demo.jar" location="lib/demo.jar"/>
+    <fileset dir="lib">
+      <include name="**/*.jar"/>
+      <exclude name="**/old/*.jar"/>
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/test/*.jar"/>
+      </patternset>
+    </fileset>
+  </path>
+
+  <!-- Default target: build -->
+  <targets xmi:id="build" name="build" description="Compile and package the project">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac" srcdir="demo-src" destdir="demo-target" debug="true" fork="false" optimize="true" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+      <classPath refid="compile.path">
+        <pathElement path="lib/compile-support.jar" location="lib/compile-support.jar"/>
+        <fileset dir="lib/compile">
+          <include name="**/*.jar"/>
+          <exclude name="**/deprecated/*.jar"/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Create target directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="demo-target"/>
+
+    <!-- Package compiled classes into a jar -->
+    <tasks xsi:type="Ant:Jar" jarfile="demo-target/AntMavenDemo.jar" basedir="demo-target" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Copy resources with filters, mapper, and nested structures -->
+    <tasks xsi:type="Ant:Copy" todir="demo-target/resources" overwrite="true" includeEmptyDirs="false" flatten="false">
+      <fileset dir="resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/temp/**"/>
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="includes.list"/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list"/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="projectName" value="AntMavenDemo"/>
+        <filtersfile file="filters/demo-filters.txt"/>
+      </filterset>
+      <mapper type="glob" from="*.properties" to="filtered-*.properties" classname="org.example.Mapper" classpath="lib/mapper.jar" classpathref="mapper.path"/>
+    </tasks>
+
+    <!-- Generate API documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="demo-src"
+           destdir="demo-target/javadoc"
+           packagenames="com.example.demo.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="AntMavenDemo API Documentation"/>
+  </targets>
+
+  <!-- Secondary target: clean -->
+  <targets xmi:id="clean" name="clean" description="Clean build output">
+    <!-- Timestamp management task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss" offset="+0" unit="second" locale="en_US"/>
+    </tasks>
+
+    <!-- Delete output directory -->
+    <tasks xsi:type="Ant:Delete" dir="demo-target" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="**/*" excludes="**/keep/**" defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="action1"/>
+    <subActions id="action2"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <notPresent>
+          <contents xsi:type="CPL:SubCall" ref="action1"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="action2"/>
+        </otherwise>
+        <addresses is="user1@example.com"/>
+        <addresses is="user2@example.com">
+          <contents xsi:type="CPL:Busy"/>
+        </addresses>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="action1"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="yes"/>
+        </redirection>
+        <failure>
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+        </failure>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="action2"/>
+        </default>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:user@domain.com" priority="1" clear="no"/>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+  <elements xsi:type="CPL:SubCall" ref="action1"/>
+  <elements xsi:type="CPL:SubCall" ref="action2"/>
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <notPresent/>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:backup@example.com" priority="2" clear="yes"/>
+        </default>
+      </contents>
+    </otherwise>
+    <addresses is="contact@example.com">
+      <contents xsi:type="CPL:NoAnswer"/>
+    </addresses>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="User-Agent">
+    <strings is="MySoftPhone" contains="softphone"/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5" greater="3"/>
+  </elements>
+</CPL:CPLModel>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction"/>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="fallback"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Reject" status="408" reason="No answer"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="destination">
+            <addresses is="user@example.com"/>
+            <otherwise>
+              <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="true"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="SIP-client-v1"/>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="mainAction"/>
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" clear="false"/>
+  <elements xsi:type="CPL:SubAction" id="fallback">
+    <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+      <default>
+        <contents xsi:type="CPL:Reject" status="503" reason="Service unavailable"/>
+      </default>
+    </contents>
+  </elements>
+</CPL:CPLModel>

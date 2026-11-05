@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiStageBuild"
+    basedir="project-root"
+    description="Full build lifecycle: compile, package, clean"
+    default="compileTarget">
+  <!-- Ant Properties (all four concrete kinds) -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="build/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition (not referenced by tasks) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: compile -->
+  <targets xmi:id="compileTarget" name="compile" description="Compile Java sources">
+    <!-- Javac task (compile sources) -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+  </targets>
+
+  <!-- Packaging target: create jar -->
+  <targets xmi:id="packageTarget" name="package" description="Package compiled classes">
+    <!-- Jar task (archive classes) -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multistage-build.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Cleanup target: mkdir and delete operations -->
+  <targets xmi:id="cleanupTarget" name="clean" description="Clean build output">
+    <!-- Mkdir task (ensure dist directory exists) -->
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <!-- Delete task (remove build directory tree) -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes="**/.keep"
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntBuild"
+    basedir="src/main/java"
+    description="Ant build with multiple targets and various tasks."
+    default="build-main">
+
+  <!-- Properties to trigger property copy rules -->
+  <properties xsi:type="Ant:PropertyValue" name="java.version" value="17"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="config/"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A simple path to trigger AntPath2MavenMavenPath and PathElement rules -->
+  <path id="compile.path">
+    <pathElement path="lib/dependency.jar" location="lib/dependency.jar"/>
+  </path>
+
+  <!-- A task definition not referenced by tasks (per constraints) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: build-main -->
+  <targets xmi:id="build-main" name="build-main" description="Main compilation and packaging target">
+    <!-- Compile Java sources: triggers AntJavac2MavenMavenJavac and several InExcludes rules -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- Generate Javadoc: triggers AntJavadoc2MavenMavenJavadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+
+    <!-- Create jar: triggers AntJar2MavenMavenJar -->
+    <tasks xsi:type="Ant:Jar" jarfile="target/example-app.jar" basedir="target/classes" compress="true"/>
+
+    <!-- Create directories: triggers AntMkdir2MavenMavenMkdir -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/generated-sources"/>
+  </targets>
+
+  <!-- Additional target: resources -->
+  <targets xmi:id="process-resources" name="process-resources" description="Copy and filter resources">
+    <!-- FilterSet + Filter(s): AntFilterSet2MavenMavenFilterSet, AntFilter2MavenMavenFilter, AntFiltersFile2MavenMavenFiltersFile -->
+    <tasks xsi:type="Ant:Copy" todir="target/classes">
+      <fileset dir="src/main/resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/secret/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexAntBuild"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+    </tasks>
+
+    <!-- Clean temporary files: triggers AntDelete2MavenMavenDelete -->
+    <tasks xsi:type="Ant:Delete" dir="target/tmp" verbose="true" quiet="false"/>
+  </targets>
+
+  <!-- Additional target exercising Tstamp and FileSet/PatternSet/IncludesFile/ExcludesFile -->
+  <targets xmi:id="prepare" name="prepare" description="Prepare build environment">
+    <!-- Timestamp task: AntTstamp2MavenMavenTstamp -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd_HH-mm-ss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+
+    <!-- Copy selected files using nested PatternSet and various InExcludes kinds -->
+    <tasks xsi:type="Ant:Copy" todir="target/prepared">
+      <fileset dir="src/support">
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="includes.list"/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list"/>
+        </patternset>
+      </fileset>
+    </tasks>
+  </targets>
+
+</Ant:Project>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyPkg"
+    nsURI="http://example.org/companyPkg"
+    nsPrefix="company">
+
+  <!-- 0: Primitive-like data type for codes -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CodeType"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="DeptKind">
+    <eLiterals name="HR" value="0" literal="HR"/>
+    <eLiterals name="ENG" value="1" literal="ENG"/>
+    <eLiterals name="FIN" value="2" literal="FIN"/>
+  </eClassifiers>
+
+  <!-- 2: Map entry class -->
+  <eClassifiers xsi:type="ecore:EClass" name="StringToInt"
+      instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 3: Superclass Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: Employee extending Person, with attributes and a container ref -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullTime"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.5"
+        eOpposite="//@eClassifiers.5/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 5: Department with contained employees, cross refs to manager and kind enum -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.4"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 6: Project referencing Department and many Employees -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        lowerBound="1"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team"
+        upperBound="-1"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tags"
+        upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 7: Company as root, containing departments and projects -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metadata"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+</ecore:EPackage>

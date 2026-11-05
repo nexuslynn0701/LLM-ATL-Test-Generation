@@ -1,0 +1,25 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:id="_G0" name="ComplexGrafcet" location="model/complexGrafcet.gcf">
+    <!-- Elements: 4 Steps and 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_S0" name="InitStep" location="model/complexGrafcet.gcf#S0" isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S1" name="ProcessingStep" location="model/complexGrafcet.gcf#S1" isInitial="false" isActive="false" action="processData"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S2" name="ParallelStepA" location="model/complexGrafcet.gcf#S2" isInitial="false" isActive="false" action="handleBranchA"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S3" name="FinalStep" location="model/complexGrafcet.gcf#S3" isInitial="false" isActive="false" action="shutdownSystem"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T0" name="T_InitToProc" location="model/complexGrafcet.gcf#T0" condition="startPressed"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T1" name="T_ProcToParallel" location="model/complexGrafcet.gcf#T1" condition="processingDone"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T2" name="T_ParallelToFinal" location="model/complexGrafcet.gcf#T2" condition="allBranchesComplete"/>
+    <!-- Connections: combine sequential and branching behaviors -->
+    <!-- InitStep --> T0 --> ProcessingStep -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C0" name="C_S0_T0" location="model/complexGrafcet.gcf#C0" from="/0/@elements.0" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C1" name="C_T0_S1" location="model/complexGrafcet.gcf#C1" from="/0/@elements.4" to="/0/@elements.1"/>
+    <!-- ProcessingStep --> T1 --> ParallelStepA and FinalStep (fan-out) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C2" name="C_S1_T1" location="model/complexGrafcet.gcf#C2" from="/0/@elements.1" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C3" name="C_T1_S2" location="model/complexGrafcet.gcf#C3" from="/0/@elements.5" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C4" name="C_T1_S3" location="model/complexGrafcet.gcf#C4" from="/0/@elements.5" to="/0/@elements.3"/>
+    <!-- ParallelStepA and FinalStep both can lead to T2 (fan-in) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C5" name="C_S2_T2" location="model/complexGrafcet.gcf#C5" from="/0/@elements.2" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C6" name="C_S3_T2" location="model/complexGrafcet.gcf#C6" from="/0/@elements.3" to="/0/@elements.6"/>
+    <!-- T2 loops back to ProcessingStep, creating a cycle -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C7" name="C_T2_S1" location="model/complexGrafcet.gcf#C7" from="/0/@elements.6" to="/0/@elements.1"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

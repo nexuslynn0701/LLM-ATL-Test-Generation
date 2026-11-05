@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiStepBuild"
+    basedir="."
+    description="Project with separate compile, docs, packaging and cleanup targets"
+    default="compileTarget">
+
+  <!-- Default compile target -->
+  <targets xmi:id="compileTarget" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/classes"/>
+  </targets>
+
+  <!-- Documentation target -->
+  <targets xmi:id="docsTarget" name="docs" description="Generate API documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="MultiStepBuild API"/>
+  </targets>
+
+  <!-- Packaging target -->
+  <targets xmi:id="packageTarget" name="package" description="Create jar artifact">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multistepbuild.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="cleanTarget" name="clean" description="Remove build outputs">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="no"/>
+  </targets>
+
+</Ant:Project>

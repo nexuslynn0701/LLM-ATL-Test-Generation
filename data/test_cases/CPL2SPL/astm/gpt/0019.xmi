@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL, with Incoming, Outgoing and multiple SubActions -->
+  <elements xsi:type="CPL:CPL">
+    <incoming contents="//@elements.6"/>
+    <outgoing contents="//@elements.10"/>
+    <subActions contents="//@elements.1"/>
+    <subActions contents="//@elements.2"/>
+    <subActions contents="//@elements.3"/>
+  </elements>
+
+  <!-- 1: SubAction SA_simpleProxy: simple Proxy via Location (no extra statements from SubAction) -->
+  <elements xsi:type="CPL:SubAction" id="SA_simpleProxy">
+    <contents xsi:type="CPL:Location" url="sip:simple@example.com" clear="yes"/>
+  </elements>
+
+  <!-- 2: SubAction SA_complexProxy: complex Proxy with all branches, contents is a SubCall -->
+  <elements xsi:type="CPL:SubAction" id="SA_complexProxy">
+    <contents xsi:type="CPL:Location" url="sip:complex@example.com" clear="no"/>
+  </elements>
+
+  <!-- 3: SubAction SA_switching: AddressSwitch as contents -->
+  <elements xsi:type="CPL:SubAction" id="SA_switching">
+    <contents xsi:type="CPL:AddressSwitch" field="origin">
+      <addresses>
+        <addresses xsi:type="CPL:SwitchedAddress" is="alice@example.com"/>
+        <addresses xsi:type="CPL:SwitchedAddress" is="bob@example.com"/>
+      </addresses>
+      <notPresent/>
+      <otherwise/>
+    </contents>
+  </elements>
+
+  <!-- 4: Top-level Redirect using a Location as its statement -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 5: Top-level SubCall (references SA_complexProxy by string) -->
+  <elements xsi:type="CPL:SubCall" ref="SA_complexProxy"/>
+
+  <!-- 6: Top-level Proxy used as incoming contents: simple Proxy (no branches) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- simple proxy: no busy/noAnswer/redirection/failure/default children -->
+  </elements>
+
+  <!-- 7: Location used by Proxy in Outgoing (for simple Proxy there) -->
+  <elements xsi:type="CPL:Location" url="sip:outgoing@example.com" priority="1" clear="true"/>
+
+  <!-- 8: Location used by top-level Redirect (to provide locations for Redirect rule) -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.com" clear="true"/>
+
+  <!-- 9: Top-level AddressSwitch exercise switch rules, with nested NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses>
+      <addresses xsi:type="CPL:SwitchedAddress" is="carol@example.com"/>
+    </addresses>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 10: Top-level Proxy used as outgoing contents: complex Proxy with all branches -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- 11: Top-level StringSwitch (for StringSwitch2SelectStat) -->
+  <elements xsi:type="CPL:StringSwitch">
+    <!-- field name will be used as variable name -->
+  </elements>
+
+</CPL:CPLModel>

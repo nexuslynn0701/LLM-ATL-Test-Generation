@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.org/company"
+    nsPrefix="cmp">
+
+  <!-- 0: Primitive String alias -->
+  <eClassifiers xsi:type="ecore:EDataType" name="StringAlias"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Primitive Integer alias -->
+  <eClassifiers xsi:type="ecore:EDataType" name="IntAlias"
+      instanceClassName="int"/>
+
+  <!-- 2: Role enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RoleKind">
+    <eLiterals name="DEVELOPER" value="0" literal="DEVELOPER"/>
+    <eLiterals name="MANAGER" value="1" literal="MANAGER"/>
+    <eLiterals name="HR" value="2" literal="HR"/>
+  </eClassifiers>
+
+  <!-- 3: Root container -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1" eType="#//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+        upperBound="-1" containment="true" eType="#//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="allEmployees"
+        upperBound="-1" containment="true" eType="#//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 4: Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="budget"
+        eType="#//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="#//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1" eType="#//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="subDepartments"
+        upperBound="-1" containment="true" eType="#//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 5: Employee base -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1" eType="#//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullName"
+        lowerBound="1" eType="#//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="#//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="roles"
+        upperBound="-1" eType="#//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 6: Manager subtype -->
+  <eClassifiers xsi:type="ecore:EClass" name="Manager"
+      eSuperTypes="#//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="level"
+        lowerBound="1" eType="#//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team"
+        upperBound="-1" eType="#//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 7: Contractor subtype -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contractor"
+      eSuperTypes="#//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="agency"
+        lowerBound="1" eType="#//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="hoursPerWeek"
+        eType="#//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 8: Project -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1" eType="#//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+        eType="#//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="contributors"
+        upperBound="-1" eType="#//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 9: Meeting -->
+  <eClassifiers xsi:type="ecore:EClass" name="Meeting">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="subject"
+        lowerBound="1" eType="#//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="durationMinutes"
+        eType="#//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="organizer"
+        eType="#//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="participants"
+        upperBound="-1" eType="#//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relatedProject"
+        eType="#//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 10: TimeSlot -->
+  <eClassifiers xsi:type="ecore:EClass" name="TimeSlot">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="day"
+        lowerBound="1" eType="#//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="startHour"
+        eType="#//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="endHour"
+        eType="#//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="meeting"
+        eType="#//@eClassifiers.9"/>
+  </eClassifiers>
+
+  <!-- 11: String to String map entry -->
+  <eClassifiers xsi:type="ecore:EClass" name="TagEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- Instances via EPackage subpackages to increase structural variety -->
+  <eSubpackages name="runtime" nsURI="http://example.org/company/runtime" nsPrefix="cmprun">
+    <!-- 0: Instance-level company model as EClasses to exercise rules on subpackages -->
+    <eClassifiers xsi:type="ecore:EClass" name="RuntimeCompany"
+        eSuperTypes="//@eClassifiers.3">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+          upperBound="-1" containment="true" eType="//@eClassifiers.8"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="meetings"
+          upperBound="-1" containment="true" eType="//@eClassifiers.9"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="timeSlots"
+          upperBound="-1" containment="true" eType="//@eClassifiers.10"/>
+    </eClassifiers>
+  </eSubpackages>
+</ecore:EPackage>

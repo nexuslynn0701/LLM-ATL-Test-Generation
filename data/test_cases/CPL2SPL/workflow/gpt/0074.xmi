@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- 0: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction1 -->
+    <subActions id="sa1">
+      <!-- contents is a simple Proxy (Location child) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <default contents="//@elements.1"/>
+      </contents>
+    </subActions>
+    <!-- Incoming with contents = complex Proxy -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </default>
+      </contents>
+    </incoming>
+    <!-- Outgoing with contents = AddressSwitch -->
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="sub1">
+        <addresses is="addr1" contains="c1" subDomainOf="sd1">
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </addresses>
+        <addresses is="addr2" contains="c2" subDomainOf="sd2">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <default contents="//@elements.0/@subActions.0"/>
+          </contents>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <default contents="//@elements.1"/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by Proxies (triggers Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:example.com" priority="1" clear="yes"/>
+
+  <!-- 2: Redirect using same Location via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 3: StringSwitch (top-level, unused by helpers but allowed) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField">
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </notPresent>
+  </elements>
+</CPL:CPLModel>

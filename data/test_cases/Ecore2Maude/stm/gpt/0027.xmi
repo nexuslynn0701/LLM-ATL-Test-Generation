@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.com/companyModel/0027"
+    nsPrefix="cmp">
+
+  <!-- 0: Primitive alias: String -->
+  <eClassifiers xsi:type="ecore:EDataType" name="StringAlias"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Primitive alias: Int -->
+  <eClassifiers xsi:type="ecore:EDataType" name="IntAlias"
+      instanceClassName="int"/>
+
+  <!-- 2: Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="street"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="city"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="zip"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 3: Person (abstract superclass) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="homeAddress"
+        eType="//@eClassifiers.2"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 4: Employee extends Person, has ID attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="employeeId"
+        iD="true"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+        upperBound="-1"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 5: Customer extends Person, non-ID attributes only -->
+  <eClassifiers xsi:type="ecore:EClass" name="Customer"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="customerNumber"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="orders"
+        upperBound="-1"
+        eType="//@eClassifiers.7"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 6: Project with bidirectional reference to Employee as members -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="members"
+        upperBound="-1"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 7: Order with containment of OrderLine and ref to Customer & Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Order">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="number"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="customer"
+        lowerBound="1"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="salesRep"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lines"
+        lowerBound="1" upperBound="-1"
+        eType="//@eClassifiers.8"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 8: OrderLine -->
+  <eClassifiers xsi:type="ecore:EClass" name="OrderLine">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="product"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="quantity"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 9: Company as root container with containments to Employee, Customer, Project, Order -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1"
+        eType="//@eClassifiers.4"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="customers"
+        upperBound="-1"
+        eType="//@eClassifiers.5"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+        upperBound="-1"
+        eType="//@eClassifiers.6"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="orders"
+        upperBound="-1"
+        eType="//@eClassifiers.7"
+        containment="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

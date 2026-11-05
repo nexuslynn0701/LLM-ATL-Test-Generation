@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <!-- elements[0]: CPL root -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction so that SubAction2Function, LocalFunctionDeclaration etc. are created -->
+    <subActions xsi:type="CPL:SubAction" id="sa1">
+      <!-- contents -> Location so Location.statement = OclUndefined and locations helper uses it -->
+      <contents xsi:type="CPL:Location" url="sip:user@example.com" clear="yes" priority="1"/>
+    </subActions>
+    <!-- One Outgoing to create an out Method -->
+    <outgoing>
+      <!-- contents -> Proxy so Proxy2Return fires; its location will use the top-level Location below -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: all outcome branches undefined -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: Top-level Location used by the Proxy to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:proxy.example.com" clear="no" priority="2"/>
+
+  <!-- elements[2]: Redirect (no locations, so it still works without URI) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- elements[3]: SubCall referring to existing SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[4]: AddressSwitch with SwitchedAddress, NotPresent, Otherwise and a nested Proxy.
+       This triggers AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse,
+       Otherwise2SelectDefault, Proxy2Select, Busy/NoAnswer/Redirection/Failure/Default rules, etc. -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="sub">
+    <!-- SwitchedAddress with contents = SubCall -->
+    <addresses is="addr1" contains="cont" subDomainOf="sdomain">
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <!-- NotPresent branch containing a Redirect -->
+    <notPresent>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </notPresent>
+    <!-- Otherwise branch containing a complex Proxy (non-simple) whose default contents is the top-level SubCall (elements[3]) -->
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="rval" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.3"/>
+      </contents>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net004" name="ParallelBranches">
+    <!-- Elements: 4 Steps (2 initial, 2 non-initial) + 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="InitA" isInitial="true" isActive="true" action="startA"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="InitB" isInitial="true" isActive="false" action="startB"/>
+    <elements xsi:type="Grafcet:Transition" location="t001" name="Merge" condition="bothReady"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="Middle" isInitial="false" isActive="false" action="processMiddle"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="Split" condition="splitCondition"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="BranchC" isInitial="false" isActive="false" action="doC"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="Join" condition="cDone"/>
+    <!-- Connections:
+         c001,c002: two initial steps converging to Merge (t001)
+         c003: Merge to Middle
+         c004: Middle to Split
+         c005,c006: Split to BranchC and back to Middle forming a loop
+         c007: BranchC to Join (terminal transition) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="initAtoMerge" from="/0/@elements.0" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c002" name="initBtoMerge" from="/0/@elements.1" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c003" name="mergeToMiddle" from="/0/@elements.2" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c004" name="middleToSplit" from="/0/@elements.3" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c005" name="splitToBranchC" from="/0/@elements.4" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c006" name="branchCtoSplit" from="/0/@elements.5" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c007" name="branchCtoJoin" from="/0/@elements.5" to="/0/@elements.6"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

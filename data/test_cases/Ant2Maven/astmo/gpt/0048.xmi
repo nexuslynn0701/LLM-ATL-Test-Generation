@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleAntProject48"
+    basedir="workspace"
+    description="Ant to Maven transformation test project 0048"
+    default="buildMain">
+
+  <!-- Path with nested PathElement and FileSet (no refid/path references used) -->
+  <path id="lib.path">
+    <pathElement path="lib/dependency.jar" location="lib/dependency.jar"/>
+    <fileset dir="resources">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/test/**"/>
+      </patternset>
+      <include name="config/*.xml"/>
+      <exclude name="temp/**"/>
+    </fileset>
+  </path>
+
+  <!-- Properties of all supported subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="SampleAntProject48"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition (not referenced by tasks) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with several different tasks -->
+  <targets xmi:id="buildMain" name="buildMain" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/artifacts/sample-project-48.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/output"/>
+    <tasks xsi:type="Ant:Copy"
+           todir="build/output">
+      <fileset dir="build/classes">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.class"/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="build.version" value="0.0.48"/>
+      </filterset>
+    </tasks>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="false"
+           includes="**/*"
+           excludes="**/.keep"
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.sample"
+           defaultexcludes="true"
+           author="Test Author"
+           version="1.0"
+           use="true"
+           windowtitle="SampleAntProject48 API"/>
+  </targets>
+
+  <!-- Secondary target exercising additional tasks and filter/pattern constructs -->
+  <targets xmi:id="prepareResources" name="prepareResources" description="Prepare resource directories">
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/resources"/>
+    <tasks xsi:type="Ant:Copy"
+           todir="build/resources">
+      <fileset dir="resources">
+        <include name="**/*.xml"/>
+        <exclude name="backup/**"/>
+      </fileset>
+      <filterset starttoken="${" endtoken="}">
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+    </tasks>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/resources/temp"
+           includes="**/*"
+           defaultexcludes="false"/>
+  </targets>
+
+</Ant:Project>

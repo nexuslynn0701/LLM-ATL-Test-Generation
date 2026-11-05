@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="mm9"
+    nsURI="http://example.org/mm9"
+    nsPrefix="mm9">
+
+  <!-- Root package classifiers (0..5) -->
+  <!-- 0: Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="true" lowerBound="1" upperBound="1" ordered="true" unique="true"
+        defaultValueLiteral="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1" upperBound="1" ordered="true" unique="true"
+        defaultValueLiteral="John &quot;Johnny&quot; Doe"/>
+    <!-- reference with opposite and multiplicities -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employer"
+        eType="//@eClassifiers.1" lowerBound="0" upperBound="1"
+        ordered="true" unique="true" containment="false"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 1: Company -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="foundedYear"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0" upperBound="1" ordered="true" unique="true"/>
+    <!-- containment reference, opposite of Person.employer -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        eType="//@eClassifiers.0" lowerBound="0" upperBound="-1"
+        ordered="false" unique="true" containment="true"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+    <!-- simple non-opposite reference -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="headquarters"
+        eType="//@eClassifiers.2" lowerBound="0" upperBound="1"
+        ordered="true" unique="true" containment="false"/>
+  </eClassifiers>
+
+  <!-- 2: Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="street"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1" upperBound="1" ordered="true" unique="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="zipCode"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0" upperBound="1" ordered="true" unique="true"/>
+  </eClassifiers>
+
+  <!-- 3: EmployeeStatus enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmployeeStatus">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+    <eLiterals name="ON_LEAVE" value="1" literal="ON_LEAVE"/>
+    <eLiterals name="RETIRED" value="2" literal="RETIRED"/>
+  </eClassifiers>
+
+  <!-- 4: Contract -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contract">
+    <!-- enum-typed attribute with default literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        eType="//@eClassifiers.3" lowerBound="1" upperBound="1"
+        ordered="true" unique="true" defaultValueLiteral="ACTIVE"/>
+    <!-- reference without opposite and with many multiplicity -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="persons"
+        eType="//@eClassifiers.0" lowerBound="1" upperBound="-1"
+        ordered="true" unique="false" containment="false"/>
+  </eClassifiers>
+
+  <!-- 5: TempId EDataType to exercise @DataType fallback -->
+  <eClassifiers xsi:type="ecore:EDataType" name="TempId" instanceClassName="java.lang.Object"/>
+
+  <!-- Subpackage to trigger super/sub package equations -->
+  <eSubpackages name="mm9.sub"
+      nsURI="http://example.org/mm9/sub"
+      nsPrefix="mm9sub">
+    <!-- Subpackage classifier indices (0..) inside subpackage context -->
+    <!-- 0: Project -->
+    <eClassifiers xsi:type="ecore:EClass" name="Project">
+      <!-- attribute using custom EDataType TempId -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="tempId"
+          eType="//@eClassifiers.5" lowerBound="0" upperBound="1"
+          ordered="true" unique="true" defaultValueLiteral="TMP-001"/>
+      <!-- reference to root Person class -->
+      <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+          eType="/0/@eClassifiers.0" lowerBound="1" upperBound="1"
+          ordered="true" unique="true" containment="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

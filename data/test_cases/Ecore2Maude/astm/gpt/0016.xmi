@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="metaRoot16"
+    nsURI="http://metaRoot16"
+    nsPrefix="mr16">
+
+  <!-- Subpackage to trigger superPackage / subPackages -->
+  <eSubpackages name="innerPkg" nsURI="http://metaRoot16/inner" nsPrefix="in16">
+    <!-- 0: Class in subpackage, used as supertype of RootClassC -->
+    <eClassifiers xsi:type="ecore:EClass" name="InnerBase"
+        abstract="true" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="innerId"
+          ordered="true" unique="true"
+          lowerBound="1" upperBound="1"
+          iD="true"
+          defaultValueLiteral="42"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eClassifiers>
+    <!-- 1: Enum in subpackage -->
+    <eClassifiers xsi:type="ecore:EEnum" name="InnerMode">
+      <eLiterals name="ALPHA" value="0" literal="ALPHA"/>
+      <eLiterals name="BETA" value="1" literal="BETA"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- 0: Data type in root package (non-primitive) -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Code"
+      serializable="true"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enumeration in root package -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StateKind">
+    <eLiterals name="ON" value="0" literal="ON"/>
+    <eLiterals name="OFF" value="1" literal="OFF"/>
+    <eLiterals name="UNKNOWN" value="2" literal="UNKNOWN"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract base class with attributes only -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootBase"
+      abstract="true" interface="false">
+    <!-- String attribute with default to exercise AttEqSpecificDefaultValue, attDataType(String) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="baseName"
+        ordered="true" unique="true"
+        lowerBound="1" upperBound="1"
+        defaultValueLiteral="&quot;base&quot; value"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Boolean attribute (no default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        ordered="true" unique="true"
+        lowerBound="0" upperBound="1"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Enum-typed attribute with default literal to test enum default handling -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="initialState"
+        ordered="true" unique="true"
+        lowerBound="0" upperBound="1"
+        iD="false"
+        defaultValueLiteral="OFF"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 3: Concrete class with multi inheritance and references/attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClassA"
+      abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <!-- ID attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        ordered="true" unique="true"
+        lowerBound="1" upperBound="1"
+        iD="true"
+        defaultValueLiteral="100"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- DataType-typed attribute using custom Code datatype -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        ordered="true" unique="true"
+        lowerBound="0" upperBound="1"
+        iD="false"
+        defaultValueLiteral="C-01"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 4: Class with both EAttributes and bidirectional EReferences -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClassB"
+      abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <!-- Attribute with Float-type default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="weight"
+        ordered="true" unique="true"
+        lowerBound="0" upperBound="1"
+        iD="false"
+        defaultValueLiteral="3.14"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <!-- Containment reference to many RootClassA; opposite set below -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="items"
+        ordered="true" unique="true"
+        lowerBound="0" upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 5: Class with supertype from subpackage and references with/without opposites -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClassC"
+      abstract="false" interface="false"
+      eSuperTypes="/@eSubpackages.0/@eClassifiers.0 //@eClassifiers.2">
+    <!-- Reference back to RootClassB (non-containment, many, with opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        ordered="true" unique="true"
+        lowerBound="1" upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.4"/>
+    <!-- Reference without opposite (to test null opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="related"
+        ordered="false" unique="false"
+        lowerBound="0" upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 6: Enum literal carrier class (to have EEnumLiteral2Operation with different enum) -->
+  <eClassifiers xsi:type="ecore:EClass" name="EnumHolder"
+      abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="mode"
+        ordered="true" unique="true"
+        lowerBound="0" upperBound="1"
+        iD="false"
+        defaultValueLiteral="ALPHA"
+        eType="/@eSubpackages.0/@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- Set the opposites for the bidirectional references -->
+  <!-- RootClassA.itemsOpposite -> RootClassB.items -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClassA"
+      abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        ordered="true" unique="true"
+        lowerBound="1" upperBound="1"
+        iD="true"
+        defaultValueLiteral="100"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        ordered="true" unique="true"
+        lowerBound="0" upperBound="1"
+        iD="false"
+        defaultValueLiteral="C-01"
+        eType="//@eClassifiers.0"/>
+    <!-- Non-containment, many, opposite of RootClassB.items -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="inContainer"
+        ordered="true" unique="true"
+        lowerBound="0" upperBound="-1"
+        containment="false"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.0"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- Update RootClassB.items opposite to RootClassA.inContainer -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClassB"
+      abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="weight"
+        ordered="true" unique="true"
+        lowerBound="0" upperBound="1"
+        iD="false"
+        defaultValueLiteral="3.14"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="items"
+        ordered="true" unique="true"
+        lowerBound="0" upperBound="-1"
+        containment="true"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.2"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Update RootClassC.owner opposite to RootClassB.items -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClassC"
+      abstract="false" interface="false"
+      eSuperTypes="/@eSubpackages.0/@eClassifiers.0 //@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        ordered="true" unique="true"
+        lowerBound="1" upperBound="1"
+        containment="false"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.0"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="related"
+        ordered="false" unique="false"
+        lowerBound="0" upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+</ecore:EPackage>

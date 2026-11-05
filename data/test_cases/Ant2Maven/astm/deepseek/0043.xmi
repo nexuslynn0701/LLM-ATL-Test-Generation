@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    basedir="."
+    description="A sample Ant project for transformation testing">
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="bin" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build"/>
+    <tasks xsi:type="Ant:Copy" todir="dist">
+      <fileset dir="src" include="*.java" exclude="test/*"/>
+      <filterset starttoken="@@" endtoken="@@">
+        <filter token="version" value="1.0"/>
+        <filtersfile file="filter.properties"/>
+      </filterset>
+    </tasks>
+    <tasks xsi:type="Ant:Delete" dir="tmp"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd"/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" compress="true" encoding="UTF-8"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="API"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Java" classname="org.junit.runner.JUnitCore" fork="yes" jar="junit.jar">
+      <classPath refid="test.classpath"/>
+    </tasks>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="debug" value="true"/>
+  <properties xsi:type="Ant:PropertyLocation" name="home" location="/usr/home"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+  <path id="compile.classpath">
+    <pathElement path="lib" location="lib/tools.jar"/>
+    <fileset dir="lib" include="*.jar" exclude="junit.jar"/>
+    <path id="nested.path" refid="compile.classpath"/>
+  </path>
+  <taskdef name="mytask" classname="com.example.MyTask"/>
+  <targets xmi:id="deploy" name="deploy" description="Deploy the application">
+    <tasks xsi:type="Ant:Copy" file="dist/app.jar" tofile="/opt/app/app.jar"/>
+    <tasks xsi:type="Ant:Delete" file="dist/app.jar"/>
+  </targets>
+</Ant:Project>

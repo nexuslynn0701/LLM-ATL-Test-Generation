@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyPkg"
+    nsURI="http://example.org/companyPkg"
+    nsPrefix="company">
+
+  <!-- 0: Base abstract NamedElement with a String name attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="neName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1: Department class, extends NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- bi-directional references with Employee -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1"
+        eType="//@eClassifiers.2"
+        containment="true"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 2: Employee class, extends NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- ID attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="empId"
+        iD="true"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- container back-reference to Department.employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+    <!-- reference to a Position -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="position"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 3: Position class, extends NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Position"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="level"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 4: Project class, not extending NamedElement (to vary super types) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- reference to many employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team"
+        upperBound="-1"
+        eType="//@eClassifiers.2"/>
+    <!-- optional reference to a lead (Employee) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lead"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 5: Address value object, with attributes only -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="street"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="zip"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 6: Company root class containing departments, projects and positions -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="registeredName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+        upperBound="-1"
+        eType="//@eClassifiers.4"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="positions"
+        upperBound="-1"
+        eType="//@eClassifiers.3"
+        containment="true"/>
+    <!-- main address of company -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="hqAddress"
+        eType="//@eClassifiers.5"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 7: Role enumeration datatype -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RoleKind">
+    <eLiterals name="DEV" value="0" literal="DEV"/>
+    <eLiterals name="MANAGER" value="1" literal="MANAGER"/>
+    <eLiterals name="HR" value="2" literal="HR"/>
+  </eClassifiers>
+
+  <!-- 8: Assignment class using complex references and enum-typed attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Assignment">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employee"
+        lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project"
+        lowerBound="1"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        lowerBound="1"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="allocationPercent"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+</ecore:EPackage>

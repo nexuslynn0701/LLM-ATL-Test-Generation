@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataProcessing"
+    description="Process and archive data files"
+    basedir="/home/user/project"
+    default="process">
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/opt/libs"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <targets xmi:id="process" name="process" description="Main processing step" ifCondition="java.home.exists">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="output"/>
+    <tasks xsi:type="Ant:Copy" file="input/data.txt" tofile="output/data.txt" overwrite="true" filtering="false"/>
+    <tasks xsi:type="Ant:Delete" dir="temp" verbose="false" quiet="true" failonerror="false"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd-HH:mm" locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="My API"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts" unless="keep.files">
+    <tasks xsi:type="Ant:Delete" dir="build" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" file="dist/app.jar"/>
+  </targets>
+</Ant:Project>

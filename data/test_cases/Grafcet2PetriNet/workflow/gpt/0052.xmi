@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingMergeWithLoop">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="StartUp" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="PrepareA" isInitial="false" isActive="false" action="prepareA"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="PrepareB" isInitial="false" isActive="false" action="prepareB"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="Process" isInitial="false" isActive="false" action="processMain"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="ErrorHandling" isInitial="false" isActive="false" action="handleError"/>
+    <elements xsi:type="Grafcet:Step" location="s006" name="Shutdown" isInitial="false" isActive="false" action="shutdownSystem"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t001" name="StartBranch" condition="systemReady"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="PathA" condition="selectA"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="PathB" condition="selectB"/>
+    <elements xsi:type="Grafcet:Transition" location="t004" name="JoinPaths" condition="bothPrepared"/>
+    <elements xsi:type="Grafcet:Transition" location="t005" name="FailureDetected" condition="errorSignal"/>
+    <elements xsi:type="Grafcet:Transition" location="t006" name="Recover" condition="recovered"/>
+    <elements xsi:type="Grafcet:Transition" location="t007" name="Finish" condition="processDone"/>
+    <!-- Connections: branching from initial step to two alternative preparations -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="startupToBranch" from="/0/@elements.0" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c002" name="branchToPrepareA" from="/0/@elements.6" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c003" name="branchToPrepareB" from="/0/@elements.6" to="/0/@elements.2"/>
+    <!-- Separate transitions out of each preparation step -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c004" name="prepareAToPathA" from="/0/@elements.1" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c005" name="prepareBToPathB" from="/0/@elements.2" to="/0/@elements.8"/>
+    <!-- Both paths join into the main processing step via same transition -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c006" name="pathAToProcess" from="/0/@elements.7" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c007" name="pathBToProcess" from="/0/@elements.8" to="/0/@elements.3"/>
+    <!-- Error handling loop around the Process step -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c008" name="processToFailure" from="/0/@elements.3" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c009" name="failureToErrorHandling" from="/0/@elements.10" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c010" name="errorHandlingToRecover" from="/0/@elements.4" to="/0/@elements.11"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c011" name="recoverToProcess" from="/0/@elements.11" to="/0/@elements.3"/>
+    <!-- Normal completion path from Process to Shutdown -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c012" name="processToFinish" from="/0/@elements.3" to="/0/@elements.12"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c013" name="finishToShutdown" from="/0/@elements.12" to="/0/@elements.5"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

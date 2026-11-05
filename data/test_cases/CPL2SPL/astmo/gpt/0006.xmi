@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one subAction, one outgoing, one incoming -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa_main">
+      <!-- contents -> complex Proxy (non-simple) at index 7 -->
+      <contents href="//@elements.7"/>
+    </subActions>
+    <outgoing>
+      <!-- contents -> simple Proxy at index 6 -->
+      <contents href="//@elements.6"/>
+    </outgoing>
+    <incoming>
+      <!-- contents -> AddressSwitch at index 8 -->
+      <contents href="//@elements.8"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy -->
+  <elements xsi:type="CPL:Location" url="sip:proxyA@example.com" clear="true" priority="0.5"/>
+
+  <!-- 2: Location used by complex Proxy -->
+  <elements xsi:type="CPL:Location" url="sip:proxyB@example.com" clear="true" priority="0.8"/>
+
+  <!-- 3: Location used by Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.com" clear="true" priority="1.0"/>
+
+  <!-- 4: SubCall that references SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- 5: Redirect with permanent="false" and a location -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents href="//@elements.3"/>
+  </elements>
+
+  <!-- 6: Simple Proxy (isSimple = true, since no children set) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <contents href="//@elements.1"/>
+  </elements>
+
+  <!-- 7: Complex Proxy (non-simple: has all branches) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- Busy branch: contents -> SubCall -->
+    <busy>
+      <contents href="//@elements.4"/>
+    </busy>
+    <!-- NoAnswer branch: contents -> simple Proxy -->
+    <noAnswer>
+      <contents href="//@elements.6"/>
+    </noAnswer>
+    <!-- Redirection branch: contents -> Redirect -->
+    <redirection>
+      <contents href="//@elements.5"/>
+    </redirection>
+    <!-- Failure branch: no contents -->
+    <failure/>
+    <!-- Default branch: contents -> Redirect -->
+    <default>
+      <contents href="//@elements.5"/>
+    </default>
+    <!-- locations for this Proxy -->
+    <contents href="//@elements.2"/>
+  </elements>
+
+  <!-- 8: AddressSwitch used by Incoming method -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- notPresent and otherwise children -->
+    <notPresent/>
+    <otherwise>
+      <!-- contents -> Redirect -->
+      <contents href="//@elements.5"/>
+    </otherwise>
+    <!-- two SwitchedAddress cases, both with contents = SubCall -->
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <contents href="//@elements.4"/>
+    </addresses>
+    <addresses is="bob@example.com" contains="bob" subDomainOf="example.com">
+      <contents href="//@elements.4"/>
+    </addresses>
+  </elements>
+
+</CPL:CPLModel>

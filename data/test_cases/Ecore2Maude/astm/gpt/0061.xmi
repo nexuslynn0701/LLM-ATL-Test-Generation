@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryRoot"
+    nsURI="http://example.org/libraryRoot"
+    nsPrefix="libroot">
+
+  <!-- Subpackage to exercise superPackage/subPackages -->
+  <eSubpackages name="inventory"
+                nsURI="http://example.org/inventory"
+                nsPrefix="inv">
+    <!-- Class 0: Item (abstract), super of Book and Magazine -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="Item"
+                  abstract="true"
+                  interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="code"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="1"
+                           upperBound="1"
+                           iD="true"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="flag"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           defaultValueLiteral="true"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      <!-- Attribute using EInt to exercise Int typing -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="rank"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           defaultValueLiteral="7"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eClassifiers>
+
+    <!-- Class 1: Book extends Item, has EString and EInt attributes and two references -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="Book"
+                  abstract="false"
+                  interface="false"
+                  eSuperTypes="#//@eSubpackages.0/@eClassifiers.0">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="title"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="1"
+                           upperBound="1"
+                           iD="false"
+                           defaultValueLiteral="&quot;Untitled &quot;Book&quot;&quot;"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="pages"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           defaultValueLiteral="123"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <!-- Containment reference to Chapter (many, upperBound = -1) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="chapters"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="true"
+                           resolveProxies="true"
+                           eType="#//@eSubpackages.0/@eClassifiers.3"/>
+      <!-- Non-containment reference to Magazine, opposite 'relatedBook' -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="relatedMagazine"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           containment="false"
+                           resolveProxies="true"
+                           eOpposite="#//@eSubpackages.0/@eClassifiers.2/@eStructuralFeatures.1"
+                           eType="#//@eSubpackages.0/@eClassifiers.2"/>
+    </eClassifiers>
+
+    <!-- Class 2: Magazine extends Item, has EString attribute and opposite reference to Book -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="Magazine"
+                  abstract="false"
+                  interface="false"
+                  eSuperTypes="#//@eSubpackages.0/@eClassifiers.0">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="issue"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           defaultValueLiteral="January"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <!-- Opposite reference back to Book -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="relatedBook"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           containment="false"
+                           resolveProxies="true"
+                           eOpposite="#//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.2"
+                           eType="#//@eSubpackages.0/@eClassifiers.1"/>
+    </eClassifiers>
+
+    <!-- Class 3: Chapter, not a subtype, contained by Book.chapters -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="Chapter"
+                  abstract="false"
+                  interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="heading"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           defaultValueLiteral="Intro"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+
+    <!-- Enum 4: BindingType with three literals -->
+    <eClassifiers xsi:type="ecore:EEnum"
+                  name="BindingType">
+      <eLiterals name="Hard_Cover"
+                 value="0"
+                 literal="Hard_Cover"/>
+      <eLiterals name="Soft_Cover"
+                 value="1"
+                 literal="Soft_Cover"/>
+      <eLiterals name="Digital"
+                 value="2"
+                 literal="Digital"/>
+    </eClassifiers>
+
+    <!-- Class 5: Binding, uses BindingType enum and EBooleanObject -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="Binding"
+                  abstract="false"
+                  interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="bindingType"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="1"
+                           upperBound="1"
+                           iD="false"
+                           defaultValueLiteral="Hard_Cover"
+                           eType="#//@eSubpackages.0/@eClassifiers.4"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="archival"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           defaultValueLiteral="false"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root package classifiers to exercise classifiers at multiple package levels -->
+
+  <!-- Class 0: Library with containment refs and reference to Binding -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Library"
+                abstract="false"
+                interface="false">
+    <!-- Containment of generic Items (Book and Magazine subclasses) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="items"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="#//@eSubpackages.0/@eClassifiers.0"/>
+    <!-- Containment of Bindings -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="bindings"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="#//@eSubpackages.0/@eClassifiers.5"/>
+    <!-- Non-containment ref to a featured Binding -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="featuredBinding"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="#//@eSubpackages.0/@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- Class 1: Librarian with String and Boolean attributes, no superTypes -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Librarian"
+                abstract="false"
+                interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="&quot;Main Librarian&quot;"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- Enum 2: Role with two literals to exercise another enum -->
+  <eClassifiers xsi:type="ecore:EEnum"
+                name="Role">
+    <eLiterals name="Head"
+               value="0"
+               literal="Head"/>
+    <eLiterals name="Assistant"
+               value="1"
+               literal="Assistant"/>
+  </eClassifiers>
+
+</ecore:EPackage>

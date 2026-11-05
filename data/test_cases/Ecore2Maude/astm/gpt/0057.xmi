@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.com/company"
+    nsPrefix="company">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="hr"
+      nsURI="http://example.com/company/hr"
+      nsPrefix="hr">
+    <!-- EClass: Employee -->
+    <eClassifiers xsi:type="ecore:EClass" name="Employee">
+      <!-- Super type from root package (Person) to trigger ClassEqSuperTypes -->
+      <eSuperTypes href="//@eClassifiers.0"/>
+      <!-- Attribute: employeeId (ID, Int, default 0) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="employeeId"
+          lowerBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          iD="true"
+          defaultValueLiteral="0"/>
+      <!-- Attribute: name (String, default with quotes to exercise escapeQuotes) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="name"
+          lowerBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          defaultValueLiteral="John &quot;Johnny&quot; Doe"/>
+      <!-- Attribute: status (custom DataType, to map to @DataType) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="status"
+          lowerBound="0"
+          eType="//@eSubpackages.0/@eClassifiers.2"/>
+      <!-- Reference: manager (single, non-containment, opposite subordinate) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="manager"
+          lowerBound="0"
+          upperBound="1"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          containment="false"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.3"/>
+      <!-- Reference: subordinates (multi, non-containment, opposite manager) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="subordinates"
+          lowerBound="0"
+          upperBound="-1"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          containment="false"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.2"/>
+    </eClassifiers>
+
+    <!-- EEnum: EmploymentType with multiple literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="EmploymentType">
+      <eLiterals name="FULL_TIME" value="0" literal="FULL_TIME"/>
+      <eLiterals name="PART_TIME" value="1" literal="PART_TIME"/>
+      <eLiterals name="CONTRACTOR" value="2" literal="CONTRACTOR"/>
+    </eClassifiers>
+
+    <!-- Custom EDataType to exercise @DataType branch in attDataType -->
+    <eClassifiers xsi:type="ecore:EDataType"
+        name="CustomStatus"
+        instanceClassName="com.example.Status"/>
+  </eSubpackages>
+
+  <!-- Root-level EClass: Person (no super types, to use sortClass as supersort) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- Attribute: ssn (ID, String, no default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="ssn"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <!-- Attribute: age (Int, no default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- Root-level EEnum: Grade with a single literal (to trigger single-literal path) -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Grade">
+    <eLiterals name="JUNIOR" value="0" literal="JUNIOR"/>
+  </eClassifiers>
+
+  <!-- Root-level EDataType that is not a primitive or enum (for @DataType mapping) -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="Blob"
+      instanceClassName="byte[]"/>
+
+</ecore:EPackage>

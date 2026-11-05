@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyPkg"
+    nsURI="http://example.com/company"
+    nsPrefix="company">
+
+  <!-- 0: Enum with literals to exercise EEnum/EEnumLiteral -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Gender">
+    <eLiterals name="male" value="0" literal="male"/>
+    <eLiterals name="female" value="1" literal="female"/>
+    <eLiterals name="other" value="2" literal="other"/>
+  </eClassifiers>
+
+  <!-- 1: DataType for custom id -->
+  <eClassifiers xsi:type="ecore:EDataType" name="IDString" instanceClassName="java.lang.String"/>
+
+  <!-- 2: Root EClass with operations and containment references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="allEmployees"
+        upperBound="-1"
+        eType="//@eClassifiers.4"/>
+    <eOperations name="getDepartmentCount"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eOperations name="findEmployeeById"
+        eType="//@eClassifiers.4">
+      <eParameters name="id"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 3: Department with opposite reference to Company and containment to Teams -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="deptCode"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="company"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="teams"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 4: Abstract Person superclass, with ID attribute and enum-typed attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        iD="true"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="gender"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 5: Team with containment of Employees and references to Projects -->
+  <eClassifiers xsi:type="ecore:EClass" name="Team">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="eccore:EReference" name="members"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+        upperBound="-1"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 6: Employee extends Person, with references and attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="positionTitle"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="teams"
+        upperBound="-1"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignedProjects"
+        upperBound="-1"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 7: Project with references to Team and Employees -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="budget"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="leadTeam"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="contributors"
+        upperBound="-1"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 8: Contractor extends Person with different attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contractor"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dailyRate"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="agency"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignedTeam"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildSystem"
+    default="build"
+    basedir="."
+    description="Comprehensive build script for testing ATL transformation">
+  <targets xmi:id="init" name="init" description="Initialize directories">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="true"/>
+  </targets>
+  <targets xmi:id="doc" name="doc" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="docs/api"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Example API"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create JAR archive">
+    <tasks xsi:type="Ant:Jar"
+        jarfile="dist/app.jar"
+        basedir="build/classes"
+        compress="true"
+        manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="build" name="build" description="Full build sequence">
+    <tasks xsi:type="Ant:Copy"
+        todir="build/resources"
+        overwrite="true"
+        filtering="true">
+      <fileset dir="resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/temp/*"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="VERSION" value="1.0.0"/>
+      </filterset>
+    </tasks>
+  </targets>
+  <properties>
+    <Ant:PropertyValue name="build.version" value="1.0.0"/>
+    <Ant:PropertyLocation name="config.dir" location="conf"/>
+    <Ant:PropertyFile file="build.properties"/>
+    <Ant:PropertyEnv environment="BUILD_ENV"/>
+  </properties>
+</Ant:Project>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions -->
+    <subActions id="sa_main">
+      <!-- contents -> complex Proxy at index 3 -->
+      <contents href="//@elements.3"/>
+    </subActions>
+    <subActions id="sa_simple">
+      <!-- contents -> simple Proxy at index 4 -->
+      <contents href="//@elements.4"/>
+    </subActions>
+
+    <!-- Incoming and Outgoing referencing various nodes -->
+    <incoming>
+      <!-- contents -> SubCall (index 1) -->
+      <contents href="//@elements.1"/>
+    </incoming>
+    <outgoing>
+      <!-- contents -> AddressSwitch (index 5) -->
+      <contents href="//@elements.5"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: SubCall (will trigger SubCall2Return) -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- 2: Location (used by several rules via locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" clear="true"/>
+
+  <!-- 3: Complex Proxy (Proxy2Select, uses all case branches) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- Locations for Proxy (include Location at index 2) -->
+    <contents href="//@elements.2"/>
+
+    <!-- Non-simple: all branches present -->
+    <busy>
+      <!-- Busy contents -> Redirect at index 6 -->
+      <contents href="//@elements.6"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer contents -> Reject branch at index 7 (no statements produced) -->
+      <contents href="//@elements.7"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection contents -> SubCall at index 1 -->
+      <contents href="//@elements.1"/>
+    </redirection>
+    <failure/>
+    <default>
+      <!-- Default contents -> simple Proxy at index 4 -->
+      <contents href="//@elements.4"/>
+    </default>
+  </elements>
+
+  <!-- 4: Simple Proxy (Proxy2Return) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- Locations for simple Proxy: distinct Location -->
+    <contents href="//@elements.8"/>
+  </elements>
+
+  <!-- 5: AddressSwitch (AddressSwitch2SelectStat) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- notPresent and otherwise children -->
+    <notPresent/>
+    <otherwise>
+      <!-- Otherwise contents -> Redirect at index 6 -->
+      <contents href="//@elements.6"/>
+    </otherwise>
+
+    <!-- SwitchedAddress entries -->
+    <addresses is="alice@example.com">
+      <!-- contents -> simple Proxy at index 4 -->
+      <contents href="//@elements.4"/>
+    </addresses>
+    <addresses is="bob@example.com">
+      <!-- contents -> Reject at index 7 -->
+      <contents href="//@elements.7"/>
+    </addresses>
+  </elements>
+
+  <!-- 6: Redirect (Redirect2Return, uses Location at index 9 via locations) -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <!-- Attach its own Location for contact URI -->
+    <contents href="//@elements.9"/>
+  </elements>
+
+  <!-- 7: Reject (no direct rule, but used as contents in several places) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 8: Location used by simple Proxy -->
+  <elements xsi:type="CPL:Location" url="sip:simple@example.net" clear="false"/>
+
+  <!-- 9: Location used by Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.org" clear="true"/>
+
+  <!-- 10: StringSwitch (StringSwitch2SelectStat) -->
+  <elements xsi:type="CPL:StringSwitch" field="x-header"/>
+
+  <!-- 11: LanguageSwitch (no dedicated rule, used to test empty statements branches) -->
+  <elements xsi:type="CPL:LanguageSwitch"/>
+
+  <!-- 12: TimeSwitch (no direct rule, used similarly) -->
+  <elements xsi:type="CPL:TimeSwitch"/>
+
+  <!-- 13: PrioritySwitch (no direct rule, used similarly) -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+
+</CPL:CPLModel>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example/rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="subPkg1"
+                nsURI="http://example/subPkg1"
+                nsPrefix="sub1">
+    <!-- Class in subpackage extending a class in super package -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClass1">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subAttr"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                           lowerBound="1"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           iD="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- DataTypes in root package -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="MyString"
+                instanceClassName="java.lang.String"/>
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="MyInt"
+                instanceClassName="int"/>
+
+  <!-- Enumeration in root package -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="RED"  value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+  </eClassifiers>
+
+  <!-- Abstract superclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Base">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="true"/>
+  </eClassifiers>
+
+  <!-- Concrete class with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person"
+                eSuperTypes="//@eClassifiers.2">
+    <!-- String attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="John Doe"
+                         iD="false"/>
+    <!-- Int attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="false"/>
+    <!-- Enum-typed reference (non-containment, with opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="favoriteColor"
+                         eType="//@eClassifiers.1"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eOpposite="//@eClassifiers.5/@eClassifiers.0/@eStructuralFeatures.0"/>
+    <!-- Containment reference to Address, many-valued, no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="addresses"
+                         eType="//@eClassifiers.5"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"/>
+  </eClassifiers>
+
+  <!-- Another concrete class with cross-package supertype and opposite ref -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Address"
+                eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+    <!-- Reference back to Person (opposite of favoriteColor) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         eType="//@eClassifiers.3"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eOpposite="//@eClassifiers.3/@eStructuralFeatures.2"/>
+    <!-- Attribute typed by custom data type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="line"
+                         eType="//@eClassifiers.0"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="false"/>
+  </eClassifiers>
+
+</ecore:EPackage>

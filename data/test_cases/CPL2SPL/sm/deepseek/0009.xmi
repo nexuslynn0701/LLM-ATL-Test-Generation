@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <subActions id="mainRouting"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="192.168.1.100" contains="work"/>
+        <addresses contains="home"/>
+        <notPresent/>
+        <otherwise/>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" tzid="America/New_York" tzurl="http://timezones.example.com">
+        <times dtstart="20250101T090000" dtend="20251231T170000" duration="PT8H" freq="DAILY" until="20251231T235959" count="365" interval="1" wkst="MO"/>
+        <notPresent/>
+        <otherwise/>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch" field="language">
+    <languages matches="en"/>
+    <languages matches="fr"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="user-agent">
+    <strings is="Mozilla" contains="Firefox"/>
+    <strings contains="Chrome"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5" greater="3" equal="4"/>
+    <priorities greater="10"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default>
+      <contents xsi:type="CPL:Location" url="sip:user@voip.example.com" priority="1" clear="yes"/>
+    </default>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="yes"/>
+  <elements xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+  <elements xsi:type="CPL:SubCall" ref="subRouting1"/>
+  <elements xsi:type="CPL:Location" url="sip:admin@company.com" priority="2" clear="no"/>
+</CPL:CPLModel>

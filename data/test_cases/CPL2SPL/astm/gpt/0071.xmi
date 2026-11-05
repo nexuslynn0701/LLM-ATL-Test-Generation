@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with both directions and a referenced SubAction -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain"/>
+    <incoming/>
+    <outgoing/>
+  </elements>
+
+  <!-- SubCall referring to SubAction id (string ref, not object ref) -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- Location contributing to locations for later Proxy/Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" clear="true" priority="10"/>
+
+  <!-- Simple Proxy (isSimple = true) because no children set -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel"/>
+
+  <!-- Complex Proxy with all branches present (isSimple = false) -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="serial">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <!-- Default branch executes a Redirect action -->
+    <default contents="//@elements.5"/>
+  </elements>
+
+  <!-- Redirect that will observe locations from the complex Proxy's context -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- Address switch using SwitchedAddress and NotPresent / Otherwise branches -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com"/>
+    <addresses is="bob@example.com" contains="bob" subDomainOf="example.com"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- String switch for exercising StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel"/>
+  </elements>
+
+  <!-- Language switch to be used as a leaf (statements become empty) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="fr"/>
+  </elements>
+
+  <!-- Time switch to be used as a leaf (statements become empty) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com">
+    <times dtstart="20260101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- Priority switch to be used as a leaf (statements become empty) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.2" greater="0.8" equal="0.5"/>
+  </elements>
+
+</CPL:CPLModel>

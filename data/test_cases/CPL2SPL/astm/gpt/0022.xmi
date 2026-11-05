@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with incoming/outgoing and several subActions -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions (functions) -->
+    <subActions xsi:type="CPL:SubAction" id="sa_simpleProxy">
+      <!-- contents -> Proxy (simple) via NodeContainer.contents -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+
+    <subActions xsi:type="CPL:SubAction" id="sa_complexProxy">
+      <!-- contents -> complex Proxy using Busy/NoAnswer/Redirection/Failure/Default -->
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </subActions>
+
+    <subActions xsi:type="CPL:SubAction" id="sa_subcallTarget">
+      <!-- contents -> SubCall, exercising SubCall2Return -->
+      <contents xsi:type="CPL:SubCall" ref="sa_simpleProxy"/>
+    </subActions>
+
+    <!-- Incoming and Outgoing methods -->
+    <incoming>
+      <!-- contents -> Location, should lead to empty statements in Incoming2Method -->
+      <contents xsi:type="CPL:Location" url="sip:incoming@example.com" clear="true"/>
+    </incoming>
+
+    <outgoing>
+      <!-- contents -> Redirect, exercising Redirect2Return -->
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy (for Proxy2Return / Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user1@example.com" clear="true"/>
+
+  <!-- 2: Location used by complex Proxy (for Proxy2Select / Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user2@example.net" clear="true"/>
+
+  <!-- 3: Complex Proxy as top-level element (NOT a statement, but valid top-level) -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="parallel">
+    <!-- associate locations via containment of Location as contents -->
+    <busy contents="//@elements.1"/>
+    <noAnswer contents="//@elements.1"/>
+    <redirection contents="//@elements.2"/>
+    <failure/>
+    <default contents="//@elements.0/@subActions.2"/>
+  </elements>
+
+  <!-- 4: AddressSwitch as top-level element, using NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- addresses cases -->
+    <addresses is="sip:case1@example.org">
+      <!-- contents -> Proxy (simple), should be used as statement in SwitchedAddress2SelectCase -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- location via separate Location (element 1) -->
+        <busy/>
+      </contents>
+    </addresses>
+    <addresses is="sip:case2@example.org">
+      <!-- contents -> Location (ignored as statement in SwitchedAddress2SelectCase) -->
+      <contents xsi:type="CPL:Location" url="sip:switch@example.org" clear="false"/>
+    </addresses>
+
+    <!-- notPresent branch (R6) -->
+    <notPresent/>
+
+    <!-- otherwise branch (R18) with contents -> Reject so statements become empty -->
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+    </otherwise>
+  </elements>
+
+  <!-- 5: StringSwitch as top-level element (R16) -->
+  <elements xsi:type="CPL:StringSwitch">
+    <!-- field name becomes variable name in SPL -->
+    <contents xsi:type="CPL:SubCall" ref="sa_complexProxy"/>
+  </elements>
+
+  <!-- 6: TimeSwitch as top-level element, just to appear (statements usually empty) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org/utc">
+    <times dtstart="20260101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+</CPL:CPLModel>

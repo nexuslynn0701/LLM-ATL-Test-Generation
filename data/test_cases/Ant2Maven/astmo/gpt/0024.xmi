@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-src"
+    description="Ant project with multiple tasks and properties"
+    default="build-main">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="project-src"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by tasks, but transformed) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="project-src"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- InExcludes for Javac -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="" unless=""/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/test/**" ifCondition="" unless=""/>
+    </tasks>
+
+    <!-- Create build directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build"/>
+
+    <!-- Package jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/lib/app.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="project-src"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Project API"/>
+  </targets>
+
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <!-- Delete build directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

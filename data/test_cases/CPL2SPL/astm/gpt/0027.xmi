@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.2" id="sa_main"/>
+    <subActions contents="//@elements.3" id="sa_simple"/>
+    <incoming contents="//@elements.5"/>
+    <outgoing contents="//@elements.6"/>
+  </elements>
+
+  <!-- 1: Location directly under CPL (for global locations sequence) -->
+  <elements xsi:type="CPL:Location" url="sip:global@example.com" clear="yes"/>
+
+  <!-- 2: Complex Proxy as statement for sa_main, also parent of switches -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- complex: all children present so isSimple = false -->
+    <busy contents="//@elements.4"/>
+    <noAnswer contents="//@elements.7"/>
+    <redirection contents="//@elements.8"/>
+    <failure/>
+    <default contents="//@elements.9"/>
+  </elements>
+
+  <!-- 3: Simple Proxy as statement for sa_simple -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- simple: no busy/noAnswer/redirection/failure/default -->
+  </elements>
+
+  <!-- 4: AddressSwitch used from Busy -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses contents="//@elements.10"/>
+    <addresses contents="//@elements.11"/>
+    <notPresent contents="//@elements.12"/>
+    <otherwise contents="//@elements.13"/>
+  </elements>
+
+  <!-- 5: SubCall used by Incoming -->
+  <elements xsi:type="CPL:SubCall" ref="sa_simple"/>
+
+  <!-- 6: Redirect used by Outgoing -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 7: NoAnswer with Reject contents -->
+  <elements xsi:type="CPL:NoAnswer">
+    <contents xsi:type="CPL:Reject" status="480" reason="Timeout"/>
+  </elements>
+
+  <!-- 8: Redirection with TimeSwitch contents -->
+  <elements xsi:type="CPL:Redirection">
+    <contents xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com">
+      <times dtstart="20250101T000000Z" interval="15" wkst="MO"/>
+    </contents>
+  </elements>
+
+  <!-- 9: Default with Location contents (ignored as statement) -->
+  <elements xsi:type="CPL:Default">
+    <contents xsi:type="CPL:Location" url="sip:default@example.com" priority="5" clear="no"/>
+  </elements>
+
+  <!-- 10: SwitchedAddress #1 with LanguageSwitch contents -->
+  <elements xsi:type="CPL:SwitchedAddress" is="alice@example.com" contains="alias" subDomainOf="example.com">
+    <contents xsi:type="CPL:LanguageSwitch">
+      <languages matches="en"/>
+    </contents>
+  </elements>
+
+  <!-- 11: SwitchedAddress #2 with PrioritySwitch contents -->
+  <elements xsi:type="CPL:SwitchedAddress" is="bob@example.com" contains="direct" subDomainOf="example.org">
+    <contents xsi:type="CPL:PrioritySwitch">
+      <priorities/>
+    </contents>
+  </elements>
+
+  <!-- 12: NotPresent used in AddressSwitch (for NotPresent2ErrorResponse) -->
+  <elements xsi:type="CPL:NotPresent"/>
+
+  <!-- 13: Otherwise with Location contents -->
+  <elements xsi:type="CPL:Otherwise">
+    <contents xsi:type="CPL:Location" url="sip:otherwise@example.net" priority="10" clear="yes"/>
+  </elements>
+
+  <!-- 14: Standalone Location to contribute to locations chain -->
+  <elements xsi:type="CPL:Location" url="sip:extra@example.net" priority="1" clear="yes"/>
+
+</CPL:CPLModel>

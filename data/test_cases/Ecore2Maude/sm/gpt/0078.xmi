@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cpx">
+
+  <!-- 0: Simple data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="StatusCode" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityLevel">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 2: Root abstract class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 3: Concrete subclass with both attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="estimate"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- containment to composite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="parentComposite"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.4"
+                         containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 4: Composite element with containment of tasks and nested composites -->
+  <eClassifiers xsi:type="ecore:EClass" name="Composite" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- containment of tasks -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="tasks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.3"
+                         containment="true"
+                         resolveProxies="false"/>
+    <!-- self-containment for nested composites -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subComposites"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.4"
+                         containment="true"
+                         resolveProxies="false"/>
+    <!-- non-containment cross refs to tasks -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="linkedTasks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.3"
+                         containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 5: Class with both attributes and operations -->
+  <eClassifiers xsi:type="ecore:EClass" name="User" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="username"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="assignedTasks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.3"
+                         containment="false"
+                         resolveProxies="true"/>
+    <eOperations name="getDisplayName"
+                 lowerBound="0"
+                 upperBound="1"
+                 ordered="true"
+                 unique="true">
+      <eParameters name="prefix"
+                   lowerBound="0"
+                   upperBound="1"
+                   ordered="true"
+                   unique="true"
+                   eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eParameters name="suffix"
+                   lowerBound="0"
+                   upperBound="1"
+                   ordered="true"
+                   unique="true"
+                   eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

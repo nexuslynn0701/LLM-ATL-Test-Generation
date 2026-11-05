@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="src"
+    description="Build, package, and clean a reusable library"
+    default="build-main">
+  <!-- Ant properties exercising PropertyValue, PropertyLocation, PropertyFile, PropertyEnv -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="build/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <!-- User-defined task definition (TaskDef) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+  <!-- Default build target with multiple predefined tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Compile and jar the main library">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="build/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="dist/library-main.jar"
+        basedir="build/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+        id="mkdirDist"
+        taskname="mkdir"
+        description="Create distribution directory"
+        dir="dist"/>
+    <tasks xsi:type="Ant:Delete"
+        id="cleanTemp"
+        taskname="delete"
+        description="Remove temporary build directory"
+        dir="build/tmp"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        includes="**/*"
+        includesfile="config/includes.txt"
+        excludes="**/*.bak"
+        excludesfile="config/excludes.txt"
+        defaultexcludes="true"/>
+  </targets>
+  <!-- Secondary target exercising Javadoc and Tstamp -->
+  <targets xmi:id="docs" name="docs" description="Generate API documentation">
+    <tasks xsi:type="Ant:Javadoc"
+        srcdir="src"
+        sourcepath="src/main/java"
+        destdir="dist/docs"
+        packagenames="com.example.lib.*"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Library API Documentation"/>
+    <tasks xsi:type="Ant:Tstamp"
+        id="stampDocs"
+        taskname="tstamp"
+        description="Record documentation build time"/>
+  </targets>
+</Ant:Project>

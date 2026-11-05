@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="deploy"
+    basedir="${basedir}"
+    description="Comprehensive build project">
+  <targets xmi:id="deploy" name="deploy" description="Deploy the application" unless="skip.deploy">
+    <tasks xsi:type="Ant:Mkdir" dir="dist/deploy"/>
+    <tasks xsi:type="Ant:Copy" file="build/app.jar" tofile="dist/deploy/app.jar" overwrite="true"/>
+    <tasks xsi:type="Ant:Delete" dir="temp" verbose="true" failonerror="false"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile source code" ifCondition="build.compiler">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" optimize="false" deprecation="true"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run unit tests">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/test.jar" basedir="build/test" compress="true"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" includeEmptyDirs="true"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="basedir" value="/home/user/project"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.compiler" location="/usr/bin/javac"/>
+  <properties xsi:type="Ant:PropertyEnv" name="java.home" environment="JAVA_HOME"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+</Ant:Project>

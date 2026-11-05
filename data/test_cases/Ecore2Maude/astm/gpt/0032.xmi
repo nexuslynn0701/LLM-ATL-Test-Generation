@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMM"
+    nsURI="http://example.org/rootMM"
+    nsPrefix="root">
+
+  <!-- Nested subpackage to exercise super/sub package rules -->
+  <eSubpackages name="subPkg"
+      nsURI="http://example.org/rootMM/sub"
+      nsPrefix="sub">
+    <!-- Classifiers in subPkg -->
+    <eClassifiers xsi:type="ecore:EClass" name="BaseInSub">
+      <!-- One attribute without explicit eType (undefined) to trigger @NoType on attDataType -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="untypedFlag"
+          iD="false"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="SubEntity">
+      <!-- Supertype from root package via cross-package inheritance -->
+      <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+      <!-- Reference with opposite pointing to RootEntity below -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="backToRoot"
+          lowerBound="0"
+          upperBound="-1"
+          ordered="false"
+          unique="false"
+          containment="false"
+          resolveProxies="true"
+          eType="//@eSuperPackage/@eClassifiers.0">
+        <!-- eOpposite set later via corresponding reference in RootEntity -->
+      </eStructuralFeatures>
+    </eClassifiers>
+
+    <!-- Enum declared in subpackage -->
+    <eClassifiers xsi:type="ecore:EEnum" name="PriorityLevel">
+      <eLiterals name="LOW" value="0" literal="LOW"/>
+      <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+      <eLiterals name="HIGH" value="2" literal="HIGH"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers in root package -->
+  <!-- Index 0 -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootEntity" abstract="false" interface="false">
+    <!-- Supertype later: specialized root class will inherit from this -->
+    <!-- Attribute with String type, default and non-ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        iD="false"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="Untitled &quot;Root&quot;"/>
+    <!-- Attribute with Boolean type and no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        iD="false"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Attribute with Int type, marked as ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="identifier"
+        iD="true"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference to SpecializedRoot (index 1), no opposite, containment=true -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- Index 1 -->
+  <eClassifiers xsi:type="ecore:EClass" name="SpecializedRoot" abstract="true" interface="false">
+    <!-- Inherit from RootEntity -->
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+    <!-- Cross-package supertype from subPkg -->
+    <eSuperTypes>//@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+    <!-- Reference with opposite to SubEntity.backToRoot, non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="subEntities"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="false"
+        unique="false"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eSubpackages.0/@eClassifiers.1"
+        eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.0"/>
+    <!-- Attribute typed by enum in same root package (defined at index 3) using name-based lookup allowed for enums? 
+         To keep cross-ref index-based, use later index via path -->
+  </eClassifiers>
+
+  <!-- Index 2: EEnum in root package -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="PROCESSING" value="1" literal="PROCESSING"/>
+  </eClassifiers>
+
+  <!-- Index 3: Data-bearing class using both enums -->
+  <eClassifiers xsi:type="ecore:EClass" name="LifecycleInfo" abstract="false" interface="false">
+    <!-- Attribute with enum StatusKind (root enum) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        iD="false"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.2"
+        defaultValueLiteral="NEW"/>
+    <!-- Attribute with enum PriorityLevel (from subpackage) without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        iD="false"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="//@eSubpackages.0/@eClassifiers.2"/>
+    <!-- Reference to RootEntity with opposite null (no eOpposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+</ecore:EPackage>

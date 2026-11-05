@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Top-level CPL root -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction with a Location as content, referenced by SubCall at elements[1] -->
+    <subActions id="subLoc">
+      <contents xsi:type="CPL:Location" url="sip:loc@example.com" clear="yes"/>
+    </subActions>
+
+    <!-- One Outgoing whose contents is a simple Proxy using the same Location -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="r1" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </outgoing>
+
+    <!-- One Incoming whose contents is the same simple Proxy -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="r1" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- Top-level SubCall, refers to SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="subLoc"/>
+
+  <!-- Top-level Location to be used as a location for Redirect and complex Proxy -->
+  <elements xsi:type="CPL:Location" url="sip:toploc@example.com" clear="yes"/>
+
+  <!-- Top-level Redirect, will use Location2URIConstant via its location -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- its location is the third top-level element (index 2) -->
+    <locations href="//@elements.2"/>
+  </elements>
+
+  <!-- Top-level AddressSwitch with SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- SwitchedAddress with a simple Proxy returning through the SubCall -->
+    <addresses is="addr1">
+      <contents xsi:type="CPL:Proxy" recurse="r2" ordering="parallel">
+        <busy contents="//@elements.1"/>
+      </contents>
+    </addresses>
+    <!-- NotPresent with contents a simple Proxy using top-level Location -->
+    <notPresent>
+      <contents xsi:type="CPL:Proxy" recurse="r3" ordering="parallel">
+        <default contents="//@elements.2"/>
+      </contents>
+    </notPresent>
+    <!-- Otherwise with contents a simple Proxy using top-level Location -->
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="r4" ordering="parallel">
+        <default contents="//@elements.2"/>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- Top-level StringSwitch with one SwitchedString (no contents) -->
+  <elements xsi:type="CPL:StringSwitch" field="headField">
+    <strings is="headIs" contains="headContains"/>
+  </elements>
+
+  <!-- Top-level LanguageSwitch with NotPresent -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- Top-level TimeSwitch with no contents -->
+  <elements xsi:type="CPL:TimeSwitch">
+    <times dtstart="20240101T000000" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- Top-level PrioritySwitch with no contents -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="low" greater="high"/>
+  </elements>
+
+  <!-- Top-level complex Proxy (non-simple) with busy, noAnswer, redirection, failure, default -->
+  <elements xsi:type="CPL:Proxy" recurse="r5" ordering="parallel">
+    <busy contents="//@elements.1"/>
+    <noAnswer/>
+    <redirection contents="//@elements.3"/>
+    <failure/>
+    <default contents="//@elements.1"/>
+    <!-- give this proxy the top-level Location as one of its locations -->
+    <locations href="//@elements.2"/>
+  </elements>
+
+</CPL:CPLModel>

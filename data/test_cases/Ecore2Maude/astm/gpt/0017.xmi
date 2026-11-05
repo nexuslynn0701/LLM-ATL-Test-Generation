@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="maudeTestMM"
+    nsURI="http://example.org/maudeTestMM"
+    nsPrefix="mtm">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="innerPkg" nsURI="http://example.org/maudeTestMM/inner" nsPrefix="inner">
+    <!-- Inner class used as supertype and reference target -->
+    <eClassifiers xsi:type="ecore:EClass" name="InnerBase">
+      <!-- attribute with Boolean type and specific default value -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="flag"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="true"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+          iD="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Enumeration with two literals, used as attribute type and default values -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StateKind">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+    <eLiterals name="INACTIVE" value="1" literal="INACTIVE"/>
+  </eClassifiers>
+
+  <!-- Simple datatype (non-primitive) to trigger generic @DataType path if used -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomNumber"
+      instanceClassName="java.lang.Integer"/>
+
+  <!-- Super class with one attribute and one reference (non-containment, single) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Element">
+    <!-- String attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <!-- Non-containment reference to InnerBase with upperBound = -1 to trigger '*' -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="inners"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="false"
+        unique="true"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- Class with supertype, references, attributes (many and single), including enum and primitive defaults -->
+  <eClassifiers xsi:type="ecore:EClass" name="Primary">
+    <!-- Inherit from Element and InnerBase -->
+    <eSuperTypes>//@eClassifiers.2 //@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+
+    <!-- Integer attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="count"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="5"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="false"/>
+
+    <!-- Enum attribute with specific default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="ACTIVE"
+        eType="//@eClassifiers.0"
+        iD="false"/>
+
+    <!-- Containment reference to Secondary with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="details"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="false"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.4"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- Class that will be contained, with opposite reference, attribute using EString default with quotes, and another ref -->
+  <eClassifiers xsi:type="ecore:EClass" name="Secondary">
+    <!-- Simple attribute with String default that includes quotes to exercise escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="description"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="&quot;quoted&quot; text"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"/>
+    <!-- Opposite reference back to Primary (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.3"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.2"/>
+    <!-- Reference to Element without opposite, to exercise null maybeRefSort -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="base"
+        lowerBound="0"
+        upperBound="1"
+        ordered="false"
+        unique="true"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+</ecore:EPackage>

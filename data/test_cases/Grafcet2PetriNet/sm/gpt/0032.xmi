@@ -1,0 +1,65 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet name="ComplexCycleGrafcet" location="file:/models/grafcet_complex_cycle.gcf">
+    <!-- Elements: Steps and Transitions -->
+    <elements xsi:type="Grafcet:Step" name="InitStep" location="1:1-1:20" isInitial="true" isActive="true" action="initializeSystem()"/>
+    <elements xsi:type="Grafcet:Step" name="ProcessStepA" location="2:1-2:25" isInitial="false" isActive="false" action="executePhaseA()"/>
+    <elements xsi:type="Grafcet:Step" name="ProcessStepB" location="3:1-3:25" isInitial="false" isActive="false" action="executePhaseB()"/>
+    <elements xsi:type="Grafcet:Step" name="ParallelStep1" location="4:1-4:25" isInitial="false" isActive="false" action="parallelTask1()"/>
+    <elements xsi:type="Grafcet:Step" name="ParallelStep2" location="5:1-5:25" isInitial="false" isActive="false" action="parallelTask2()"/>
+    <elements xsi:type="Grafcet:Step" name="MergeStep" location="6:1-6:25" isInitial="false" isActive="false" action="mergeParallelResults()"/>
+    <elements xsi:type="Grafcet:Step" name="ErrorStep" location="7:1-7:25" isInitial="false" isActive="false" action="handleError()"/>
+    <elements xsi:type="Grafcet:Step" name="FinalStep" location="8:1-8:25" isInitial="false" isActive="false" action="shutdownSystem()"/>
+
+    <elements xsi:type="Grafcet:Transition" name="T_Init_to_A" location="10:1-10:25" condition="startButtonPressed"/>
+    <elements xsi:type="Grafcet:Transition" name="T_A_to_B" location="11:1-11:25" condition="phaseACompleted"/>
+    <elements xsi:type="Grafcet:Transition" name="T_B_to_Parallel" location="12:1-12:30" condition="phaseBCompleted"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Par1_to_Merge" location="13:1-13:30" condition="task1Done"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Par2_to_Merge" location="14:1-14:30" condition="task2Done"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Merge_to_Final" location="15:1-15:30" condition="bothTasksDone"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Final_to_Init" location="16:1-16:30" condition="restartRequested"/>
+    <elements xsi:type="Grafcet:Transition" name="T_A_to_Error" location="17:1-17:30" condition="errorInPhaseA"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Error_to_Final" location="18:1-18:30" condition="errorResolved"/>
+
+    <!-- Connections: StepToTransition -->
+    <!-- InitStep -> T_Init_to_A -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Init_to_T_InitA" location="20:1-20:40" from="/0/@elements.0" to="/0/@elements.8"/>
+    <!-- ProcessStepA -> T_A_to_B -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_A_to_T_AB" location="21:1-21:40" from="/0/@elements.1" to="/0/@elements.9"/>
+    <!-- ProcessStepB -> T_B_to_Parallel -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_B_to_T_BPar" location="22:1-22:40" from="/0/@elements.2" to="/0/@elements.10"/>
+    <!-- ParallelStep1 -> T_Par1_to_Merge -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Par1_to_T_PM" location="23:1-23:45" from="/0/@elements.3" to="/0/@elements.11"/>
+    <!-- ParallelStep2 -> T_Par2_to_Merge -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Par2_to_T_PM" location="24:1-24:45" from="/0/@elements.4" to="/0/@elements.12"/>
+    <!-- MergeStep -> T_Merge_to_Final -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Merge_to_T_MF" location="25:1-25:45" from="/0/@elements.5" to="/0/@elements.13"/>
+    <!-- FinalStep -> T_Final_to_Init (cycle back) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Final_to_T_FI" location="26:1-26:45" from="/0/@elements.7" to="/0/@elements.14"/>
+    <!-- ProcessStepA -> T_A_to_Error (branch to error) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_A_to_T_AErr" location="27:1-27:45" from="/0/@elements.1" to="/0/@elements.15"/>
+    <!-- ErrorStep -> T_Error_to_Final -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Error_to_T_EF" location="28:1-28:45" from="/0/@elements.6" to="/0/@elements.16"/>
+
+    <!-- Connections: TransitionToStep -->
+    <!-- T_Init_to_A -> ProcessStepA -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_InitA_to_A" location="30:1-30:40" from="/0/@elements.8" to="/0/@elements.1"/>
+    <!-- T_A_to_B -> ProcessStepB -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_AB_to_B" location="31:1-31:40" from="/0/@elements.9" to="/0/@elements.2"/>
+    <!-- T_B_to_Parallel -> ParallelStep1 -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_BPar_to_Par1" location="32:1-32:45" from="/0/@elements.10" to="/0/@elements.3"/>
+    <!-- T_B_to_Parallel -> ParallelStep2 (fan-out) -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_BPar_to_Par2" location="33:1-33:45" from="/0/@elements.10" to="/0/@elements.4"/>
+    <!-- T_Par1_to_Merge -> MergeStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_PM1_to_Merge" location="34:1-34:45" from="/0/@elements.11" to="/0/@elements.5"/>
+    <!-- T_Par2_to_Merge -> MergeStep (fan-in) -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_PM2_to_Merge" location="35:1-35:45" from="/0/@elements.12" to="/0/@elements.5"/>
+    <!-- T_Merge_to_Final -> FinalStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_MF_to_Final" location="36:1-36:45" from="/0/@elements.13" to="/0/@elements.7"/>
+    <!-- T_Final_to_Init -> InitStep (closing cycle) -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_FI_to_Init" location="37:1-37:45" from="/0/@elements.14" to="/0/@elements.0"/>
+    <!-- T_A_to_Error -> ErrorStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_AErr_to_Error" location="38:1-38:45" from="/0/@elements.15" to="/0/@elements.6"/>
+    <!-- T_Error_to_Final -> FinalStep (error recovery) -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_EF_to_Final" location="39:1-39:45" from="/0/@elements.16" to="/0/@elements.7"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

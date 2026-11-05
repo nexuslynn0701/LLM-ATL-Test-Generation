@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="universityModel"
+    nsURI="http://universityModel/1.0"
+    nsPrefix="univ">
+
+  <!-- 0: Data type for course codes -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CourseCode"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Data type for email addresses -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Email"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 2: Enum for semester kinds -->
+  <eClassifiers xsi:type="ecore:EEnum" name="SemesterKind">
+    <eLiterals name="FALL" value="0" literal="FALL"/>
+    <eLiterals name="SPRING" value="1" literal="SPRING"/>
+    <eLiterals name="SUMMER" value="2" literal="SUMMER"/>
+  </eClassifiers>
+
+  <!-- 3: Root class University -->
+  <eClassifiers xsi:type="ecore:EClass" name="University">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+        eType="//@eClassifiers.4" containment="true" upperBound="-1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="persons"
+        eType="//@eClassifiers.6" containment="true" upperBound="-1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="semesters"
+        eType="//@eClassifiers.9" containment="true" upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- 4: Department class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="building"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="courses"
+        eType="//@eClassifiers.5" containment="true" upperBound="-1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="head"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 5: Course class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Course">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="//@eClassifiers.0" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="credits"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="teacher"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="enrolled"
+        eType="//@eClassifiers.8" upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- 6: Abstract Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="email"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 7: Professor extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Professor"
+      eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tenured"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="teaches"
+        eType="//@eClassifiers.5" upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- 8: Student extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Student"
+      eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="year"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="major"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 9: Semester class referencing enum -->
+  <eClassifiers xsi:type="ecore:EClass" name="Semester">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        eType="//@eClassifiers.2" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="year"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="offeredCourses"
+        eType="//@eClassifiers.5" upperBound="-1"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with Incoming & Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions -->
+    <subActions id="saA">
+      <!-- contents = Location (no statements produced) -->
+      <contents xsi:type="CPL:Location"
+                url="sip:saA@example.com"
+                clear="yes"/>
+    </subActions>
+
+    <subActions id="saB">
+      <!-- contents = simple Proxy (Proxy2Return) -->
+      <contents xsi:type="CPL:Proxy"
+                recurse="yes"
+                ordering="parallel">
+        <!-- simple: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+
+    <!-- Incoming method with contents = complex Proxy -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy"
+                recurse="no"
+                ordering="serial">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.1"/>
+      </contents>
+    </incoming>
+
+    <!-- Outgoing method with contents = SubCall -->
+    <outgoing>
+      <contents xsi:type="CPL:SubCall" ref="saA"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Reject (used via Default.contents in complex Proxy) -->
+  <elements xsi:type="CPL:Reject"
+            status="603"
+            reason="Decline"/>
+
+  <!-- 2: Location, used for proxy locations (simple proxy from saB) -->
+  <elements xsi:type="CPL:Location"
+            url="sip:simple-proxy@example.com"
+            priority="0.5"
+            clear="no"/>
+
+  <!-- 3: Location, used for Redirect2Return -->
+  <elements xsi:type="CPL:Location"
+            url="sip:redirect-target@example.org"
+            priority="1.0"
+            clear="yes"/>
+
+  <!-- 4: Redirect (permanent) referencing location 3 -->
+  <elements xsi:type="CPL:Redirect"
+            permanent="true"/>
+
+  <!-- 5: TimeSwitch (no contents, just to test presence) -->
+  <elements xsi:type="CPL:TimeSwitch"
+            tzid="UTC"
+            tzurl="http://tz.example.org/utc">
+    <times dtstart="20240101T000000Z"
+           interval="1"
+           wkst="MO"/>
+  </elements>
+
+  <!-- 6: AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch"
+            field="origin"
+            subField="user">
+    <addresses is="alice"
+               contains="example.com"
+               subDomainOf="example.com"/>
+    <addresses is="bob"
+               contains="example.org"
+               subDomainOf="example.org">
+      <!-- contents = SubCall to saB to yield statements in SelectCase -->
+      <contents xsi:type="CPL:SubCall" ref="saB"/>
+    </addresses>
+    <notPresent/>
+    <otherwise>
+      <!-- contents = Redirect to exercise Otherwise2SelectDefault with non-empty statements -->
+      <contents xsi:type="CPL:Redirect"
+                permanent="false"/>
+    </otherwise>
+  </elements>
+
+  <!-- 7: StringSwitch -->
+  <elements xsi:type="CPL:StringSwitch"
+            contents="//@elements.2"
+            field="custom-header"/>
+
+  <!-- 8: LanguageSwitch -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="fr"/>
+  </elements>
+
+  <!-- 9: TimeSwitch with richer SwitchedTime attributes -->
+  <elements xsi:type="CPL:TimeSwitch"
+            tzid="Europe/Paris"
+            tzurl="http://tz.example.org/paris">
+    <times dtstart="20240101T080000Z"
+           dtend="20240101T180000Z"
+           duration="PT10H"
+           freq="DAILY"
+           until="20241231T235959Z"
+           count="10"
+           interval="2"
+           bySecond="0"
+           byMinute="0"
+           byHour="8,9,10"
+           byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1,15"
+           byYearDay="100,200"
+           byWeekNo="1,2"
+           byMonth="1,6,12"
+           wkst="MO"
+           bySetPos="1"/>
+  </elements>
+
+  <!-- 10: PrioritySwitch -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.7" equal="0.5"/>
+  </elements>
+
+</CPL:CPLModel>

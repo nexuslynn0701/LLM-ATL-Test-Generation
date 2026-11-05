@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DemoProject"
+    description="A sample project for ATL testing"
+    default="build"
+    basedir=".">
+  <targets xmi:id="build" name="build">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="classes" debug="true" optimize="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*Test.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/*Test.java" ifCondition="test.skip"/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="classes" compress="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="output"/>
+    <tasks xsi:type="Ant:Delete" dir="temp"/>
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="docs/api"
+        packagenames="com.example"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Demo API"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Copy" todir="test-output">
+      <fileset dir="test-src"/>
+      <filterset>
+        <filter token="VERSION" value="1.0"/>
+      </filterset>
+    </tasks>
+    <tasks xsi:type="Ant:Javac" srcdir="test-src" destdir="test-classes" deprecation="true"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyLocation" name="dist.dir" location="dist"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <path id="my.path">
+    <pathElement path="/usr/lib" location="tools.jar"/>
+  </path>
+  <classPath refid="my.path"/>
+</Ant:Project>

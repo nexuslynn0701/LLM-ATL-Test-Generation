@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="Ant2MavenSample63"
+    basedir="src/main/java"
+    description="Sample Ant build to exercise Ant2Maven transformation."
+    default="buildTarget">
+
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A simple task definition (no references from tasks) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with a Mix of tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile, document, package and prepare output.">
+    <!-- Compile Java sources (AntJavac2MavenMavenJavac) -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true">
+      <!-- Include/exclude patterns for Javac (InExcludes + PatternSet/FileSet coverage via containment) -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="compile.enabled" unless="skip.compile"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="" unless=""/>
+    </tasks>
+
+    <!-- Generate Javadoc (AntJavadoc2MavenMavenJavadoc) -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+
+    <!-- Create output directory (AntMkdir2MavenMavenMkdir) -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+
+    <!-- Package classes into a jar (AntJar2MavenMavenJar) -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/dist/example-1.0.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Copy resources with filters and mapper (AntCopy2MavenMavenCopy + FileSet/FilterSet/Filter/FiltersFile/Mapper/PatternSet/Includes/Excludes) -->
+    <tasks xsi:type="Ant:Copy"
+           todir="target/resources"
+           presservelastmodified="true"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="src/main/resources">
+        <!-- Direct include/exclude -->
+        <include name="**/*.properties" ifCondition="" unless=""/>
+        <exclude name="**/temp/**" ifCondition="" unless=""/>
+        <!-- Pattern set with various InExcludes subtypes -->
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.xml" ifCondition="" unless=""/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/backup/**" ifCondition="" unless=""/>
+          <inexcludes xsi:type="Ant:IncludesFile" name="includes.list" ifCondition="" unless=""/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list" ifCondition="" unless=""/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="Ant2MavenSample63"/>
+        <filter token="project.version" value="1.0.0"/>
+        <filtersfile file="filters.properties"/>
+      </filterset>
+      <mapper type="glob"
+              classname="com.example.ant.Mapping"
+              classpath="lib/mapping.jar"
+              classpathref=""
+              from="*.tmpl"
+              to="*.cfg"/>
+    </tasks>
+
+    <!-- Delete temporary files (AntDelete2MavenMavenDelete) -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes="**/*.keep"
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target with other task types -->
+  <targets xmi:id="auxTarget" name="prepare" description="Prepare timestamps and classpath.">
+    <!-- Tstamp task (AntTstamp2MavenMavenTstamp) with nested formats -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.date" pattern="yyyy-MM-dd" offset="0" unit="day" locale="en_US"/>
+      <format property="build.time" pattern="HH:mm:ss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+
+    <!-- Java execution task (AntJava2MavenMavenJava) with ClassPath, PathElement, FileSet -->
+    <tasks xsi:type="Ant:Java"
+           classname="com.example.tools.Runner"
+           jar="lib/tools.jar"
+           fork="true">
+      <classPath refid="runtime.cp">
+        <pathElement path="lib/core.jar" location="lib/core.jar"/>
+        <pathElement path="lib/utils.jar" location="lib/utils.jar"/>
+        <fileset dir="lib/ext">
+          <include name="**/*.jar" ifCondition="" unless=""/>
+          <exclude name="**/old/**" ifCondition="" unless=""/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Path definition (AntPath2MavenMavenPath + PathElement/FileSet) -->
+    <tasks xsi:type="Ant:Java"
+           classname="com.example.tools.ClasspathPrinter"
+           jar=""
+           fork="false">
+      <classPath refid="print.cp">
+        <pathElement path="target/classes" location="target/classes"/>
+        <fileset dir="target/lib">
+          <include name="**/*.jar" ifCondition="" unless=""/>
+        </fileset>
+      </classPath>
+    </tasks>
+  </targets>
+
+  <!-- A standalone Path instance at project level to exercise AntPath2MavenMavenPath etc. -->
+  <path id="main.path">
+    <pathElement path="src/main/java" location="src/main/java"/>
+    <pathElement path="src/main/resources" location="src/main/resources"/>
+    <fileset dir="lib">
+      <include name="**/*.jar" ifCondition="" unless=""/>
+    </fileset>
+  </path>
+
+</Ant:Project>

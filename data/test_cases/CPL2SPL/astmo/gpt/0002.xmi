@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: CPL root with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- complex Proxy inside SubAction -->
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="yes" ordering="parallel">
+        <!-- all non-simple branches present -->
+        <busy>
+          <!-- Busy contents: SubCall to saMain -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents: Redirect (permanent) -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents: AddressSwitch -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <!-- one SwitchedAddress with nested simple Proxy via contents reference -->
+            <addresses is="sip:alt@example.com">
+              <contents xsi:type="CPL:Proxy" timeout="10" recurse="no" ordering="sequential">
+                <!-- simple Proxy: only locations chain will be used -->
+              </contents>
+            </addresses>
+            <!-- NotPresent and Otherwise children required for switches -->
+            <notPresent/>
+            <otherwise>
+              <!-- Otherwise contents: SubCall to saMain -->
+              <contents xsi:type="CPL:SubCall" ref="saMain"/>
+            </otherwise>
+          </contents>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default contents: SubCall to saMain -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Outgoing method, its contents is the *same* complex Proxy via contents reference -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="yes" ordering="parallel">
+        <!-- replicate same structure to avoid cross-contents reference (keep local containment) -->
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:AddressSwitch" field="destination">
+            <addresses is="sip:dst@example.net">
+              <contents xsi:type="CPL:SubCall" ref="saMain"/>
+            </addresses>
+            <notPresent/>
+            <otherwise>
+              <contents xsi:type="CPL:Redirect" permanent="false"/>
+            </otherwise>
+          </contents>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by all Proxies and Redirects through locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" clear="yes" priority="1">
+    <!-- no contents: this Location serves only as a URI anchor -->
+  </elements>
+
+  <!-- 2: simple Proxy as a top-level Element (allowed) -->
+  <elements xsi:type="CPL:Proxy" timeout="15" recurse="yes" ordering="parallel">
+    <!-- simple => no children busy/noAnswer/etc. -->
+  </elements>
+
+  <!-- 3: Redirect (non-permanent) as separate Element -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+</CPL:CPLModel>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="deploy"
+    basedir="/workspace"
+    description="Main build project">
+  <targets xmi:id="deploy" name="deploy" description="Deploy the application">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="deploy"/>
+    <tasks xsi:type="Ant:Copy" file="dist/app.jar" todir="deploy" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Delete" dir="temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run unit tests">
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="target/test-classes" debug="true" fork="true" optimize="false" deprecation="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/test.jar" basedir="target/test-classes" compress="false"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="target" failonerror="false"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" failonerror="false"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyValue" name="java.home" value="/usr/lib/jvm/java-11"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/opt/libs"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+</Ant:Project>

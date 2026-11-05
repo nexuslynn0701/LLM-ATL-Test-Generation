@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- Non-simple proxy inside SubAction -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <busy>
+          <!-- Busy contains a SubCall (to 'saMain') -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <!-- Default contains an AddressSwitch -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <!-- AddressSwitch has one SwitchedAddress and one NotPresent and Otherwise -->
+            <addresses is="addrA" contains="contA" subDomainOf="subDomA">
+              <!-- SwitchedAddress contains a simple Proxy -->
+              <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential"/>
+            </addresses>
+            <notPresent/>
+            <otherwise>
+              <!-- Otherwise contains a Redirect -->
+              <contents xsi:type="CPL:Redirect" permanent="false"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <incoming>
+      <!-- Incoming method body: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential"/>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing method body: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel"/>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by all locations helpers (for Proxies and Redirect) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+
+  <!-- Standalone SubCall, to be invoked from Busy and for overall coverage -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- Standalone simple Proxy whose statement is a ReturnStat -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="sequential"/>
+
+  <!-- Standalone AddressSwitch with its own structure -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses is="addrB" contains="contB" subDomainOf="subDomB"/>
+    <notPresent/>
+    <otherwise>
+      <!-- Otherwise here contains a simple Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="parallel"/>
+    </otherwise>
+  </elements>
+
+  <!-- A Redirect element using same location -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- A StringSwitch to trigger R16 (not used as statement anywhere) -->
+  <elements xsi:type="CPL:StringSwitch" field="hdrField">
+    <strings is="strA" contains="x"/>
+  </elements>
+
+  <!-- A TimeSwitch to be used as a contents that produces no statements (tested via rule guards) -->
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20240101T000000Z" interval="10" wkst="MO"/>
+</CPL:CPLModel>

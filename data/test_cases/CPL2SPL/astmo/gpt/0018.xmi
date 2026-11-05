@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="saA">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <!-- complex proxy (all branches present) -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </subActions>
+    <incoming/>
+    <outgoing/>
+  </elements>
+
+  <!-- 1: SubAction referenced by SubCall (inside switch/default) -->
+  <elements xsi:type="CPL:SubAction" id="saB"/>
+
+  <!-- 2: AddressSwitch used as contents of NotPresent -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="addr1"/>
+    <addresses is="addr2"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 3: SwitchedAddress with 'is' set (for OCL7) -->
+  <elements xsi:type="CPL:SwitchedAddress" is="mainAddress"/>
+
+  <!-- 4: Default whose contents is the AddressSwitch (for OCL5: AddressSwitch branch) -->
+  <elements xsi:type="CPL:Default" contents="//@elements.2"/>
+
+  <!-- 5: Busy whose contents is a SubCall (for OCL6) -->
+  <elements xsi:type="CPL:Busy" contents="//@elements.10"/>
+
+  <!-- 6: NoAnswer simple (no contents) -->
+  <elements xsi:type="CPL:NoAnswer"/>
+
+  <!-- 7: Redirection simple (no contents) -->
+  <elements xsi:type="CPL:Redirection"/>
+
+  <!-- 8: Failure simple (for ErrorResponse count) -->
+  <elements xsi:type="CPL:Failure"/>
+
+  <!-- 9: NotPresent with contents = AddressSwitch (for OCL32 and error mapping) -->
+  <elements xsi:type="CPL:NotPresent" contents="//@elements.2"/>
+
+  <!-- 10: SubCall referencing saB (string) -->
+  <elements xsi:type="CPL:SubCall" ref="saB"/>
+
+  <!-- 11: Location used by simple proxy and Redirect (for Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+
+  <!-- 12: Simple Proxy (no branches) using Location -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <contents xsi:type="CPL:Location" url="sip:simple@example.com" clear="true"/>
+  </elements>
+
+  <!-- 13: Redirect with permanent="true" using Location11 -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:Location" url="sip:redirect@example.com" clear="true"/>
+  </elements>
+
+  <!-- 14: Otherwise with contents = Busy (for OCL18 and Default/Otherwise mapping) -->
+  <elements xsi:type="CPL:Otherwise" contents="//@elements.5"/>
+
+</CPL:CPLModel>

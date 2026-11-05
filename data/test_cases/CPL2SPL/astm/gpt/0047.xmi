@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL element to trigger CPL2Program -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions to trigger SubAction2Function and SubCall2Return -->
+    <subActions xsi:type="CPL:SubAction" id="sa1">
+      <!-- Simple Proxy as contents -> Proxy2Return via SubAction2Function -->
+      <contents xsi:type="CPL:Proxy" recurse="once" ordering="parallel">
+        <!-- no busy/noAnswer/redirection/failure/default => isSimple = true -->
+      </contents>
+    </subActions>
+
+    <subActions xsi:type="CPL:SubAction" id="sa2">
+      <!-- SubCall as contents -> SubCall2Return via SubAction2Function -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </subActions>
+
+    <!-- Incoming and Outgoing to trigger Incoming2Method and Outgoing2Method -->
+    <incoming>
+      <!-- Complex Proxy as contents -> Proxy2Select -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <!-- Add a Location so locations helper is non-empty -->
+        <contents xsi:type="CPL:Location" url="sip:incoming.example.com" priority="1" clear="true"/>
+        <!-- Non-simple: all branches present, some with contents -->
+        <busy>
+          <!-- Busy contents: Redirect -> Redirect2Return -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents: SubCall -> SubCall2Return -->
+          <contents xsi:type="CPL:SubCall" ref="sa2"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents: simple Proxy -> Proxy2Return -->
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+            <contents xsi:type="CPL:Location" url="sip:redir.example.com" priority="2" clear="false"/>
+          </contents>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default contents: Reject (filtered out as statements) -->
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+        </default>
+      </contents>
+    </incoming>
+
+    <outgoing>
+      <!-- Outgoing contents: Redirect -> Redirect2Return -->
+      <contents xsi:type="CPL:Redirect" permanent="true">
+        <!-- Location to contribute to locations helper -->
+        <contents xsi:type="CPL:Location" url="sip:outgoing.example.com" priority="3" clear="false"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Top-level Location to affect locations for later nodes -->
+  <elements xsi:type="CPL:Location" url="sip:top.example.com" priority="5" clear="true"/>
+
+  <!-- Top-level Redirect (will use locations from containing CPLModel -> empty) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- Top-level SubCall referencing sa1 -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- Top-level simple Proxy with one Location -> Proxy2Return & Location2URIConstant -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <contents xsi:type="CPL:Location" url="sip:simpleproxy.example.com" priority="4" clear="true"/>
+  </elements>
+
+  <!-- AddressSwitch with SwitchedAddress and NotPresent/Otherwise to trigger rules:
+       AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- SwitchedAddress with contents: SubCall (statements from SubCall2Return) -->
+    <addresses xsi:type="CPL:SwitchedAddress" is="sip:user@example.com" contains="hostpart" subDomainOf="example.com">
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <!-- NotPresent to trigger NotPresent2ErrorResponse -->
+    <notPresent/>
+    <!-- Otherwise with contents: simple Proxy -> Proxy2Return -->
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="once" ordering="parallel">
+        <contents xsi:type="CPL:Location" url="sip:otherwise.example.com" priority="6" clear="true"/>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- StringSwitch to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" >
+    <contents xsi:type="CPL:Location" url="sip:stringswitch.example.com" priority="7" clear="false"/>
+    <!-- field attribute is mandatory by metamodel -->
+    <!-- put it after via attribute to keep XMI valid -->
+    <!-- note: attributes order is not semantically relevant -->
+  </elements>
+
+</CPL:CPLModel>

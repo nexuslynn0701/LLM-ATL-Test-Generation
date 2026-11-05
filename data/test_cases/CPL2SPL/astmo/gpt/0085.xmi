@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents: complex Proxy (non-simple) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- All branches present so proxy is non-simple -->
+        <busy>
+          <!-- Busy contents: SubCall to saMain to exercise SubCall2Return via Busy2SelectCase -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- Default contents: Redirect to exercise Redirect2Return from within Default2SelectDefault -->
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Incoming with contents a simple Proxy -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <!-- No branches -> simple proxy -->
+      </contents>
+    </incoming>
+
+    <!-- Outgoing with contents AddressSwitch -->
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <!-- SwitchedAddress with concrete 'is' to trigger SwitchedAddress2SelectCase & OCL7 -->
+        <addresses is="sip:alice@example.com" contains="foo" subDomainOf="example.com">
+          <!-- Contents: simple Proxy to exercise Proxy2Return via SwitchedAddress2SelectCase -->
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+        </addresses>
+
+        <!-- notPresent branch with contents Failure to trigger Failure2ErrorResponse via AddressSwitch2SelectStat -->
+        <notPresent>
+          <contents xsi:type="CPL:Failure"/>
+        </notPresent>
+
+        <!-- otherwise branch with contents NotPresent to trigger NotPresent2ErrorResponse via Otherwise2SelectDefault -->
+        <otherwise>
+          <contents xsi:type="CPL:NotPresent"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by simple Outgoing Proxy (locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:out-proxy@example.net" priority="1" clear="yes"/>
+
+  <!-- Location used by complex Proxy of SubAction -->
+  <elements xsi:type="CPL:Location" url="sip:sub-main@example.org" priority="1" clear="yes"/>
+
+</CPL:CPLModel>

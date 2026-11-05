@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL to trigger CPL2Program -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="saMain" contents="//@elements.3"/>
+    <subActions xsi:type="CPL:SubAction" id="saSimple" contents="//@elements.2"/>
+    <outgoing contents="//@elements.4"/>
+    <incoming contents="//@elements.5"/>
+  </elements>
+
+  <!-- 1: Location used by Proxy and Redirect (for locations helper and Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" clear="true" priority="10"/>
+
+  <!-- 2: Simple Proxy (isSimple = true) to trigger Proxy2Return via SubAction and Incoming/Outgoing -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- no busy/noAnswer/redirection/failure/default => isSimple = true -->
+    <contents href="//@elements.1"/>
+  </elements>
+
+  <!-- 3: Redirect used by SubAction.saMain (tests Redirect2Return, locations from Location) -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents href="//@elements.1"/>
+  </elements>
+
+  <!-- 4: Complex Proxy used by Outgoing (isSimple = false) to trigger Proxy2Select and inner Busy/NoAnswer/Redirection/Failure/Default -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <busy>
+      <!-- Busy with contents = SubCall -> Busy2SelectCase + SubCall2Return + nested Proxy via SubAction -->
+      <contents href="//@elements.6"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer with contents = Redirect -> NoAnswer2SelectCase + Redirect2Return -->
+      <contents href="//@elements.3"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection with contents = simple Proxy -> Redirection2SelectCase + Proxy2Return -->
+      <contents href="//@elements.2"/>
+    </redirection>
+    <failure/>
+    <default>
+      <!-- Default with contents = SubCall -> Default2SelectDefault + SubCall2Return -->
+      <contents href="//@elements.6"/>
+    </default>
+    <contents href="//@elements.1"/>
+  </elements>
+
+  <!-- 5: AddressSwitch used by Incoming (tests AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="userA" contains="foo" subDomainOf="example.com">
+      <!-- SwitchedAddress contents = simple Proxy -> SwitchedAddress2SelectCase + Proxy2Return -->
+      <contents href="//@elements.2"/>
+    </addresses>
+    <addresses is="userB" contains="bar" subDomainOf="example.org">
+      <!-- SwitchedAddress contents = Redirect -> SwitchedAddress2SelectCase + Redirect2Return -->
+      <contents href="//@elements.3"/>
+    </addresses>
+    <notPresent/>
+    <otherwise>
+      <!-- Otherwise contents = SubCall -> Otherwise2SelectDefault + SubCall2Return -->
+      <contents href="//@elements.6"/>
+    </otherwise>
+  </elements>
+
+  <!-- 6: SubCall referencing SubAction.saSimple (string ref) -->
+  <elements xsi:type="CPL:SubCall" ref="saSimple"/>
+
+  <!-- 7: StringSwitch as top-level element (tests StringSwitch2SelectStat) -->
+  <elements xsi:type="CPL:StringSwitch" field="customHeader">
+    <!-- no contents needed for rule R16 -->
+  </elements>
+
+  <!-- 8: TimeSwitch as top-level element; its contents drive locations for nested Redirect -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO">
+      <!-- SwitchedTime contents = Redirect (locations from TimeSwitch -> CPL root -> empty),
+           so Redirect2Return executes with OclUndefined location branch -->
+      <contents href="//@elements.9"/>
+    </times>
+  </elements>
+
+  <!-- 9: Redirect inside TimeSwitch (no locations in chain) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 10: LanguageSwitch as top-level element (not directly transformed, but used to prune contents in several rules) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <!-- no languages needed to affect tested rules; presence allows oclIsTypeOf(LanguageSwitch) branches -->
+  </elements>
+
+  <!-- 11: PrioritySwitch as top-level element (similarly used in pruning branches) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <!-- empty contents -->
+  </elements>
+
+</CPL:CPLModel>

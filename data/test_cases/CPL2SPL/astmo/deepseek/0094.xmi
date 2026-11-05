@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPLModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="login">
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default contents="//@elements.5"/>
+          </contents>
+        </addresses>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="yes"/>
+        </otherwise>
+      </contents>
+    </subActions>
+    <subActions id="admin">
+      <contents xsi:type="CPL:StringSwitch" field="User-Agent">
+        <strings is="CiscoPhone" contains="Cisco"/>
+        <notPresent>
+          <contents xsi:type="CPL:SubCall" ref="login"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities less="1" greater="5" equal="3"/>
+        <notPresent>
+          <contents xsi:type="CPL:LanguageSwitch">
+            <languages matches="en"/>
+            <otherwise>
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </otherwise>
+          </contents>
+        </notPresent>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:proxy@example.com" priority="1" clear="yes"/>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy"/>
+  <elements xsi:type="CPL:SubCall" ref="admin"/>
+  <elements xsi:type="CPL:Location" url="sip:secretary@example.com" priority="1" clear="yes"/>
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20250101T000000" interval="1" wkst="MO">
+    <times dtstart="20250101T090000" interval="1" wkst="MO"/>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:backup@example.com" priority="1" clear="yes"/>
+    </otherwise>
+  </elements>
+</CPLModel>

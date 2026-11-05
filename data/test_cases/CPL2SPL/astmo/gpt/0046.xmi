@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa_main">
+      <!-- contents points to complex Proxy at elements[4] -->
+      <contents href="#//@elements.4"/>
+    </subActions>
+    <incoming>
+      <!-- contents points to Redirect at elements[3] -->
+      <contents href="#//@elements.3"/>
+    </incoming>
+    <outgoing>
+      <!-- contents points to AddressSwitch at elements[6] -->
+      <contents href="#//@elements.6"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by Proxy and Redirect (for URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes" priority="1"/>
+
+  <!-- 2: SubAction target of SubCall (no contents) -->
+  <elements xsi:type="CPL:SubAction" id="helperAction"/>
+
+  <!-- 3: Redirect (non-permanent) used by Incoming and by Redirection SelectCase contents -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 4: Non-simple Proxy used from SubAction.contents and Busy.contents -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- child NodeContainer branches -->
+    <busy>
+      <!-- contents: SubCall at elements[5] -->
+      <contents href="#//@elements.5"/>
+    </busy>
+    <noAnswer/>
+    <redirection>
+      <!-- contents: Redirect at elements[3] -->
+      <contents href="#//@elements.3"/>
+    </redirection>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- 5: SubCall referencing helperAction -->
+  <elements xsi:type="CPL:SubCall" ref="helperAction"/>
+
+  <!-- 6: AddressSwitch used from Outgoing.contents -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- notPresent with contents pointing to Reject at elements[8] -->
+    <notPresent>
+      <contents href="#//@elements.8"/>
+    </notPresent>
+    <!-- otherwise with contents pointing to simple Proxy at elements[7] -->
+    <otherwise>
+      <contents href="#//@elements.7"/>
+    </otherwise>
+    <!-- one SwitchedAddress with contents pointing to Location at elements[1] -->
+    <addresses is="alice@example.com">
+      <contents href="#//@elements.1"/>
+    </addresses>
+  </elements>
+
+  <!-- 7: Simple Proxy used from AddressSwitch.otherwise.contents -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential"/>
+
+  <!-- 8: Reject used from NotPresent.contents -->
+  <elements xsi:type="CPL:Reject" status="405" reason="Method Not Allowed"/>
+
+</CPL:CPLModel>

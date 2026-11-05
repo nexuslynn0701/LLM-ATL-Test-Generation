@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="RichAntBuild"
+    basedir="project-src"
+    description="Full Ant build with compilation, packaging and cleanup"
+    default="buildAll">
+
+  <!-- Properties to exercise AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="project-src/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="project-src/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Standalone task definition -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="buildAll" name="buildAll">
+    <tasks xsi:type="Ant:Mkdir" dir="project-src/target/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="project-src/src/main/java"
+           destdir="project-src/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- Simple classpath with one path element and one fileset -->
+      <classPath refid="compile.cp">
+        <pathElement path="project-src/lib/core.jar" location="project-src/lib"/>
+        <fileset dir="project-src/lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+            <inexcludes xsi:type="Ant:Excludes" name="**/*-tests.jar" ifCondition="skip.tests"/>
+          </patternset>
+          <include name="**/extra/*.jar"/>
+          <exclude name="**/old/*.jar"/>
+        </fileset>
+      </classPath>
+      <!-- InExcludes directly on Javac -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/experimental/**"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Java"
+           classname="com.example.Main"
+           jar="project-src/target/app.jar"
+           fork="true">
+      <classPath refid="run.cp">
+        <pathElement path="project-src/target/classes" location="project-src/target/classes"/>
+        <fileset dir="project-src/target">
+          <patternset>
+            <inexcludes xsi:type="Ant:IncludesFile" name="include.list" unless="no.includes"/>
+            <inexcludes xsi:type="Ant:ExcludesFile" name="exclude.list" ifCondition="has.excludes"/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="project-src/src/main/java"
+           destdir="project-src/target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="RichAntBuild API"/>
+
+    <tasks xsi:type="Ant:Jar"
+           jarfile="project-src/target/app.jar"
+           basedir="project-src/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="project-src/manifest.mf"/>
+
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyyMMdd-HHmmss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Copy"
+           todir="project-src/target/dist"
+           overwrite="true"
+           includeEmptyDirs="false">
+      <fileset dir="project-src/target">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@[" endtoken="]@">
+        <filter token="project.name" value="RichAntBuild"/>
+        <filtersfile file="project-src/filter.properties"/>
+      </filterset>
+    </tasks>
+  </targets>
+
+  <!-- Secondary target for cleanup -->
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete"
+           dir="project-src/target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/.gitignore"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Target exercising Path and ClassPath tasks -->
+  <targets xmi:id="setupPaths" name="setupPaths">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="project-src/src/test/java"
+           destdir="project-src/target/test-classes">
+      <classPath refid="test.cp">
+        <pathElement path="project-src/lib/test.jar" location="project-src/lib"/>
+        <fileset dir="project-src/lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*-tests.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+    <!-- Simple Mkdir to support Mkdir rule -->
+    <tasks xsi:type="Ant:Mkdir" dir="project-src/target/logs"/>
+  </targets>
+
+  <!-- Path definition at project level (contained via path reference in ATL) -->
+  <path id="global.path">
+    <pathElement path="project-src/lib/support.jar" location="project-src/lib"/>
+    <fileset dir="project-src/resources">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.xml"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/old/**"/>
+      </patternset>
+      <include name="config/**/*.xml"/>
+      <exclude name="config/backup/**"/>
+    </fileset>
+  </path>
+
+</Ant:Project>

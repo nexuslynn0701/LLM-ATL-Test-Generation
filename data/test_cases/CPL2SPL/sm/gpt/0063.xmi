@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL script with subActions and call flow -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions defined but not linked by contents to test unused definitions -->
+    <subActions xsi:type="CPL:SubAction" id="entryMenu"/>
+    <subActions xsi:type="CPL:SubAction" id="vipRoute"/>
+
+    <!-- One incoming and one outgoing container that reference other top-level nodes -->
+    <incoming xsi:type="CPL:Incoming" contents="//@elements.1"/>
+    <outgoing xsi:type="CPL:Outgoing" contents="//@elements.2 //@elements.3"/>
+  </elements>
+
+  <!-- 1: SubCall referring (by string) to a defined SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="entryMenu"/>
+
+  <!-- 2: Location node that itself contains another node via contents -->
+  <elements xsi:type="CPL:Location" url="sip:primary@example.com" priority="10" clear="yes"
+            contents="//@elements.4"/>
+
+  <!-- 3: Redirect action -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 4: Reject action -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 5: Proxy with full set of outcome branches, each pointing somewhere different -->
+  <elements xsi:type="CPL:Proxy" timeout="20" recurse="yes" ordering="sequential">
+    <busy contents="//@elements.2"/>
+    <noAnswer contents="//@elements.3"/>
+    <redirection contents="//@elements.4"/>
+    <failure contents="//@elements.6"/>
+    <default contents="//@elements.7"/>
+  </elements>
+
+  <!-- 6: AddressSwitch with multiple SwitchedAddress cases, notPresent, otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="to" subField="user">
+    <addresses is="alice" contains="example.com" subDomainOf="corp.example.com"
+               contents="//@elements.2 //@elements.3"/>
+    <addresses is="bob" contains="sales" subDomainOf="example.com"
+               contents="//@elements.7"/>
+    <notPresent contents="//@elements.4"/>
+    <otherwise contents="//@elements.5"/>
+  </elements>
+
+  <!-- 7: StringSwitch chaining to another switch and to actions -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <strings is="support" contains="ticket" contents="//@elements.8"/>
+    <strings is="complaint" contains="urgent" contents="//@elements.4 //@elements.9"/>
+    <notPresent contents="//@elements.3"/>
+    <otherwise contents="//@elements.2"/>
+  </elements>
+
+  <!-- 8: LanguageSwitch with several language branches -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en" contents="//@elements.2 //@elements.5"/>
+    <languages matches="fr" contents="//@elements.3"/>
+    <languages matches="de" contents="//@elements.9"/>
+    <notPresent contents="//@elements.4"/>
+    <otherwise contents="//@elements.1"/>
+  </elements>
+
+  <!-- 9: TimeSwitch with rich recurrence attributes and nested SwitchedTime -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <times dtstart="20260101T080000" dtend="20260101T180000" duration="PT10H"
+           freq="DAILY" until="20261231T235959" count="365" interval="1"
+           bySecond="0" byMinute="0" byHour="8,9,10,11,12,13,14,15,16,17"
+           byDay="MO,TU,WE,TH,FR" byMonthDay="1-31" byYearDay="1-365"
+           byWeekNo="1-52" byMonth="1-12" wkst="MO" bySetPos="1"
+           contents="//@elements.2 //@elements.5"/>
+    <times dtstart="20260101T000000" dtend="20260101T075959"
+           interval="1" wkst="MO"
+           contents="//@elements.4"/>
+    <notPresent contents="//@elements.7"/>
+    <otherwise contents="//@elements.3"/>
+  </elements>
+
+  <!-- 10: PrioritySwitch deciding based on priority levels -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5" contents="//@elements.2"/>
+    <priorities equal="5" contents="//@elements.5"/>
+    <priorities greater="5" contents="//@elements.3 //@elements.4"/>
+    <notPresent contents="//@elements.1"/>
+    <otherwise contents="//@elements.9"/>
+  </elements>
+
+</CPL:CPLModel>

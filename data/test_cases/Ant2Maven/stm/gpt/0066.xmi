@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryManager"
+    basedir="."
+    description="Ant build for a multi-step Java project"
+    default="build-main">
+
+  <!-- Properties exercising different Property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="test.src.dir" value="src/test/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="env.settings"/>
+
+  <!-- Task definition, not referenced from tasks -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default build target with several predefined tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Compile sources, create jar and clean temp">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/library-manager.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           excludes="**/*.keep"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target to build test classes only -->
+  <targets xmi:id="build-tests" name="build-tests" description="Compile test sources only">
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="build/test-classes"
+           debug="false"
+           fork="false"
+           optimize="false"
+           deprecation="false"/>
+  </targets>
+
+</Ant:Project>

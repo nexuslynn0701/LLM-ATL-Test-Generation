@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="compile"
+    basedir="."
+    description="Sample build project">
+  <targets xmi:id="compile" name="compile" description="Compile sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="bin" debug="true" fork="false" optimize="false" deprecation="false"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Package application">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/myapp.jar" basedir="bin" compress="true" encoding="UTF-8"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" file="dist/myapp.jar" dir="build" verbose="true" quiet="false" failonerror="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs" packagenames="com.example" defaultexcludes="true" author="true" version="true" use="true" windowtitle="My API"/>
+  </targets>
+  <targets xmi:id="all" name="all" description="Run all tasks">
+    <tasks xsi:type="Ant:Copy" file="README.md" tofile="build/README.md" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyyMMdd-HHmmss" offset="0" unit="hour"/>
+    </tasks>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/usr/share/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+</Ant:Project>

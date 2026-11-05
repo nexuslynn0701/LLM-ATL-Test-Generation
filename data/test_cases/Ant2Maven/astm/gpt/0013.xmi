@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="Ant2MavenSample13"
+    basedir="src/main/java"
+    description="Sample Ant project with multiple targets and tasks for ATL testing"
+    default="buildTarget">
+
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target/build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- One task definition (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple different tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile, package and clean project">
+    <!-- Compile Java sources (Javac rule) -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+
+    <!-- Generate Javadoc (Javadoc rule) -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API"/>
+
+    <!-- Create directory (Mkdir rule) -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+
+    <!-- Create JAR file (Jar rule) -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/dist/example-1.0.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Copy resources with nested FileSet, PatternSet, Includes/Excludes, FilterSet, Mapper (Copy + many pattern/filter rules) -->
+    <tasks xsi:type="Ant:Copy"
+           todir="target/dist/resources"
+           overwrite="true"
+           includeEmptyDirs="false"
+           flatten="false"
+           filtering="true">
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/secret/*.properties"/>
+        </patternset>
+        <include name="**/*.xml"/>
+        <exclude name="**/*.tmp"/>
+      </fileset>
+      <filterset starttoken="${" endtoken="}">
+        <filter token="app.name" value="Ant2MavenSample13"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.properties" to="conf/*.properties"/>
+    </tasks>
+
+    <!-- Delete temporary directory (Delete rule) -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/*.keep"
+           defaultexcludes="yes"/>
+  </targets>
+
+  <!-- Additional target with Java execution, Tstamp, and path/classpath usage -->
+  <targets xmi:id="runTarget" name="run" description="Run the main application">
+    <!-- Tstamp task (Tstamp rule) -->
+    <tasks xsi:type="Ant:Tstamp"/>
+
+    <!-- Java execution with nested ClassPath, PathElement and FileSet (Java, ClassPath, PathElement, FileSet rules) -->
+    <tasks xsi:type="Ant:Java"
+           classname="com.example.Main"
+           jar="target/dist/example-1.0.jar"
+           fork="true">
+      <classPath refid="runtime.classpath">
+        <pathElement path="libs/runtime-lib1.jar" location="libs/runtime-lib1.jar"/>
+        <pathElement path="libs/runtime-lib2.jar" location="libs/runtime-lib2.jar"/>
+        <fileset dir="libs/extra">
+          <include name="**/*.jar"/>
+          <exclude name="**/old/*.jar"/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Path definition with nested PathElement and FileSet (Path, PathElement, FileSet rules) -->
+    <tasks xsi:type="Ant:Copy"
+           todir="target/backup"
+           overwrite="false">
+      <fileset dir="target/dist">
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="backup/includes.txt"/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="backup/excludes.txt"/>
+        </patternset>
+      </fileset>
+    </tasks>
+  </targets>
+
+  <!-- Standalone Path definition at project level (Path rule) -->
+  <path id="compile.path">
+    <pathElement path="libs/compile-lib.jar" location="libs/compile-lib.jar"/>
+    <fileset dir="libs/compile">
+      <include name="**/*.jar"/>
+      <exclude name="**/*-sources.jar"/>
+    </fileset>
+  </path>
+
+</Ant:Project>

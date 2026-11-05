@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- e0 -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions -->
+    <subActions id="sa1"/>
+    <subActions id="sa2"/>
+
+    <!-- Outgoing and Incoming -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="series">
+        <!-- simple proxy: no children -->
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- complex proxy: all branches present -->
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="sa2"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure>
+          <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+        </failure>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <addresses is="sip:case@example.com">
+              <contents xsi:type="CPL:SubCall" ref="sa1"/>
+            </addresses>
+            <notPresent>
+              <contents xsi:type="CPL:Proxy" recurse="yes" ordering="series">
+                <!-- simple proxy inside NotPresent -->
+              </contents>
+            </notPresent>
+            <otherwise>
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- e1 -->
+  <elements xsi:type="CPL:Location" url="sip:loc1@example.com" clear="true"/>
+
+  <!-- e2 -->
+  <elements xsi:type="CPL:Location" url="sip:loc2@example.com" clear="true"/>
+
+  <!-- e3 -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- simple proxy whose location is e1 -->
+    <contents xsi:type="CPL:Location" url="sip:loc1@example.com" clear="true"/>
+  </elements>
+
+  <!-- e4 -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="series">
+    <!-- complex proxy whose location is e2 -->
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:SubCall" ref="sa2"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </redirection>
+    <failure>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+    </failure>
+    <default>
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="sip:dest@example.com">
+          <contents xsi:type="CPL:SubCall" ref="sa2"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <!-- simple proxy inside NotPresent -->
+            <contents xsi:type="CPL:Location" url="sip:loc2@example.com" clear="true"/>
+          </contents>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </default>
+  </elements>
+
+  <!-- e5 -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="sip:origin1@example.com">
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <addresses is="sip:origin2@example.com">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="series">
+        <!-- simple proxy inside switched address -->
+        <contents xsi:type="CPL:Location" url="sip:loc1@example.com" clear="true"/>
+      </contents>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy inside NotPresent -->
+        <contents xsi:type="CPL:Location" url="sip:loc2@example.com" clear="true"/>
+      </contents>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </otherwise>
+  </elements>
+
+  <!-- e6 -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:Location" url="sip:loc1@example.com" clear="true"/>
+  </elements>
+
+  <!-- e7 -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:loc2@example.com" clear="true"/>
+  </elements>
+
+  <!-- e8 -->
+  <elements xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+</CPL:CPLModel>

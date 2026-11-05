@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiPhaseBuild"
+    basedir="."
+    description="Project with separate build and package targets"
+    default="buildTarget">
+
+  <!-- Default build target -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources and prepare output">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" optimize="false"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API"/>
+  </targets>
+
+  <!-- Separate packaging target -->
+  <targets xmi:id="packageTarget" name="package" description="Create distributable JAR">
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/example-app.jar" basedir="build/classes" compress="true"/>
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" includeEmptyDirs="true"/>
+  </targets>
+
+</Ant:Project>

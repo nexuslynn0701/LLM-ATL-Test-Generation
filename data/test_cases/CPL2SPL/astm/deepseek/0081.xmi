@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="authCheck"/>
+    <subActions id="logCall"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="sip:boss@company.com">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default/>
+          </contents>
+        </addresses>
+        <addresses is="sip:colleague@company.com">
+          <contents xsi:type="CPL:SubCall" ref="logCall"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities greater="50">
+          <contents xsi:type="CPL:Location" url="sip:urgent@company.com" priority="1" clear="yes"/>
+        </priorities>
+        <priorities less="10">
+          <contents xsi:type="CPL:SubCall" ref="authCheck"/>
+        </priorities>
+        <notPresent>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+            <busy/>
+            <default/>
+          </contents>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:default@company.com" priority="2" clear="no"/>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="authCheck"/>
+  <elements xsi:type="CPL:SubCall" ref="logCall"/>
+  <elements xsi:type="CPL:Location" url="sip:urgent@company.com" priority="1" clear="yes"/>
+  <elements xsi:type="CPL:Location" url="sip:default@company.com" priority="2" clear="no"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="user-agent">
+    <strings is="CiscoPhone">
+      <contents xsi:type="CPL:Location" url="sip:cisco@company.com" priority="1" clear="yes"/>
+    </strings>
+    <strings is="Polycom">
+      <contents xsi:type="CPL:Location" url="sip:polycom@company.com" priority="1" clear="yes"/>
+    </strings>
+    <notPresent>
+      <contents xsi:type="CPL:Location" url="sip:unknown@company.com" priority="1" clear="yes"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:generic@company.com" priority="1" clear="yes"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en">
+      <contents xsi:type="CPL:Location" url="sip:support-en@company.com" priority="1" clear="yes"/>
+    </languages>
+    <languages matches="fr">
+      <contents xsi:type="CPL:Location" url="sip:support-fr@company.com" priority="1" clear="yes"/>
+    </languages>
+    <notPresent>
+      <contents xsi:type="CPL:Location" url="sip:support-default@company.com" priority="1" clear="yes"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:support-other@company.com" priority="1" clear="yes"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20240101T000000" interval="1" wkst="MO">
+    <times dtstart="20240101T090000" dtend="20240101T170000" interval="1" wkst="MO" freq="DAILY">
+      <contents xsi:type="CPL:Location" url="sip:office@company.com" priority="1" clear="yes"/>
+    </times>
+    <notPresent>
+      <contents xsi:type="CPL:Location" url="sip:afterhours@company.com" priority="1" clear="yes"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:backup@company.com" priority="1" clear="yes"/>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

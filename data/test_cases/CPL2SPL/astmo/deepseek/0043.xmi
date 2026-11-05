@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sub1"/>
+    <subActions id="sub2"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="192.168.1.1"/>
+        <addresses is="10.0.0.1"/>
+        <notPresent/>
+        <otherwise/>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sub1"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="sub2"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </default>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:backup@domain.com" priority="2" clear="no"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+  <elements xsi:type="CPL:StringSwitch" field="User-Agent">
+    <strings is="MySoftPhone" contains="SoftPhone"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="fr"/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" tzid="America/New_York" dtstart="20250101T090000" dtend="20250101T170000" duration="PT8H" freq="DAILY" interval="1" wkst="MO">
+    <times dtstart="20250101T090000" dtend="20250101T170000" interval="1" wkst="MO"/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5" greater="1"/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="sub1"/>
+  <elements xsi:type="CPL:SubCall" ref="sub2"/>
+</CPL:CPLModel>

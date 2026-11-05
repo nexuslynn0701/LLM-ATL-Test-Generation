@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntBuild"
+    basedir="."
+    description="Comprehensive Ant project for Ant2Maven testing"
+    default="build-target">
+
+  <!-- Project-level properties -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="conf/build.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="ENV_"/>
+
+  <!-- Custom task definition (unreferenced by tasks, per constraints) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- First target: build (default) with multiple task types -->
+  <targets xmi:id="build-target" name="build" description="Main build target">
+    <tasks xsi:type="Ant:Mkdir" target="//@targets.0" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac" target="//@targets.0"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" target="//@targets.0"
+           jarfile="dist/app-main.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Second target: clean with file management tasks -->
+  <targets xmi:id="clean-target" name="clean" description="Cleanup artifacts">
+    <tasks xsi:type="Ant:Delete" target="//@targets.1"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/.git/**"/>
+    <tasks xsi:type="Ant:Mkdir" target="//@targets.1" dir="build/temp"/>
+  </targets>
+
+</Ant:Project>

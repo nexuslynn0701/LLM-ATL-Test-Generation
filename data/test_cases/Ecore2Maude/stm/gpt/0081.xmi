@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyPkg"
+    nsURI="http://example.org/companyPkg"
+    nsPrefix="comp">
+
+  <!-- 0: Primitive-ish local data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CodeType"/>
+
+  <!-- 1: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RoleKind">
+    <eLiterals name="DEV" value="0" literal="DEV"/>
+    <eLiterals name="MANAGER" value="1" literal="MANAGER"/>
+    <eLiterals name="HR" value="2" literal="HR"/>
+  </eClassifiers>
+
+  <!-- 2: Address class, referenced and contained -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="street"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="city"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="zip"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract Person, super of Employee and Contractor -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- ID attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        iD="true"
+        eType="//@eClassifiers.0"/>
+    <!-- non-contained reference to Address -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mainAddress"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 4: Employee extends Person, with enum and containment -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <!-- contained addresses -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="otherAddresses"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 5: Contractor extends Person, refers to Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contractor"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dailyRate"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 6: Department with bidirectional containment to Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.4"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 7: Company with containment of Departments, Employees, Contractors -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.6"/>
+    <!-- separate containment of contractors not tied to departments -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="externalContractors"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.5"/>
+    <!-- contained shared addresses for reuse by persons -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="knownAddresses"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 8: Project referencing Employee and Contractor -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lead"
+        lowerBound="1"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team"
+        upperBound="-1"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outsourcedTo"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 9: Utility MapEntry to exercise map-like class -->
+  <eClassifiers xsi:type="ecore:EClass" name="StringPair">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 10: Registry using StringPair and Project -->
+  <eClassifiers xsi:type="ecore:EClass" name="Registry">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entries"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.9"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 11: Root model class aggregating everything -->
+  <eClassifiers xsi:type="ecore:EClass" name="World">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="company"
+        containment="true"
+        lowerBound="1"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="registry"
+        containment="true"
+        eType="//@eClassifiers.10"/>
+  </eClassifiers>
+
+  <!-- complete the opposite of Department.employees -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <!-- opposite side to Department.employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.6"
+        eOpposite="//@eClassifiers.6/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+</ecore:EPackage>

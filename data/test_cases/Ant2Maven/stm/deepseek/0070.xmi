@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="build"
+    basedir="."
+    description="Sample build project">
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <targets xmi:id="init" name="init" description="Initialize build">
+    <tasks xsi:type="Ant:Mkdir" dir="build"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile sources" unless="skip.compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build" debug="true" fork="false" optimize="false" deprecation="false"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create JAR" ifCondition="build.jar">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build" compress="true"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build">
+    <tasks xsi:type="Ant:Delete" dir="build"/>
+    <tasks xsi:type="Ant:Delete" dir="dist"/>
+  </targets>
+  <targets xmi:id="build" name="build" description="Main build target">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" compress="true"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="DSTAMP" pattern="yyyyMMdd"/>
+      <format property="TSTAMP" pattern="HHmm"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run tests" unless="skip.tests">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build"/>
+    <tasks xsi:type="Ant:Copy" file="README" tofile="dist/README" overwrite="true"/>
+  </targets>
+</Ant:Project>

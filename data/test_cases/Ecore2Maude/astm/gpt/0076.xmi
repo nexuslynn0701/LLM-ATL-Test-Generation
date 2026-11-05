@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg0076" nsURI="http://example.org/rootPkg0076" nsPrefix="rp76">
+
+  <!-- Subpackage to exercise superPackage/subpackages and maudeMaybePackSort -->
+  <eSubpackages name="subPkgA" nsURI="http://example.org/subPkgA" nsPrefix="spa">
+    <!-- Classifiers of subPkgA are indexed after all classifiers of rootPkg0076.
+         rootPkg0076 has 6 classifiers (indices 0..5), so subPkgA classifiers start at 6. -->
+    <!-- index 6 -->
+    <eClassifiers xsi:type="ecore:EClass" name="BaseEntity">
+      <!-- No superTypes: will subsort to @Class -->
+      <!-- One attribute (string, ID, with default) and two references (one containment, one non-containment, no opposite here) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="id"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          iD="true"
+          defaultValueLiteral="ENT-001"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="ownedDetails"
+          lowerBound="0"
+          upperBound="-1"
+          ordered="true"
+          unique="true"
+          eType="//@eSubpackages.0/@eClassifiers.7"
+          containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="primaryDetail"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          eType="//@eSubpackages.0/@eClassifiers.7"
+          containment="false"/>
+    </eClassifiers>
+
+    <!-- index 7 -->
+    <eClassifiers xsi:type="ecore:EClass" name="Detail">
+      <!-- Supertype from root package (cross-package inheritance) -->
+      <eSuperTypes href="//@eClassifiers.2"/>
+      <!-- Attribute using custom data type -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="score"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          eType="//@eClassifiers.5"
+          defaultValueLiteral="0.75"/>
+      <!-- Reference with an opposite (to a root class) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="owner"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          eType="//@eClassifiers.1"
+          eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"
+          containment="false"/>
+    </eClassifiers>
+
+    <!-- index 8 -->
+    <eClassifiers xsi:type="ecore:EEnum" name="SubStatus">
+      <eLiterals name="INIT" value="0" literal="INIT"/>
+      <eLiterals name="READY" value="1" literal="READY"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root package classifiers (indices relative to rootPkg0076) -->
+  <!-- index 0 -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractNode" abstract="true" interface="false">
+    <!-- Boolean attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        iD="false"
+        defaultValueLiteral="true"/>
+  </eClassifiers>
+
+  <!-- index 1 -->
+  <eClassifiers xsi:type="ecore:EClass" name="NodeA" abstract="false" interface="false">
+    <!-- SuperType from same package -->
+    <eSuperTypes href="//@eClassifiers.0"/>
+    <!-- Reference to NodeB with opposite; containment=true here -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.3"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.0"
+        containment="true"/>
+    <!-- Reference to Detail (in subpackage), opposite defined in Detail.owner -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="details"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        eType="//@eSubpackages.0/@eClassifiers.7"
+        eOpposite="//@eSubpackages.0/@eClassifiers.7/@eStructuralFeatures.1"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- index 2 -->
+  <eClassifiers xsi:type="ecore:EClass" name="NodeB" abstract="false" interface="false">
+    <!-- SuperType chain: NodeA -->
+    <eSuperTypes href="//@eClassifiers.1"/>
+    <!-- Reference back to parent NodeA (opposite of children); non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="parent"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"
+        containment="false"/>
+    <!-- Enum-typed attribute (Status) with default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.4"
+        iD="false"
+        defaultValueLiteral="RUNNING"/>
+  </eClassifiers>
+
+  <!-- index 3 -->
+  <eClassifiers xsi:type="ecore:EClass" name="LeafNode" abstract="false" interface="false">
+    <!-- Multiple supertypes: AbstractNode and NodeA -->
+    <eSuperTypes href="//@eClassifiers.0"/>
+    <eSuperTypes href="//@eClassifiers.1"/>
+    <!-- String attribute, non-ID, upperBound -1 (multi-valued) without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="tags"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- index 4 -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="RUNNING" value="1" literal="RUNNING"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- index 5 -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ScoreType"
+      instanceClassName="double"/>
+
+</ecore:EPackage>

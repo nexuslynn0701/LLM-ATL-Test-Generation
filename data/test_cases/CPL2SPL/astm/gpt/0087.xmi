@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with both incoming and outgoing,
+       plus a SubAction referenced by a SubCall in a Default branch -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain"/>
+    <incoming contents="//@elements.2"/>
+    <outgoing contents="//@elements.3"/>
+  </elements>
+
+  <!-- SubAction whose contents is a complex Proxy (exercises Proxy2Select, Busy/NoAnswer/Redirection/Failure/Default, plus SubCall2Return via the SubCall it contains) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- busy branch with simple Proxy as contents (Proxy2Return) -->
+    <busy>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+        <default/>
+      </contents>
+    </busy>
+    <!-- noAnswer branch containing a Redirect (Redirect2Return) -->
+    <noAnswer>
+      <contents xsi:type="CPL:Redirect" permanent="false">
+        <!-- Location used for Redirect2Return (Location2URIConstant, locations helper) -->
+        <contents xsi:type="CPL:Location" url="sip:user-noanswer@example.com" clear="no"/>
+      </contents>
+    </noAnswer>
+    <!-- redirection branch containing a simple Proxy (Proxy2Return) -->
+    <redirection>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <default/>
+      </contents>
+    </redirection>
+    <!-- failure branch with nested complex Proxy (Proxy2Select + Failure2ErrorResponse via other part of model) -->
+    <failure>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="serial">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </failure>
+    <!-- default branch containing a SubCall (SubCall2Return) -->
+    <default>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </default>
+  </elements>
+
+  <!-- Incoming node whose contents is a TimeSwitch (no statements generated, but tests filtering condition) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com">
+    <times dtstart="20260101T000000Z" interval="60" wkst="MO"/>
+  </elements>
+
+  <!-- Outgoing node whose contents is a simple Proxy (Proxy2Return through statement helper) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="serial">
+    <default>
+      <contents xsi:type="CPL:Location" url="sip:notify-target@example.com" clear="yes"/>
+    </default>
+  </elements>
+
+  <!-- Top-level Redirect whose locations come via a nested Location (Location.locations helper + Location2URIConstant) -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:Location" url="sip:redirect-main@example.com" priority="1" clear="yes"/>
+  </elements>
+
+  <!-- AddressSwitch exercising AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault.
+       Its contents are Location (filtered out as statements) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com">
+      <contents xsi:type="CPL:Location" url="sip:alice-device@example.com" clear="yes"/>
+    </addresses>
+    <addresses is="sip:bob@example.net" contains="bob" subDomainOf="example.net">
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:bob-device@example.net" clear="no"/>
+        </default>
+      </contents>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="false">
+        <contents xsi:type="CPL:Location" url="sip:other@example.org" clear="yes"/>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- StringSwitch used only to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="custom-header">
+    <strings is="value1" contains="val1"/>
+    <strings is="value2" contains="val2"/>
+  </elements>
+
+  <!-- LanguageSwitch, TimeSwitch, PrioritySwitch as top-level nodes (used only to exercise filters in various rules) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en-US"/>
+    <languages matches="fr-FR"/>
+  </elements>
+
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.paris.example.com">
+    <times dtstart="20260102T080000Z" interval="30" wkst="MO"/>
+  </elements>
+
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" equal="0.5" greater="0.8"/>
+  </elements>
+
+  <!-- Top-level Proxy with all result branches empty but present, plus explicit Failure child to trigger Failure2ErrorResponse -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+</CPL:CPLModel>

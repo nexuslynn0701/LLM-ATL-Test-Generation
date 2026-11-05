@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmi:id="_cpl">
+    <subActions id="action1" xmi:id="_subAction1">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="30" xmi:id="_proxy1">
+        <busy xmi:id="_busy1">
+          <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+        </busy>
+        <noAnswer xmi:id="_noAnswer1"/>
+        <redirection xmi:id="_redirection1"/>
+        <failure xmi:id="_failure1"/>
+        <default xmi:id="_default1">
+          <contents xsi:type="CPL:AddressSwitch" field="origin" xmi:id="_addrSwitch1">
+            <addresses is="sip:user@example.com" xmi:id="_switchedAddr1"/>
+            <otherwise xmi:id="_otherwise1">
+              <contents xsi:type="CPL:Redirect" permanent="true" xmi:id="_redirect1"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <outgoing xmi:id="_outgoing1">
+      <contents xsi:type="CPL:StringSwitch" field="user-agent" xmi:id="_stringSwitch1">
+        <strings is="AcmeClient/1.0" xmi:id="_switchedString1"/>
+      </contents>
+    </outgoing>
+    <incoming xmi:id="_incoming1"/>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction" xmi:id="_subCall1"/>
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" clear="yes" priority="1" xmi:id="_location1"/>
+  <elements xsi:type="CPL:Reject" status="403" reason="Forbidden" xmi:id="_reject1"/>
+</CPL:CPLModel>

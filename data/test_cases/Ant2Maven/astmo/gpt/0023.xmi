@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-root"
+    description="Ant project with multiple targets and tasks"
+    default="buildMain">
+
+  <!-- Properties: one of each concrete subtype -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A standalone TaskDef (not referenced by any NewTask) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: buildMain -->
+  <targets xmi:id="buildMain" name="buildMain" description="Compile sources and package jar">
+    <!-- Compile task -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Documentation task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+    <!-- Archive task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/example-app.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Secondary target: prepare -->
+  <targets xmi:id="prepare" name="prepare" description="Prepare build directories">
+    <!-- Create build directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <!-- Create distribution directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+    <!-- Cleanup old distribution directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/old-dist"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           includesfile="config/includes.txt"
+           excludes="**/*.tmp"
+           excludesfile="config/excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Testing target: testBuild -->
+  <targets xmi:id="testBuild" name="testBuild" description="Test build outputs">
+    <!-- Simple Java execution task -->
+    <tasks xsi:type="Ant:Java"
+           classname="com.example.Main"
+           jar="target/example-app.jar"
+           fork="true"/>
+    <!-- Timestamp task -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+</Ant:Project>

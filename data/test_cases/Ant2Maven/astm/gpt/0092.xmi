@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryManager"
+    basedir="lib-src"
+    description="Build and package the library module"
+    default="buildTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="lib.name" value="library-core"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.output" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (unreferenced by any task, as required) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="initTarget" name="init" description="Initialize build folders">
+    <tasks xsi:type="Ant:Mkdir" target="//@targets.0" dir="build"/>
+    <tasks xsi:type="Ant:Mkdir" target="//@targets.0" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" target="//@targets.0" dir="build/jar"/>
+  </targets>
+
+  <targets xmi:id="compileTarget" name="compile" description="Compile source tree">
+    <tasks xsi:type="Ant:Javac"
+           target="//@targets.1"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+  </targets>
+
+  <targets xmi:id="docsTarget" name="docs" description="Generate Javadoc API">
+    <tasks xsi:type="Ant:Javadoc"
+           target="//@targets.2"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.library.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Library API"/>
+  </targets>
+
+  <targets xmi:id="packageTarget" name="package" description="Create distribution jar">
+    <tasks xsi:type="Ant:Jar"
+           target="//@targets.3"
+           jarfile="build/jar/library-core.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <targets xmi:id="cleanTarget" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete"
+           target="//@targets.4"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/.git/**"
+           defaultexcludes="true"/>
+  </targets>
+
+  <targets xmi:id="timestampTarget" name="timestamp" description="Stamp build with timestamp">
+    <tasks xsi:type="Ant:Tstamp" target="//@targets.5">
+      <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <targets xmi:id="buildTarget" name="build" description="Full build including docs and package">
+    <tasks xsi:type="Ant:Javac"
+           target="//@targets.6"
+           srcdir="src/secondary/java"
+           destdir="build/secondary-classes"
+           debug="false"
+           fork="true"
+           optimize="false"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+           target="//@targets.6"
+           jarfile="build/jar/library-extra.jar"
+           basedir="build/secondary-classes"
+           compress="false"
+           encoding="ISO-8859-1"
+           manifest="META-INF/EXTRA.MF"/>
+  </targets>
+
+</Ant:Project>

@@ -1,0 +1,40 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet name="ComplexGrafcet_0033" location="file://grafcet_models/complex_0033.gxf">
+    <!-- Elements: 4 Steps + 4 Transitions -->
+    <elements xsi:type="Grafcet:Step" name="S_Start" location="1:1-1:20" isInitial="true" isActive="true" action="initSystem()"/>
+    <elements xsi:type="Grafcet:Step" name="S_ProcessA" location="2:1-2:25" isInitial="false" isActive="false" action="runProcessA()"/>
+    <elements xsi:type="Grafcet:Step" name="S_ProcessB" location="3:1-3:25" isInitial="false" isActive="false" action="runProcessB()"/>
+    <elements xsi:type="Grafcet:Step" name="S_Final" location="4:1-4:20" isInitial="false" isActive="false" action="shutdown()"/>
+
+    <elements xsi:type="Grafcet:Transition" name="T_Split" location="5:1-5:25" condition="cond_split"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Join" location="6:1-6:25" condition="cond_join"/>
+    <elements xsi:type="Grafcet:Transition" name="T_A2Final" location="7:1-7:25" condition="cond_A_done"/>
+    <elements xsi:type="Grafcet:Transition" name="T_B2Final" location="8:1-8:25" condition="cond_B_done"/>
+
+    <!-- Connections: indices of elements:
+         0=S_Start, 1=S_ProcessA, 2=S_ProcessB, 3=S_Final,
+         4=T_Split, 5=T_Join, 6=T_A2Final, 7=T_B2Final -->
+
+    <!-- Start -> Split -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Start_to_Split" location="9:1-9:40" from="/0/@elements.0" to="/0/@elements.4"/>
+
+    <!-- Split -> ProcessA and Split -> ProcessB (branching) -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Split_to_A" location="10:1-10:45" from="/0/@elements.4" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Split_to_B" location="11:1-11:45" from="/0/@elements.4" to="/0/@elements.2"/>
+
+    <!-- ProcessA and ProcessB -> Join (converging) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_A_to_Join" location="12:1-12:40" from="/0/@elements.1" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_B_to_Join" location="13:1-13:40" from="/0/@elements.2" to="/0/@elements.5"/>
+
+    <!-- Join -> ProcessA (loopback to A) -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Join_to_A_Loop" location="14:1-14:50" from="/0/@elements.5" to="/0/@elements.1"/>
+
+    <!-- ProcessA -> T_A2Final and ProcessB -> T_B2Final (diverging to different exits) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_A_to_FinalTrans" location="15:1-15:50" from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_B_to_FinalTrans" location="16:1-16:50" from="/0/@elements.2" to="/0/@elements.7"/>
+
+    <!-- T_A2Final and T_B2Final -> Final (multiple incoming to Final) -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_TA_to_Final" location="17:1-17:45" from="/0/@elements.6" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_TB_to_Final" location="18:1-18:45" from="/0/@elements.7" to="/0/@elements.3"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

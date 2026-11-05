@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="actMain">
+      <!-- SubAction contents: SubCall to itself -->
+      <contents xsi:type="CPL:SubCall" ref="actMain"/>
+    </subActions>
+    <incoming>
+      <!-- Incoming contents: simple Proxy (only busy branch, no default) -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="sequential">
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy here"/>
+        </busy>
+      </contents>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing contents: complex Proxy with all branches and default SubCall -->
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="actMain"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- contents points to the top-level SubCall element (index 1 below) -->
+          <contents xsi:type="CPL:SubCall" ref="actMain"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Top-level SubCall (used by complex Proxy default via ref string) -->
+  <elements xsi:type="CPL:SubCall" ref="actMain"/>
+
+  <!-- Top-level Location used by all location-based rules -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="true"/>
+
+  <!-- Top-level Redirect (permanent=true) to exercise R14 / OCL15/28 -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- Top-level simple Proxy whose locations include the Location above.
+       It has no branches, so it is simple (isSimple = true) -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <!-- contents of this Location referenced as statement in SubAction/Method rules -->
+    <contents xsi:type="CPL:Location" url="sip:alt@example.com" priority="5" clear="false"/>
+  </elements>
+
+  <!-- Top-level AddressSwitch with one SwitchedAddress and one NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="sip:alice@example.com" contains="example.com" subDomainOf="">
+      <!-- SwitchedAddress contents: simple Proxy (no branches) -->
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential"/>
+    </addresses>
+    <notPresent/>
+    <otherwise>
+      <!-- Otherwise contents: simple Proxy as well -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel"/>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

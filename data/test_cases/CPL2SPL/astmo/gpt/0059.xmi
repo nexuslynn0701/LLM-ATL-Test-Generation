@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Outgoing and one Incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction of this CPL -->
+    <subActions id="sa1">
+      <!-- SubAction contents: complex Proxy (not simple) -->
+      <contents xsi:type="CPL:Proxy" timeout="30" recurse="true" ordering="parallel">
+        <!-- make it non-simple by providing at least one of these -->
+        <busy>
+          <!-- Busy contents: SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- Default contents: Redirect -->
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Outgoing with Location contents -->
+    <outgoing>
+      <contents xsi:type="CPL:Location" url="sip:out@example.com" clear="true"/>
+    </outgoing>
+
+    <!-- Incoming with simple Proxy contents -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" timeout="15" recurse="false" ordering="sequential">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- Location used as context for Proxies and Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" clear="false"/>
+
+</CPL:CPLModel>

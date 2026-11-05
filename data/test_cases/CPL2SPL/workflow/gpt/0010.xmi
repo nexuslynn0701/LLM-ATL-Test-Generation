@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction and both incoming/outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa_main">
+      <!-- SubAction contents: simple Proxy to trigger Proxy2Return and Location2URIConstant -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- Location inside Proxy to provide a concrete URI for Location2URIConstant -->
+        <contents xsi:type="CPL:Location" url="sip:sa_main_proxy@example.com" clear="true"/>
+      </contents>
+    </subActions>
+    <!-- Incoming referring to a simple Proxy with a Location (Location2URIConstant) -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <contents xsi:type="CPL:Location" url="sip:incoming_proxy@example.com" clear="true"/>
+      </contents>
+    </incoming>
+    <!-- Outgoing referring to a non-simple Proxy (has Busy/NoAnswer/Redirection/Failure/Default) -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- Busy with SubCall contents -->
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </busy>
+        <!-- NoAnswer with SubCall contents -->
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </noAnswer>
+        <!-- Redirection with SubCall contents -->
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </redirection>
+        <!-- Failure with SubCall contents -->
+        <failure>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </failure>
+        <!-- Default with SubCall contents -->
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Top-level SubCall referencing the SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- Top-level Redirect using a Location to trigger Location2URIConstant through Redirect2Return -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:Location" url="sip:redirect_target@example.com" clear="true"/>
+  </elements>
+
+  <!-- Top-level AddressSwitch with SwitchedAddress and Otherwise; also uses NotPresent -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="user1@example.com">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <contents xsi:type="CPL:Location" url="sip:user1_proxy@example.com" clear="true"/>
+      </contents>
+    </addresses>
+    <addresses is="user2@example.com">
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <contents xsi:type="CPL:Location" url="sip:otherwise_proxy@example.com" clear="true"/>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- Top-level Location not referenced by any Proxy/Redirect (will not trigger rules but allowed) -->
+  <elements xsi:type="CPL:Location" url="sip:standalone@example.com" clear="true"/>
+
+  <!-- Top-level StringSwitch to exercise its rule (no impact on OCL) -->
+  <elements xsi:type="CPL:StringSwitch" field="header-field"/>
+
+  <!-- Top-level LanguageSwitch with NotPresent to exercise NotPresent2ErrorResponse -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </notPresent>
+  </elements>
+
+  <!-- Top-level PrioritySwitch (no contents, just to instantiate the type) -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+
+  <!-- Top-level TimeSwitch (no contents, just to instantiate the type) -->
+  <elements xsi:type="CPL:TimeSwitch"/>
+
+  <!-- Top-level Reject (not used by rules that inspect contents, but allowed) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+</CPL:CPLModel>

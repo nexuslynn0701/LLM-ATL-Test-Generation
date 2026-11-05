@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complex"
+    nsPrefix="complex">
+
+  <!-- 0: A simple data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CodeType" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with literals -->
+  <eClassifiers xsi:type="eccore:EEnum" name="PriorityKind">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 2: Base abstract class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 3: Concrete node with containment & cross refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="Node" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="children" upperBound="-1"
+        containment="true" eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="links" upperBound="-1"
+        eType="//@eClassifiers.5"/>
+    <eOperations name="computeDepth"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt">
+      <eParameters name="includeSelf"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 4: Leaf subclass with additional attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="LeafNode" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 5: Link class referencing Node -->
+  <eClassifiers xsi:type="ecore:EClass" name="Link" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 6: Container root with containment of nodes and links -->
+  <eClassifiers xsi:type="ecore:EClass" name="ModelRoot" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="version" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rootElements" upperBound="-1"
+        containment="true" eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="allLinks" upperBound="-1"
+        containment="true" eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 7: Operation-only utility class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Analyzer" abstract="false" interface="false">
+    <eOperations name="findByCode"
+        eType="//@eClassifiers.3">
+      <eParameters name="root"
+          eType="//@eClassifiers.6"/>
+      <eParameters name="code"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

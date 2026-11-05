@@ -1,0 +1,55 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcet0018" location="file://grafcet/ComplexGrafcet0018.grafcet">
+    <!-- Elements: Steps and Transitions -->
+    <!-- Index 0: Initial step with two outgoing transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="1,1" isInitial="true" isActive="true" action="initializeSystem"/>
+    <!-- Index 1: Non-initial active step with no incoming transitions (to test partial connectivity) -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="OrphanActiveStep" location="2,1" isInitial="false" isActive="true" action="orphanAction"/>
+    <!-- Index 2: Non-initial inactive step used as a simple successor -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="StepA" location="3,1" isInitial="false" isActive="false" action="doA"/>
+    <!-- Index 3: Non-initial inactive step used for alternative branch -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="StepB" location="4,1" isInitial="false" isActive="false" action="doB"/>
+    <!-- Index 4: Non-initial step in a small cycle -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s4" name="CycleStep1" location="5,1" isInitial="false" isActive="false" action="cycle1"/>
+    <!-- Index 5: Non-initial step in a small cycle -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s5" name="CycleStep2" location="6,1" isInitial="false" isActive="false" action="cycle2"/>
+    <!-- Index 6: Transition from initial step branching to StepA -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="T_Init_to_A" location="1,2" condition="x &gt; 0"/>
+    <!-- Index 7: Transition from initial step branching to StepB -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="T_Init_to_B" location="1,3" condition="x &lt;= 0"/>
+    <!-- Index 8: Transition from StepA to StepB (sequential) -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="T_A_to_B" location="3,2" condition="a_done"/>
+    <!-- Index 9: Transition from StepB back to StepA (forms a loop with different condition) -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" name="T_B_to_A" location="4,2" condition="b_retry"/>
+    <!-- Index 10: Transition forming a 2-step cycle between CycleStep1 and CycleStep2 -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t4" name="T_Cycle_1to2" location="5,2" condition="cycle_go"/>
+    <!-- Index 11: Transition closing the cycle back from CycleStep2 to CycleStep1 -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t5" name="T_Cycle_2to1" location="6,2" condition="cycle_back"/>
+
+    <!-- Connections: StepToTransition and TransitionToStep -->
+    <!-- From InitStep to T_Init_to_A -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="C_Init_to_T0" location="1,1-1,2" from="/0/@elements.0" to="/0/@elements.6"/>
+    <!-- From InitStep to T_Init_to_B -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c1" name="C_Init_to_T1" location="1,1-1,3" from="/0/@elements.0" to="/0/@elements.7"/>
+
+    <!-- From T_Init_to_A to StepA -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c2" name="C_T0_to_A" location="1,2-3,1" from="/0/@elements.6" to="/0/@elements.2"/>
+    <!-- From T_Init_to_B to StepB -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c3" name="C_T1_to_B" location="1,3-4,1" from="/0/@elements.7" to="/0/@elements.3"/>
+
+    <!-- Sequential connection StepA -> T_A_to_B -> StepB -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c4" name="C_A_to_T2" location="3,1-3,2" from="/0/@elements.2" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c5" name="C_T2_to_B" location="3,2-4,1" from="/0/@elements.8" to="/0/@elements.3"/>
+
+    <!-- Loop connection StepB -> T_B_to_A -> StepA -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c6" name="C_B_to_T3" location="4,1-4,2" from="/0/@elements.3" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c7" name="C_T3_to_A" location="4,2-3,1" from="/0/@elements.9" to="/0/@elements.2"/>
+
+    <!-- Cycle between CycleStep1 and CycleStep2 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c8" name="C_Cycle1_to_T4" location="5,1-5,2" from="/0/@elements.4" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c9" name="C_T4_to_Cycle2" location="5,2-6,1" from="/0/@elements.10" to="/0/@elements.5"/>
+
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c10" name="C_Cycle2_to_T5" location="6,1-6,2" from="/0/@elements.5" to="/0/@elements.11"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c11" name="C_T5_to_Cycle1" location="6,2-5,1" from="/0/@elements.11" to="/0/@elements.4"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

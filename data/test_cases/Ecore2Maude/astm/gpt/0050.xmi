@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    xmi:version="2.0"
+    name="rootPkg"
+    nsURI="http://example/rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to trigger super/sub package equations -->
+  <eSubpackages name="childPkg" nsURI="http://example/childPkg" nsPrefix="child">
+
+    <!-- Classifier 0: EClass Person (no supertype), attributes & refs -->
+    <eClassifiers xsi:type="ecore:EClass" name="Person">
+      <!-- StructuralFeature 0: id : EInt, iD=true, with default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="id"
+          iD="true"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="0"/>
+      <!-- StructuralFeature 1: name : EString, ordered=false, unique=true, default with quotes -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="name"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="0"
+          upperBound="1"
+          ordered="false"
+          unique="true"
+          defaultValueLiteral="John &quot;Doe&quot;"/>
+      <!-- StructuralFeature 2: nicknames : EString[*], ordered=true, unique=false, no default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="nicknames"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="0"
+          upperBound="-1"
+          ordered="true"
+          unique="false"/>
+      <!-- StructuralFeature 3: spouse : Person [0..1], bidirectional non-containment -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="spouse"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          lowerBound="0"
+          upperBound="1"
+          containment="false"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.3"
+          ordered="true"
+          unique="true"/>
+      <!-- StructuralFeature 4: addresses : Address[*], containment, opposite residents -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="addresses"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          lowerBound="0"
+          upperBound="-1"
+          containment="true"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.0"
+          ordered="true"
+          unique="true"/>
+    </eClassifiers>
+
+    <!-- Classifier 1: EClass Address, supertype of HomeAddress, with containment opposite -->
+    <eClassifiers xsi:type="ecore:EClass" name="Address">
+      <!-- StructuralFeature 0: residents : Person[*], non-containment, opposite addresses -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="residents"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          lowerBound="0"
+          upperBound="-1"
+          containment="false"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.4"
+          ordered="true"
+          unique="true"/>
+      <!-- StructuralFeature 1: city : EString, with default literal -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="city"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="UnknownCity"/>
+    </eClassifiers>
+
+    <!-- Classifier 2: EClass HomeAddress extends Address, with additional attribute -->
+    <eClassifiers xsi:type="ecore:EClass" name="HomeAddress"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.1">
+      <!-- StructuralFeature 0: label : EString, no default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="label"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"/>
+    </eClassifiers>
+
+    <!-- Classifier 3: EEnum Gender with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Gender">
+      <eLiterals name="Male" value="0" literal="Male"/>
+      <eLiterals name="Female" value="1" literal="Female"/>
+    </eClassifiers>
+
+    <!-- Classifier 4: EClass Employee extends Person, uses enum and primitive datatypes -->
+    <eClassifiers xsi:type="ecore:EClass" name="Employee"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <!-- StructuralFeature 0: gender : Gender, no default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="gender"
+          eType="//@eSubpackages.0/@eClassifiers.3"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"/>
+      <!-- StructuralFeature 1: active : EBoolean, default true -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="active"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="true"/>
+      <!-- StructuralFeature 2: salary : EDouble, default 0.0 -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="salary"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="0.0"/>
+      <!-- StructuralFeature 3: home : HomeAddress[0..1], non-containment, no opposite -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="home"
+          eType="//@eSubpackages.0/@eClassifiers.2"
+          lowerBound="0"
+          upperBound="1"
+          containment="false"
+          ordered="true"
+          unique="true"/>
+    </eClassifiers>
+
+    <!-- Classifier 5: EClass Project with mixed multiplicities -->
+    <eClassifiers xsi:type="ecore:EClass" name="Project">
+      <!-- StructuralFeature 0: code : EString, required, no default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="code"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"/>
+      <!-- StructuralFeature 1: members : Employee[*], non-containment, no opposite -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="members"
+          eType="//@eSubpackages.0/@eClassifiers.4"
+          lowerBound="0"
+          upperBound="-1"
+          containment="false"
+          ordered="true"
+          unique="false"/>
+    </eClassifiers>
+
+  </eSubpackages>
+</ecore:EPackage>

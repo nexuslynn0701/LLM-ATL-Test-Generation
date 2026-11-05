@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryManager"
+    basedir="src/main/java"
+    description="Build and package the library module."
+    default="buildTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="lib.name" value="core-lib"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="target/build"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/library.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A simple custom task definition (not referenced from tasks) -->
+  <taskdef name="custom.report" classname="com.example.tools.ReportTask"/>
+
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources, create output directories and package the jar.">
+    <!-- Compile task with include/exclude patterns -->
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- Prepare output directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/lib"/>
+
+    <!-- Timestamp management -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyyMMdd-HHmmss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+
+    <!-- Copy filtered resources with mapper and fileset -->
+    <tasks xsi:type="Ant:Copy" todir="target/classes" overwrite="true" filtering="true" flatten="false" includeEmptyDirs="true">
+      <fileset dir="src/resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/test/**"/>
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="includes.list"/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list"/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="lib.name" value="core-lib"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.properties" to="*.conf"/>
+    </tasks>
+
+    <!-- Package compiled classes into a jar -->
+    <tasks xsi:type="Ant:Jar" jarfile="target/lib/core-lib.jar" basedir="target/classes" compress="true" encoding="UTF-8"/>
+  </targets>
+
+  <!-- Additional target with documentation and cleanup -->
+  <targets xmi:id="docsAndClean" name="docs-and-clean" description="Generate Javadoc then remove temporary build folders.">
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src"
+           destdir="target/docs/api"
+           packagenames="com.example.lib.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Core Library API"/>
+    <!-- Remove temporary build directory -->
+    <tasks xsi:type="Ant:Delete" dir="target/build" verbose="true" quiet="false" failonerror="false" includeEmptyDirs="true" defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

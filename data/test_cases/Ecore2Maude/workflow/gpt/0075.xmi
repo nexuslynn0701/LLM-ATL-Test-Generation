@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://root/pkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise superPackage/subPackages -->
+  <eSubpackages name="subPkg"
+                nsURI="http://root/pkg/sub"
+                nsPrefix="sub">
+    <!-- Classifiers of subPkg -->
+    <!-- 0: Class in subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="Child" abstract="false" interface="false">
+      <!-- Attribute in Child (typed to EString) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="childName"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           defaultValueLiteral="defaultChild"
+                           iD="false">
+        <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      </eStructuralFeatures>
+      <!-- Reference from Child to Root (containment=false, with opposite) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="parent"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="1"
+                           upperBound="1"
+                           containment="false"
+                           eType="//@eClassifiers.0"
+                           eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers of rootPkg -->
+
+  <!-- 0: Root class with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Root" abstract="true" interface="false">
+    <!-- Attribute 0: id (EInt, is ID) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true">
+      <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+    <!-- Attribute 1: title (EString, with default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="Untitled &quot;Root&quot;">
+      <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <!-- Reference 2: children (many, containment, opposite in Child) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 1: Abstract base class for inheritance chain -->
+  <eClassifiers xsi:type="ecore:EClass" name="Base" abstract="true" interface="false">
+    <!-- Attribute in Base (EBoolean) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1">
+      <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 2: Mid class extending Base -->
+  <eClassifiers xsi:type="ecore:EClass" name="Mid" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.1">
+    <!-- Reference to Root (non containment, no opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="rootRef"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 3: Leaf class extending Mid and Root (multiple inheritance) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Leaf" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2 //@eClassifiers.0">
+    <!-- Attribute with wildcard upperBound (-1) and Float type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="values"
+                         ordered="false"
+                         unique="false"
+                         lowerBound="0"
+                         upperBound="-1">
+      <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 4: Enumeration with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 5: Class using the enum and String attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false">
+    <!-- Attribute: name (EString) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1">
+      <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <!-- Attribute: status (typed to Status enum) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eAttributeType="//@eClassifiers.4"/>
+    <!-- Reference: owner (to Leaf, non containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 6: EDataType to exercise classifier without further structure -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData" instanceTypeName="java.lang.Object"/>
+
+</ecore:EPackage>

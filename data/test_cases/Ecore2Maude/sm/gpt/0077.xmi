@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="universityModel"
+    nsURI="http://example.org/universityModel"
+    nsPrefix="univ">
+
+  <!-- 0: Primitive datatype defined in this package -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="Code"
+                instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum for course level -->
+  <eClassifiers xsi:type="ecore:EEnum" name="CourseLevel">
+    <eLiterals name="introductory" value="0" literal="introductory"/>
+    <eLiterals name="intermediate" value="1" literal="intermediate"/>
+    <eLiterals name="advanced" value="2" literal="advanced"/>
+  </eClassifiers>
+
+  <!-- 2: Enum for semester -->
+  <eClassifiers xsi:type="ecore:EEnum" name="SemesterKind">
+    <eLiterals name="spring" value="0" literal="spring"/>
+    <eLiterals name="fall" value="1" literal="fall"/>
+  </eClassifiers>
+
+  <!-- 3: Root container class -->
+  <eClassifiers xsi:type="ecore:EClass" name="University">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- contain departments -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="departments"
+                         lowerBound="1"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 4: Department, contained in University -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         lowerBound="1"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- contain both persons and courses -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="persons"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="courses"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 5: Course class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Course">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         lowerBound="1"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="credits"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- enum-typed attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="level"
+                         lowerBound="1"
+                         eType="//@eClassifiers.1"/>
+    <!-- enum-typed attribute with multiplicity 0..1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="semesterOffered"
+                         eType="//@eClassifiers.2"/>
+    <!-- reference to instructor (a Professor, subclass of Person) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="instructor"
+                         lowerBound="1"
+                         eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 6: Abstract person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 7: Student subclass -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Student"
+                eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="enrollmentYear"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- simple ref to advisor professor -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="advisor"
+                         eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 8: Professor subclass -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Professor"
+                eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 9: Administrative staff, another subclass -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="AdminStaff"
+                eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="role"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 10: Utility class with operation and parameter -->
+  <eClassifiers xsi:type="ecore:EClass" name="StatisticsUtil">
+    <eOperations name="computeAverageCredits"
+                 eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt">
+      <eParameters name="courses"
+                   eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EEList"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

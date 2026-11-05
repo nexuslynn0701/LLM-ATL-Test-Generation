@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryManager"
+    basedir="."
+    description="Build, test, and package a small library."
+    default="buildTarget">
+
+  <!-- Default build target with multiple different tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources, create build dir, and package jar.">
+    <!-- Create build output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/output"/>
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/output"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Package compiled classes into a jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/library-manager.jar"
+           basedir="build/output"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Secondary target exercising other file tasks -->
+  <targets xmi:id="cleanupTarget" name="cleanup" description="Clean build artifacts.">
+    <!-- Remove generated build directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/output"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           defaultexcludes="true"/>
+    <!-- Remove distribution directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="dist"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"
+           excludes="*.keep"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Extra target exercising Copy with nested FileSet/FilterSet/Mapper -->
+  <targets xmi:id="resourcesTarget" name="process-resources" description="Copy and filter resource files.">
+    <tasks xsi:type="Ant:Copy"
+           todir="build/resources"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="src/main/resources"/>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="LibraryManager"/>
+        <filter token="project.env" value="dev"/>
+      </filterset>
+      <mapper type="glob" from="*.template" to="*.properties"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

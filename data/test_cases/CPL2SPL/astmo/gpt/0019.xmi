@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : root CPL with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="true" ordering="serial">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer/>
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <addresses is="home" contains="info" subDomainOf="example.org">
+              <contents xsi:type="CPL:SubCall" ref="saMain"/>
+            </addresses>
+            <notPresent/>
+            <otherwise>
+              <contents xsi:type="CPL:SubCall" ref="saMain"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:Proxy" timeout="15" recurse="true" ordering="parallel">
+        <busy/>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </noAnswer>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </default>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" timeout="30" recurse="true" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </failure>
+        <default/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1] : Location used by proxies and redirects (for URIConstant & ForwardExp) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+
+  <!-- elements[2] : Redirect (non-permanent) using Location[1] as its location -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <subActions/>
+    <outgoing/>
+    <incoming/>
+  </elements>
+
+  <!-- elements[3] : Redirect (permanent) using Location[1] as its location -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <subActions/>
+    <outgoing/>
+    <incoming/>
+  </elements>
+
+  <!-- elements[4] : AddressSwitch at top level, different from inner one -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses is="office" contains="data" subDomainOf="corp.example.com">
+      <contents xsi:type="CPL:Proxy" timeout="25" recurse="true" ordering="serial">
+        <busy/>
+        <noAnswer/>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </redirection>
+        <failure/>
+        <default/>
+      </contents>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[5] : StringSwitch to exercise R16 (no contents needed for SPL side) -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents xsi:type="CPL:Location" url="sip:alt@example.net" priority="2" clear="no"/>
+  </elements>
+
+  <!-- elements[6] : TimeSwitch to ensure it does NOT create statements in several contexts -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org">
+    <times dtstart="20250101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- elements[7] : LanguageSwitch (no contents used as statements) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en-US"/>
+  </elements>
+
+  <!-- elements[8] : PrioritySwitch (no contents used as statements) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.2" greater="0.8" equal="0.5"/>
+  </elements>
+
+  <!-- elements[9] : SubCall that also refers to the single SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+</CPL:CPLModel>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-root"
+    description="Ant project for ATL Ant2Maven testing"
+    default="build-main">
+
+  <!-- Properties: one of each subtype -->
+  <properties xsi:type="Ant:PropertyValue" name="source.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by tasks, per requirements) -->
+  <taskdef name="customTask" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target with various pre-defined tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <!-- Compile task with minimal attributes -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java"/>
+
+    <!-- Documentation task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="org.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+
+    <!-- Archive task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/example-app.jar"
+           basedir="target/classes"/>
+
+    <!-- File tasks -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/temp"/>
+    <tasks xsi:type="Ant:Copy" todir="target/distribution"/>
+    <tasks xsi:type="Ant:Delete" dir="target/temp"/>
+
+    <!-- Properties management task -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Secondary target with another set of tasks -->
+  <targets xmi:id="test-suite" name="test-suite" description="Run tests">
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/test/java"
+           destdir="target/site/test-apidocs"
+           packagenames="org.example.tests.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="false"
+           windowtitle="Example Test Documentation"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/example-tests.jar"
+           basedir="target/test-classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/test-output"/>
+    <tasks xsi:type="Ant:Copy" todir="target/test-output"/>
+    <tasks xsi:type="Ant:Delete" dir="target/test-output"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+</Ant:Project>

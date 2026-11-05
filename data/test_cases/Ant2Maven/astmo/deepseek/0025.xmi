@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleBuild"
+    default="main"
+    basedir="."
+    description="Sample Ant project for transformation testing">
+  <properties xsi:type="Ant:PropertyValue" name="version" value="1.0"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+  <targets xmi:id="main" name="main" description="Main build target">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/reports"/>
+    <tasks xsi:type="Ant:Delete" dir="build/temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="false" includes="*.tmp" excludes="keep.txt" defaultexcludes="true"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Test target">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="build/docs" packagenames="com.example.*" defaultexcludes="true" author="true" version="true" use="true" windowtitle="API Documentation"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" offset="1" unit="hour" locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Copy" file="README.txt" todir="build/docs" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="true"/>
+  </targets>
+</Ant:Project>

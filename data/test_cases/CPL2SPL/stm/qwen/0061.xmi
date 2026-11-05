@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmi:id="cpl_root">
+    <subActions id="main_action">
+      <contents xsi:type="CPL:AddressSwitch" field="from" subField="user">
+        <addresses is="alice" contains="example.com"/>
+        <addresses subDomainOf="company.org"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="403" reason="Sender not present"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" timeout="30" recurse="no" ordering="sequential">
+            <busy>
+              <contents xsi:type="CPL:Location" url="sip:voicemail@company.org" priority="medium" clear="true"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Redirect" permanent="yes"/>
+            </noAnswer>
+            <redirection/>
+            <failure/>
+            <default contents="//@elements.1"/>
+          </Proxy>
+        </otherwise>
+      </contents>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="Urgent"/>
+        <strings contains="Meeting"/>
+        <notPresent>
+          <contents xsi:type="CPL:SubCall" ref="fallback_handler"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:default@company.org" priority="low" clear="false"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+        <times dtstart="20240101T090000" dtend="20240101T170000" interval="1" wkst="MO" byDay="MO,TU,WE,TH,FR"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="480" reason="Outside business hours"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:PrioritySwitch">
+            <priorities greater="5" less="10"/>
+            <priorities equal="1"/>
+            <otherwise>
+              <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+                <default contents="//@elements.2"/>
+              </Proxy>
+            </otherwise>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:backup@company.org" priority="high" clear="true"/>
+  <elements xsi:type="CPL:SubCall" ref="emergency_route"/>
+</CPL:CPLModel>

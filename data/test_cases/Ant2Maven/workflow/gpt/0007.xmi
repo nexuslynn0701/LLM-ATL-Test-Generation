@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project-root"
+    description="Full build lifecycle including compilation, packaging, and cleanup"
+    default="build-all">
+  <!-- Properties to exercise AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition (TaskDef rule) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="build-all" name="build-all">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="target/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false"/>
+    <!-- Generate Javadocs -->
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src/main/java"
+        destdir="target/site/apidocs"
+        packagenames="com.example.*"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="ComplexBuild API"/>
+    <!-- Package into a jar -->
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/complexbuild.jar"
+        basedir="target/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Auxiliary target for preparing directories -->
+  <targets xmi:id="prepare" name="prepare">
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="target"/>
+  </targets>
+</Ant:Project>

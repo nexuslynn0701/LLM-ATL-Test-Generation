@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="workspace"
+    description="Ant to Maven transformation test project"
+    default="compileTarget">
+
+  <!-- Properties of all four concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="ComplexAntProject"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- One TaskDef not referenced by any task -->
+  <taskdef name="customTask" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target with several tasks exercising many rules -->
+  <targets xmi:id="compileTarget" name="compileTarget" description="Compilation and packaging">
+    <!-- Javac task with minimal attributes -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java"/>
+
+    <!-- Javadoc task with all required attributes -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="docs/api"
+           packagenames="org.example"
+           defaultexcludes="true"
+           author="true"
+           version="1.0"
+           use="true"
+           windowtitle="Example API"/>
+
+    <!-- Jar task -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/example.jar" basedir="build/classes"/>
+
+    <!-- Mkdir task -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+
+    <!-- Delete task -->
+    <tasks xsi:type="Ant:Delete" dir="build/temp"/>
+
+    <!-- Tstamp task -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Second target to create an additional Maven goal -->
+  <targets xmi:id="resourcesTarget" name="resourcesTarget" description="Resource handling">
+    <!-- Copy task using FileSet, FilterSet, and Mapper to cover pattern-related rules -->
+    <tasks xsi:type="Ant:Copy" todir="build/resources">
+      <fileset dir="src/main/resources">
+        <!-- Direct include and exclude -->
+        <include name="**/*.properties"/>
+        <exclude name="**/secret/**"/>
+        <!-- PatternSet with nested IncludesFile and ExcludesFile -->
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="include.list" ifCondition="on" unless=""/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="exclude.list" ifCondition="" unless="off"/>
+        </patternset>
+      </fileset>
+      <!-- FilterSet with one Filter and one FiltersFile -->
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="projectName" value="ComplexAntProject"/>
+        <filtersfile file="config/filters.txt"/>
+      </filterset>
+      <!-- Mapper -->
+      <mapper type="glob" classname="org.example.Mapper" classpath="" classpathref="" from="*.txt" to="*.cfg"/>
+    </tasks>
+
+    <!-- PathElement to exercise path mapping -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java">
+      <classPath refid="testClasspath">
+        <pathElement path="lib/test-lib.jar" location="lib/test-lib.jar"/>
+      </classPath>
+    </tasks>
+  </targets>
+
+</Ant:Project>

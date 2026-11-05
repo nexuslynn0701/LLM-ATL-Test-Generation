@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleBuild"
+    default="build-all"
+    basedir="."
+    description="Comprehensive build script for testing ATL transformation">
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/docs"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="true"/>
+  </targets>
+  <targets xmi:id="doc" name="doc">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src/main/java"
+        destdir="target/docs"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="My Project API"/>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/dist/app.jar"
+        basedir="target/classes"
+        compress="true"
+        manifest="src/main/resources/MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="target" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="build-all" name="build-all">
+    <tasks xsi:type="Ant:Copy"
+        todir="target/resources"
+        overwrite="true"
+        filtering="true">
+      <fileset dir="src/main/resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/secret.properties"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0.0"/>
+        <filter token="build.date" value="2024-06-15"/>
+      </filterset>
+    </tasks>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="project.version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+</Ant:Project>

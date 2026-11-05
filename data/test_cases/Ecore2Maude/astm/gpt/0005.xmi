@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example.org/rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise super/sub package relations -->
+  <eSubpackages name="subPkg"
+                nsURI="http://example.org/subPkg"
+                nsPrefix="sub">
+    <!-- Classifiers of subPkg: 0..3 -->
+    <!-- 0: EClass SubBase -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubBase"/>
+
+    <!-- 1: EClass SubChild extends SubBase, has ref to root's RootBase and an attribute -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubChild">
+      <eSuperTypes>//@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="toRootBase"
+                           eType="//@eClassifiers.1"
+                           containment="false"
+                           lowerBound="0"
+                           upperBound="-1"
+                           ordered="false"
+                           unique="true"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subFlag"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           ordered="true"
+                           unique="true"
+                           defaultValueLiteral="true"/>
+    </eClassifiers>
+
+    <!-- 2: Enum SubLevel with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="SubLevel">
+      <eLiterals name="LOW" value="0" literal="LOW"/>
+      <eLiterals name="HIGH" value="1" literal="HIGH"/>
+    </eClassifiers>
+
+    <!-- 3: EClass EnumHolder with enum attribute that has default value -->
+    <eClassifiers xsi:type="ecore:EClass" name="EnumHolder">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="level"
+                           eType="//@eSubpackages.0/@eClassifiers.2"
+                           lowerBound="1"
+                           upperBound="1"
+                           iD="false"
+                           ordered="true"
+                           unique="true"
+                           defaultValueLiteral="LOW"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers of rootPkg: 0..5 -->
+  <!-- 0: EClass RootBase, abstract, with ID attribute and reference to RootDetail -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootBase" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="RB-1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="detail"
+                         eType="//@eClassifiers.2"
+                         containment="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"/>
+  </eClassifiers>
+
+  <!-- 1: EClass RootDerived extends RootBase and external EClass (used to trigger createSort) -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootDerived">
+    <eSuperTypes>//@eClassifiers.0 //@eClassifiers.3</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="count"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="0"
+                         upperBound="-1"
+                         iD="false"
+                         ordered="true"
+                         unique="false"/>
+    <!-- Reference with opposite to exercise RefEqOpposite/maudeMaybeRefSort -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="others"
+                         eType="//@eClassifiers.1"
+                         containment="false"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="false"
+                         unique="true"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"/>
+    <!-- Reference whose eContainingClass is implicit (to exercise EqContainingClass fallback) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="toSubChild"
+                         eType="//@eSubpackages.0/@eClassifiers.1"
+                         containment="false"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"/>
+  </eClassifiers>
+
+  <!-- 2: EClass RootDetail with opposite ref back to RootDerived -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootDetail">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         eType="//@eClassifiers.1"
+                         containment="false"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 3: External superclass EClass (no package ecore, but will still be in same package; 
+           used only to trigger createSort because it will be treated as EClass with ePackage=rootPkg) -->
+  <eClassifiers xsi:type="ecore:EClass" name="ExternalSuper">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="flag"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"/>
+  </eClassifiers>
+
+  <!-- 4: Enum RootStatus with one literal -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RootStatus">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+  </eClassifiers>
+
+  <!-- 5: EClass StatusHolder with several attributes using different primitive types -->
+  <eClassifiers xsi:type="ecore:EClass" name="StatusHolder">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="statusText"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="&quot;quoted&quot; value"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="threshold"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="3.14"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="statusEnum"
+                         eType="//@eClassifiers.4"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="ACTIVE"/>
+  </eClassifiers>
+
+</ecore:EPackage>

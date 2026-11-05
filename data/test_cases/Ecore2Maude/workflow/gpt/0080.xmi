@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="testpkg"
+    nsURI="http://test/pkg"
+    nsPrefix="tp">
+  <!-- Root package with one subpackage -->
+  <eSubpackages name="subpkg"
+                nsURI="http://test/sub"
+                nsPrefix="tpsub">
+    <!-- Class in subpackage, used as supertype to trigger createSort -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubSuper">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subAttr"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           lowerBound="0"
+                           upperBound="-1"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifier 0: a simple enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+  </eClassifiers>
+
+  <!-- Classifier 1: a simple data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="MyStringType"
+                instanceTypeName="java.lang.String"/>
+
+  <!-- Classifier 2: another enum used as attribute type -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Size">
+    <eLiterals name="SMALL" value="0" literal="SMALL"/>
+    <eLiterals name="LARGE" value="1" literal="LARGE"/>
+  </eClassifiers>
+
+  <!-- Classifier 3: base class, no supertype -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseClass" abstract="false">
+    <!-- Primitive attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="nameAttr"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="defaultName"
+                         iD="true"/>
+    <!-- Enum-typed attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="sizeAttr"
+                         eType="//@eClassifiers.2"
+                         lowerBound="0"
+                         upperBound="1"/>
+  </eClassifiers>
+
+  <!-- Classifier 4: derived class with supertype from subpackage to trigger createSort -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="DerivedClass"
+                abstract="true">
+    <eSuperTypes>//@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+    <!-- Reference to BaseClass with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="toBase"
+                         eType="//@eClassifiers.3"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"/>
+  </eClassifiers>
+
+  <!-- Classifier 5: class with bidirectional references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Owner">
+    <!-- Containment reference to Item, opposite set below -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="items"
+                         eType="//@eClassifiers.6"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Classifier 6: class with opposite reference back to Owner -->
+  <eClassifiers xsi:type="ecore:EClass" name="Item">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         eType="//@eClassifiers.5"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+</ecore:EPackage>

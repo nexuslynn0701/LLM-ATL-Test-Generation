@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <!-- Index 0: Root CPL with subAction, incoming, outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction that will be referenced by SubCall below -->
+    <subActions id="sub1">
+      <!-- Contents is the simple Proxy at elements[1] -->
+      <contents xmi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="parallel">
+        <!-- Simple proxy: all outcome branches undefined -->
+      </contents>
+    </subActions>
+    <!-- Outgoing with complex Proxy (uses Location to trigger Location2URIConstant via Proxy2Return/Proxy2Select) -->
+    <outgoing>
+      <contents xmi:type="CPL:Proxy" timeout="20" recurse="no" ordering="sequential">
+        <!-- Not simple proxy: all branches present -->
+        <busy>
+          <!-- Busy contents: SubCall (triggers SubCall2Return inside Busy2SelectCase) -->
+          <contents xmi:type="CPL:SubCall" ref="sub1"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <!-- Default contents: the simple Proxy from elements[1] -->
+          <contents xmi:type="CPL:Proxy" timeout="15" recurse="yes" ordering="parallel"/>
+        </default>
+      </contents>
+    </outgoing>
+    <!-- Incoming with Redirect (trigger Redirect2Return and Location2URIConstant through Location child) -->
+    <incoming>
+      <contents xmi:type="CPL:Redirect" permanent="true">
+        <!-- Redirect's Location child provides locations for Contact URI -->
+        <contents xmi:type="CPL:Location" url="sip:redirect@example.com" priority="1" clear="true"/>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- Index 1: Simple Proxy used as statement and to trigger Location2URIConstant via Location inside SubAction contents -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+    <!-- Simple proxy (no busy/noAnswer/redirection/failure/default) with a Location child -->
+    <default>
+      <contents xmi:type="CPL:Location" url="sip:proxy@example.com" priority="1" clear="true"/>
+    </default>
+  </elements>
+
+  <!-- Index 2: Location top-level to also trigger Location2URIConstant through SubAction contents (not used as statement) -->
+  <elements xsi:type="CPL:Location" url="sip:top@example.com" priority="2" clear="false"/>
+
+  <!-- Index 3: AddressSwitch with SwitchedAddress (triggers AddressSwitch2SelectStat and SwitchedAddress2SelectCase) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1" contains="cont1" subDomainOf="subd1">
+      <!-- SwitchedAddress contents: SubCall, exercising SubCall2Return via SwitchedAddress2SelectCase -->
+      <contents xsi:type="CPL:SubCall" ref="sub1"/>
+    </addresses>
+    <notPresent/>
+    <otherwise>
+      <!-- Otherwise contents: simple Proxy -->
+      <contents xmi:type="CPL:Proxy" timeout="40" recurse="yes" ordering="parallel"/>
+    </otherwise>
+  </elements>
+
+  <!-- Index 4: StringSwitch (triggers StringSwitch2SelectStat) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField">
+    <!-- No specific strings needed; rule uses only field name -->
+  </elements>
+
+  <!-- Index 5: LanguageSwitch with NotPresent (triggers NotPresent2ErrorResponse) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- Index 6: TimeSwitch (unused contents to avoid statements) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="TZ1" tzurl="http://tz.example.com">
+    <!-- No times; presence alone is enough to test Type filtering in statements -->
+  </elements>
+
+  <!-- Index 7: PrioritySwitch (unused contents to avoid statements) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <!-- No priorities -->
+  </elements>
+
+  <!-- Index 8: Redirect top-level (permanent=false) with Location child to trigger Redirect2Return and Location2URIConstant -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xmi:type="CPL:Location" url="sip:redirect2@example.com" priority="3" clear="true"/>
+  </elements>
+
+  <!-- Index 9: Reject top-level (not used in statements, but valid) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+</CPL:CPLModel>

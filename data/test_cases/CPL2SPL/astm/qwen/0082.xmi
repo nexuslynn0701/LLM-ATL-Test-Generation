@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmi:id="cpl_root">
+    <subActions id="mainAction" xmi:id="sub_main">
+      <contents xsi:type="CPL:AddressSwitch" field="origin" xmi:id="addr_switch">
+        <addresses is="alice@example.com" xmi:id="addr_case1">
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential" xmi:id="proxy_simple"/>
+        </addresses>
+        <notPresent xmi:id="not_present"/>
+        <otherwise xmi:id="otherwise_block">
+          <contents xsi:type="CPL:Reject" status="403" reason="Forbidden" xmi:id="reject_otherwise"/>
+        </otherwise>
+      </contents>
+    </subActions>
+    <incoming xmi:id="incoming_entry">
+      <contents xsi:type="CPL:StringSwitch" field="user-agent" xmi:id="string_switch">
+        <strings is="MobileClient" xmi:id="string_case">
+          <contents xsi:type="CPL:SubCall" ref="mainAction" xmi:id="subcall_inside"/>
+        </strings>
+        <otherwise xmi:id="string_otherwise">
+          <contents xsi:type="CPL:Redirect" permanent="true" xmi:id="redirect_permanent"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing xmi:id="outgoing_entry">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" xmi:id="proxy_complex">
+        <busy xmi:id="busy_handler">
+          <contents xsi:type="CPL:Location" url="sip:busy@voicemail.com" clear="yes" xmi:id="loc_busy"/>
+        </busy>
+        <noAnswer xmi:id="noanswer_handler">
+          <contents xsi:type="CPL:Location" url="sip:noanswer@voicemail.com" clear="yes" xmi:id="loc_noanswer"/>
+        </noAnswer>
+        <redirection xmi:id="redir_handler">
+          <contents xsi:type="CPL:Location" url="sip:redirect@backup.com" clear="no" xmi:id="loc_redir"/>
+        </redirection>
+        <failure xmi:id="failure_handler"/>
+        <default xmi:id="default_handler">
+          <contents xsi:type="CPL:Location" url="sip:default@fallback.com" clear="yes" xmi:id="loc_default"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:proxy-target@example.com" clear="yes" xmi:id="loc_proxy_target"/>
+</CPL:CPLModel>

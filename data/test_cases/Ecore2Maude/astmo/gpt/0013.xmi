@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMM"
+    nsURI="http://example.org/rootMM"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="innerPkg"
+                nsURI="http://example.org/rootMM/inner"
+                nsPrefix="inner">
+    <!-- Class in subpackage with supertype from root package -->
+    <eClassifiers xsi:type="ecore:EClass" name="InnerClass">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="flag"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                           iD="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- EDataType to exercise non-primitive datatype handling -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomNumber"/>
+
+  <!-- Two EClasses in root package -->
+  <eClassifiers xsi:type="ecore:EClass" name="Base">
+    <!-- Attribute with String type, default value, non-ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"
+                         defaultValueLiteral="untitled"/>
+    <!-- Reference with containment, upperBound -1, no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="items"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"
+                         containment="true"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Derived"
+                eSuperTypes="//@eClassifiers.1">
+    <!-- Attribute with custom EDataType, is ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.0"
+                         iD="true"/>
+    <!-- Non-containment reference with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="baseRef"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- Enumeration with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="KindEnum">
+    <eLiterals name="FIRST" value="0" literal="FIRST"/>
+    <eLiterals name="SECOND" value="1" literal="SECOND"/>
+  </eClassifiers>
+
+  <!-- Class that uses the enumeration and links to InnerClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Holder">
+    <!-- Attribute of enum type, with default literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="mode"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.3"/>
+    <!-- Reference to subpackage class, non-containment, no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="innerLink"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         containment="false"/>
+  </eClassifiers>
+
+</ecore:EPackage>

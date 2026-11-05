@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction whose contents is a simple Proxy using a Location -->
+    <subActions>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+
+    <!-- Outgoing whose contents is a complex Proxy using the same Location -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <!-- complex proxy: all branches present -->
+        <busy>
+          <!-- Busy contents: SubCall, so Busy2SelectCase + SubCall2Return -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- default branch: SubCall again -->
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </default>
+      </contents>
+    </outgoing>
+
+    <!-- Incoming whose contents is a SubCall to the SubAction -->
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </incoming>
+  </elements>
+
+  <!-- Location used by both Proxies to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true">
+    <!-- No nested contents: statement helper returns OclUndefined -->
+  </elements>
+
+  <!-- SubCall not used as contents (top-level SubCall only) -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+</CPL:CPLModel>

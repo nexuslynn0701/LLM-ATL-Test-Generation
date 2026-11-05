@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL as first top-level element -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <!-- SubAction contents: simple Proxy using the Location below -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <default contents="//@elements.2"/>
+      </contents>
+    </subActions>
+    <incoming>
+      <!-- Incoming contents: simple Proxy using the same Location -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <default contents="//@elements.2"/>
+      </contents>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing contents: complex Proxy with full error handling and AddressSwitch -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <addresses is="addr1" contains="x" subDomainOf="y">
+              <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+                <default contents="//@elements.2"/>
+              </contents>
+            </addresses>
+            <addresses is="addr2" contains="y" subDomainOf="z"/>
+            <notPresent>
+              <contents xsi:type="CPL:Reject" status="405" reason="method-not-allowed"/>
+            </notPresent>
+            <otherwise>
+              <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+                <default contents="//@elements.2"/>
+              </contents>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- SubCall body referenced by SubCall and several Proxies -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- Location used by Proxies to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:example@domain.com" clear="true" priority="1"/>
+
+  <!-- Additional Redirect to exercise Redirect2Return with location -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- Additional AddressSwitch (destination) to add more SwitchedAddress cases -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses is="addr3" contains="a" subDomainOf="b">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <default contents="//@elements.2"/>
+      </contents>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:Reject" status="486" reason="busy-here"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <default contents="//@elements.2"/>
+      </contents>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

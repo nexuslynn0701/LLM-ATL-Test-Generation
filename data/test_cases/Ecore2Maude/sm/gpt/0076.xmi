@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.org/companyModel"
+    nsPrefix="cmp">
+
+  <!-- 0: Primitive-like datatypes -->
+  <eClassifiers xsi:type="ecore:EDataType" name="EStringAlias" instanceClassName="java.lang.String"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="EIntAlias" instanceClassName="int"/>
+
+  <!-- 2: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmploymentType">
+    <eLiterals name="FULL_TIME" value="0" literal="FULL_TIME"/>
+    <eLiterals name="PART_TIME" value="1" literal="PART_TIME"/>
+    <eLiterals name="CONTRACTOR" value="2" literal="CONTRACTOR"/>
+  </eClassifiers>
+
+  <!-- 3: Root class Company -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments" upperBound="-1"
+        containment="true" eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="allEmployees" upperBound="-1"
+        containment="true" eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 4: Department subclass of NamedElement-like -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees" upperBound="-1"
+        containment="true" eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parentCompany"
+        eType="//@eClassifiers.3" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 5: Employee base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="empId" lowerBound="1" iD="true"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="firstName" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="lastName" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="employmentType" lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.5" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 6: Manager subclass of Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Manager" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="level"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="teamMembers" upperBound="-1"
+        eType="//@eClassifiers.5" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 7: Project class referencing Department and Employees -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="projectId" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ownerDepartment"
+        eType="//@eClassifiers.4" containment="false" resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignedEmployees" upperBound="-1"
+        eType="//@eClassifiers.5" containment="false" resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="leadManager"
+        eType="//@eClassifiers.6" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 8: Address datatype-containing class used as containment -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="street" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="city" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="zip"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 9: Office class, contained by Company and referencing Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Office" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="officeCode" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="location" containment="true"
+        eType="//@eClassifiers.8"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="company"
+        eType="//@eClassifiers.3" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 10: ExtendedCompany subclass of Company adding projects and offices -->
+  <eClassifiers xsi:type="ecore:EClass" name="ExtendedCompany" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects" upperBound="-1"
+        containment="true" eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="offices" upperBound="-1"
+        containment="true" eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+</ecore:EPackage>

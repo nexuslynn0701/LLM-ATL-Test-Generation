@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: main CPL root exercising Incoming/Outgoing/SubActions -->
+  <elements xsi:type="CPL:CPL"/>
+
+  <!-- elements[1]: Location used directly at top level (for locations helper chain) -->
+  <elements xsi:type="CPL:Location" url="sip:top-location@example.com" priority="1" clear="true"/>
+
+  <!-- elements[2]: SubCall referring plain string -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- elements[3]: Redirect (non-permanent) with nested Location -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:redirect@example.com" clear="true"/>
+  </elements>
+
+  <!-- elements[4]: AddressSwitch with SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="from-field">
+    <addresses is="user1@example.com" contains="u1" subDomainOf="example.com">
+      <!-- SwitchedAddress contents: simple Proxy to exercise nested Location again -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:u1@example.com" clear="true"/>
+        </default>
+      </contents>
+    </addresses>
+    <notPresent>
+      <!-- NotPresent with Failure as contents -->
+      <contents xsi:type="CPL:Failure"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise contents is a SubCall (top-level elements[2]) -->
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[5]: Proxy (complex) with full set of branches -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- Busy branch with SubCall contents -->
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </busy>
+    <!-- NoAnswer branch with Redirect contents -->
+    <noAnswer>
+      <contents xsi:type="CPL:Redirect" permanent="true">
+        <contents xsi:type="CPL:Location" url="sip:noanswer@example.com" clear="true"/>
+      </contents>
+    </noAnswer>
+    <!-- Redirection branch with Location contents -->
+    <redirection>
+      <contents xsi:type="CPL:Location" url="sip:redirection@example.com" clear="true"/>
+    </redirection>
+    <!-- Failure branch with no contents -->
+    <failure/>
+    <!-- Default branch with SubCall contents -->
+    <default>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </default>
+  </elements>
+
+  <!-- elements[6]: StringSwitch (field name is arbitrary) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField">
+    <strings is="match1" contains="text1">
+      <!-- StringSwitch branch contents: simple Proxy with Location -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:string-switch@example.com" clear="true"/>
+        </default>
+      </contents>
+    </strings>
+  </elements>
+
+  <!-- elements[7]: LanguageSwitch with NotPresent only (to keep simple) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- elements[8]: PrioritySwitch just to be present; no contents -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+
+  <!-- elements[9]: TimeSwitch to appear but without contents -->
+  <elements xsi:type="CPL:TimeSwitch"/>
+
+</CPL:CPLModel>

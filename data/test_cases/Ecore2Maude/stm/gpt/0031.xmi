@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyHierarchy"
+    nsURI="http://example.org/companyHierarchy"
+    nsPrefix="ch">
+
+  <!-- 0: EClass Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="deptName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- containment of teams -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="teams"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+    <!-- containment of projects -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 1: EClass Team -->
+  <eClassifiers xsi:type="ecore:EClass" name="Team">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="teamName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- non-containment cross reference to Department -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <!-- containment of employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 2: EClass Project -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- cross reference to Team (owning team) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owningTeam"
+        eType="//@eClassifiers.1"/>
+    <!-- cross reference to many Employees (participants) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="participants"
+        upperBound="-1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 3: EClass Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="empId"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- non-containment reference to Team -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 4: EClass Resource (abstract super type for Person, Asset) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Resource" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="identifier"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 5: EClass Person extends Resource -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 6: EClass Asset extends Resource -->
+  <eClassifiers xsi:type="ecore:EClass" name="Asset"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="assetTag"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 7: EEnum Role -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Role">
+    <eLiterals name="DEV" value="0" literal="DEV"/>
+    <eLiterals name="LEAD" value="1" literal="LEAD"/>
+    <eLiterals name="MANAGER" value="2" literal="MANAGER"/>
+  </eClassifiers>
+
+  <!-- 8: EDataType Level (custom integer type) -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Level"
+      instanceClassName="int"/>
+
+  <!-- 9: EClass Assignment uses Role enum and Level data type -->
+  <eClassifiers xsi:type="ecore:EClass" name="Assignment">
+    <!-- reference to Employee -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignee"
+        lowerBound="1"
+        eType="//@eClassifiers.3"/>
+    <!-- reference to Project -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project"
+        lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <!-- enum-typed attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        lowerBound="1"
+        eType="//@eClassifiers.7"/>
+    <!-- custom data type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="seniority"
+        eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+</ecore:EPackage>

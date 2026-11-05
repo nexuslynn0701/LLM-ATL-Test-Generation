@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="RootMM"
+    nsURI="http://rootmm/1.0"
+    nsPrefix="rootmm">
+
+  <!-- Subpackage so that eSuperPackage / eSubpackages and PackEqSupPackage / PackEqSubPackages are exercised -->
+  <eSubpackages name="SubPkg"
+                nsURI="http://rootmm/sub"
+                nsPrefix="sub">
+    <!-- Class in subpackage, to exercise nested package names in maudeName -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubEntity">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subCode"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                           iD="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- EClass 0 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- Attribute 0: String, default, iD=true -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"
+                         defaultValueLiteral="&quot;unknown&quot;"/>
+    <!-- Attribute 1: Boolean -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         iD="false"/>
+    <!-- Reference 0: multi-valued, containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="addresses"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"
+                         containment="true"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- EClass 1 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- Attribute 0: Integer -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="number"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         iD="false"/>
+    <!-- Attribute 1: String with quotes in default to exercise escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="street"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"
+                         defaultValueLiteral="&quot;Main&quot; Street"/>
+    <!-- Reference 0: non-containment, many, opposite, to exercise maudeMaybeRefSort with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.0"
+                         containment="false"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- EEnum 2 -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="OLD" value="1" literal="OLD"/>
+  </eClassifiers>
+
+  <!-- EClass 3: uses enum Status -->
+  <eClassifiers xsi:type="ecore:EClass" name="Order">
+    <!-- Attribute 0: enum-typed -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.2"
+                         iD="false"/>
+    <!-- Attribute 1: String without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="description"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"/>
+  </eClassifiers>
+
+  <!-- Extra EDataType 4 (not one of EMF intrinsics) to exercise @DataType in attDataType default case -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="CustomData"
+                instanceClassName="com.example.Custom"/>
+
+  <!-- EClass 5: exercises EDataType-based attribute mapping to @DataType -->
+  <eClassifiers xsi:type="ecore:EClass" name="MetaInfo">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="payload"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.4"
+                         iD="false"/>
+  </eClassifiers>
+
+</ecore:EPackage>

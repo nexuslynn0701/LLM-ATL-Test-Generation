@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="universityModel"
+    nsURI="http://example.org/university"
+    nsPrefix="univ">
+
+  <!-- 0: Primitive alias type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Code"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum for semester kinds -->
+  <eClassifiers xsi:type="ecore:EEnum" name="SemesterKind">
+    <eLiterals name="FALL" value="0" literal="FALL"/>
+    <eLiterals name="SPRING" value="1" literal="SPRING"/>
+    <eLiterals name="SUMMER" value="2" literal="SUMMER"/>
+  </eClassifiers>
+
+  <!-- 2: Root container -->
+  <eClassifiers xsi:type="ecore:EClass" name="University">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments" upperBound="-1"
+        containment="true" eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 3: Department with non-containment and containment refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- container back-reference -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="university"
+        eType="//@eClassifiers.2" containment="false"/>
+    <!-- cross-department collaborations -->
+    <eStructuralFeatures xsi:type="eccore:EReference" name="partners" upperBound="-1"
+        eType="//@eClassifiers.3" containment="false"/>
+    <!-- contained elements -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="programs" upperBound="-1"
+        containment="true" eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="staff" upperBound="-1"
+        containment="true" eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 4: Abstract Program, super of Bachelor/Master -->
+  <eClassifiers xsi:type="ecore:EClass" name="Program" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="durationYears"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.3" containment="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="courses" upperBound="-1"
+        containment="true" eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 5: Course with references to staff and prerequisites -->
+  <eClassifiers xsi:type="ecore:EClass" name="Course">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="credits"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="program"
+        eType="//@eClassifiers.4" containment="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lecturer"
+        eType="//@eClassifiers.6" containment="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assistants" upperBound="-1"
+        eType="//@eClassifiers.6" containment="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="prerequisites" upperBound="-1"
+        eType="//@eClassifiers.5" containment="false"/>
+  </eClassifiers>
+
+  <!-- 6: Staff, super of Professor and TA -->
+  <eClassifiers xsi:type="ecore:EClass" name="Staff" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullName" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.3" containment="false"/>
+  </eClassifiers>
+
+  <!-- 7: Professor, subclass of Staff -->
+  <eClassifiers xsi:type="ecore:EClass" name="Professor" eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tenured"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 8: TeachingAssistant, subclass of Staff -->
+  <eClassifiers xsi:type="ecore:EClass" name="TeachingAssistant" eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="hoursPerWeek"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 9: Concrete BachelorProgram -->
+  <eClassifiers xsi:type="ecore:EClass" name="BachelorProgram" eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="honours"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 10: Concrete MasterProgram -->
+  <eClassifiers xsi:type="ecore:EClass" name="MasterProgram" eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="researchOriented"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 11: Semester with enum usage and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Semester">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="year"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="offeredCourses" upperBound="-1"
+        eType="//@eClassifiers.5" containment="false"/>
+  </eClassifiers>
+
+</ecore:EPackage>

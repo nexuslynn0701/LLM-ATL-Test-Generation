@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one outgoing and one incoming, each pointing to a complex Proxy -->
+  <elements xsi:type="CPL:CPL">
+    <subActions>
+      <!-- sa_main: points to outgoingProxy (elements[3]) -->
+      <subActions xsi:type="CPL:SubAction" id="sa_main">
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+          <busy/>
+          <noAnswer/>
+          <redirection/>
+          <failure/>
+          <default contents="//@elements.5"/>
+        </contents>
+      </subActions>
+      <!-- sa_aux: points to redirectNode (elements[6]) -->
+      <subActions xsi:type="CPL:SubAction" id="sa_aux">
+        <contents xsi:type="CPL:Redirect" permanent="true"/>
+      </subActions>
+    </subActions>
+    <outgoing>
+      <!-- Outgoing method will use outgoingProxy as its statement -->
+      <outgoing xsi:type="CPL:Outgoing">
+        <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+          <busy/>
+          <noAnswer/>
+          <redirection/>
+          <failure/>
+          <default contents="//@elements.5"/>
+        </contents>
+      </outgoing>
+    </outgoing>
+    <incoming>
+      <!-- Incoming method will also use outgoingProxy as its statement -->
+      <incoming xsi:type="CPL:Incoming">
+        <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+          <busy/>
+          <noAnswer/>
+          <redirection/>
+          <failure/>
+          <default contents="//@elements.5"/>
+        </contents>
+      </incoming>
+    </incoming>
+  </elements>
+
+  <!-- Simple Proxy used inside Busy/NoAnswer/Redirection and Default, with a Location -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default>
+      <contents xsi:type="CPL:Location" url="sip:inner@example.com" clear="yes"/>
+    </default>
+  </elements>
+
+  <!-- Busy handling a simple Proxy (innerSimpleProxy) -->
+  <elements xsi:type="CPL:Busy">
+    <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+      <busy/>
+      <noAnswer/>
+      <redirection/>
+      <failure/>
+      <default>
+        <contents xsi:type="CPL:Location" url="sip:busy@example.com" clear="yes"/>
+      </default>
+    </contents>
+  </elements>
+
+  <!-- Complex Proxy used by outgoing and incoming of the CPL -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.6"/>
+  </elements>
+
+  <!-- AddressSwitch with SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses>
+      <addresses xsi:type="CPL:SwitchedAddress" is="alice">
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+          <busy/>
+          <noAnswer/>
+          <redirection/>
+          <failure/>
+          <default contents="//@elements.1"/>
+        </contents>
+      </addresses>
+      <addresses xsi:type="CPL:SwitchedAddress" is="bob">
+        <contents xsi:type="CPL:SubCall" ref="sa_aux"/>
+      </addresses>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:other@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- Redirect used by AddressSwitch.default and sa_aux via SubCall -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+</CPL:CPLModel>

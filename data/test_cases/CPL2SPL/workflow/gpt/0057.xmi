@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- Top-level CPL root -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction whose contents is a simple Proxy -->
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="true" ordering="parallel">
+        <!-- Simple proxy: no outcome handlers -->
+        <!-- Location inside proxy so Location2URIConstant is triggered -->
+        <contents xsi:type="CPL:Location" url="sip:user1@example.com" clear="yes" priority="1"/>
+      </contents>
+    </subActions>
+    <!-- Outgoing referencing the same simple Proxy as statement -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" timeout="5" recurse="false" ordering="parallel">
+        <!-- This proxy reuses the CPL locations of the CPL root (empty),
+             but has its own inner Location so Location2URIConstant is used again -->
+        <contents xsi:type="CPL:Location" url="sip:user2@example.org" clear="no" priority="2"/>
+      </contents>
+    </outgoing>
+    <!-- Incoming using a Redirect whose Location is top-level element -->
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </incoming>
+  </elements>
+
+  <!-- Top-level Location used by Redirect (invokes Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.net" clear="yes" priority="3"/>
+
+  <!-- Top-level Redirect that will use the above Location via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- Top-level SubCall that refers to sa1 -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- Top-level Proxy (complex) exercising Busy/NoAnswer/Redirection/Failure/Default chain -->
+  <elements xsi:type="CPL:Proxy" timeout="20" recurse="loop" ordering="sequential">
+    <busy>
+      <!-- Busy contents is a SubCall (mapped to ReturnStat + FunctionCall) -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <!-- Default contents is the AddressSwitch below -->
+    <default contents="//@elements.6"/>
+  </elements>
+
+  <!-- Top-level AddressSwitch with SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- One SwitchedAddress with a simple Proxy as contents (Location2URIConstant via Location) -->
+    <addresses is="sip:case1@example.com" contains="foo" subDomainOf="example.com">
+      <contents xsi:type="CPL:Proxy" timeout="30" recurse="deep" ordering="parallel">
+        <!-- this proxy is simple and has a Location as contents -->
+        <contents xsi:type="CPL:Location" url="sip:case1dest@example.com" clear="yes" priority="4"/>
+      </contents>
+    </addresses>
+    <!-- NotPresent arm with no contents -->
+    <notPresent/>
+    <!-- Otherwise arm with a Redirect as contents -->
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </otherwise>
+  </elements>
+
+  <!-- Top-level StringSwitch (just to follow metamodel; its rule creates a VariableDeclaration) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField">
+    <strings is="value1" contains="val">
+      <!-- SwitchedString contents left undefined -->
+    </strings>
+  </elements>
+
+  <!-- Top-level LanguageSwitch with NotPresent (mapped to RedirectionErrorResponse USE_PROXY) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- Top-level PrioritySwitch with no contents (only to exercise its presence) -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+</CPL:CPLModel>

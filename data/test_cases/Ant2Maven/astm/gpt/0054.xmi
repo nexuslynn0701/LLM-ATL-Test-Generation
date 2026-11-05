@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntBuild"
+    basedir="src/main/java"
+    description="Comprehensive Ant build with multiple targets and tasks."
+    default="mainTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target/build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by any task, as required) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target -->
+  <targets xmi:id="mainTarget" name="mainTarget" description="Main build pipeline">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true">
+      <!-- InExcludes directly under Javac -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+      <!-- ClassPath with nested PathElement and FileSet -->
+      <classPath refid="compile.classpath">
+        <pathElement path="lib/runtime" location="lib/runtime/library.jar"/>
+        <fileset dir="lib/optional">
+          <include name="**/*.jar"/>
+          <exclude name="**/*-sources.jar"/>
+          <patternset>
+            <inexcludes xsi:type="Ant:IncludesFile" name="include.list"/>
+            <inexcludes xsi:type="Ant:ExcludesFile" name="exclude.list"/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Create main JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/artifacts/app-main.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Application API"/>
+  </targets>
+
+  <!-- Auxiliary target: manage directories and filtered copy -->
+  <targets xmi:id="prepTarget" name="prepTarget" description="Prepare directories and resources">
+    <!-- Make directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/build"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/site"/>
+
+    <!-- Copy resources with FileSet, FilterSet, Mapper and nested helpers -->
+    <tasks xsi:type="Ant:Copy" todir="target/build/resources" overwrite="true">
+      <fileset dir="src/main/resources">
+        <include name="**/*.*"/>
+        <exclude name="**/*.tmp"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="app.name" value="ComplexAntBuild"/>
+        <filter token="app.env" value="production"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.template" to="*.cfg" classname="org.apache.tools.ant.util.GlobPatternMapper"/>
+    </tasks>
+
+    <!-- Clean temporary files -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           excludes="**/*.keep"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Path definition (contained from Project via 'path') -->
+  <path id="build.path">
+    <pathElement path="lib/build" location="lib/build/build-tool.jar"/>
+    <fileset dir="lib/build-extensions">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+</Ant:Project>

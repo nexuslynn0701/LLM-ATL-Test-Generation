@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: CPL root -->
+  <elements xsi:type="CPL:CPL">
+    <subActions>
+      <!-- SubAction SA1: simple proxy via Location (no statements) -->
+      <subActions id="SA1">
+        <contents xsi:type="CPL:Location" url="sip:sa1@example.com" clear="yes"/>
+      </subActions>
+      <!-- SubAction SA2: SubCall to SA1 -->
+      <subActions id="SA2">
+        <contents xsi:type="CPL:SubCall" ref="SA1"/>
+      </subActions>
+      <!-- SubAction SA3: simple Proxy (no error branches) -->
+      <subActions id="SA3">
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+          <!-- simple proxy: no busy/noAnswer/redirection/failure/default children -->
+        </contents>
+      </subActions>
+      <!-- SubAction SA4: complex Proxy using external Location and leaves -->
+      <subActions id="SA4">
+        <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+          <busy contents="//@elements.6"/>
+          <noAnswer/>
+          <redirection/>
+          <failure/>
+          <default contents="//@elements.5"/>
+        </contents>
+      </subActions>
+    </subActions>
+
+    <!-- Incoming and Outgoing for Dialog / methods -->
+    <incoming>
+      <!-- 1 Incoming: contents is a simple Proxy (no branches) -->
+      <incoming>
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+          <!-- simple proxy -->
+        </contents>
+      </incoming>
+    </incoming>
+    <outgoing>
+      <!-- 1 Outgoing: contents is a Proxy with only busy branch (non-simple) -->
+      <outgoing>
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+          <busy/>
+        </contents>
+      </outgoing>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location for Proxy in SA4 and Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:proxy4@example.org" priority="1" clear="no"/>
+
+  <!-- 2: Redirect using Location 1 -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 3: AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="userA" contains="boxA" subDomainOf="example.com"/>
+    <addresses is="userB" contains="boxB" subDomainOf="example.net">
+      <!-- contents: SubCall to SA2 -->
+      <contents xsi:type="CPL:SubCall" ref="SA2"/>
+    </addresses>
+    <notPresent/>
+    <otherwise>
+      <!-- contents: simple Proxy using Location 4 -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+    </otherwise>
+  </elements>
+
+  <!-- 4: Location used by Otherwise->Proxy -->
+  <elements xsi:type="CPL:Location" url="sip:default@example.net" priority="5" clear="yes"/>
+
+  <!-- 5: SubCall used by SA4.default (ref to SA3) -->
+  <elements xsi:type="CPL:SubCall" ref="SA3"/>
+
+  <!-- 6: Busy used by SA4.busy, contents Redirect (2) -->
+  <elements xsi:type="CPL:Busy">
+    <contents xsi:type="CPL:Redirect" permanent="false"/>
+  </elements>
+
+  <!-- 7: StringSwitch (for R16) -->
+  <elements xsi:type="CPL:StringSwitch" field="hdrField">
+    <strings is="alpha" contains="x"/>
+    <strings is="beta" contains="y"/>
+  </elements>
+
+  <!-- 8: LanguageSwitch (no statements) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="es"/>
+  </elements>
+
+  <!-- 9: TimeSwitch (no statements) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz">
+    <times dtstart="20260101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 10: PrioritySwitch (no statements) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.7" equal="0.5"/>
+  </elements>
+
+</CPL:CPLModel>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with both incoming and outgoing and a complex Proxy in subActions -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="subA1">
+      <!-- SubAction contents is a complex Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- Complex proxy has all branches, so R8, R9-12 applied -->
+        <busy>
+          <!-- Busy contents is a simple Proxy (R7) -->
+          <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+            <default>
+              <!-- Default contents is a SubCall, will trigger R13 inside R12 -->
+              <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+            </default>
+          </contents>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents is Redirect (R14 inside R10) -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents is a complex Proxy again -->
+          <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default/>
+          </contents>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default contents is Reject (filtered to empty in R12) -->
+          <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Incoming and Outgoing use SubCall contents to exercise R3, R4, R13 -->
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:SubCall" ref="sa_helper"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: SubAction referenced by SubCall ref="sa_main" -->
+  <elements xsi:type="CPL:SubAction" id="sa_main">
+    <!-- contents is a simple Proxy, giving R2 + R7 -->
+    <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+      <!-- simple proxy: no branches -->
+    </contents>
+  </elements>
+
+  <!-- 2: SubAction referenced by SubCall ref="sa_helper" -->
+  <elements xsi:type="CPL:SubAction" id="sa_helper">
+    <!-- contents is a Location (filtered to empty statements in R2) -->
+    <contents xsi:type="CPL:Location" url="sip:helper@example.com" clear="yes" priority="5"/>
+  </elements>
+
+  <!-- 3: Top-level Location for global URI (used by proxies and redirect via locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" clear="yes" priority="1"/>
+
+  <!-- 4: Top-level Redirect, to trigger R14 -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 5: AddressSwitch with SwitchedAddress children and NotPresent/Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="sip:user1@example.com" contains="" subDomainOf="">
+      <!-- SwitchedAddress contents is a simple Proxy so R17 + R7 -->
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential"/>
+    </addresses>
+    <addresses is="sip:user2@example.com" contains="" subDomainOf="">
+      <!-- SwitchedAddress contents is Reject, so R17 with empty statements -->
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+    </addresses>
+    <notPresent>
+      <!-- NotPresent triggers R6 -->
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise contents is a SubCall so R18 + R13 -->
+      <contents xsi:type="CPL:SubCall" ref="sa_helper"/>
+    </otherwise>
+  </elements>
+
+  <!-- 6: StringSwitch to trigger R16 -->
+  <elements xsi:type="CPL:StringSwitch" field="event-type">
+    <!-- strings are not used by ATL rules; omitted to keep model small -->
+  </elements>
+
+  <!-- 7: LanguageSwitch (only used to test the 'filtered out' branch in various rules) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <!-- contents is a simple Proxy but will be filtered to empty where checked -->
+    <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel"/>
+  </elements>
+
+  <!-- 8: TimeSwitch to exercise filter branch and SwitchedTime attributes -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com">
+    <times dtstart="20260101T000000Z" dtend="20261231T235959Z" duration="P1D"
+           freq="DAILY" until="20261231T235959Z" count="365" interval="1"
+           bySecond="0" byMinute="0" byHour="8" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1" byYearDay="1" byWeekNo="1" byMonth="1"
+           wkst="MO" bySetPos="1">
+      <!-- SwitchedTime contents is Default, filtered in many rules -->
+      <contents xsi:type="CPL:Default"/>
+    </times>
+  </elements>
+
+  <!-- 9: PrioritySwitch (only to hit filtering cases and attributes) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+      <failure/>
+    </contents>
+  </elements>
+
+</CPL:CPLModel>

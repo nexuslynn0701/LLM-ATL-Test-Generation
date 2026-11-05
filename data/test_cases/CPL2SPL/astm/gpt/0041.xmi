@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.5" id="saA"/>
+    <subActions contents="//@elements.6" id="saB"/>
+    <outgoing/>
+    <incoming/>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy -->
+  <elements xsi:type="CPL:Location" url="sip:user1@example.com" clear="yes" priority="10"/>
+
+  <!-- 2: Location used by Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:newdest@example.org" clear="no" priority="5"/>
+
+  <!-- 3: Simple Proxy (isSimple = true) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <default contents="//@elements.7"/>
+  </elements>
+
+  <!-- 4: Complex Proxy (isSimple = false: all branches present) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <busy contents="//@elements.8"/>
+    <noAnswer contents="//@elements.9"/>
+    <redirection contents="//@elements.10"/>
+    <failure contents="//@elements.11"/>
+    <default contents="//@elements.12"/>
+  </elements>
+
+  <!-- 5: SubCall inside SubAction saA -->
+  <elements xsi:type="CPL:SubCall" ref="saB"/>
+
+  <!-- 6: Redirect inside SubAction saB -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 7: Reject (reached via simple Proxy default) -->
+  <elements xsi:type="CPL:Reject" status="603" reason="Decline"/>
+
+  <!-- 8: AddressSwitch inside Busy branch (contents: simple Proxy) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses contents="//@elements.3" is="alice@example.net" contains="alice" subDomainOf="example.net"/>
+    <notPresent contents="//@elements.6"/>
+    <otherwise contents="//@elements.2"/>
+  </elements>
+
+  <!-- 9: StringSwitch inside NoAnswer branch (contents: Reject) -->
+  <elements xsi:type="CPL:StringSwitch" field="reason">
+    <strings contents="//@elements.7" is="timeout" contains="time"/>
+  </elements>
+
+  <!-- 10: LanguageSwitch inside Redirection branch (contents: Location) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages contents="//@elements.1" matches="en"/>
+  </elements>
+
+  <!-- 11: TimeSwitch inside Failure branch (contents: PrioritySwitch) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org/utc">
+    <times contents="//@elements.13"
+           dtstart="20240101T000000Z"
+           dtend="20241231T235959Z"
+           duration="3600"
+           freq="DAILY"
+           until="20241231T235959Z"
+           count="100"
+           interval="1"
+           bySecond="0"
+           byMinute="0"
+           byHour="9"
+           byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1"
+           byYearDay="1"
+           byWeekNo="1"
+           byMonth="1"
+           wkst="MO"
+           bySetPos="1"/>
+  </elements>
+
+  <!-- 12: SubCall inside Default branch (refers to saA) -->
+  <elements xsi:type="CPL:SubCall" ref="saA"/>
+
+  <!-- 13: PrioritySwitch (contents: Reject) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities contents="//@elements.7" less="0.5" equal="0.8" greater="1.0"/>
+  </elements>
+
+</CPL:CPLModel>

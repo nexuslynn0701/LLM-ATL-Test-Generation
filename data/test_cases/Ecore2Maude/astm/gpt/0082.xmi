@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="mm82Root"
+    nsURI="http://mm82/root"
+    nsPrefix="mm82r">
+
+  <!-- Subpackage with its own classifiers, to exercise super/sub package handling -->
+  <eSubpackages name="subPkgA" nsURI="http://mm82/subA" nsPrefix="mm82a">
+    <!-- Class in subpackage, no features, no supertypes (simple class) -->
+    <eClassifiers xsi:type="ecore:EClass" name="LeafA"/>
+    <!-- Enum in subpackage with three literals to exercise Enum-related rules and list operators -->
+    <eClassifiers xsi:type="ecore:EEnum" name="ColorMode">
+      <eLiterals name="LIGHT" value="0" literal="LIGHT"/>
+      <eLiterals name="DARK" value="1" literal="DARK"/>
+      <eLiterals name="AUTO" value="2" literal="AUTO"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root-level enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusFlag">
+    <eLiterals name="OK" value="0" literal="OK"/>
+    <eLiterals name="FAIL" value="1" literal="FAIL"/>
+  </eClassifiers>
+
+  <!-- Root-level classes -->
+  <!-- Class with no supertypes and no features -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseNode"/>
+
+  <!-- Class with one superclass and multiple attributes (including different datatypes and default values) -->
+  <eClassifiers xsi:type="ecore:EClass" name="DetailedNode" abstract="true" interface="false"
+                eSuperTypes="//@eClassifiers.1">
+    <!-- String ID attribute with default, marked as ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nodeId"
+        ordered="true" unique="true" lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true" defaultValueLiteral="N-001"/>
+    <!-- Boolean attribute with default false -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        ordered="true" unique="true" lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        iD="false" defaultValueLiteral="false"/>
+    <!-- Integer attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        ordered="true" unique="true" lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="false"/>
+    <!-- Enum attribute with default literal, to trigger enum default handling -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        ordered="true" unique="true" lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.0"
+        iD="false" defaultValueLiteral="OK"/>
+  </eClassifiers>
+
+  <!-- Class with two supertypes (BaseNode and DetailedNode) and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="CompositeNode" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.1 //@eClassifiers.2">
+    <!-- Containment reference to children, many, ordered, unique -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="children"
+        ordered="true" unique="true" lowerBound="0" upperBound="-1"
+        eType="//@eClassifiers.3"
+        containment="true" resolveProxies="true"/>
+    <!-- Non-containment reference to parent, single-valued, opposite of children -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parent"
+        ordered="true" unique="true" lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.3"
+        containment="false" resolveProxies="true"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+</ecore:EPackage>

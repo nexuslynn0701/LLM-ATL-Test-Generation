@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libPkg"
+    nsURI="http://example.org/libPkg"
+    nsPrefix="lib">
+
+  <!-- 0: Primitive-ish data type for identifiers -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="IdString"
+                instanceClassName="java.lang.String"
+                serializable="true"/>
+
+  <!-- 1: Enumeration for item status -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ItemStatus">
+    <eLiterals name="AVAILABLE" value="0" literal="AVAILABLE"/>
+    <eLiterals name="CHECKED_OUT" value="1" literal="CHECKED_OUT"/>
+    <eLiterals name="LOST" value="2" literal="LOST"/>
+  </eClassifiers>
+
+  <!-- 2: Top-level abstract class Item -->
+  <eClassifiers xsi:type="ecore:EClass" name="Item" abstract="true" interface="false">
+    <!-- features: id (ID attr), status (enum), container ref to Library -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.0"
+                         iD="true"
+                         ordered="true"
+                         unique="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 3: Concrete subclass Book -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="pages"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 4: Concrete subclass Journal -->
+  <eClassifiers xsi:type="ecore:EClass" name="Journal" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="issueNumber"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 5: Person base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 6: Member extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="memberId"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="//@eClassifiers.0"/>
+    <!-- non-containment reference to borrowed items -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="borrowedItems"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 7: Librarian extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Librarian" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="employeeNumber"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 8: Library root -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library" abstract="false" interface="false">
+    <!-- containment of items -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="items"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         resolveProxies="false"
+                         eType="//@eClassifiers.2"/>
+    <!-- containment of people (members and librarians) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="people"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         resolveProxies="false"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 9: Map entry for miscellaneous properties -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="PropertyEntry"
+                abstract="false"
+                interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="key"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="value"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

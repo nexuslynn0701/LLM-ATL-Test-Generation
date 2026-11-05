@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <!-- elements[0]: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction -->
+    <subActions id="sa_main">
+      <!-- contents -> Proxy (complex, non-simple) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- All branches present so proxy is non-simple -->
+        <busy>
+          <!-- busy.contents -> SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </busy>
+        <noAnswer>
+          <!-- noAnswer.contents -> Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </noAnswer>
+        <redirection>
+          <!-- redirection.contents -> SubCall with different ref -->
+          <contents xsi:type="CPL:SubCall" ref="sa_aux"/>
+        </redirection>
+        <failure>
+          <!-- failure.contents -> Reject -->
+          <contents xsi:type="CPL:Reject" status="400" reason="bad_request"/>
+        </failure>
+        <default>
+          <!-- default.contents -> SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- ONE Outgoing (required by OCL23 etc.) -->
+    <outgoing>
+      <!-- Outgoing.contents -> same complex Proxy (non-simple) to reuse -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="sa_aux"/>
+        </redirection>
+        <failure>
+          <contents xsi:type="CPL:Reject" status="405" reason="method_not_allowed"/>
+        </failure>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </default>
+      </contents>
+    </outgoing>
+
+    <!-- ONE Incoming -->
+    <incoming>
+      <!-- Incoming.contents -> simple Proxy (to exercise Proxy2Return) -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <!-- no children => isSimple = true -->
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- elements[1]: SubCall referenced by SubCall.ref = "sa_main" -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- elements[2]: SubCall referenced by SubCall.ref = "sa_aux" -->
+  <elements xsi:type="CPL:SubCall" ref="sa_aux"/>
+
+  <!-- elements[3]: Location used by Proxies and Redirect to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="true"/>
+
+  <!-- elements[4]: Redirect (top-level) using Location via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- elements[5]: AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="from-subfield">
+    <addresses is="addr1" contains="contains1" subDomainOf="subdom1">
+      <!-- SwitchedAddress.contents -> SubCall to exercise SubCall2Return -->
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </addresses>
+    <notPresent>
+      <!-- NotPresent.contents -> Reject -->
+      <contents xsi:type="CPL:Reject" status="404" reason="not_found"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise.contents -> Redirect -->
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[6]: StringSwitch (unused by OCL but allowed top-level) -->
+  <elements xsi:type="CPL:StringSwitch" field="header-field">
+    <strings is="str1" contains="cont1"/>
+  </elements>
+
+  <!-- elements[7]: LanguageSwitch (top-level) with NotPresent -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <contents xsi:type="CPL:Reject" status="406" reason="not_acceptable"/>
+    </notPresent>
+  </elements>
+
+  <!-- elements[8]: TimeSwitch (top-level) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- elements[9]: PrioritySwitch (top-level) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="low" greater="high" equal="mid"/>
+  </elements>
+</CPL:CPLModel>

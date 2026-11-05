@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cp">
+
+  <!-- 0: Simple data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CodeType" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enumeration with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="ARCHIVED" value="2" literal="ARCHIVED"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract root element -->
+  <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="identifier" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 3: NamedEntity extends Element, has ID attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedEntity" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 4: Container class with containment and cross refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="Registry" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entries" upperBound="-1" containment="true"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="defaultOwner"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 5: Entry extends NamedEntity, references Owner and Category -->
+  <eClassifiers xsi:type="ecore:EClass" name="Entry" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="category"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 6: Owner extends NamedEntity, opposite non-containment reference to entries -->
+  <eClassifiers xsi:type="ecore:EClass" name="Owner" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entries" upperBound="-1"
+        eType="//@eClassifiers.5" eOpposite="//@eClassifiers.5/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 7: Category extends NamedEntity, self reference and map-like string-to-string entries -->
+  <eClassifiers xsi:type="ecore:EClass" name="Category" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parent"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="subcategories" upperBound="-1"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 8: Utility class with operation and parameter -->
+  <eClassifiers xsi:type="ecore:EClass" name="RegistryUtils" abstract="false" interface="false">
+    <eOperations name="findByCode"
+        eType="//@eClassifiers.5">
+      <eParameters name="registry"
+          eType="//@eClassifiers.4"/>
+      <eParameters name="code"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

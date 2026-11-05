@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.org/companyModel"
+    nsPrefix="cmp">
+
+  <!-- 0: Primitive data types used by the package -->
+  <eClassifiers xsi:type="ecore:EDataType" name="StringAlias"
+                instanceClassName="java.lang.String"/>
+  <eClassifiers xsi:type="eccore:EDataType" name="IntAlias"
+                instanceClassName="int"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="BoolAlias"
+                instanceClassName="boolean"/>
+
+  <!-- 3: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ProjectStatus">
+    <eLiterals name="PLANNED" value="0" literal="PLANNED"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="COMPLETED" value="2" literal="COMPLETED"/>
+  </eClassifiers>
+
+  <!-- 4: Base abstract class Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+                         eType="//@eClassifiers.0" lowerBound="1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+                         eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 5: Employee extends Person, has reference to Department and Projects -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="employeeNumber"
+                         eType="//@eClassifiers.1" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullTime"
+                         eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+                         eType="//@eClassifiers.7" lowerBound="1" containment="false"
+                         resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+                         upperBound="-1"
+                         eType="//@eClassifiers.8" containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 6: Manager extends Employee, with managed department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Manager" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="level"
+                         eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="managedDepartment"
+                         eType="//@eClassifiers.7" containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 7: Department with containment of employees and bidirectional manager reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+                         eType="//@eClassifiers.0" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+                         eType="//@eClassifiers.0" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+                         upperBound="-1"
+                         eType="//@eClassifiers.5" containment="true"
+                         resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+                         eType="//@eClassifiers.6" containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 8: Project with enum attribute, cross references and containment -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="identifier"
+                         eType="//@eClassifiers.0" lowerBound="1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+                         eType="//@eClassifiers.3" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="budget"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lead"
+                         eType="//@eClassifiers.6" lowerBound="1" containment="false"
+                         resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team"
+                         upperBound="-1"
+                         eType="//@eClassifiers.5" containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 9: Utility map entry type -->
+  <eClassifiers xsi:type="ecore:EClass" name="TagEntry" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+                         eType="//@eClassifiers.0" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 10: Root container -->
+  <eClassifiers xsi:type="ecore:EClass" name="CompanyModel" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+                         eType="//@eClassifiers.0" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+                         upperBound="-1"
+                         eType="//@eClassifiers.7" containment="true"
+                         resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+                         upperBound="-1"
+                         eType="//@eClassifiers.8" containment="true"
+                         resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tags"
+                         upperBound="-1"
+                         eType="//@eClassifiers.9" containment="true"
+                         resolveProxies="false"/>
+  </eClassifiers>
+
+  <!-- 11: Operation and parameter example -->
+  <eClassifiers xsi:type="ecore:EClass" name="StatisticsService" abstract="false" interface="true">
+    <eOperations name="averageAge"
+                 eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt">
+      <eParameters name="dept"
+                   eType="//@eClassifiers.7"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

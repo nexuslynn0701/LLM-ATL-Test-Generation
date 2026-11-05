@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="metaRoot"
+    nsURI="http://example.org/metaRoot"
+    nsPrefix="mr">
+
+  <!-- top-level classifiers: 0..6 -->
+  <!-- 0: RootClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClass">
+    <!-- attributes: name, flag, count, grade, mood -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="flag"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="count"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="grade"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        defaultValueLiteral="3.5"/>
+    <!-- enum-typed attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="mood"
+        eType="//@eClassifiers.5"
+        defaultValueLiteral="HAPPY"/>
+    <!-- references: children (containment, many), partner (single, non-containment, opposite), oppositeRef -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="children" lowerBound="0"
+        upperBound="-1" eType="//@eClassifiers.2" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="partner"
+        eType="//@eClassifiers.1" containment="false"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="oppositeRef"
+        eType="//@eClassifiers.2" containment="false"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 1: AbstractBase -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractBase" abstract="true">
+    <!-- self-reference to exercise EqContainingClass / EqType / bounds -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="baseRef" lowerBound="1"
+        upperBound="-1" eType="//@eClassifiers.1" containment="false"/>
+    <!-- attribute with no explicit type (eAttributeType undefined) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="untypedAttr"/>
+  </eClassifiers>
+
+  <!-- 2: SubClass extends AbstractBase, contained by RootClass via children -->
+  <eClassifiers xsi:type="ecore:EClass" name="SubClass"
+      eSuperTypes="//@eClassifiers.1">
+    <!-- opposite of RootClass.oppositeRef -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="backRef"
+        eType="//@eClassifiers.0" containment="false"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.7"/>
+    <!-- containment reference to DeepClass (to test multi-level containingClass) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="deep"
+        eType="//@eClassifiers.6" containment="true" lowerBound="1"/>
+    <!-- int attribute with explicit default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="level"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="10"/>
+  </eClassifiers>
+
+  <!-- 3: StandaloneClass in root package -->
+  <eClassifiers xsi:type="ecore:EClass" name="StandaloneClass">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="&quot;base &quot; title"/>
+  </eClassifiers>
+
+  <!-- 4: TaggedClass with boolean and enum attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="TaggedClass">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        eType="//@eClassifiers.5"
+        defaultValueLiteral="SAD"/>
+  </eClassifiers>
+
+  <!-- 5: Enum Feeling with three literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Feeling">
+    <eLiterals name="HAPPY" value="0" literal="HAPPY"/>
+    <eLiterals name="SAD" value="1" literal="SAD"/>
+    <eLiterals name="NEUTRAL" value="2" literal="NEUTRAL"/>
+  </eClassifiers>
+
+  <!-- 6: DeepClass, contained by SubClass.deep -->
+  <eClassifiers xsi:type="ecore:EClass" name="DeepClass">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- nested subpackage to exercise superPackage/subPackages and cross-package references -->
+  <eSubpackages name="innerPkg" nsURI="http://example.org/inner" nsPrefix="in">
+    <!-- inner classifiers: 0..2 inside subpackage -->
+    <!-- innerPkg0: InnerBase -->
+    <eClassifiers xsi:type="ecore:EClass" name="InnerBase">
+      <!-- reference back to RootClass to test cross-package class references -->
+      <eStructuralFeatures xsi:type="ecore:EReference" name="rootLink"
+          eType="//@eClassifiers.0" containment="false"/>
+    </eClassifiers>
+
+    <!-- innerPkg1: InnerDerived extends InnerBase and RootClass -->
+    <eClassifiers xsi:type="ecore:EClass" name="InnerDerived"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.0 //@eClassifiers.0">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="innerName"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+
+    <!-- innerPkg2: InnerEnum with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="InnerEnum">
+      <eLiterals name="FIRST" value="0" literal="FIRST"/>
+      <eLiterals name="SECOND" value="1" literal="SECOND"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

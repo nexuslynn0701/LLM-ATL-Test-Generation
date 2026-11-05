@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.3" id="saMain"/>
+    <incoming contents="//@elements.4"/>
+    <outgoing contents="//@elements.5"/>
+  </elements>
+
+  <!-- 1: AddressSwitch used inside a SubAction (via contents on element 3) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses contents="//@elements.6"/>
+    <addresses contents="//@elements.7"/>
+    <notPresent/>
+    <otherwise contents="//@elements.8"/>
+  </elements>
+
+  <!-- 2: StringSwitch used inside Proxy.default (element 6) -->
+  <elements xsi:type="CPL:StringSwitch" field="custom-header">
+    <strings contents="//@elements.9"/>
+  </elements>
+
+  <!-- 3: SubAction whose body is the AddressSwitch (element 1) -->
+  <elements xsi:type="CPL:SubAction" id="mainAction" contents="//@elements.1"/>
+
+  <!-- 4: Redirect used by CPL.incoming -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 5: TimeSwitch used by CPL.outgoing -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org">
+    <times dtstart="20250101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 6: Complex Proxy used in SwitchedAddress (element 1) -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+    <busy contents="//@elements.4"/>
+    <noAnswer contents="//@elements.5"/>
+    <redirection contents="//@elements.10"/>
+    <failure/>
+    <default contents="//@elements.2"/>
+  </elements>
+
+  <!-- 7: Simple Proxy used in SwitchedAddress (element 1) -->
+  <elements xsi:type="CPL:Proxy" timeout="15" recurse="no" ordering="sequential"/>
+
+  <!-- 8: Otherwise branch of AddressSwitch, pointing to SubCall (element 11) -->
+  <elements xsi:type="CPL:Otherwise" contents="//@elements.11"/>
+
+  <!-- 9: SwitchedString inside StringSwitch (element 2) -->
+  <elements xsi:type="CPL:SwitchedString" is="match-this" contains="substring"/>
+
+  <!-- 10: Location used via locations of complex Proxy (element 6) and Redirect (4) -->
+  <elements xsi:type="CPL:Location" url="sip:dest@example.com" priority="1" clear="yes"/>
+
+  <!-- 11: SubCall used inside Otherwise (element 8) -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+</CPL:CPLModel>

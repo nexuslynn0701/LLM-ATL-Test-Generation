@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="ParallelBranchesWithMerge">
+    <!-- Steps: one initial, multiple non-initial, including branches and merge -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="StartUp" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Transition" location="t001" name="BeginProcessing" condition="ready"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="LoadData" isInitial="false" isActive="false" action="load"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="CheckConfig" isInitial="false" isActive="false" action="check"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="DataAndConfigOK" condition="dataLoaded and configValid"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="RunMainTask" isInitial="false" isActive="false" action="run"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="MainCompleted" condition="taskDone"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="Shutdown" isInitial="false" isActive="false" action="cleanup"/>
+    <!-- Connections: branching from one step to two transitions, then to two steps, then merged, plus final sequence -->
+    <!-- StartUp -> BeginProcessing -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="startupToBegin" from="/0/@elements.0" to="/0/@elements.1"/>
+    <!-- BeginProcessing -> LoadData -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c002" name="beginToLoad" from="/0/@elements.1" to="/0/@elements.2"/>
+    <!-- BeginProcessing -> CheckConfig (parallel branch) -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c003" name="beginToCheck" from="/0/@elements.1" to="/0/@elements.3"/>
+    <!-- LoadData -> DataAndConfigOK -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c004" name="loadToOk" from="/0/@elements.2" to="/0/@elements.4"/>
+    <!-- CheckConfig -> DataAndConfigOK (merge point) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c005" name="checkToOk" from="/0/@elements.3" to="/0/@elements.4"/>
+    <!-- DataAndConfigOK -> RunMainTask -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c006" name="okToRun" from="/0/@elements.4" to="/0/@elements.5"/>
+    <!-- RunMainTask -> MainCompleted -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c007" name="runToCompleted" from="/0/@elements.5" to="/0/@elements.6"/>
+    <!-- MainCompleted -> Shutdown -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c008" name="completedToShutdown" from="/0/@elements.6" to="/0/@elements.7"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

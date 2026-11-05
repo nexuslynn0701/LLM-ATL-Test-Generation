@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LoadTestProject"
+    description="Testing multiple Ant rules"
+    default="process"
+    basedir="/home/build">
+  <targets xmi:id="init" name="init" description="Initialize build environment">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/test-classes"/>
+  </targets>
+  <targets xmi:id="compile-src" name="compile-src" description="Compile main sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main" destdir="target/classes" debug="true" optimize="false" deprecation="false" fork="false"/>
+  </targets>
+  <targets xmi:id="compile-test" name="compile-test" description="Compile test sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src/test" destdir="target/test-classes" debug="true" optimize="false" deprecation="false" fork="false"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create distribution archive">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/myapp.jar" basedir="target/classes" compress="true"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="target" failonerror="false"/>
+    <tasks xsi:type="Ant:Delete" file="dist/myapp.jar" quiet="true"/>
+  </targets>
+  <targets xmi:id="process" name="process" description="Default build lifecycle">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main" destdir="target/classes" debug="true" fork="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/process.jar" basedir="target/classes" compress="true"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run tests">
+    <tasks xsi:type="Ant:Javac" srcdir="src/test" destdir="target/test-classes" debug="false" fork="true"/>
+  </targets>
+</Ant:Project>

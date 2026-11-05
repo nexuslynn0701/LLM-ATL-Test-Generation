@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    default="build-all"
+    basedir="/home/project"
+    description="A sample Ant project for transformation testing">
+  <targets xmi:id="build-all" name="build-all" description="Build everything">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/sample.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Sample API"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Copy" todir="dist/config">
+      <fileset dir="config">
+        <include name="*.xml"/>
+        <exclude name="backup-*"/>
+      </fileset>
+    </tasks>
+    <tasks xsi:type="Ant:Delete" dir="temp"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+  <targets xmi:id="test" name="test" ifCondition="run.tests" description="Run unit tests">
+    <tasks xsi:type="Ant:Java" classname="org.junit.runner.JUnitCore" jar="" fork="true"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" unless="skip.clean">
+    <tasks xsi:type="Ant:Delete" dir="build"/>
+    <tasks xsi:type="Ant:Delete" dir="dist"/>
+  </targets>
+  <path id="classpath">
+    <pathElement path="/usr/share/java" location="libs"/>
+    <fileset dir="lib">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="home" location="/tmp"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+</Ant:Project>

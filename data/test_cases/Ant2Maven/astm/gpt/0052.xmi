@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleAntProject52"
+    basedir="src/main/java"
+    description=""
+    default="buildTarget">
+  <!-- one property value (tests AntPropertyValue2MavenMavenAntPropertyValue) -->
+  <properties xsi:type="Ant:PropertyValue" name="java.version" value="17"/>
+  <!-- one property file (tests AntPropertyFile2MavenMavenAntPropertyFile) -->
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <!-- one property env (tests AntPropertyEnv2MavenMavenAntPropertyEnv) -->
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+  <!-- a standalone taskdef (tests AntTaskDef2MavenMavenTaskDef) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+  <!-- default target with several tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile and package">
+    <!-- Management: create build directory (AntMkdir2MavenMavenMkdir) -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/output"/>
+    <!-- Compile task with includes/excludes and classpath (AntJavac2MavenMavenJavac, patterns, classpath, pathElement, fileSet, patternSet, includes/excludes, filterset/filter/filtersfile) -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false">
+      <!-- inExcludes: direct Includes (AntIncludes2MavenMavenIncludes) -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="compile.includes" unless=""/>
+      <!-- inExcludes: direct Excludes (AntExcludes2MavenMavenExcludes) -->
+      <inExcludes xsi:type="Ant:Excludes" name="**/test/**" ifCondition="" unless="skip.tests"/>
+      <!-- classPath with pathElement and fileset (AntClassPath2MavenMavenClassPath, AntPathElement2MavenMavenPathElement,
+           AntFileSet2MavenMavenFileSet, AntPatternset2MavenMavenPatternset, AntIncludesFile2MavenMavenIncludesFile, AntExcludesFile2MavenMavenExcludesFile) -->
+      <classPath>
+        <pathElement path="lib/runtime.jar" location="lib/runtime.jar"/>
+        <fileset dir="lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:IncludesFile" name="lib-includes.txt" ifCondition="" unless=""/>
+            <inexcludes xsi:type="Ant:ExcludesFile" name="lib-excludes.txt" ifCondition="" unless=""/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+    <!-- Documentation task (AntJavadoc2MavenMavenJavadoc) -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Sample Project API"/>
+    <!-- Archive task (AntJar2MavenMavenJar) -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/sample-52.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF"/>
+    <!-- Copy task with fileset, filterset, mapper (AntCopy2MavenMavenCopy, AntFilterSet2MavenMavenFilterSet, AntFilter2MavenMavenFilter, AntFiltersFile2MavenMavenFiltersFile, AntFileSet2MavenMavenFileSet, AntMapper2MavenMavenMapper) -->
+    <tasks xsi:type="Ant:Copy" todir="build/distribution" overwrite="true" flatten="false" includeEmptyDirs="true" filtering="true">
+      <fileset dir="resources">
+        <include name="**/*" ifCondition="" unless=""/>
+        <exclude name="**/*.bak" ifCondition="" unless=""/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="SampleAntProject52"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="org.example.Mapper" classpath="lib/mapper.jar" classpathref="" from="*.tpl" to="*.cfg"/>
+    </tasks>
+    <!-- Delete task (AntDelete2MavenMavenDelete) -->
+    <tasks xsi:type="Ant:Delete" dir="build/temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="**/*" excludes="**/*.keep" defaultexcludes="true"/>
+    <!-- Tstamp task (AntTstamp2MavenMavenTstamp, plus FormatTstamp copied through containment) -->
+    <tasks xsi:type="Ant:Tstamp" id="ts1" taskname="timestamp" description="Generate build timestamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" offset="+1" unit="hour" locale="en_US"/>
+    </tasks>
+    <!-- Java execution task with classpath (AntJava2MavenMavenJava, AntClassPath2MavenMavenClassPath again) -->
+    <tasks xsi:type="Ant:Java" classname="com.example.Main" jar="" fork="true">
+      <classPath refid="run.classpath">
+        <pathElement path="dist/sample-52.jar" location="dist/sample-52.jar"/>
+      </classPath>
+    </tasks>
+  </targets>
+  <!-- secondary target with a Javac and a Delete (exercises multiple goals and task copies) -->
+  <targets xmi:id="cleanCompile" name="clean-compile" description="Clean then compile tests">
+    <tasks xsi:type="Ant:Delete" dir="build/test-classes" verbose="false" quiet="true" failonerror="false" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="build/test-classes" debug="false" fork="false" optimize="false" deprecation="true"/>
+  </targets>
+  <!-- Path at project level (AntPath2MavenMavenPath with internal structures) -->
+  <path id="build.path">
+    <pathElement path="build/classes" location="build/classes"/>
+    <fileset dir="lib/test">
+      <include name="**/*.jar" ifCondition="" unless=""/>
+    </fileset>
+  </path>
+</Ant:Project>

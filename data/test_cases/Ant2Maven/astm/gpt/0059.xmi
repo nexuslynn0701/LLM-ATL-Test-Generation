@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="Ant2MavenSample059"
+    basedir="project-src"
+    description="Ant project with various tasks and properties for ATL testing."
+    default="build-target">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="project.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (standalone, not referenced by any task) -->
+  <taskdef name="custom.task" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target with several predefined tasks -->
+  <targets xmi:id="build-target" name="build" description="Compile and package sources.">
+    <!-- Create build directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+
+    <!-- Compile Java sources with includes/excludes and classpath -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="true">
+      <!-- inExcludes: Includes and Excludes -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="have.sources" unless="skip.compile"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="exclude.internal" unless=""/>
+
+      <!-- ClassPath with one PathElement -->
+      <classPath refid="compile.classpath">
+        <pathElement path="lib/dependency.jar" location="lib/dependency.jar"/>
+      </classPath>
+    </tasks>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="org.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+  </targets>
+
+  <!-- Secondary target with archive and file operations -->
+  <targets xmi:id="dist-target" name="dist" description="Build distribution artifacts.">
+    <!-- Package classes into a JAR -->
+    <tasks xsi:type="Ant:Jar" jarfile="target/artifacts/example-1.0.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Copy resources using FileSet, FilterSet, and Mapper -->
+    <tasks xsi:type="Ant:Copy" todir="target/dist" overwrite="true" includeEmptyDirs="false">
+      <!-- FileSet with PatternSet, Includes, and Excludes -->
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/secret/**"/>
+        </patternset>
+        <include name="**/*.xml"/>
+        <exclude name="**/*.tmp"/>
+      </fileset>
+
+      <!-- FilterSet with one Filter and one FiltersFile -->
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="Ant2MavenSample059"/>
+        <filtersfile file="filters.properties"/>
+      </filterset>
+
+      <!-- Mapper configuration -->
+      <mapper type="glob" from="*.txt" to="docs/*.txt"/>
+    </tasks>
+
+    <!-- Delete temporary build directory -->
+    <tasks xsi:type="Ant:Delete" dir="target/tmp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="**/*" defaultexcludes="true"/>
+  </targets>
+
+  <!-- Management properties task: Tstamp with one format -->
+  <targets xmi:id="timestamp-target" name="timestamp" description="Generate build timestamp.">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Path definition at project level (no cross references used) -->
+  <path id="compile.path">
+    <pathElement path="lib/extra-lib.jar" location="lib/extra-lib.jar"/>
+    <fileset dir="lib/optional">
+      <include name="**/*.jar"/>
+      <exclude name="**/old/**"/>
+    </fileset>
+  </path>
+
+</Ant:Project>

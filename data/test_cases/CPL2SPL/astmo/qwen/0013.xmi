@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction"/>
+    <subActions id="helperAction"/>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="helperAction"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="true">
+            <locations url="sip:default@example.com" clear="yes"/>
+          </contents>
+        </default>
+        <locations url="sip:proxy@example.com" clear="yes"/>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:user@example.com">
+          <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+            <default>
+              <contents xsi:type="CPL:SubCall" ref="mainAction"/>
+            </default>
+            <locations url="sip:fallback@example.com" clear="yes"/>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:common@example.com" clear="yes"/>
+</CPL:CPLModel>

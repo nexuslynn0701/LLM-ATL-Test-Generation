@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryPkg"
+    nsURI="http://example.org/libraryPkg"
+    nsPrefix="lib">
+
+  <!-- 0: Enum for status -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="USED" value="1" literal="USED"/>
+    <eLiterals name="DAMAGED" value="2" literal="DAMAGED"/>
+  </eClassifiers>
+
+  <!-- 1: Root EClass Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="members"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 2: Book -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pages"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- enum attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <!-- cross-book reference, non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="related"
+        upperBound="-1"
+        eType="//@eClassifiers.2"/>
+    <!-- containment of chapters -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="chapters"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 3: Member -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="memberId"
+        lowerBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- non-containment reference to borrowed books -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="borrowed"
+        upperBound="-1"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 4: Chapter -->
+  <eClassifiers xsi:type="ecore:EClass" name="Chapter">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="index"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 5: Abstract supertype for employees and visitors -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nick"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 6: Librarian, subclass of Person and Member (multiple inheritance) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Librarian"
+      eSuperTypes="//@eClassifiers.5 //@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="shift"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 7: Visitor, subclass of Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Visitor"
+      eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="temporaryCard"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 8: Map entry type used as a pseudo-feature -->
+  <eClassifiers xsi:type="ecore:EClass" name="StringTag"
+      eSuperTypes="http://www.eclipse.org/emf/2002/Ecore#//EStringToStringMapEntry">
+  </eClassifiers>
+
+</ecore:EPackage>

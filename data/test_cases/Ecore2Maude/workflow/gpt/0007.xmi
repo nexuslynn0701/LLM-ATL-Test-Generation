@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://root/pkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to trigger subPackages + superPackage handling -->
+  <eSubpackages name="subPkg"
+                nsURI="http://root/sub"
+                nsPrefix="sub">
+    <!-- Class in subpackage extending a class in root package -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClass">
+      <eSuperTypes href="//@eClassifiers.0"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subFlag"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- 0: EClass Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- Attribute name: String, lower=1, upper=1, with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         defaultValueLiteral="John &quot;Doe&quot;"
+                         iD="true"/>
+    <!-- Attribute age: Int, many (-1) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference address: containment, single, no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="address"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.1"
+                         containment="true"/>
+    <!-- Non-containment reference to owned Company with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="employer"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.2"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 1: EClass Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- Attribute street: String -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="street"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute zip: Int -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="zip"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 2: EClass Company -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company" abstract="true">
+    <!-- opposite of Person.employer, many employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="employees"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.0"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.3"/>
+    <!-- Attribute rating: Double (uses EDouble) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rating"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+  </eClassifiers>
+
+  <!-- 3: EEnum Role -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Role">
+    <eLiterals name="ADMIN" value="0" literal="ADMIN"/>
+    <eLiterals name="USER" value="1" literal="USER"/>
+  </eClassifiers>
+
+  <!-- 4: EClass Account with enum-typed attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Account">
+    <!-- Enum-typed attribute role -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="role"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.3"/>
+    <!-- Reference owner to Person -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 5: EDataType CustomData to trigger generic @DataType mapping -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData"/>
+</ecore:EPackage>

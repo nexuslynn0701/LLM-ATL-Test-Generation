@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL script with various sub-actions and main routing logic -->
+  <elements xsi:type="CPL:CPL">
+    <!-- main actions as subActions -->
+    <subActions xsi:type="CPL:SubAction" id="mainRoute">
+      <contents>//@elements.4</contents> <!-- AddressSwitch -->
+      <contents>//@elements.7</contents> <!-- Proxy -->
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="langHandler">
+      <contents>//@elements.5</contents> <!-- LanguageSwitch -->
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="timeHandler">
+      <contents>//@elements.6</contents> <!-- TimeSwitch -->
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="prioHandler">
+      <contents>//@elements.8</contents> <!-- PrioritySwitch -->
+    </subActions>
+
+    <!-- incoming and outgoing references to locations and actions -->
+    <incoming contents="//@elements.1"/>
+    <incoming contents="//@elements.2"/>
+    <outgoing contents="//@elements.3"/>
+    <outgoing contents="//@elements.9"/>
+  </elements>
+
+  <!-- 1: Main location (e.g., primary contact endpoint) -->
+  <elements xsi:type="CPL:Location" url="sip:primary@example.com" priority="1.0" clear="yes">
+    <!-- chain to language-specific handling -->
+    <contents>//@elements.5</contents>
+  </elements>
+
+  <!-- 2: Backup location -->
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" priority="0.5" clear="no">
+    <!-- after this backup, call the time handler -->
+    <contents>//@elements.6</contents>
+  </elements>
+
+  <!-- 3: SubCall using string reference to a SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="prioHandler"/>
+
+  <!-- 4: AddressSwitch with NotPresent, Otherwise, and multiple SwitchedAddress cases -->
+  <elements xsi:type="CPL:AddressSwitch" field="To" subField="domain">
+    <notPresent>
+      <contents>//@elements.2</contents> <!-- go to backup location -->
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.7</contents> <!-- default to Proxy -->
+    </otherwise>
+    <addresses is="sip:vip@example.com" contains="vip" subDomainOf="example.com">
+      <!-- VIP callers go directly to primary location -->
+      <contents>//@elements.1</contents>
+    </addresses>
+    <addresses is="sip:blocked@example.com" contains="blocked" subDomainOf="example.com">
+      <!-- Blocked callers get rejected -->
+      <contents>//@elements.10</contents>
+    </addresses>
+  </elements>
+
+  <!-- 5: LanguageSwitch with two language branches and Otherwise -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <!-- if language header missing, go to time-based handling -->
+      <contents>//@elements.6</contents>
+    </notPresent>
+    <otherwise>
+      <!-- default language behaviour: proxy -->
+      <contents>//@elements.7</contents>
+    </otherwise>
+    <languages matches="en">
+      <!-- English callers: primary then backup -->
+      <contents>//@elements.1</contents>
+      <contents>//@elements.2</contents>
+    </languages>
+    <languages matches="fr">
+      <!-- French callers: backup only -->
+      <contents>//@elements.2</contents>
+    </languages>
+  </elements>
+
+  <!-- 6: TimeSwitch with rich SwitchedTime configuration -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <notPresent>
+      <!-- if no time info, proxy immediately -->
+      <contents>//@elements.7</contents>
+    </notPresent>
+    <otherwise>
+      <!-- default time branch: reject -->
+      <contents>//@elements.10</contents>
+    </otherwise>
+    <times dtstart="20260101T080000" dtend="20260101T180000" duration="PT10H"
+           freq="DAILY" until="20261231T235959" count="0" interval="1"
+           bySecond="0" byMinute="0" byHour="8,9,10,11,12,13,14,15,16,17"
+           byDay="MO,TU,WE,TH,FR" byMonthDay="1-31" byYearDay="" byWeekNo=""
+           byMonth="1-12" wkst="MO" bySetPos="">
+      <!-- office hours: proxy -->
+      <contents>//@elements.7</contents>
+    </times>
+    <times dtstart="20260101T000000" dtend="20260101T075959" duration="PT8H"
+           freq="DAILY" until="20261231T235959" count="0" interval="1"
+           bySecond="" byMinute="" byHour="0,1,2,3,4,5,6,7"
+           byDay="MO,TU,WE,TH,FR,SA,SU" byMonthDay="" byYearDay="" byWeekNo=""
+           byMonth="" wkst="MO" bySetPos="">
+      <!-- night hours: send to voicemail location -->
+      <contents>//@elements.9</contents>
+    </times>
+  </elements>
+
+  <!-- 7: Proxy with all status branches and contents chains -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+    <busy>
+      <!-- if busy, redirect to backup location -->
+      <contents>//@elements.2</contents>
+    </busy>
+    <noAnswer>
+      <!-- if no answer, invoke mainRoute sub-action -->
+      <contents>//@elements.11</contents>
+    </noAnswer>
+    <redirection>
+      <!-- if redirected, follow address switch -->
+      <contents>//@elements.4</contents>
+    </redirection>
+    <failure>
+      <!-- if failure, send to fallback location -->
+      <contents>//@elements.9</contents>
+    </failure>
+    <default>
+      <!-- default branch: primary location then SubCall to timeHandler -->
+      <contents>//@elements.1</contents>
+      <contents>//@elements.12</contents>
+    </default>
+  </elements>
+
+  <!-- 8: PrioritySwitch with multiple SwitchedPriority branches -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <!-- if priority header missing, go to language handler -->
+      <contents>//@elements.5</contents>
+    </notPresent>
+    <otherwise>
+      <!-- otherwise: proxy -->
+      <contents>//@elements.7</contents>
+    </otherwise>
+    <priorities less="0.3" greater="" equal="">
+      <!-- low priority: backup -->
+      <contents>//@elements.2</contents>
+    </priorities>
+    <priorities less="" greater="0.7" equal="">
+      <!-- high priority: primary -->
+      <contents>//@elements.1</contents>
+    </priorities>
+    <priorities less="" greater="" equal="0.5">
+      <!-- exactly medium priority: time-based handling -->
+      <contents>//@elements.6</contents>
+    </priorities>
+  </elements>
+
+  <!-- 9: Additional location used as voicemail / fallback -->
+  <elements xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="0.1" clear="yes">
+    <!-- after voicemail, reject the call -->
+    <contents>//@elements.10</contents>
+  </elements>
+
+  <!-- 10: Reject action with full info -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 11: SubCall referencing mainRoute sub-action -->
+  <elements xsi:type="CPL:SubCall" ref="mainRoute"/>
+
+  <!-- 12: SubCall referencing timeHandler sub-action -->
+  <elements xsi:type="CPL:SubCall" ref="timeHandler"/>
+
+  <!-- 13: StringSwitch using Request-URI like field -->
+  <elements xsi:type="CPL:StringSwitch" field="Request-URI">
+    <notPresent>
+      <!-- no URI, reject -->
+      <contents>//@elements.10</contents>
+    </notPresent>
+    <otherwise>
+      <!-- default: primary -->
+      <contents>//@elements.1</contents>
+    </otherwise>
+    <strings is="sip:sales@example.com" contains="sales">
+      <!-- sales calls go to backup -->
+      <contents>//@elements.2</contents>
+    </strings>
+    <strings is="sip:support@example.com" contains="support">
+      <!-- support calls to proxy -->
+      <contents>//@elements.7</contents>
+    </strings>
+  </elements>
+
+</CPL:CPLModel>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="buildAll"
+    basedir="/workspace"
+    description="Main build project">
+  <targets xmi:id="buildAll" name="buildAll" description="Builds everything">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="false" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/project.jar" basedir="target/classes" compress="true" encoding="UTF-8"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src/main/java" destdir="target/docs" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Project API"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Cleans build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="false" quiet="false" failonerror="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xmi:id="tstamp1" xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyyMMdd-HHmmss" locale="en_US"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compiles sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="false" fork="true" optimize="true" deprecation="true"/>
+    <tasks xsi:type="Ant:Copy" todir="target/resources" flatten="true" overwrite="true" filtering="false" includeEmptyDirs="true">
+      <fileset dir="src/main/resources"/>
+    </tasks>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+</Ant:Project>

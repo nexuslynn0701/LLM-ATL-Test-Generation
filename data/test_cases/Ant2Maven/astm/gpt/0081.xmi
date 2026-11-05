@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project-src"
+    description="Complex Ant build with multiple targets and tasks."
+    default="mainTarget">
+
+  <!-- Properties to exercise AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="conf/build.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Empty path element just to be copied -->
+  <path id="compile.path"/>
+
+  <!-- A standalone taskdef (copied but not referenced by any task) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- First target: mainTarget (default) -->
+  <targets xmi:id="mainTarget" name="mainTarget" description="Main build target">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="on"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API"/>
+  </targets>
+
+  <!-- Second target: packageTarget -->
+  <targets xmi:id="packageTarget" name="packageTarget" description="Package as JAR">
+    <!-- Create build directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/dist"/>
+    <!-- Create jar archive -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/dist/example-app.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Third target: cleanTarget -->
+  <targets xmi:id="cleanTarget" name="cleanTarget" description="Clean build output">
+    <!-- Delete entire build directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/.git/**"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

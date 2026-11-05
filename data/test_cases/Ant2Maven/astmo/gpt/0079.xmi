@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntBuild"
+    basedir="workspace"
+    description="Ant build with multiple tasks and properties."
+    default="mainTarget">
+
+  <!-- Properties of all four concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="build/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A standalone TaskDef (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple different tasks -->
+  <targets xmi:id="mainTarget" name="mainTarget" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/complex-ant-build.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/classes"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile="temp/includes.list"
+           excludes="**/*.keep"
+           excludesfile="temp/excludes.list"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target to increase goal coverage -->
+  <targets xmi:id="auxTarget" name="auxTarget" description="Auxiliary target for cleanup">
+    <tasks xsi:type="Ant:Mkdir"
+           dir="logs"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="logs/old"
+           verbose="false"
+           quiet="true"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*.log"
+           includesfile="logs/includes.list"
+           excludes="**/*.keep"
+           excludesfile="logs/excludes.list"
+           defaultexcludes="false"/>
+  </targets>
+
+</Ant:Project>

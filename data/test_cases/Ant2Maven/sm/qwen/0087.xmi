@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildSystem"
+    default="build-all"
+    basedir="."
+    description="Comprehensive build script for testing ATL transformation">
+  <targets xmi:id="init" name="init" description="Initialize directories">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" deprecation="true"/>
+  </targets>
+  <targets xmi:id="doc" name="doc" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="docs/api"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Example API"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create JAR archive">
+    <tasks xsi:type="Ant:Jar"
+        jarfile="dist/app.jar"
+        basedir="build/classes"
+        compress="true"
+        manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="docs" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="build-all" name="build-all" description="Full build cycle">
+    <tasks xsi:type="Ant:Java" classname="com.example.Main" fork="true"/>
+  </targets>
+  <properties>
+    <PropertyValue name="build.compiler" value="modern"/>
+    <PropertyLocation name="config.dir" location="conf"/>
+    <PropertyFile file="build.properties"/>
+    <PropertyEnv environment="JAVA_HOME"/>
+  </properties>
+</Ant:Project>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: main CPL root using SubAction and Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- two SubActions -->
+    <subActions id="sa1">
+      <!-- contents: simple Proxy (will use Location via locations helper) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+    </subActions>
+    <subActions id="sa2">
+      <!-- contents: SubCall calling sa1 -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </subActions>
+
+    <!-- one Outgoing whose contents is an AddressSwitch -->
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <!-- SwitchedAddress with 'is' set, contents is SubCall (to sa2) -->
+        <addresses is="addrCase1">
+          <contents xsi:type="CPL:SubCall" ref="sa2"/>
+        </addresses>
+        <!-- notPresent branch with contents a SubCall (to sa1) -->
+        <notPresent>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </notPresent>
+        <!-- otherwise branch with contents a Redirect that uses a Location -->
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: Location used by Proxy and Redirect via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes" priority="1"/>
+
+  <!-- elements[2]: Redirect using locations (will trigger Location2URIConstant) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- elements[3]: Proxy using all child branches, contents referencing SubCall -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="no" ordering="sequential">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:SubCall" ref="sa2"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </redirection>
+    <failure>
+      <contents xsi:type="CPL:SubCall" ref="sa2"/>
+    </failure>
+    <default>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </default>
+  </elements>
+
+</CPL:CPLModel>

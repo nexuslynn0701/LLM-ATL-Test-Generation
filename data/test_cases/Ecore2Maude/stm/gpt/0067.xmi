@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companySpec"
+    nsURI="http://example.org/companySpec/1.0"
+    nsPrefix="company">
+
+  <!-- 0: Abstract named element with id -->
+  <eClassifiers xsi:type="ecore:EClass" name="IdentifiedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="description"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1: Abstract person type -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Person"
+      abstract="true"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 2: Department class -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Department"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 3: Employee class -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Employee"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="salary"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="department"
+        lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="manager"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 4: Manager class extending Employee -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Manager"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="level"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="team"
+        upperBound="-1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 5: Project class with many references and containment -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Project"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="budget"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="1"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="participants"
+        upperBound="-1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 6: Address as a value-type class -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Address"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="city"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="zipCode"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 7: Office with containment -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Office"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="department"
+        lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="address"
+        lowerBound="1"
+        containment="true"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 8: Skill enumeration -->
+  <eClassifiers xsi:type="ecore:EEnum" name="SkillLevel">
+    <eLiterals name="JUNIOR" value="0" literal="JUNIOR"/>
+    <eLiterals name="MID" value="1" literal="MID"/>
+    <eLiterals name="SENIOR" value="2" literal="SENIOR"/>
+  </eClassifiers>
+
+  <!-- 9: Skill class referencing enum and employee -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Skill"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="area"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="level"
+        lowerBound="1"
+        eType="//@eClassifiers.8"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 10: Simple map entry type -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="StringToString"
+      instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="key"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

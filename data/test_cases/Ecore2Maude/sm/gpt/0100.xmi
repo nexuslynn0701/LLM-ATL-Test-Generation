@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg0100"
+    nsPrefix="cplx">
+
+  <!-- 0: Primitive alias: String -->
+  <eClassifiers xsi:type="ecore:EDataType" name="MyString"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Primitive alias: Int -->
+  <eClassifiers xsi:type="ecore:EDataType" name="MyInt"
+      instanceClassName="int"/>
+
+  <!-- 2: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW"  value="0" literal="NEW"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="DEPRECATED" value="2" literal="DEPRECATED"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract root element -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="version"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 4: Project extends RootElement, has ID attribute and reference to Module -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        iD="true"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mainModule"
+        lowerBound="1"
+        eType="//@eClassifiers.5"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="allModules"
+        upperBound="-1"
+        eType="//@eClassifiers.5"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 5: Module with bidirectional non-containment reference to Project and containment to Component -->
+  <eClassifiers xsi:type="ecore:EClass" name="Module" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project"
+        lowerBound="1"
+        eType="//@eClassifiers.4"
+        containment="false"
+        eOpposite="//@eClassifiers.7/@eStructuralFeatures.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="components"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 6: Component with self-reference and reference to abstract RootElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Component" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="subComponents"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependsOn"
+        upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 7: Container with opposite reference back from Module.project -->
+  <eClassifiers xsi:type="ecore:EClass" name="Workspace" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.4"
+        eOpposite="//@eClassifiers.5/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 8: Utility class with operations and parameters -->
+  <eClassifiers xsi:type="ecore:EClass" name="Validator" abstract="false" interface="false">
+    <eOperations name="validateProject">
+      <eParameters name="target" eType="//@eClassifiers.4"/>
+      <eParameters name="strict"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eOperations>
+    <eOperations name="computeScore"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt">
+      <eParameters name="module" eType="//@eClassifiers.5"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

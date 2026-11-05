@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.org/companyModel"
+    nsPrefix="cm">
+
+  <!-- Root package classifiers -->
+  <!-- 0: Department -->
+  <!-- 1: Company -->
+  <!-- 2: Role (abstract supertype) -->
+  <!-- 3: Employee -->
+  <!-- 4: Address -->
+  <!-- 5: Status (EEnum) -->
+  <!-- 6: Extra (no structural features) -->
+
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <!-- Department has one attribute and two references -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="deptCode"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"
+        defaultValueLiteral="D-001"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="mainAddress"
+        containment="true"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <!-- Company has attributes, a reference to Department and a reference back from Department -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="ACME \"Global\" Inc."/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="foundedYear"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="1999"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="departments"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="headquarters"
+        eType="//@eClassifiers.4"
+        containment="true"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Role" abstract="true">
+    <!-- Abstract superclass for Employee -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <!-- Employee extends Role, has mixed attributes (String, Int, Enum, other datatype) and references -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="empId"
+        lowerBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="E-0001"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="30"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        eType="//@eClassifiers.5"
+        defaultValueLiteral="ACTIVE"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="salary"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        defaultValueLiteral="45000.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="notes"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- reference to Address (non-containment, many) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="addresses"
+        upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.4"/>
+    <!-- bidirectional reference with Department -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="department"
+        eType="//@eClassifiers.0"
+        containment="false"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- Address used from Company and Employee -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="Main St."/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="number"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="zip"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+    <eLiterals name="INACTIVE" value="1" literal="INACTIVE"/>
+    <eLiterals name="SABBATICAL" value="2" literal="SABBATICAL"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Extra">
+    <!-- Class without structural features to exercise empty lists -->
+  </eClassifiers>
+
+  <!-- Subpackage under root to exercise superPackage/subPackages and multi-root package handling -->
+  <eSubpackages name="hr"
+      nsURI="http://example.org/companyModel/hr"
+      nsPrefix="cmhr">
+    <!-- 0: Contract (in subpackage) -->
+    <!-- 1: Benefit (in subpackage) -->
+    <eClassifiers xsi:type="ecore:EClass" name="Contract">
+      <!-- Reference back to root Employee (cross-package, non-containment) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="employee"
+          lowerBound="1"
+          eType="//@eClassifiers.3"/>
+      <!-- Containment of Benefit (within subpackage) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="benefits"
+          upperBound="-1"
+          containment="true"
+          eType="//@eSubpackages.0/@eClassifiers.1"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="Benefit">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="description"
+          lowerBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

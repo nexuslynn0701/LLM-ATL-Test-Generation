@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildAndDeploy"
+    description="Build and deploy the application"
+    default="deploy"
+    basedir=".">
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/usr/local/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="false" deprecation="false"/>
+    <tasks xsi:type="Ant:Copy" todir="build/classes">
+      <fileset dir="src/resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/test/*.properties"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0"/>
+        <filtersfile file="filter.txt"/>
+      </filterset>
+    </tasks>
+  </targets>
+  <targets xmi:id="deploy" name="deploy">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="build/docs" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="My API"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Delete" dir="build/temp"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+</Ant:Project>

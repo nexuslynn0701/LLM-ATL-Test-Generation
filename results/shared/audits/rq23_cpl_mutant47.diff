@@ -1,0 +1,46 @@
+--- CPL2SPL.atl
++++ CPL2SPL_Mutant47.atl
+@@ -1,4 +1,4 @@
+-module CPL2SPL;
++module CPL2SPL_Mutant47;
+ create OUT : SPL, TM : TMM from IN : CPL;
+ 
+ -- We consider nodes are statements, by default.
+@@ -51,9 +51,9 @@
+ 	from
+ 		s : CPL!CPL
+ 	to
+-		t : SPL!Program (
+-			service <- service
+-		),
++--		t : SPL!Program (             -- Mutant: 1 out-pattern element deletion
++--			service <- service        -- 1 binding deletion
++--		),
+ 		service : SPL!Service (
+ 			name <- 'unnamed',
+ 			declarations <- s.subActions,
+@@ -65,7 +65,7 @@
+ 		--For storing the trace information
+ 		tl : TMM!TraceLink(
+ 			ruleName <- 'CPL2Program',
+-			targetElements <- Sequence{t, service, dialog}
++			targetElements <- Sequence{service, dialog}
+ 		)
+ 	do{
+ 		-- trace information
+@@ -80,7 +80,7 @@
+ 		s : CPL!SubAction
+ 	to
+ 		t : SPL!LocalFunctionDeclaration (
+-			name <- s.id,
++			name <- s.id + ' mutant',              -- Mutant: binding value change
+ 			returnType <- rt,
+ 			statements <- if s.contents.oclIsUndefined() 
+ 			              then Sequence{} 
+@@ -702,5 +702,4 @@
+ 		tl.sourceElements <- Sequence{s};
+ 		thisModule.trace.traceLinks <- tl;
+ 	}
+-}
+-
++}

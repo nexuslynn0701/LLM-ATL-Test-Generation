@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="metaRoot"
+    nsURI="http://example/metaroot"
+    nsPrefix="mr">
+
+  <!-- Root package classifiers -->
+  <!-- 0: EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClass">
+    <!-- Attribute with EString type, lower/upper bounds set -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="rootName"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Reference to SubClass1, containment true, lower=0, upper=-1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="subs"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 1: EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="HelperClass">
+    <!-- Attribute with EInt type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="helperValue"
+        ordered="false"
+        unique="false"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 2: EEnum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="OK" value="0" literal="OK"/>
+    <eLiterals name="FAIL" value="1" literal="FAIL"/>
+  </eClassifiers>
+
+  <!-- 3: EDataType -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData" instanceTypeName="java.lang.String"/>
+
+  <!-- Subpackage with its own classifiers -->
+  <eSubpackages name="subPkg"
+      nsURI="http://example/subpkg"
+      nsPrefix="sp">
+    <!-- 0: EClass in subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClass1">
+      <!-- Super type RootClass from parent package -->
+      <eSuperTypes href="//@eClassifiers.0"/>
+      <!-- Attribute using EBoolean -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="flag"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      <!-- Attribute using custom data type from root package -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="custom"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="//@eClassifiers.3"/>
+      <!-- Reference to SubClass2, non-containment, opposite set -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="toSub2"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          containment="false"
+          eType="//@eClassifiers.1"
+          eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"/>
+    </eClassifiers>
+
+    <!-- 1: EClass in subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClass2">
+      <!-- Another super type HelperClass from root -->
+      <eSuperTypes href="//@eSuperPackage/@eClassifiers.1"/>
+      <!-- Reference back to SubClass1, opposite of toSub2 -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="owner"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          containment="false"
+          eType="//@eClassifiers.0"
+          eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+      <!-- Attribute whose type is the EEnum StatusKind -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="status"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="//@eSuperPackage/@eClassifiers.2"/>
+    </eClassifiers>
+
+    <!-- 2: EEnum in subpackage -->
+    <eClassifiers xsi:type="ecore:EEnum" name="LevelKind">
+      <eLiterals name="LOW" value="0" literal="LOW"/>
+      <eLiterals name="HIGH" value="1" literal="HIGH"/>
+    </eClassifiers>
+  </eSubpackages>
+</ecore:EPackage>

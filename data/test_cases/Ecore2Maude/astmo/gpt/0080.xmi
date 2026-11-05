@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="blogRoot"
+    nsURI="http://example.org/blogRoot"
+    nsPrefix="blogRoot">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="subBlog"
+                nsURI="http://example.org/subBlog"
+                nsPrefix="subBlog">
+    <!-- Class in subpackage, exercises Class2Sort etc. -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubPost">
+      <!-- Attribute in SubPost -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subTitle"
+                           lowerBound="1"
+                           iD="false"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <!-- Reference in SubPost to root package class (by path after root classifiers) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="mainPost"
+                           lowerBound="0"
+                           upperBound="1"
+                           containment="false"
+                           eType="//@eClassifiers.1"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- EDataType to have something in eClassifiers that is not a class -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="CustomText"
+                instanceClassName="java.lang.String"/>
+
+  <!-- Root EClass 0: User -->
+  <eClassifiers xsi:type="ecore:EClass" name="User">
+    <!-- Attribute: name, String, lowerBound 1, upperBound 1, ID true, default literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true"
+                         defaultValueLiteral="anonymous"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute: age, Int, lowerBound 0, upperBound 1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference: posts, to Post, many (-1), containment true, opposite author -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="posts"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.2"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- Root EClass 1: Tag, to be superclass and have no features -->
+  <eClassifiers xsi:type="ecore:EClass" name="Tag"/>
+
+  <!-- Root EClass 2: Post, subclass of Tag -->
+  <eClassifiers xsi:type="ecore:EClass" name="Post" eSuperTypes="//@eClassifiers.1">
+    <!-- Reference 0: author, to User, opposite posts -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="author"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.0"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+    <!-- Attribute 1: title, String, defaultValueLiteral with quotes, non-ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="&quot;Untitled&quot;"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute 2: status, EEnum BlogStatus, defaultValueLiteral one of literals -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         eType="//@eClassifiers.4"
+                         defaultValueLiteral="DRAFT"/>
+  </eClassifiers>
+
+  <!-- Root EEnum 3: BlogStatus with three literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="BlogStatus">
+    <eLiterals name="DRAFT" value="0" literal="DRAFT"/>
+    <eLiterals name="PUBLISHED" value="1" literal="PUBLISHED"/>
+    <eLiterals name="ARCHIVED" value="2" literal="ARCHIVED"/>
+  </eClassifiers>
+
+</ecore:EPackage>

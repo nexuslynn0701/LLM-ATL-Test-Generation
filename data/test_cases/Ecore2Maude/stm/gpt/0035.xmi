@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://company/example/3.5"
+    nsPrefix="comp">
+
+  <!-- 0: Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="deptName"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 1: Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="managerOf"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 2: Manager extends Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Manager"
+                eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="level"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 3: Project -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="budget"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lead"
+                         lowerBound="1"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 4: Role enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RoleKind">
+    <eLiterals name="DEV" value="0" literal="DEV"/>
+    <eLiterals name="QA" value="1" literal="QA"/>
+    <eLiterals name="PM" value="2" literal="PM"/>
+  </eClassifiers>
+
+  <!-- 5: Address datatype -->
+  <eClassifiers xsi:type="ecore:EDataType" name="AddressString"
+                instanceClassName="java.lang.String"/>
+
+  <!-- 6: Assignment (EAttribute using custom EDataType and EEnum as type of another EAttribute) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Assignment">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="location"
+                         lowerBound="1"
+                         eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+                         lowerBound="1"
+                         eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employee"
+                         lowerBound="1"
+                         eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project"
+                         lowerBound="1"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 7: Utility class demonstrating operations, parameters, exceptions -->
+  <eClassifiers xsi:type="ecore:EClass" name="CompanyUtils">
+    <eOperations name="findEmployee"
+                 eType="//@eClassifiers.1">
+      <eParameters name="empId"
+                   eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eExceptions href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eOperations name="totalBudget"
+                 eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+  </eClassifiers>
+
+</ecore:EPackage>

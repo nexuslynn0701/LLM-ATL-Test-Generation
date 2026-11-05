@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : Root CPL with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction triggers SubAction2Function (R2) -->
+    <subActions id="saMain">
+      <!-- contents[0] of SubAction: simple Proxy (statement via Proxy2Return, R7) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <!-- Simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+
+    <!-- Incoming triggers Incoming2Method (R3) -->
+    <incoming>
+      <!-- contents[0] of Incoming: SubCall (SubCall2Return, R13) -->
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </incoming>
+
+    <!-- Outgoing triggers Outgoing2Method (R4) -->
+    <outgoing>
+      <!-- contents[0] of Outgoing: AddressSwitch (AddressSwitch2SelectStat, R15) -->
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <!-- notPresent child (NotPresent2ErrorResponse, R6) -->
+        <notPresent>
+          <!-- contents[0] of NotPresent: Redirect (Redirect2Return, R14) -->
+          <contents xsi:type="CPL:Redirect" permanent="true">
+            <!-- Location to provide URI for Redirect and Proxy -->
+            <contents xsi:type="CPL:Location" url="sip:user@example.com" clear="yes"/>
+          </contents>
+        </notPresent>
+
+        <!-- otherwise child (Otherwise2SelectDefault, R18) -->
+        <otherwise>
+          <!-- contents[0] of Otherwise: simple Proxy (Proxy2Return, R7) -->
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+            <!-- simple proxy again -->
+          </contents>
+        </otherwise>
+
+        <!-- one SwitchedAddress (SwitchedAddress2SelectCase, R17) -->
+        <addresses is="dest1"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1] : Top-level Location used by proxies (Location2URIConstant, R19) -->
+  <elements xsi:type="CPL:Location" url="sip:alt@example.org" clear="no"/>
+
+</CPL:CPLModel>

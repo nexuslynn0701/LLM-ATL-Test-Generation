@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    basedir="."
+    description="A sample project for testing ATL transformation"
+    default="build">
+  <properties xsi:type="Ant:PropertyValue" name="version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <path id="compile.classpath">
+    <pathElement path="lib/commons.jar" location="lib/commons.jar"/>
+    <fileset dir="lib">
+      <include name="*.jar"/>
+      <exclude name="test-*.jar"/>
+    </fileset>
+  </path>
+  <taskdef name="mytask" classname="com.example.MyTask"/>
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <depends href="#init"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true">
+      <classPath refid="compile.classpath"/>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/Test*.java"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="jar" name="jar">
+    <depends href="#compile"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes"/>
+  </targets>
+  <targets xmi:id="build" name="build">
+    <depends href="#jar"/>
+    <tasks xsi:type="Ant:Copy" todir="deploy">
+      <fileset dir="dist">
+        <include name="*.jar"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="VERSION" value="1.0.0"/>
+        <filtersfile file="filters.txt"/>
+      </filterset>
+    </tasks>
+    <tasks xsi:type="Ant:Delete" dir="temp" quiet="true"/>
+  </targets>
+</Ant:Project>

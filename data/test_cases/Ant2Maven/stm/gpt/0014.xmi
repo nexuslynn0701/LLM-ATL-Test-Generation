@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Ant project exercising multiple predefined tasks"
+    default="build-main">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/classes"/>
+  <properties xsi:type="Ant:PropertyValue" name="dist.dir" value="dist"/>
+
+  <!-- Task definition (unreferenced, allowed) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: build-main -->
+  <targets xmi:id="build-main" name="build-main" description="Compile sources and create jar">
+    <!-- Create build directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Package into jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/app-main.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Additional target: clean -->
+  <targets xmi:id="clean" name="clean" description="Remove build and dist directories">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="dist"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target: doc -->
+  <targets xmi:id="doc" name="doc" description="Generate API documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+  </targets>
+
+  <!-- Additional target: prepare-dist -->
+  <targets xmi:id="prepare-dist" name="prepare-dist" description="Prepare distribution directory">
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Copy"
+           todir="dist"
+           overwrite="true"
+           includeEmptyDirs="false"
+           flatten="false"
+           filtering="false"/>
+  </targets>
+
+</Ant:Project>

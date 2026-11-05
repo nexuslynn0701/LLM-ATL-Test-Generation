@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="RichBuild"
+    basedir="workspace"
+    description="Full build lifecycle with custom properties and file operations"
+    default="buildTarget">
+
+  <!-- Properties covering all Property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="java.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="output/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A standalone TaskDef (mapped but never referenced by tasks) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="workspace/output/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- InExcludes contained to exercise pattern-related rules -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- Package compiled classes into a JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/dist/app-main.jar"
+           basedir="workspace/output/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="MANIFEST.MF"/>
+
+    <!-- Prepare output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/output"/>
+
+    <!-- Clean temporary files -->
+    <tasks xsi:type="Ant:Delete"
+           dir="workspace/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           excludes="**/*.keep"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target to increase Goal coverage -->
+  <targets xmi:id="docsTarget" name="generate-docs">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="workspace/output/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+  </targets>
+
+</Ant:Project>

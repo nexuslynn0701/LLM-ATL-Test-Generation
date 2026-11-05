@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements.0 : main CPL -->
+  <elements xsi:type="CPL:CPL">
+    <!-- one SubAction -->
+    <subActions id="action1">
+      <!-- contents points to simple Proxy at elements.5 -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no children; locations computed from Location at elements.2 -->
+      </contents>
+    </subActions>
+    <!-- one Outgoing whose contents is a complex Proxy at elements.6 -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <busy>
+          <!-- Busy contents is SubCall at elements.3 -->
+          <contents xsi:type="CPL:SubCall" ref="action1"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- default contents is Redirect at elements.4 -->
+        <default contents="//@elements.4"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements.1 : AddressSwitch used as SubAction contents and as Busy contents via SwitchedAddress -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- notPresent and otherwise are empty node-containers -->
+    <notPresent/>
+    <otherwise/>
+    <!-- one SwitchedAddress whose contents is complex Proxy at elements.6 -->
+    <addresses is="addr1">
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </addresses>
+  </elements>
+
+  <!-- elements.2 : Location whose contents is simple Proxy at elements.5 -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes" priority="1">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <!-- simple proxy: locations comes from this Location -->
+    </contents>
+  </elements>
+
+  <!-- elements.3 : SubCall referencing SubAction id="action1" -->
+  <elements xsi:type="CPL:SubCall" ref="action1"/>
+
+  <!-- elements.4 : Redirect (non-permanent) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- elements.5 : simple Proxy with location (to trigger Location2URIConstant) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- simple proxy, no outcome branches -->
+  </elements>
+
+  <!-- elements.6 : complex Proxy used in Outgoing and SwitchedAddress -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+</CPL:CPLModel>

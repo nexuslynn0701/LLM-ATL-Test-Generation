@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DeploymentBuild"
+    basedir="."
+    description="Build and deploy application"
+    default="deploy">
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target"/>
+  <properties xsi:type="Ant:PropertyLocation" name="src.dir" location="src"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyyMMdd-HHmmss"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="target/classes" debug="true" fork="false" optimize="false" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="include.tests" unless="skip.tests"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/*Test.java"/>
+      <inExcludes xsi:type="Ant:IncludesFile" name="include-list.txt"/>
+      <inExcludes xsi:type="Ant:ExcludesFile" name="exclude-list.txt"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="docs" name="docs">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="target/docs" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Application API"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="**/*.class" includesfile="clean-includes.txt" excludes="**/*.tmp" excludesfile="clean-excludes.txt" defaultexcludes="no"/>
+  </targets>
+  <targets xmi:id="deploy" name="deploy">
+    <tasks xsi:type="Ant:Java" classname="com.example.Deployer" jar="deployer.jar" fork="true">
+      <classPath refid="deploy.classpath">
+        <pathElement path="lib/deploy.jar" location="lib"/>
+        <pathElement path="lib/util.jar" location="lib"/>
+      </classPath>
+    </tasks>
+    <tasks xsi:type="Ant:Copy" file="dist/app.jar" todir="deploy" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="true">
+      <fileset dir="config">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.xml"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/*.bak"/>
+        </patternset>
+        <include name="**/*.properties"/>
+        <exclude name="**/*.sample"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0"/>
+        <filtersfile file="filter.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.xml" to="*.config"/>
+    </tasks>
+  </targets>
+</Ant:Project>

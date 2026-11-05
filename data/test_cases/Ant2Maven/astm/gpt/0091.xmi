@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntBuild"
+    basedir="project-src"
+    description="Ant build with multiple compilation and packaging tasks."
+    default="mainTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="ComplexAntBuild"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (unreferenced, but transformed by its own rule) -->
+  <taskdef name="custom.task" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target -->
+  <targets xmi:id="mainTarget" name="main" description="Main build pipeline">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/main-artifact.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Additional target with documentation and cleanup -->
+  <targets xmi:id="docAndClean" name="doc-and-clean" description="Generate javadoc and clean temp files">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="org.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntBuild API"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+    <tasks xsi:type="Ant:Delete" dir="build/tmp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" defaultexcludes="true"/>
+  </targets>
+
+  <!-- Testing target -->
+  <targets xmi:id="testTarget" name="test" description="Compile tests and package test jar">
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="build/test-classes" debug="false" fork="false" optimize="false" deprecation="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/test-artifact.jar" basedir="build/test-classes" compress="false" encoding="UTF-8"/>
+  </targets>
+
+</Ant:Project>

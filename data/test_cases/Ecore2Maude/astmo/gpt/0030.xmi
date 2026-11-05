@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    xmi:version="2.0"
+    name="metaRoot"
+    nsURI="http://metaroot/1.0"
+    nsPrefix="mroot">
+
+  <!-- Subpackage to trigger superPackage/subPackages equations -->
+  <eSubpackages name="subPkg"
+                nsURI="http://sub/1.0"
+                nsPrefix="sub">
+    <!-- Classifier 0 in subPkg: simple class used as reference target -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="SubNode">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subId"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifier 0 in root: a class with super type, refs and attrs -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Node">
+    <!-- attribute with default value, String -->
+    <eStructuralFeatures xsi:type="eccore:EAttribute"/>
+  </eClassifiers>
+
+  <!-- Classifier 1 in root: superclass for Node to exercise eSuperTypes -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="NamedElement">
+  </eClassifiers>
+
+  <!-- Classifier 2 in root: enum used as attribute type -->
+  <eClassifiers xsi:type="ecore:EEnum"
+                name="Priority">
+    <eLiterals name="LOW"   value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH"  value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- Classifier 3 in root: another enum to have more than one -->
+  <eClassifiers xsi:type="ecore:EEnum"
+                name="Status">
+    <eLiterals name="OPEN"   value="0" literal="OPEN"/>
+    <eLiterals name="CLOSED" value="1" literal="CLOSED"/>
+  </eClassifiers>
+
+  <!-- Re-specify Node with structural features and supertype -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Node"
+                eSuperTypes="//@eClassifiers.1">
+    <!-- String attribute with default value (triggers AttEqSpecificDefaultValue) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="Unnamed Node"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Boolean attribute, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Integer attribute, with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="weight"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="5"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Enum attribute of Priority -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         eType="//@eClassifiers.2"/>
+    <!-- Reference to NamedElement, bidirectional with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="parent"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.4/@eStructuralFeatures.1"
+                         eType="//@eClassifiers.1"/>
+    <!-- Containment reference to SubNode with upperBound -1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- Classifier 4 in root: NamedElement with opposite reference back to Node -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="NamedElement">
+    <!-- ID attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Reference opposite to Node.parent -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="ownedNode"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.3/@eStructuralFeatures.4"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+</ecore:EPackage>

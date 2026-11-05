@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="build"
+    basedir="."
+    description="Sample build project">
+  <targets xmi:id="clean" name="clean" description="Clean build directory">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" failonerror="true"/>
+  </targets>
+  <targets xmi:id="build" name="build" description="Compile and package" ifCondition="build.ready">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" optimize="false" deprecation="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/myapp.jar" basedir="build/classes" compress="true" encoding="UTF-8"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run tests" unless="skip.tests">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes" debug="true"/>
+    <tasks xsi:type="Ant:Copy" file="test/resources/config.xml" todir="build/test-classes" overwrite="true" flatten="true"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="MyApp API"/>
+  </targets>
+  <targets xmi:id="dist" name="dist" description="Create distribution">
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" manifest="src/META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Copy" file="README.txt" tofile="dist/README.txt" filtering="true"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.ready" value="true"/>
+  <properties xsi:type="Ant:PropertyLocation" name="src.dir" location="src"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+</Ant:Project>

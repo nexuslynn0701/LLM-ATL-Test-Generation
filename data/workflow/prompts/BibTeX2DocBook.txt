@@ -1,0 +1,1098 @@
+You are an expert in Model-Driven Engineering (MDE) and model transformation testing.
+Your task is to generate one valid source model for testing an ATL model transformation.
+
+--------------------------------
+METAMODELS
+--------------------------------
+Two metamodels are provided below in order: SOURCE first, TARGET second.
+
+The SOURCE metamodel defines the structure your output must conform to.
+The TARGET metamodel is provided only to help you understand the target-side
+types and bindings referenced in the ATL transformation.
+
+Do NOT instantiate target metamodel classes.
+Do NOT generate a target model.
+Do NOT use target-only classes, attributes, references, or namespace prefixes
+in the source model.
+
+--- BibTeX.ecore ---
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="BibTeX" nsURI="http://BibTeX/1.0" nsPrefix="BibTeX">
+  <eClassifiers xsi:type="ecore:EClass" name="BibTeXFile">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entries" ordered="false"
+        upperBound="-1" eType="#//BibTeXEntry" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Author">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="author" ordered="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BibTeXEntry" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" ordered="false" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AuthoredEntry" abstract="true" eSuperTypes="#//BibTeXEntry">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="authors" lowerBound="1"
+        upperBound="-1" eType="#//Author" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DatedEntry" abstract="true" eSuperTypes="#//BibTeXEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="year" ordered="false" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TitledEntry" abstract="true" eSuperTypes="#//BibTeXEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" ordered="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BookTitledEntry" abstract="true" eSuperTypes="#//BibTeXEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="booktitle" ordered="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Article" eSuperTypes="#//AuthoredEntry #//DatedEntry #//TitledEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="journal" ordered="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TechReport" eSuperTypes="#//AuthoredEntry #//DatedEntry #//TitledEntry"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Unpublished" eSuperTypes="#//AuthoredEntry #//TitledEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="note" ordered="false" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Manual" eSuperTypes="#//TitledEntry"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Proceedings" eSuperTypes="#//DatedEntry #//TitledEntry"/>
+  <eClassifiers xsi:type="ecore:EClass" name="InProceedings" eSuperTypes="#//Proceedings #//AuthoredEntry #//BookTitledEntry"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Booklet" eSuperTypes="#//DatedEntry"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Book" eSuperTypes="#//AuthoredEntry #//DatedEntry #//TitledEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="publisher" ordered="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="InCollection" eSuperTypes="#//Book #//BookTitledEntry"/>
+  <eClassifiers xsi:type="ecore:EClass" name="InBook" eSuperTypes="#//Book">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="chapter" ordered="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Misc" eSuperTypes="#//BibTeXEntry"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ThesisEntry" abstract="true" eSuperTypes="#//AuthoredEntry #//DatedEntry #//TitledEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="school" ordered="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PhDThesis" eSuperTypes="#//ThesisEntry"/>
+  <eClassifiers xsi:type="ecore:EClass" name="MasterThesis" eSuperTypes="#//ThesisEntry"/>
+</ecore:EPackage>
+
+
+--- DocBook.ecore ---
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="DocBook" nsURI="http://DocBook/1.0" nsPrefix="DocBook">
+  <eClassifiers xsi:type="ecore:EClass" name="DocBook">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books" lowerBound="1" upperBound="-1"
+        eType="#//Book" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Book">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="articles" lowerBound="1"
+        upperBound="-1" eType="#//Article" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TitledElement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" ordered="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Article" eSuperTypes="#//TitledElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sections_1" lowerBound="1"
+        upperBound="-1" eType="#//Sect1" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Section" abstract="true" eSuperTypes="#//TitledElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="paras" lowerBound="1" upperBound="-1"
+        eType="#//Para" containment="true" eOpposite="#//Para/section"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Sect1" eSuperTypes="#//Section">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sections_2" lowerBound="1"
+        upperBound="-1" eType="#//Sect2" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Sect2" eSuperTypes="#//Section"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Para">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="content" ordered="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="section" lowerBound="1"
+        eType="#//Section" eOpposite="#//Section/paras"/>
+  </eClassifiers>
+</ecore:EPackage>
+
+--------------------------------
+OCL CONSTRAINTS
+--------------------------------
+All generated source models must satisfy the following constraints:
+---------------------------------------------------------------------------------------
+--- Copyright (c) 2017 Universidad de Sevilla.
+--- All rights reserved. This program and the accompanying materials
+--- are made available under the terms of the Eclipse Public License v1.0
+--- which accompanies this distribution, and is available at
+--- http://www.eclipse.org/legal/epl-v10.html
+---
+--- Contributors:
+--- Javier Troya (Universidad de Sevilla, Spain) - implementation
+---------------------------------------------------------------------------------------
+
+--The following 16 OCL constraints are taken from the TSE 2015 paper
+
+--OCL1. It checks that the main Article is properly created and named (Rule Main)
+TrgBook.allInstances()->forAll(b | b.articles->exists(a | a.title = 'BibTeXML to DocBook'))
+
+--OCL2. It checks that all the sections for the main Article are properly created and named (Rule Main)
+TrgArticle.allInstances()->forAll(a | a.sections_1->size() >= 4 and a.sections_1->at(1).title = 'References List' and a.sections_1->at(2).title = 'Authors List' and a.sections_1->at(3).title = 'Titles List' and a.sections_1->at(4).title = 'Journals List')
+
+--OCL3. It checks that all Articles have a paragraph for the author information
+SrcAuthor.allInstances()->forAll(au|TrgArticle.allInstances()->exists(a|a.sections_1->at(2).paras->exists(p|p.content=au.author )))
+
+--OCL4. It checks that for each of the authors that appear in all the different publications, there is a paragraph with the name of the author within a section named 'Authors List'
+SrcAuthor.allInstances()->forAll(a | TrgPara.allInstances()->exists(p | p.content = a.author and p.section.title = 'Authors List'))
+
+--OCL5. It checks that a Booklet is properly converted into a paragraph with the right content ('[' + id of the Booklet + ']' + 'Booklet' + its year) and within the right section ('References List').  
+SrcBooklet.allInstances()->forAll(b | TrgPara.allInstances()->exists(p | p.content = '['.concat(b.id).concat('] Booklet ').concat(b.year) and p.section.title = 'References List'))
+
+--OCL6. It checks that an Unpublished publication (UP) authored and titled entry is properly converted into a paragraph with the right content ('[' + id of the UP + ']' + 'Unpublished' + its title + its authors + its note) and within the right section ('References List'). And also that its title is included in another paragraph within the right section ('Titles List')
+SrcUnpublished.allInstances()->forAll(b|TrgPara.allInstances()->exists(p|p.content='[' + b.id + '] Unpublished ' + b.title + ' ' + b.authors->iterate(e;str:String=''|str+e.author+' ') + b.note  and p.section.title = 'References List') and TrgPara.allInstances()->exists(p | p.content = b.title and p.section.title = 'Titles List'))
+
+--OCL7. It checks that a MasterThesis is properly converted into a paragraph with the right content ('[' + id of the MasterThesis + ']' + 'MaterThesis' + its title + its authors + its note + its year + its school) and within the right section ('References List'). And also that its title is included in another paragraph within the right section ('Titles List') 
+--SrcMasterThesis.allInstances()->forAll(b |TrgPara.allInstances()->exists(p | p.content = '[' + b.id +'] MasterThesis ' + b.title + ' ' + b.authors->iterate(e; str : String = '' | str + e.author + ' ') + b.year + ' ' + b.school and p.section.title = 'References List') and TrgPara.allInstances()->exists(p | p.content = b.title and p.section.title = 'Titles List'))
+
+--OCL8. It checks that a PhDThesis is properly converted into a paragraph with the right content ('[' + id of the PhDThesis + ']' + 'PhDThesis' + its title + its authors + its note + its year + its school) and within the right section ('References List'). And also that its title is included in another paragraph within the right section ('Titles List')
+SrcPhDThesis.allInstances()->forAll(b | TrgPara.allInstances()->exists(p | p.content = '[' + b.id + '] PhDThesis ' + b.title + ' ' + b.authors->iterate(e; str : String = '' | str + e.author + ' ') + b.year + ' ' + b.school and p.section.title = 'References List') and TrgPara.allInstances()->exists(p | p.content = b.title and p.section.title = 'Titles List'))
+
+--OCL9. It checks that a Book (but not its children) is properly converted into a paragraph with the right content ('[' + id of the Book + ']' + 'Book' + its title + its authors + its note + its year + its publisher) and within the right section ('References List'). And also that its title is included in another paragraph within the right section ('Titles List')
+SrcBook.allInstances()->select(b|b.oclIsTypeOf(SrcBook))->forAll(b | TrgPara.allInstances()->exists(p | p.content ='['+b.id+'] Book ' + b.title + ' ' + b.authors->iterate(e; str : String =  '' | str + e.author + ' ') + b.year + ' ' + b.publisher and p.section.title = 'References List') and	TrgPara.allInstances()->exists(p | p.content = b.title and p.section.title = 'Titles List'))
+
+--OCL10. It checks that an InBook is properly converted into a paragraph with the right content ('[' + id of the InBook + ']' + 'InBook' + its title + its authors + its note + its year + its publisher + its chapter) and within the right section ('References List'). And also that its title is included in another paragraph within the right section ('Titles List')
+SrcInBook.allInstances()->forAll(b | TrgPara.allInstances()->exists(p | p.content = '[' + b.id + '] InBook ' + b.title + ' ' + b.authors->iterate(e; str : String = '' | str + e.author + ' ') + b.year + ' ' + b.publisher + ' ' + b.chapter.toString() and p.section.title = 'References List') and TrgPara.allInstances()->exists(p | p.content = b.title and p.section.title = 'Titles List'))
+
+--OCL11. It checks that a TechReport is properly converted into a paragraph with the right content ('[' + id of the TechReport + ']' + 'TechReport' + its title + its authors + its year) and within the right section ('References List'). And also that its title is included in another paragraph within the right section ('Titles List')
+SrcTechReport.allInstances()->forAll(b | TrgPara.allInstances()->exists(p | p.content = '['+b.id+'] TechReport ' + b.title + ' ' + b.authors->iterate(e; str : String = '' | str + e.author + ' ') + b.year and p.section.title = 'References List') and	TrgPara.allInstances()->exists(p | p.content = b.title and	p.section.title = 'Titles List'))
+
+--OCL12. It checks that a Manual is properly converted into a paragraph with the right content ('[' + id of the Manual + ']' + 'Manual' + its title) and within the right section ('References List'). And also that its title is included in another paragraph within the right section ('Titles List')
+SrcManual.allInstances()->forAll(b | TrgPara.allInstances()->exists(p | p.content = '['.concat(b.id).concat('] Manual ').concat(b.title) and p.section.title = 'References List')	and TrgPara.allInstances()->exists(p | p.content = b.title and p.section.title = 'Titles List'))
+
+--OCL13. It checks that a Proceedings (but not its children) is properly converted into a paragraph with the right content ('[' + id of the Proceedings + ']' + 'Proceedings' + its title + its year) and within the right section ('References List'). And also that its title is included in another paragraph within the right section ('Titles List')
+SrcProceedings.allInstances()->select(p|p.oclIsTypeOf(SrcProceedings))->forAll(b | TrgPara.allInstances()->exists(p | p.content = '['+b.id+'] Proceedings ' + b.title + ' ' + b.year and p.section.title = 'References List') and TrgPara.allInstances()->exists(p | p.content = b.title and p.section.title = 'Titles List'))
+
+--OCL14. It checks that an InProceedings is properly converted into a paragraph with the right content ('[' + id of the InProceedings + ']' + 'InProceedings' + its title + its authors + its year + its booktitle) and within the right section ('References List'). And also that its title is included in another paragraph within the right section ('Titles List')
+SrcInProceedings.allInstances()->forAll(b |	TrgPara.allInstances()->exists(p | p.content = '['+b.id+'] InProceedings ' + b.title + ' ' + b.authors->iterate(e; str : String = '' | str + e.author+ ' ') + b.year + ' ' + b.booktitle) and	TrgPara.allInstances()->exists(p | p.content = b.title and p.section.title = 'Titles List'))
+
+--OCL15. It checks that an InCollection is properly converted into a paragraph with the right content ('[' + id of the InCollection + ']' + 'InCollection' + its title + its authors + its year + its booktitle + its publisher) and within the right section ('References List'). And also that its title is included in another paragraph within the right section ('Titles List')
+SrcInCollection.allInstances()->forAll(b | TrgPara.allInstances()->exists(p | p.content = '['+b.id+'] InCollection ' + b.title + ' ' + b.authors->iterate(e; str : String = '' | str + e.author + ' ') + b.year + ' ' + b.booktitle + ' ' + b.publisher) and	TrgPara.allInstances()->exists(p | p.content = b.title and p.section.title = 'Titles List'))
+
+--OCL16. It checks that an Article is properly converted into a paragraph with the right content ('[' + id of the Article + ']' + 'Article' + its title + its authors + its year + its journal) and within the right section ('References List'). And also that its title is included in another paragraph within the right section ('Titles List') and also that its journal is included in another paragraph within the right section ('Journals List')
+SrcArticle.allInstances()->forAll(b | TrgPara.allInstances()->exists(p | p.content = '['+b.id+'] Article ' + b.title + ' ' + b.authors->iterate(e; str : String = '' | str + e.author + ' ') + b.year + ' ' + b.journal) and TrgPara.allInstances()->exists(p | p.content = b.title and p.section.title = 'Titles List') and TrgPara.allInstances()->exists(p | p.content = b.journal and p.section.title = 'Journals List'))
+
+-- End of the 16 OCL constraints from the TSE 2015 paper
+
+--OCL17. It checks that the number of DocBooks and Books created must be the same as the number of BibTexFiles
+SrcBibTeXFile.allInstances()->size() = TrgDocBook.allInstances()->size() and SrcBibTeXFile.allInstances()->size() = TrgBook.allInstances()->size()
+
+--OCL18. It checks that for each of the titles that appear in all the different publications, there is a paragraph with the title as content within a section named 'Titles List'
+SrcTitledEntry.allInstances() -> forAll(te | TrgPara.allInstances()->exists(p | p.content = te.title and p.section.title = 'Titles List'))
+
+--OCL19. It checks that for each of the articles, there is a paragraph with the name of the journal of the article within a section named 'Journals List'
+SrcArticle.allInstances()->forAll(a | TrgPara.allInstances()->exists(p | p.content = a.journal and p.section.title = 'Journals List'))
+
+--OCL20. It checks that the titles of all the publications appear in the content of a paragraph of a section
+SrcTitledEntry.allInstances()->forAll(te | TrgSect1.allInstances() -> exists(s | s.paras -> exists(p | p.content = te.title)))
+
+--OCL21. It checks that there are no two paragraphs within the 'Authors List' section with the same content
+not TrgSect1.allInstances() -> asSequence() -> select(s | s.title = 'Authors List') -> first().paras -> exists(p1,p2 | p1<>p2 and p1.content=p2.content)
+
+--OCL22. It checks that there are no two paragraphs within the 'Titles List' section with the same content
+not TrgSect1.allInstances() -> asSequence() -> select(s | s.title = 'Titles List') -> first().paras -> exists(p1,p2 | p1<>p2 and p1.content=p2.content)
+
+--OCL23. It checks that there are no two paragraphs within the 'Journals List' section with the same content
+not TrgSect1.allInstances() -> asSequence() -> select(s | s.title = 'Journals List') -> first().paras -> exists(p1,p2 | p1<>p2 and p1.content=p2.content)
+
+--OCL24. There is a paragraph within the section 'References List' for every Bibtex entry, so the number of instances must be the same
+SrcBibTeXEntry.allInstances()->size() = TrgSect1.allInstances()->select(s | s.title = 'References List') -> asSequence() -> first().paras -> size()
+
+--OCL25. The number of distinct titles must be the same as the number of paragraphs within the 'Titles List' section
+SrcTitledEntry.allInstances()->iterate(e; te : Sequence(SrcTitledEntry) = Sequence {} |	if te->collect(ee | ee.title)->includes(e.title) then	te else	te->including(e) endif) -> size() = TrgSect1.allInstances()->select(s | s.title = 'Titles List') -> asSequence() -> first().paras -> size()
+
+--OCL26. The number of distinct author names must be the same as the number of paragraphs within the 'Authors List' section
+SrcAuthor.allInstances()->iterate(e; a : Sequence(SrcAuthor) = Sequence {} | if a->collect(ee | ee.author)->includes(e.author) then	a else a->including(e) endif ) -> size() = TrgSect1.allInstances()->select(s | s.title = 'Authors List') -> asSequence() -> first().paras -> size()
+
+--OCL27. The number of distinct journals names must be the same as the number of paragraphs within the 'Journals List' section
+SrcArticle.allInstances()->iterate(e; a : Sequence(SrcArticle) = Sequence {} | if a->collect(ee | ee.journal)->includes(e.journal) then	a else a->including(e) endif ) -> size() = TrgSect1.allInstances()->select(s | s.title = 'Journals List') -> asSequence() -> first().paras -> size()
+
+--------------------------------
+MODEL TRANSFORMATION (ATL)
+--------------------------------
+Study this ATL transformation carefully to understand which source structures
+trigger which rules. Use this knowledge to design a source model that exercises
+as many different transformation rules as possible.
+
+module BibTeX2DocBook;
+create OUT : DocBook, TM : TMM from IN : BibTeX;
+
+helper def : trace : TMM!Trace = OclUndefined;
+
+-------------------------------------------------------------------------------
+-- RULES ----------------------------------------------------------------------
+-------------------------------------------------------------------------------
+entrypoint rule createTrace()
+{
+	to
+		tr : TMM!Trace( )
+	
+	do {
+		thisModule.trace <- tr;
+	}	
+}
+
+-- R1
+-- Rule 'Main'
+-- This rule generates the structure of the DocBook model from a BibTeXFile element
+rule Main {
+	from
+        bib : BibTeX!BibTeXFile
+	to 
+		doc : DocBook!DocBook (
+			books <- boo
+		),
+		boo : DocBook!Book (
+			articles <- art
+		),
+		art : DocBook!Article (
+			title <- 'BibTeXML to DocBook',
+			sections_1 <- Sequence{se1, se2, se3, se4}
+		),
+		se1 : DocBook!Sect1 (
+			title <- 'References List',
+			paras <- BibTeX!BibTeXEntry.allInstances()->sortedBy(e | e.id)
+		),
+		se2 : DocBook!Sect1 (
+			title <- 'Authors List',
+			paras <- BibTeX!Author.allInstances()->iterate(e; ret : Sequence(BibTeX!Author) = Sequence {} |
+				if ret->collect(e | e.author)->includes(e.author) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.author)
+		),
+		se3 : DocBook!Sect1 (
+			title <- 'Titles List',
+			paras <- BibTeX!TitledEntry.allInstances()->iterate(e; ret : Sequence(BibTeX!TitledEntry) = Sequence {} |
+				if ret->collect(e | e.title)->includes(e.title) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.title)	->collect(e | thisModule.resolveTemp(e, 'title_para'))
+		),
+		se4 : DocBook!Sect1 (
+			title <- 'Journals List',
+			paras <- BibTeX!Article.allInstances()->iterate(e; ret : Sequence(BibTeX!Article) = Sequence {} |
+				if ret->collect(e | e.journal)->includes(e.journal) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.journal)->collect(e | thisModule.resolveTemp(e, 'journal_para'))
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'Main',
+			targetElements <- Sequence{doc,boo,art,se1,se2,se3,se4}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{bib};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+-- R2
+-- Rule 'Author'
+-- This rule generates a section_2 paragraph for each distinct author.
+rule Author {
+	from
+		a : BibTeX!Author (
+			  BibTeX!Author.allInstances()->iterate(e; ret : Sequence(BibTeX!Author) = Sequence {} |
+				if ret->collect(e | e.author)->includes(e.author) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.author)->includes(a))
+	to
+		p1 : DocBook!Para (
+			content <- a.author
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'Author',
+			targetElements <- Sequence{p1}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{a};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+-- R3
+-- Rule 'UntitledEntry'
+-- This rule generates a section_1 paragraph for each untitled entry.
+-- The elements that should trigger this rule are: Misc, Booklet
+rule UntitledEntry {
+	from
+		e : BibTeX!BibTeXEntry (
+			not e.oclIsKindOf(BibTeX!TitledEntry)
+		)
+	to
+		p : DocBook!Para (
+			content <- '[' + e.id + ']'
+				+ ' ' + e.oclType().name
+				+ (if e.oclIsKindOf(BibTeX!TitledEntry) then ' ' + e.title else '' endif)
+				+ (if e.oclIsKindOf(BibTeX!AuthoredEntry) 
+				   then e.authors->iterate(e; str : String = '' | str + ' ' + e.author)
+				   else ''
+				   endif)
+				+ (if e.oclIsKindOf(BibTeX!DatedEntry) then ' ' + e.year else '' endif)
+				+ (if e.oclIsKindOf(BibTeX!BookTitledEntry) then ' ' + e.booktitle else '' endif)
+				+ (if e.oclIsKindOf(BibTeX!ThesisEntry) then ' ' +  e.school else '' endif)
+				+ (if e.oclIsKindOf(BibTeX!Article) then ' ' + e.journal else '' endif)
+				+ (if e.oclIsKindOf(BibTeX!Unpublished) then ' ' + e.note else '' endif)
+				+ (if e.oclIsKindOf(BibTeX!Book) then ' ' + e.publisher else '' endif)
+				+ (if e.oclIsKindOf(BibTeX!InBook) then ' ' + e.chapter.toString() else '' endif)
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'UntitledEntry',
+			targetElements <- Sequence{p}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{e};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+
+
+-- R4
+-- Rule 'TitledEntry_Title_NoArticle'
+-- [titledEntrySet contains a subset of TitledEntry, so that each title
+-- appears only once in the set]
+-- For each "no article" titled entry that belongs to titledEntrySet,
+-- this rule generates:
+--   * a section_1 paragraph;
+--   * a section_3 paragraph.
+-- The elements that should trigger this rule are (but not all of them, since two publications with the same title don't trigger this rule twice):
+-- MasterThesis, PhDThesis, InBook, Book, InCollection, InProceedings, Proceedings, Manual, Unpublished, TechReport
+rule TitledEntry_Title_NoArticle {
+	from
+		e : BibTeX!TitledEntry (
+			BibTeX!TitledEntry.allInstances()->iterate(e; ret : Sequence(BibTeX!TitledEntry) = Sequence {} |
+				if ret->collect(e | e.title)->includes(e.title) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.title)->includes(e) and
+			not e.oclIsKindOf(BibTeX!Article)
+		)
+	to
+		entry_para : DocBook!Para (
+			content <- '[' + e.id + ']'
+			+ ' ' + e.oclType().name
+			+ (if e.oclIsKindOf(BibTeX!TitledEntry) then ' ' + e.title else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!AuthoredEntry) 
+			   then e.authors->iterate(e; str : String = '' | str + ' ' + e.author)
+			   else ''
+			   endif)
+			+ (if e.oclIsKindOf(BibTeX!DatedEntry) then ' ' + e.year else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!BookTitledEntry) then ' ' + e.booktitle else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!ThesisEntry) then ' ' +  e.school else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Article) then ' ' + e.journal else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Unpublished) then ' ' + e.note else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Book) then ' ' + e.publisher else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!InBook) then ' ' + e.chapter.toString() else '' endif)
+		),
+		title_para : DocBook!Para (
+			content <- e.title
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'TitledEntry_Title_NoArticle',
+			targetElements <- Sequence{entry_para, title_para}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{e};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+-- R5
+-- Rule 'TitledEntry_NoTitle_NoArticle'
+-- [titledEntrySet contains a subset of TitledEntry, so that each title
+-- appears only once in the set]
+-- For each "no article" titled entry that does not belong to titledEntrySet,
+-- this rule generates:
+--   * a section_1 paragraph;
+-- It is executed when there are two or more titled publications with the same title.
+-- The elements that should trigger this rule are (but not all of them, since two publications with the same title don't trigger this rule twice):
+-- MasterThesis, PhDThesis, InBook, Book, InCollection, InProceedings, Proceedings, Manual, Unpublished, TechReport
+rule TitledEntry_NoTitle_NoArticle {
+	from
+		e : BibTeX!TitledEntry (
+			not BibTeX!TitledEntry.allInstances()->iterate(e; ret : Sequence(BibTeX!TitledEntry) = Sequence {} |
+				if ret->collect(e | e.title)->includes(e.title) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.title)->includes(e) and
+			not e.oclIsKindOf(BibTeX!Article)
+		)
+	to
+		entry_para : DocBook!Para (
+			content <- '[' + e.id + ']'
+			+ ' ' + e.oclType().name
+			+ (if e.oclIsKindOf(BibTeX!TitledEntry) then ' ' + e.title else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!AuthoredEntry) 
+			   then e.authors->iterate(e; str : String = '' | str + ' ' + e.author)
+			   else ''
+			   endif)
+			+ (if e.oclIsKindOf(BibTeX!DatedEntry) then ' ' + e.year else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!BookTitledEntry) then ' ' + e.booktitle else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!ThesisEntry) then ' ' +  e.school else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Article) then ' ' + e.journal else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Unpublished) then ' ' + e.note else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Book) then ' ' + e.publisher else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!InBook) then ' ' + e.chapter.toString() else '' endif)
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'TitledEntry_NoTitle_NoArticle',
+			targetElements <- Sequence{entry_para}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{e};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+-- R6
+-- Rule 'Article_Title_Journal'
+-- [titledEntrySet contains a subset of TitledEntry, so that each title
+-- appears only once in the set]
+-- [articleSet contains a subset of Article, so that each journal
+-- appears only once in the set]
+-- For each article entry that belongs to articleSet, this rule generates:
+--   * a section_1 paragraph;
+--   * a section_3 paragraph;
+--   * a section_4 paragraph.
+-- The elements that should trigger this rule are: Article
+rule Article_Title_Journal {
+	from
+		e : BibTeX!Article (
+			BibTeX!TitledEntry.allInstances()->iterate(e; ret : Sequence(BibTeX!TitledEntry) = Sequence {} |
+				if ret->collect(e | e.title)->includes(e.title) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.title)->includes(e) and
+			BibTeX!Article.allInstances()->iterate(e; ret : Sequence(BibTeX!Article) = Sequence {} |
+				if ret->collect(e | e.journal)->includes(e.journal) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.journal)->includes(e)
+		)
+	to
+		entry_para : DocBook!Para (
+			content <- '[' + e.id + ']'
+			+ ' ' + e.oclType().name
+			+ (if e.oclIsKindOf(BibTeX!TitledEntry) then ' ' + e.title else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!AuthoredEntry) 
+			   then e.authors->iterate(e; str : String = '' | str + ' ' + e.author)
+			   else ''
+			   endif)
+			+ (if e.oclIsKindOf(BibTeX!DatedEntry) then ' ' + e.year else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!BookTitledEntry) then ' ' + e.booktitle else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!ThesisEntry) then ' ' +  e.school else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Article) then ' ' + e.journal else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Unpublished) then ' ' + e.note else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Book) then ' ' + e.publisher else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!InBook) then ' ' + e.chapter.toString() else '' endif)
+		),
+		title_para : DocBook!Para (
+			content <- e.title
+		),
+		journal_para : DocBook!Para (
+			content <- e.journal
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'Article_Title_Journal',
+			targetElements <- Sequence{entry_para, title_para, journal_para}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{e};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+-- R7
+-- Rule 'Article_NoTitle_Journal'
+-- [titledEntrySet contains a subset of TitledEntry, so that each title
+-- appears only once in the set]
+-- [articleSet contains a subset of Article, so that each journal
+-- appears only once in the set]
+-- For each article entry that belongs to articleSet, this rule generates:
+--   * a section_1 paragraph;
+--   * a section_4 paragraph.
+-- It is executed when there are two Articles with the same title
+-- The elements that should trigger this rule are: Article
+rule Article_NoTitle_Journal {
+	from
+		e : BibTeX!Article (
+			not BibTeX!TitledEntry.allInstances()->iterate(e; ret : Sequence(BibTeX!TitledEntry) = Sequence {} |
+				if ret->collect(e | e.title)->includes(e.title) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.title)->includes(e) and
+			BibTeX!Article.allInstances()->iterate(e; ret : Sequence(BibTeX!Article) = Sequence {} |
+				if ret->collect(e | e.journal)->includes(e.journal) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.journal)->includes(e)
+		)
+	to
+		entry_para : DocBook!Para (
+			content <- '[' + e.id + ']'
+			+ ' ' + e.oclType().name
+			+ (if e.oclIsKindOf(BibTeX!TitledEntry) then ' ' + e.title else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!AuthoredEntry) 
+			   then e.authors->iterate(e; str : String = '' | str + ' ' + e.author)
+			   else ''
+			   endif)
+			+ (if e.oclIsKindOf(BibTeX!DatedEntry) then ' ' + e.year else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!BookTitledEntry) then ' ' + e.booktitle else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!ThesisEntry) then ' ' +  e.school else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Article) then ' ' + e.journal else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Unpublished) then ' ' + e.note else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Book) then ' ' + e.publisher else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!InBook) then ' ' + e.chapter.toString() else '' endif)
+		),
+		journal_para : DocBook!Para (
+			content <- e.journal
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'Article_NoTitle_Journal',
+			targetElements <- Sequence{entry_para, journal_para}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{e};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+-- R8
+-- Rule 'Article_Title_NoJournal'
+-- [titledEntrySet contains a subset of TitledEntry, so that each title
+-- appears only once in the set]
+-- [articleSet contains a subset of Article, so that each journal
+-- appears only once in the set]
+-- For each article entry that belongs to articleSet, this rule generates:
+--   * a section_1 paragraph;
+--   * a section_3 paragraph.
+-- It is executed when there are two articles within the same journal
+-- The elements that should trigger this rule are: Article
+rule Article_Title_NoJournal {
+	from
+		e : BibTeX!Article (
+			BibTeX!TitledEntry.allInstances()->iterate(e; ret : Sequence(BibTeX!TitledEntry) = Sequence {} |
+				if ret->collect(e | e.title)->includes(e.title) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.title)->includes(e) and
+			not BibTeX!Article.allInstances()->iterate(e; ret : Sequence(BibTeX!Article) = Sequence {} |
+				if ret->collect(e | e.journal)->includes(e.journal) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.journal)->includes(e)
+		)
+	to
+		entry_para : DocBook!Para (
+			content <- '[' + e.id + ']'
+			+ ' ' + e.oclType().name
+			+ (if e.oclIsKindOf(BibTeX!TitledEntry) then ' ' + e.title else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!AuthoredEntry) 
+			   then e.authors->iterate(e; str : String = '' | str + ' ' + e.author)
+			   else ''
+			   endif)
+			+ (if e.oclIsKindOf(BibTeX!DatedEntry) then ' ' + e.year else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!BookTitledEntry) then ' ' + e.booktitle else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!ThesisEntry) then ' ' +  e.school else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Article) then ' ' + e.journal else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Unpublished) then ' ' + e.note else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Book) then ' ' + e.publisher else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!InBook) then ' ' + e.chapter.toString() else '' endif)
+		),
+		title_para : DocBook!Para (
+			content <- e.title
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'Article_Title_NoJournal',
+			targetElements <- Sequence{entry_para, title_para}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{e};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+-- R9
+-- Rule 'Article_NoTitle_NoJournal'
+-- [titledEntrySet contains a subset of TitledEntry, so that each title
+-- appears only once in the set]
+-- [articleSet contains a subset of Article, so that each journal
+-- appears only once in the set]
+-- For each article entry that belongs to articleSet, this rule generates:
+--   * a section_1 paragraph;
+-- It is executed when there are two articles with the same title and within the same journal
+-- The elements that should trigger this rule are: Article
+rule Article_NoTitle_NoJournal {
+	from
+		e : BibTeX!Article (
+			not BibTeX!TitledEntry.allInstances()->iterate(e; ret : Sequence(BibTeX!TitledEntry) = Sequence {} |
+				if ret->collect(e | e.title)->includes(e.title) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.title)->includes(e) and
+			not BibTeX!Article.allInstances()->iterate(e; ret : Sequence(BibTeX!Article) = Sequence {} |
+				if ret->collect(e | e.journal)->includes(e.journal) then
+					ret
+				else
+					ret->including(e)
+				endif
+			)->sortedBy(e | e.journal)->includes(e)
+		)
+	to
+		entry_para : DocBook!Para (
+			content <- '[' + e.id + ']'
+			+ ' ' + e.oclType().name
+			+ (if e.oclIsKindOf(BibTeX!TitledEntry) then ' ' + e.title else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!AuthoredEntry) 
+			   then e.authors->iterate(e; str : String = '' | str + ' ' + e.author)
+			   else ''
+			   endif)
+			+ (if e.oclIsKindOf(BibTeX!DatedEntry) then ' ' + e.year else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!BookTitledEntry) then ' ' + e.booktitle else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!ThesisEntry) then ' ' +  e.school else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Article) then ' ' + e.journal else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Unpublished) then ' ' + e.note else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!Book) then ' ' + e.publisher else '' endif)
+			+ (if e.oclIsKindOf(BibTeX!InBook) then ' ' + e.chapter.toString() else '' endif)
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'Article_NoTitle_NoJournal',
+			targetElements <- Sequence{entry_para}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{e};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+--------------------------------
+EXAMPLE SOURCE MODELS
+--------------------------------
+Below are example source models that conform to the source metamodel.
+Use them only to understand the correct source-side XMI format and structure.
+Generate a NEW and DIFFERENT source model that covers different ATL rules.
+
+--- Example 1: AutomaticModel_BibTex1.xmi ---
+<?xml version="1.0" encoding="ASCII"?>
+<BibTeX:BibTeXFile xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:BibTeX="http://BibTeX/1.0">
+  <entries xsi:type="BibTeX:Article" id="ijvchkubhy" year="1995" title="QoS-aware middleware for Web services composition" journal="Journal of Systems and Software">
+    <authors author="Dorothy E. Denning"/>
+  </entries>
+  <entries xsi:type="BibTeX:Article" id="sjb-m_rqnx" year="1987" title="A metrics suite for object oriented design" journal="Software -- Practice and Experience">
+    <authors author="Kim G. Larsen"/>
+    <authors author="Craig Larman"/>
+    <authors author="Martin Fowler"/>
+  </entries>
+  <entries xsi:type="BibTeX:Article" id="urbxwxrrdb" year="1987" title="Graph drawing by force-directed placement" journal="Information and Software Technology">
+    <authors author="Paul Pettersson"/>
+  </entries>
+  <entries xsi:type="BibTeX:Article" id="ccjv_mddem" year="2004" title="Graph drawing by force-directed placement" journal="IEEE Transactions on Software Engineering">
+    <authors author="Gerard J. Holzmann"/>
+    <authors author="Craig Larman"/>
+    <authors author="Thomas M. J. Fruchterman"/>
+    <authors author="Robert C. Martin"/>
+  </entries>
+  <entries xsi:type="BibTeX:Article" id="u_mmjggkm_" year="1991" title="Complexity measure" journal="Information and Software Technology">
+    <authors author="Nenad Medvidovic"/>
+    <authors author="Thomas M. J. Fruchterman"/>
+    <authors author="Craig Larman"/>
+    <authors author="Paul Pettersson"/>
+  </entries>
+  <entries xsi:type="BibTeX:Manual" id="lbgq-lfhrq" title="Graph drawing by force-directed placement"/>
+  <entries xsi:type="BibTeX:Manual" id="lt_pgq te " title="Program slicing"/>
+  <entries xsi:type="BibTeX:Manual" id="cuvx-ezy d" title="QoS-aware middleware for Web services composition"/>
+  <entries xsi:type="BibTeX:Book" id="s-d  j--in" year="2000" title="An intrusion-detection model" publisher="mefsvqhvlf">
+    <authors author="Liangzhao Zeng"/>
+    <authors author="Liangzhao Zeng"/>
+    <authors author="Donald E. Knuth"/>
+  </entries>
+  <entries xsi:type="BibTeX:Book" id="kawsxveg v" year="1976" title="A metrics suite for object oriented design" publisher="uqknawbazm">
+    <authors author="Paul Pettersson"/>
+    <authors author="Richard N. Taylor"/>
+    <authors author="Nenad Medvidovic"/>
+  </entries>
+  <entries xsi:type="BibTeX:InBook" id="cblkzozosg" year="1991" title="QoS-aware middleware for Web services composition" publisher="q_fr gauv " chapter="61">
+    <authors author="Liangzhao Zeng"/>
+    <authors author="Chris F. Kemerer"/>
+  </entries>
+  <entries xsi:type="BibTeX:Misc" id="ksox_z_-pu"/>
+  <entries xsi:type="BibTeX:PhDThesis" id="mysxrciyiu" year="1997" title="4 + 1 view model of architecture" school="jkdwklgbtl">
+    <authors author="Donald E. Knuth"/>
+    <authors author="Edward N. Reingold"/>
+    <authors author="Wang Yi"/>
+  </entries>
+  <entries xsi:type="BibTeX:PhDThesis" id="oqyzgh pmz" year="1984" title="A metrics suite for object oriented design" school="xmrf ywcbn">
+    <authors author="Wang Yi"/>
+    <authors author="Elisabeth Freeman"/>
+    <authors author="Steve McConnell"/>
+    <authors author="Craig Larman"/>
+  </entries>
+</BibTeX:BibTeXFile>
+
+
+--- Example 1 ATL output: DocBook_out1.xmi ---
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DocBook:DocBook xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:DocBook="http://DocBook/1.0">
+  <books>
+    <articles title="BibTeXML to DocBook">
+      <sections_1 title="References List">
+        <paras content="[cblkzozosg] InBook QoS-aware middleware for Web services composition Liangzhao Zeng Chris F. Kemerer 1991 q_fr gauv  61"/>
+        <paras content="[ccjv_mddem] Article Graph drawing by force-directed placement Gerard J. Holzmann Craig Larman Thomas M. J. Fruchterman Robert C. Martin 2004 IEEE Transactions on Software Engineering"/>
+        <paras content="[cuvx-ezy d] Manual QoS-aware middleware for Web services composition"/>
+        <paras/>
+        <paras content="[kawsxveg v] Book A metrics suite for object oriented design Paul Pettersson Richard N. Taylor Nenad Medvidovic 1976 uqknawbazm"/>
+        <paras content="[ksox_z_-pu] Misc"/>
+        <paras content="[lbgq-lfhrq] Manual Graph drawing by force-directed placement"/>
+        <paras content="[lt_pgq te ] Manual Program slicing"/>
+        <paras content="[mysxrciyiu] PhDThesis 4 + 1 view model of architecture Donald E. Knuth Edward N. Reingold Wang Yi 1997 jkdwklgbtl"/>
+        <paras content="[oqyzgh pmz] PhDThesis A metrics suite for object oriented design Wang Yi Elisabeth Freeman Steve McConnell Craig Larman 1984 xmrf ywcbn"/>
+        <paras content="[s-d  j--in] Book An intrusion-detection model Liangzhao Zeng Liangzhao Zeng Donald E. Knuth 2000 mefsvqhvlf"/>
+        <paras/>
+        <paras content="[u_mmjggkm_] Article Complexity measure Nenad Medvidovic Thomas M. J. Fruchterman Craig Larman Paul Pettersson 1991 Information and Software Technology"/>
+        <paras/>
+      </sections_1>
+      <sections_1 title="Authors List">
+        <paras content="Chris F. Kemerer"/>
+        <paras content="Craig Larman"/>
+        <paras content="Donald E. Knuth"/>
+        <paras content="Dorothy E. Denning"/>
+        <paras content="Edward N. Reingold"/>
+        <paras content="Elisabeth Freeman"/>
+        <paras content="Gerard J. Holzmann"/>
+        <paras content="Kim G. Larsen"/>
+        <paras content="Liangzhao Zeng"/>
+        <paras content="Martin Fowler"/>
+        <paras content="Nenad Medvidovic"/>
+        <paras content="Paul Pettersson"/>
+        <paras content="Richard N. Taylor"/>
+        <paras content="Robert C. Martin"/>
+        <paras content="Steve McConnell"/>
+        <paras content="Thomas M. J. Fruchterman"/>
+        <paras content="Wang Yi"/>
+      </sections_1>
+      <sections_1 title="Titles List">
+        <paras content="4 + 1 view model of architecture"/>
+        <paras content="A metrics suite for object oriented design"/>
+        <paras content="An intrusion-detection model"/>
+        <paras content="Complexity measure"/>
+        <paras content="Graph drawing by force-directed placement"/>
+        <paras content="Program slicing"/>
+        <paras content="QoS-aware middleware for Web services composition"/>
+      </sections_1>
+      <sections_1 title="Journals List">
+        <paras content="IEEE Transactions on Software Engineering"/>
+        <paras content="Information and Software Technology"/>
+        <paras content="Journal of Systems and Software"/>
+        <paras content="Software -- Practice and Experience"/>
+      </sections_1>
+    </articles>
+  </books>
+</DocBook:DocBook>
+
+
+--- Example 2: AutomaticModel_BibTex2.xmi ---
+<?xml version="1.0" encoding="ASCII"?>
+<BibTeX:BibTeXFile xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:BibTeX="http://BibTeX/1.0">
+  <entries xsi:type="BibTeX:Article" id="hzdvzuiepn" year="1994" title="QoS-aware middleware for Web services composition" journal="Software -- Practice and Experience">
+    <authors author="Gerard J. Holzmann"/>
+    <authors author="Nenad Medvidovic"/>
+  </entries>
+  <entries xsi:type="BibTeX:Article" id="hlotqizkpf" year="1995" title="A metrics suite for object oriented design" journal="IEEE Transactions on Software Engineering">
+    <authors author="Chris F. Kemerer"/>
+    <authors author="Bruce Schneier"/>
+    <authors author="Craig Larman"/>
+    <authors author="Steve McConnell"/>
+  </entries>
+  <entries xsi:type="BibTeX:Article" id="jtfcfevygx" year="2000" title="Program slicing" journal="Software and Systems Modeling">
+    <authors author="Kim G. Larsen"/>
+    <authors author="Marlon Dumas"/>
+  </entries>
+  <entries xsi:type="BibTeX:Article" id="gxytcdjdps" year="1991" title="A metrics suite for object oriented design" journal="Software -- Practice and Experience">
+    <authors author="Dorothy E. Denning"/>
+    <authors author="Marlon Dumas"/>
+  </entries>
+  <entries xsi:type="BibTeX:Article" id="ohebloazdq" year="2000" title="Program slicing" journal="Software and Systems Modeling">
+    <authors author="Bruce Schneier"/>
+    <authors author="Edward N. Reingold"/>
+    <authors author="Philippe Kruchten"/>
+    <authors author="Chris F. Kemerer"/>
+  </entries>
+  <entries xsi:type="BibTeX:Article" id="z_joynjhho" year="1987" title="A classification and coparison framework for software architecture description languages" journal="Software and Systems Modeling">
+    <authors author="Nenad Medvidovic"/>
+    <authors author="Craig Larman"/>
+  </entries>
+  <entries xsi:type="BibTeX:TechReport" id="u_mz-mkjmi" year="1984" title="A classification and coparison framework for software architecture description languages">
+    <authors author="Steve McConnell"/>
+  </entries>
+  <entries xsi:type="BibTeX:Proceedings" id="stiuksvxyo" year="2000" title="Complexity measure"/>
+  <entries xsi:type="BibTeX:Proceedings" id=" svemrwdgm" year="1995" title="Complexity measure"/>
+  <entries xsi:type="BibTeX:Proceedings" id="jspflvahvn" year="2000" title="A metrics suite for object oriented design"/>
+  <entries xsi:type="BibTeX:Booklet" id="bzvqfa-hox" year="1994"/>
+  <entries xsi:type="BibTeX:Booklet" id="xhqpdymmqb" year="1976"/>
+  <entries xsi:type="BibTeX:Booklet" id="rxpaluidfw" year="1995"/>
+  <entries xsi:type="BibTeX:Book" id="g_btqyds_v" year="1991" title="Graph drawing by force-directed placement" publisher="_qyoxcmddg">
+    <authors author="Marlon Dumas"/>
+    <authors author="Robert C. Martin"/>
+    <authors author="Marlon Dumas"/>
+  </entries>
+  <entries xsi:type="BibTeX:Book" id="v_ym_j-mna" year="1976" title="An intrusion-detection model" publisher="ezbwukq-zl">
+    <authors author="Martin Fowler"/>
+    <authors author="Liangzhao Zeng"/>
+    <authors author="Edward N. Reingold"/>
+  </entries>
+  <entries xsi:type="BibTeX:Misc" id="kxwvqpdyri"/>
+</BibTeX:BibTeXFile>
+
+
+--- Example 2 ATL output: DocBook_out2.xmi ---
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DocBook:DocBook xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:DocBook="http://DocBook/1.0">
+  <books>
+    <articles title="BibTeXML to DocBook">
+      <sections_1 title="References List">
+        <paras content="[ svemrwdgm] Proceedings Complexity measure 1995"/>
+        <paras content="[bzvqfa-hox] Booklet 1994"/>
+        <paras content="[g_btqyds_v] Book Graph drawing by force-directed placement Marlon Dumas Robert C. Martin Marlon Dumas 1991 _qyoxcmddg"/>
+        <paras content="[gxytcdjdps] Article A metrics suite for object oriented design Dorothy E. Denning Marlon Dumas 1991 Software -- Practice and Experience"/>
+        <paras/>
+        <paras/>
+        <paras content="[jspflvahvn] Proceedings A metrics suite for object oriented design 2000"/>
+        <paras/>
+        <paras content="[kxwvqpdyri] Misc"/>
+        <paras content="[ohebloazdq] Article Program slicing Bruce Schneier Edward N. Reingold Philippe Kruchten Chris F. Kemerer 2000 Software and Systems Modeling"/>
+        <paras content="[rxpaluidfw] Booklet 1995"/>
+        <paras content="[stiuksvxyo] Proceedings Complexity measure 2000"/>
+        <paras content="[u_mz-mkjmi] TechReport A classification and coparison framework for software architecture description languages Steve McConnell 1984"/>
+        <paras content="[v_ym_j-mna] Book An intrusion-detection model Martin Fowler Liangzhao Zeng Edward N. Reingold 1976 ezbwukq-zl"/>
+        <paras content="[xhqpdymmqb] Booklet 1976"/>
+        <paras content="[z_joynjhho] Article A classification and coparison framework for software architecture description languages Nenad Medvidovic Craig Larman 1987 Software and Systems Modeling"/>
+      </sections_1>
+      <sections_1 title="Authors List">
+        <paras content="Bruce Schneier"/>
+        <paras content="Chris F. Kemerer"/>
+        <paras content="Craig Larman"/>
+        <paras content="Dorothy E. Denning"/>
+        <paras content="Edward N. Reingold"/>
+        <paras content="Gerard J. Holzmann"/>
+        <paras content="Kim G. Larsen"/>
+        <paras content="Liangzhao Zeng"/>
+        <paras content="Marlon Dumas"/>
+        <paras content="Martin Fowler"/>
+        <paras content="Nenad Medvidovic"/>
+        <paras content="Philippe Kruchten"/>
+        <paras content="Robert C. Martin"/>
+        <paras content="Steve McConnell"/>
+      </sections_1>
+      <sections_1 title="Titles List">
+        <paras content="A classification and coparison framework for software architecture description languages"/>
+        <paras content="A metrics suite for object oriented design"/>
+        <paras content="An intrusion-detection model"/>
+        <paras content="Complexity measure"/>
+        <paras content="Graph drawing by force-directed placement"/>
+        <paras content="Program slicing"/>
+        <paras content="QoS-aware middleware for Web services composition"/>
+      </sections_1>
+      <sections_1 title="Journals List">
+        <paras content="IEEE Transactions on Software Engineering"/>
+        <paras content="Software -- Practice and Experience"/>
+        <paras content="Software and Systems Modeling"/>
+      </sections_1>
+    </articles>
+  </books>
+</DocBook:DocBook>
+
+
+--- Example 3: AutomaticModel_BibTex3.xmi ---
+<?xml version="1.0" encoding="ASCII"?>
+<BibTeX:BibTeXFile xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:BibTeX="http://BibTeX/1.0">
+  <entries xsi:type="BibTeX:Article" id="ou-tvqzirb" year="1976" title="Program slicing" journal="Journal of Systems and Software">
+    <authors author="Dorothy E. Denning"/>
+    <authors author="Robert C. Martin"/>
+    <authors author="Paul Pettersson"/>
+  </entries>
+  <entries xsi:type="BibTeX:Article" id="ep_oigwllw" year="1984" title="Uppaal in a nutshell" journal="Software -- Practice and Experience">
+    <authors author="Philippe Kruchten"/>
+  </entries>
+  <entries xsi:type="BibTeX:Unpublished" id="cobsizqaun" title="4 + 1 view model of architecture" note="dnqoccmanj">
+    <authors author="Craig Larman"/>
+    <authors author="Wang Yi"/>
+    <authors author="Dorothy E. Denning"/>
+    <authors author="Erich Gamma"/>
+  </entries>
+  <entries xsi:type="BibTeX:Unpublished" id="_nrp _x xe" title="Graph drawing by force-directed placement" note="toffvgyybk">
+    <authors author="Liangzhao Zeng"/>
+    <authors author="Erich Gamma"/>
+    <authors author="Robert C. Martin"/>
+  </entries>
+  <entries xsi:type="BibTeX:Unpublished" id="ajhlqyvmkt" title="Complexity measure" note="f_vfggvtal">
+    <authors author="Paul Pettersson"/>
+    <authors author="Donald E. Knuth"/>
+    <authors author="Marlon Dumas"/>
+    <authors author="Elisabeth Freeman"/>
+  </entries>
+  <entries xsi:type="BibTeX:Misc" id="lcxigjqpxj"/>
+  <entries xsi:type="BibTeX:Misc" id="mxwiqz dzk"/>
+  <entries xsi:type="BibTeX:PhDThesis" id="m -rgnnopw" year="2004" title="QoS-aware middleware for Web services composition" school="qazaj- rxs">
+    <authors author="Shyam R. Chidamber"/>
+    <authors author="Wang Yi"/>
+    <authors author="Chris F. Kemerer"/>
+  </entries>
+</BibTeX:BibTeXFile>
+
+
+--- Example 3 ATL output: DocBook_out3.xmi ---
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<DocBook:DocBook xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:DocBook="http://DocBook/1.0">
+  <books>
+    <articles title="BibTeXML to DocBook">
+      <sections_1 title="References List">
+        <paras content="[_nrp _x xe] Unpublished Graph drawing by force-directed placement Liangzhao Zeng Erich Gamma Robert C. Martin toffvgyybk"/>
+        <paras content="[ajhlqyvmkt] Unpublished Complexity measure Paul Pettersson Donald E. Knuth Marlon Dumas Elisabeth Freeman f_vfggvtal"/>
+        <paras content="[cobsizqaun] Unpublished 4 + 1 view model of architecture Craig Larman Wang Yi Dorothy E. Denning Erich Gamma dnqoccmanj"/>
+        <paras/>
+        <paras content="[lcxigjqpxj] Misc"/>
+        <paras content="[m -rgnnopw] PhDThesis QoS-aware middleware for Web services composition Shyam R. Chidamber Wang Yi Chris F. Kemerer 2004 qazaj- rxs"/>
+        <paras content="[mxwiqz dzk] Misc"/>
+        <paras/>
+      </sections_1>
+      <sections_1 title="Authors List">
+        <paras content="Chris F. Kemerer"/>
+        <paras content="Craig Larman"/>
+        <paras content="Donald E. Knuth"/>
+        <paras content="Dorothy E. Denning"/>
+        <paras content="Elisabeth Freeman"/>
+        <paras content="Erich Gamma"/>
+        <paras content="Liangzhao Zeng"/>
+        <paras content="Marlon Dumas"/>
+        <paras content="Paul Pettersson"/>
+        <paras content="Philippe Kruchten"/>
+        <paras content="Robert C. Martin"/>
+        <paras content="Shyam R. Chidamber"/>
+        <paras content="Wang Yi"/>
+      </sections_1>
+      <sections_1 title="Titles List">
+        <paras content="4 + 1 view model of architecture"/>
+        <paras content="Complexity measure"/>
+        <paras content="Graph drawing by force-directed placement"/>
+        <paras content="Program slicing"/>
+        <paras content="QoS-aware middleware for Web services composition"/>
+        <paras content="Uppaal in a nutshell"/>
+      </sections_1>
+      <sections_1 title="Journals List">
+        <paras content="Journal of Systems and Software"/>
+        <paras content="Software -- Practice and Experience"/>
+      </sections_1>
+    </articles>
+  </books>
+</DocBook:DocBook>
+
+--------------------------------
+GENERATION REQUIREMENTS
+--------------------------------
+The source model must:
+1. Conform to the source metamodel.
+2. Satisfy all OCL constraints.
+3. Exercise as many different ATL rules as possible.
+4. Be structurally different from the example source models.
+5. Be syntactically valid XMI.
+6. Use ONLY classes, attributes, references, and namespace prefixes defined
+   in the source metamodel.
+7. Never instantiate target metamodel classes.
+8. Express attribute values as XMI attributes, not as XML text content nodes.
+   CORRECT:   <Entry title="My Title" year="2024"/>
+   INCORRECT: <Entry><title>My Title</title></Entry>
+9. Containment references may be represented as nested XMI elements when
+   required by the source metamodel.
+
+--------------------------------
+SOURCE FORMAT NOTES
+--------------------------------
+
+CRITICAL XMI FORMAT for BibTeX2DocBook source models:
+
+1. Root element MUST be <BibTeX:BibTeXFile> directly — NOT wrapped in <xmi:XMI>:
+   CORRECT:
+     <BibTeX:BibTeXFile xmi:version="2.0"
+         xmlns:xmi="http://www.omg.org/XMI"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:BibTeX="http://BibTeX/1.0">
+   INCORRECT:
+     <xmi:XMI xmi:version="2.0" ...>
+       <BibTeX:BibTeXFile>
+
+2. The xmlns:xsi namespace MUST be declared on the root element.
+   xsi:type is used on <entries> elements and requires this declaration.
+
+3. All <entries> elements use xsi:type to specify the concrete type:
+   <entries xsi:type="BibTeX:Article" id="..." title="..." year="..." journal="...">
+
+4. Authors are nested elements, not attributes:
+   <authors author="John Doe"/>
+
+--------------------------------
+OUTPUT FORMAT
+--------------------------------
+Return exactly one source model and nothing else:
+
+<source_model>
+[source XMI here]
+</source_model>
+
+Do not include: target_model, expected output, coverage notes,
+explanation, or Markdown fences.

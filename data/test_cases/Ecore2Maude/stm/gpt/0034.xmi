@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.com/complexPkg"
+    nsPrefix="cp">
+
+  <!-- 0: Abstract super class -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1: Concrete root class with attributes and containment -->
+  <eClassifiers xsi:type="ecore:EClass" name="Root"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="rootName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="version"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="children"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="configurations"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 2: Node with bidirectional containment, attributes, and refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="Node"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parent"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="eccore:EReference" name="subNodes"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outgoingEdges"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="annotations"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 3: Edge connecting nodes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Edge"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="weight"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source"
+        lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="eccore:EReference" name="target"
+        lowerBound="1"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 4: Enum for configuration kind -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ConfigKind">
+    <eLiterals name="SYSTEM" value="0" literal="SYSTEM"/>
+    <eLiterals name="USER" value="1" literal="USER"/>
+    <eLiterals name="TEMPORARY" value="2" literal="TEMPORARY"/>
+  </eClassifiers>
+
+  <!-- 5: Simple datatype wrapper for identifiers -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Identifier"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 6: Configuration class using enum and custom datatype -->
+  <eClassifiers xsi:type="ecore:EClass" name="Configuration"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="key"
+        lowerBound="1"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        lowerBound="1"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="enabled"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+  </eClassifiers>
+
+  <!-- 7: Annotation attached to nodes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Annotation"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="key"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 8: EClass with operations and parameters -->
+  <eClassifiers xsi:type="ecore:EClass" name="Service"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="operations"
+        upperBound="-1" containment="true"
+        eType="#//EOperation"/>
+  </eClassifiers>
+
+</ecore:EPackage>

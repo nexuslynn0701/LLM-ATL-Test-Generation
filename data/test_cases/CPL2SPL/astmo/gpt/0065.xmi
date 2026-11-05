@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Outgoing, one Incoming -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents: complex Proxy (non-simple) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- make Proxy non-simple by defining at least one branch -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- default selects an AddressSwitch declared later -->
+        <default contents="//@elements.6"/>
+      </contents>
+    </subActions>
+    <!-- one Outgoing and one Incoming, both contents = same simple Proxy -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <!-- simple Proxy: all branches undefined and with a Location in its locations -->
+        <busy xsi:nil="true"/>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy xsi:nil="true"/>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- 1: SubCall, used by Busy inside complex Proxy -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- 2: Location providing URI for simple Proxy forwarding -->
+  <elements xsi:type="CPL:Location" url="sip:simple@example.com" clear="yes" priority="1"/>
+
+  <!-- 3: Redirect, permanent=false, used in Redirection and Default branches -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 4: Reject, unused but allowed as top-level -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 5: Location for Redirect (for Location2URIConstant via Redirect) -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.com" clear="yes" priority="5"/>
+
+  <!-- 6: AddressSwitch used as Default contents of complex Proxy -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- NotPresent and Otherwise children -->
+    <notPresent>
+      <!-- Failure as contents to generate an additional ErrorResponse -->
+      <contents xsi:type="CPL:Failure"/>
+    </notPresent>
+    <otherwise>
+      <!-- Default with contents = SubCall to exercise Default2SelectDefault with SubCall -->
+      <contents xsi:type="CPL:Default">
+        <contents xsi:type="CPL:SubCall" ref="saMain"/>
+      </contents>
+    </otherwise>
+    <!-- One SwitchedAddress referencing simple Proxy -->
+    <addresses is="sip:case@example.com" contains="x" subDomainOf="example.com">
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <busy xsi:nil="true"/>
+      </contents>
+    </addresses>
+  </elements>
+
+  <!-- 7: StringSwitch to exercise StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="hdrField">
+    <strings is="token" contains="abc"/>
+  </elements>
+
+  <!-- 8: LanguageSwitch (only created as Session; contents left undefined) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en-US"/>
+  </elements>
+
+  <!-- 9: TimeSwitch exercising several required attributes -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/eu">
+    <times dtstart="20260101T000000Z" interval="1" wkst="MO" freq="DAILY"/>
+  </elements>
+
+  <!-- 10: PrioritySwitch with SwitchedPriority -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.2" equal="0.5" greater="0.8"/>
+  </elements>
+
+  <!-- 11: Top-level Proxy (another simple Proxy) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy xsi:nil="true"/>
+  </elements>
+
+  <!-- 12: Redirection top-level, contents = Redirect to combine rules -->
+  <elements xsi:type="CPL:Redirection">
+    <contents xsi:type="CPL:Redirect" permanent="true"/>
+  </elements>
+
+  <!-- 13: Location that will be in locations of Redirect via containment chain -->
+  <elements xsi:type="CPL:Location" url="sip:chain@example.org" clear="no" priority="10"/>
+
+</CPL:CPLModel>

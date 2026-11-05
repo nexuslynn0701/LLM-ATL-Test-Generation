@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="outerPkg"
+    nsURI="http://example.org/outerPkg"
+    nsPrefix="outer">
+
+  <!-- Root-level class with no supertype to trigger EmptyList in ClassEqSuperTypes -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootEntity">
+    <!-- Attribute with String type and specific default value to trigger AttEqSpecificDefaultValue as String -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rootCode"
+                         lowerBound="1"
+                         iD="true"
+                         defaultValueLiteral="ROOT-001"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- Class with one supertype and both attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Container">
+    <!-- Single super type: RootEntity (index 0) -->
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+
+    <!-- Attribute with Boolean type, lowerBound=0, upperBound=1, defaultValueLiteral, not ID -->
+    <eStructuralFeatures xsi:type="eccore:EAttribute"
+                         name="activeFlag"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+
+    <!-- Reference to Item, containment, lowerBound=1, upperBound=-1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="items"
+                         lowerBound="1"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- Abstract class with no references / attributes to exercise isAbstract and EmptyList for refs/atts -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractBase" abstract="true">
+    <!-- Super type RootEntity -->
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+  </eClassifiers>
+
+  <!-- Class that will use an enum-typed attribute and a non-primitive DataType attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Config">
+    <!-- Super type RootEntity -->
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+
+    <!-- Attribute typed by local EEnum "Status" -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="ENABLED"
+                         eType="//@eClassifiers.4"/>
+
+    <!-- Attribute typed by custom EDataType "CustomID", no default, to hit '@DataType' branch -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="customId"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- Enum with two literals to trigger Enum2Sort, EnumEqDefaultValue, EqLiterals(EnumLitList) -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="ENABLED" value="0" literal="ENABLED"/>
+    <eLiterals name="DISABLED" value="1" literal="DISABLED"/>
+  </eClassifiers>
+
+  <!-- Custom EDataType to drive '@DataType' branch in attDataType -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomID" instanceClassName="java.lang.String"/>
+
+  <!-- Subpackage to exercise PackEqSubPackages and EPackage.eSuperPackage -->
+  <eSubpackages name="innerPkg"
+                nsURI="http://example.org/outerPkg/inner"
+                nsPrefix="inner">
+    <!-- Class Item inside subpackage, with reference back to Container (non-containment, opposite set) -->
+    <eClassifiers xsi:type="ecore:EClass" name="Item">
+      <!-- Reference back to Container, non-containment, single-valued, opposite 'items' -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="owner"
+                           lowerBound="0"
+                           upperBound="1"
+                           containment="false"
+                           eType="//@eClassifiers.1"/>
+    </eClassifiers>
+
+    <!-- Class Detail extending Item and AbstractBase (multiple supertypes) with one attribute and one reference -->
+    <eClassifiers xsi:type="ecore:EClass" name="Detail">
+      <!-- Multiple supertypes: Item (index 0 in subpkg) and AbstractBase (index 2 in root pkg) -->
+      <eSuperTypes>//@eSubpackages.0/@eClassifiers.0 //@eClassifiers.2</eSuperTypes>
+
+      <!-- Integer attribute with default value to hit Int branch of attDataType and specific default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="sequenceNo"
+                           lowerBound="1"
+                           upperBound="1"
+                           iD="false"
+                           defaultValueLiteral="10"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+
+      <!-- Reference to Config, non-containment, multi-valued, no opposite -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="configRefs"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="false"
+                           eType="//@eClassifiers.3"/>
+    </eClassifiers>
+  </eSubpackages>
+</ecore:EPackage>

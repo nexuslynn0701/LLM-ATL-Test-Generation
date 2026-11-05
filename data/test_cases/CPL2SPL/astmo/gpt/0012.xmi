@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : One CPL root with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa_main">
+      <!-- contents -> Proxy (non-simple) at elements[3] -->
+      <contents xmi:type="CPL:Proxy"
+                timeout="60"
+                recurse="yes"
+                ordering="parallel">
+        <!-- Complex proxy: all branches present -->
+        <busy>
+          <!-- Busy.contents -> SubCall at elements[1] -->
+          <contents xmi:type="CPL:SubCall" ref="sa_main"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer.contents -> Redirect at elements[2] -->
+          <contents xmi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection.contents -> AddressSwitch at elements[4] -->
+          <contents xmi:type="CPL:AddressSwitch"
+                    field="origin"
+                    subField="user">
+            <notPresent/>
+            <otherwise>
+              <!-- Otherwise.contents -> SubCall at elements[1] -->
+              <contents xmi:type="CPL:SubCall" ref="sa_main"/>
+            </otherwise>
+            <addresses is="userA" contains="domA" subDomainOf="example.com"/>
+          </contents>
+        </redirection>
+        <failure>
+          <!-- Failure.contents left undefined -->
+        </failure>
+        <default>
+          <!-- Default.contents -> Redirect at elements[2] -->
+          <contents xmi:type="CPL:Redirect" permanent="true"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Incoming with contents -> simple Proxy at elements[5] -->
+    <incoming>
+      <contents xmi:type="CPL:Proxy"
+                timeout="30"
+                recurse="no"
+                ordering="sequential">
+        <!-- Simple proxy: no branches -->
+      </contents>
+    </incoming>
+
+    <!-- Outgoing with contents -> simple Proxy at elements[6] -->
+    <outgoing>
+      <contents xmi:type="CPL:Proxy"
+                timeout="45"
+                recurse="yes"
+                ordering="parallel">
+        <!-- Simple proxy: no branches -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1] : SubCall referring to SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- elements[2] : Redirect used from NoAnswer.default and Default.contents -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- elements[3] : Location referenced via locations[] in proxies/redirect -->
+  <elements xsi:type="CPL:Location"
+            url="sip:service@example.com"
+            priority="1"
+            clear="yes"/>
+
+  <!-- elements[4] : AddressSwitch top-level, with notPresent/otherwise/address -->
+  <elements xsi:type="CPL:AddressSwitch"
+            field="destination"
+            subField="host">
+    <notPresent>
+      <!-- NotPresent.contents -> SubCall at elements[1] -->
+      <contents xmi:type="CPL:SubCall" ref="sa_main"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise.contents -> Redirect at elements[2] -->
+      <contents xmi:type="CPL:Redirect" permanent="false"/>
+    </otherwise>
+    <addresses is="userB" contains="domB" subDomainOf="example.org">
+      <!-- SwitchedAddress.contents -> Redirect at elements[2] -->
+      <contents xmi:type="CPL:Redirect" permanent="true"/>
+    </addresses>
+  </elements>
+
+  <!-- elements[5] : Simple Proxy used as Incoming.contents -->
+  <elements xsi:type="CPL:Proxy"
+            timeout="20"
+            recurse="yes"
+            ordering="sequential">
+    <!-- Simple proxy: all branches undefined -->
+  </elements>
+
+  <!-- elements[6] : Simple Proxy used as Outgoing.contents -->
+  <elements xsi:type="CPL:Proxy"
+            timeout="25"
+            recurse="no"
+            ordering="parallel">
+    <!-- Simple proxy: all branches undefined -->
+  </elements>
+
+</CPL:CPLModel>

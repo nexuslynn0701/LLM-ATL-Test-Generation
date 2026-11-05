@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullPipelineBuild"
+    basedir="workspace"
+    description="End-to-end build, test, and package pipeline"
+    default="buildAll">
+
+  <!-- Properties to exercise all AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="project.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="workspace/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Task definition to exercise AntTaskDef2MavenMavenTaskDef -->
+  <taskdef name="custom.task" classname="com.example.build.CustomTask"/>
+
+  <!-- Default target with a variety of tasks -->
+  <targets xmi:id="buildAll" name="buildAll">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+        srcdir="workspace/src/main/java"
+        destdir="workspace/target/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false"/>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="workspace/src/main/java"
+        destdir="workspace/target/site/apidocs"
+        packagenames="com.example.*"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Full Pipeline API"/>
+
+    <!-- Create jar artifact -->
+    <tasks xsi:type="Ant:Jar"
+        jarfile="workspace/target/full-pipeline.jar"
+        basedir="workspace/target/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="workspace/META-INF/MANIFEST.MF"/>
+
+    <!-- Ensure output and temp directories exist -->
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/target"/>
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/target/tmp"/>
+
+    <!-- Clean temporary files -->
+    <tasks xsi:type="Ant:Delete"
+        dir="workspace/target/tmp"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        includes="**/*"
+        includesfile="workspace/config/includes.txt"
+        excludes="**/*.bak"
+        excludesfile="workspace/config/excludes.txt"
+        defaultexcludes="true"/>
+
+    <!-- Copy resources into the jar directory -->
+    <tasks xsi:type="Ant:Copy"
+        file="workspace/src/main/resources/app.properties"
+        presservelastmodified="true"
+        tofile="workspace/target/classes/app.properties"
+        todir="workspace/target/classes"
+        overwrite="true"
+        filtering="false"
+        flatten="false"
+        includeEmptyDirs="false"/>
+
+    <!-- Simple timestamp task -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Additional target to increase rule coverage (no depends, no tasks needed) -->
+  <targets xmi:id="runTests" name="runTests"/>
+</Ant:Project>

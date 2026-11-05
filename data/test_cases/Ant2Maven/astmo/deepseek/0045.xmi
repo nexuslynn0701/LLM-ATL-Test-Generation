@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataProcessing"
+    basedir="/opt/data"
+    description="Data processing pipeline">
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="/opt/data/build"/>
+    <tasks xsi:type="Ant:Delete" dir="/opt/data/temp"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="/opt/data/src" destdir="/opt/data/build" debug="true" fork="false" optimize="true" deprecation="false"/>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar" jarfile="/opt/data/dist/app.jar" basedir="/opt/data/build" compress="true" encoding="UTF-8" manifest="/opt/data/MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="docs" name="docs">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="/opt/data/src" destdir="/opt/data/docs" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Data Processing API"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Java" classname="com.example.TestRunner" jar="/opt/data/lib/test.jar" fork="true"/>
+  </targets>
+  <targets xmi:id="deploy" name="deploy">
+    <tasks xsi:type="Ant:Copy" file="/opt/data/dist/app.jar" todir="/opt/data/deploy" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" offset="1" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.number" value="42"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="/opt/data/config"/>
+  <properties xsi:type="Ant:PropertyFile" file="/opt/data/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customTask" classname="com.example.CustomTask"/>
+  <path id="compile.path">
+    <pathElement path="/opt/data/lib" location="/opt/data/lib/commons.jar"/>
+    <pathElement path="/opt/data/lib2" location="/opt/data/lib2/util.jar"/>
+  </path>
+  <path id="test.path">
+    <pathElement path="/opt/data/testlib" location="/opt/data/testlib/junit.jar"/>
+  </path>
+  <default="compile"/>
+</Ant:Project>

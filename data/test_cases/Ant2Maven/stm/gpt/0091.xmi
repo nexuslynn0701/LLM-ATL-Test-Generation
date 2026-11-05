@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiPhaseBuild"
+    basedir="."
+    description="Ant project with compile, package, and clean phases"
+    default="t_compile">
+
+  <!-- Properties exercising different Property subclasses -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/classes"/>
+  <properties xsi:type="Ant:PropertyValue" name="dist.dir" value="dist"/>
+  <properties xsi:type="Ant:PropertyLocation" name="user.home" location="/home/developer"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="env."/>
+
+  <!-- Default target: compile -->
+  <targets xmi:id="t_compile" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+  </targets>
+
+  <!-- Packaging target -->
+  <targets xmi:id="t_package" name="package" description="Create distributable JAR">
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multiphase-build.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Cleaning target -->
+  <targets xmi:id="t_clean" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           includesfile=""
+           excludesfile=""
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="dist"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           includesfile=""
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cpml:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cpml="http://cpl/1.0">
+  <elements xsi:type="cpml:CPL">
+    <subActions id="mainAction"/>
+    <outgoing>
+      <contents xsi:type="cpml:AddressSwitch" field="origin">
+        <addresses is="sip:alice@example.com">
+          <contents xsi:type="cpml:Proxy" recurse="yes" ordering="parallel">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default contents="//@elements.4"/>
+          </contents>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="cpml:Redirect" permanent="false"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="cpml:SubCall" ref="mainAction"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="cpml:Reject" status="486" reason="Busy Here"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="cpml:SubAction" id="subOne">
+    <contents xsi:type="cpml:StringSwitch" field="subject">
+      <strings is="meeting" contains="urgent"/>
+      <notPresent/>
+    </contents>
+  </elements>
+  <elements xsi:type="cpml:Location" url="sip:user@elsewhere.com" priority="1" clear="yes">
+    <contents xsi:type="cpml:Proxy" recurse="no" ordering="sequential">
+      <busy/>
+      <noAnswer/>
+      <redirection/>
+      <failure/>
+      <default/>
+    </contents>
+  </elements>
+  <elements xsi:type="cpml:SubCall" ref="subOne"/>
+  <elements xsi:type="cpml:Redirect" permanent="true"/>
+  <elements xsi:type="cpml:Reject" status="600" reason="Global Error"/>
+</cpml:CPLModel>

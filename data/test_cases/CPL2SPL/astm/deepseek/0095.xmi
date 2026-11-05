@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="loginSub"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="sip:user@domain.com"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:backup@domain.com" priority="1" clear="yes"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings contains="Windows"/>
+        <notPresent/>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="loginSub"/>
+  <elements xsi:type="CPL:Location" url="sip:voicemail@domain.com" priority="2" clear="no"/>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+    <busy>
+      <contents xsi:type="CPL:Location" url="sip:busy@domain.com" priority="1" clear="yes"/>
+    </busy>
+    <noAnswer/>
+    <redirection>
+      <contents xsi:type="CPL:SubCall" ref="handleRedirect"/>
+    </redirection>
+    <failure>
+      <contents xsi:type="CPL:Location" url="sip:failure@domain.com" priority="1" clear="yes"/>
+    </failure>
+    <default>
+      <contents xsi:type="CPL:StringSwitch" field="priority">
+        <strings contains="urgent"/>
+      </contents>
+    </default>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch" field="emergency">
+    <priorities less="5" greater="10"/>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:default@domain.com" priority="1" clear="yes"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" tzid="America/New_York">
+    <times dtstart="20240101T090000" interval="1" wkst="MO"/>
+    <notPresent/>
+  </elements>
+</CPL:CPLModel>

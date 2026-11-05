@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companySpec"
+    nsURI="http://example.org/companySpec"
+    nsPrefix="company">
+
+  <!-- 0: Primitive data type for IDs -->
+  <eClassifiers xsi:type="ecore:EDataType" name="EID" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with literals -->
+  <eClassifiers xsi:type="eccore:EEnum" name="RoleKind">
+    <eLiterals name="MANAGER" value="0" literal="MANAGER"/>
+    <eLiterals name="ENGINEER" value="1" literal="ENGINEER"/>
+    <eLiterals name="INTERN" value="2" literal="INTERN"/>
+  </eClassifiers>
+
+  <!-- 2: Root class Company -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- derived, non-containment view over employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="allEmployees"
+        upperBound="-1" changeable="false" derived="true"
+        eType="//@eClassifiers.3"/>
+    <!-- containment of departments -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- container back-ref to Company -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="company"
+        eType="//@eClassifiers.2"/>
+    <!-- containment of employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 5: Employee extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- reference to department (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.4"/>
+    <!-- reference to manager (self-reference) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.5"/>
+    <!-- list of direct reports (derived view) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="reports"
+        upperBound="-1" changeable="false" derived="true"
+        eType="//@eClassifiers.5"/>
+    <!-- role as enum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 6: Project -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- container: owning company -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="company"
+        eType="//@eClassifiers.2"/>
+    <!-- many-to-many participants -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="participants"
+        upperBound="-1"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 7: ContractEmployee extends Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="ContractEmployee" eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="contractId"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="durationMonths"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+</ecore:EPackage>

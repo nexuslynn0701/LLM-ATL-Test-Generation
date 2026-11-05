@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with both incoming and outgoing to trigger R1, R3, R4 -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions to trigger R2 and SubCall2Return (R13) -->
+    <subActions id="saIn"/>
+    <subActions id="saOut"/>
+    <subActions id="saProxyComplex"/>
+    <subActions id="saSwitch"/>
+
+    <!-- Incoming method body: simple Proxy -> R7 + Location2URIConstant (R19) -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- No busy/noAnswer/... so isSimple = true -->
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:simple@example.com" clear="true"/>
+        </default>
+      </contents>
+    </incoming>
+
+    <!-- Outgoing method body: SubCall -> R13 -->
+    <outgoing>
+      <contents xsi:type="CPL:SubCall" ref="saIn"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used as explicit top-level Location (statement is its contents) -->
+  <elements xsi:type="CPL:Location" url="sip:loc1@example.org" clear="clearAll">
+    <!-- contents refers to the Redirect at index 2 -->
+    <contents href="//@elements.2"/>
+  </elements>
+
+  <!-- 2: Redirect with permanent="false" -> R14 (MOVED_TEMPORARILY) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 3: Top-level SubCall referencing existing SubAction saOut -> R13 -->
+  <elements xsi:type="CPL:SubCall" ref="saOut"/>
+
+  <!-- 4: Complex Proxy used as a top-level element (and also referenced from switch cases)
+           Triggers R8, and its busy/noAnswer/redirection/failure/default trigger R9–R12 & R5 -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="serial">
+    <busy>
+      <!-- Busy contents: SubCall (to saProxyComplex) -> R9 + R13 -->
+      <contents xsi:type="CPL:SubCall" ref="saProxyComplex"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer contents: Reject -> R10 (no further statements since Reject is filtered) -->
+      <contents xsi:type="CPL:Reject" status="480" reason="No Answer"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection contents: Redirect at index 2 -> R11 + R14 -->
+      <contents href="//@elements.2"/>
+    </redirection>
+    <failure/>
+    <default>
+      <!-- Default contents: simple Proxy (isSimple = true) -> R12 + R7 -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:def@example.net" clear="true"/>
+        </default>
+      </contents>
+    </default>
+  </elements>
+
+  <!-- 5: AddressSwitch as top-level element -> R15, R17, R18, and NotPresent2ErrorResponse (R6) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- SwitchedAddress case with simple Proxy contents -> R17 + R7 -->
+    <addresses is="alice@example.com">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:alice@example.com" clear="true"/>
+        </default>
+      </contents>
+    </addresses>
+    <!-- SwitchedAddress case with TimeSwitch contents (filtered out in statements) -> R17 only -->
+    <addresses is="bob@example.com">
+      <contents xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com">
+        <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+      </contents>
+    </addresses>
+    <!-- NotPresent branch -> participates in AddressSwitch2SelectStat (R15), and R6 -->
+    <notPresent/>
+    <!-- Otherwise branch with SubCall contents -> R18 + R13 -->
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="saSwitch"/>
+    </otherwise>
+  </elements>
+
+  <!-- 6: StringSwitch as top-level element -> R16 -->
+  <elements xsi:type="CPL:StringSwitch" field="headerValue">
+    <!-- no strings / notPresent / otherwise needed for R16, model kept minimal here -->
+  </elements>
+
+  <!-- 7: Top-level LanguageSwitch (just to include its type as a top-level, used via filters) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <!-- No languages; mainly to be referenced via contents filters if needed -->
+  </elements>
+
+  <!-- 8: Top-level TimeSwitch so that its type appears as a top-level and in filters -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.paris">
+    <times dtstart="20240101T080000Z" interval="2" wkst="MO"/>
+  </elements>
+
+  <!-- 9: Top-level PrioritySwitch (also used in filters) -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+
+</CPL:CPLModel>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="src/main/java"
+    description="Complex Ant project with various tasks and properties"
+    default="buildTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition not referenced by any task (allowed) -->
+  <taskdef name="custom.task" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target with several tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile, package and clean before build">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/artifacts/app.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/artifacts"/>
+    <tasks xsi:type="Ant:Copy"
+           file="README.md"
+           todir="build/artifacts"
+           overwrite="true"
+           includeEmptyDirs="false"
+           flatten="true"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           excludes="**/keep/**"
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="org.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Additional target to be turned into a separate Goal -->
+  <targets xmi:id="testTarget" name="test" description="Run tests after build">
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/test-results"/>
+    <tasks xsi:type="Ant:Copy"
+           file="config/test-config.xml"
+           todir="build/test-config"
+           overwrite="false"
+           includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/old-tests"
+           quiet="true"
+           defaultexcludes="false"/>
+  </targets>
+
+  <!-- Target without description to test transformation of Project without description rule (via another project normally, here just extra Goal) -->
+  <targets xmi:id="cleanTarget" name="clean">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build"/>
+  </targets>
+
+</Ant:Project>

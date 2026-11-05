@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMeta"
+    nsURI="http://example.org/rootMeta"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise superPackage/subPackages -->
+  <eSubpackages name="subMeta"
+      nsURI="http://example.org/subMeta"
+      nsPrefix="sub">
+    <!-- Class D: no superTypes, one attribute, one enum-typed attribute, reference to outer class -->
+    <eClassifiers xsi:type="ecore:EClass" name="D">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="flag"
+          lowerBound="0" upperBound="1"
+          iD="false"
+          defaultValueLiteral="true">
+        <eType xsi:type="ecore:EDataType"
+            href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="color"
+          lowerBound="1" upperBound="1"
+          iD="false">
+        <!-- Will reference the enum in the root package -->
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="toAInRoot"
+          lowerBound="0" upperBound="-1"
+          containment="false">
+        <!-- Will reference Class A in the root package -->
+      </eStructuralFeatures>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Class A: root class, no superTypes, single EString attribute with default and ID -->
+  <eClassifiers xsi:type="ecore:EClass" name="A">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1" upperBound="1"
+        iD="true"
+        defaultValueLiteral="&quot;base&quot;">
+      <eType xsi:type="ecore:EDataType"
+          href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- Class B: extends A, has attributes and a bidirectional reference to C -->
+  <eClassifiers xsi:type="ecore:EClass" name="B"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="count"
+        lowerBound="0" upperBound="1"
+        iD="false"
+        defaultValueLiteral="42">
+      <eType xsi:type="ecore:EDataType"
+          href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="note"
+        lowerBound="0" upperBound="1"
+        iD="false">
+      <!-- intentionally no eType to trigger @NoType branch -->
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="toC"
+        lowerBound="0" upperBound="-1"
+        containment="true">
+      <!-- eType and eOpposite set after class C declaration -->
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- Class C: extends B, contains a reference back to B, and an EBooleanObject attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="C"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fromB"
+        lowerBound="0" upperBound="1"
+        containment="false">
+      <!-- Will be opposite of B.toC -->
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        lowerBound="0" upperBound="1"
+        iD="false"
+        defaultValueLiteral="false">
+      <eType xsi:type="ecore:EDataType"
+          href="http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- Enumeration with multiple literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- Cross-references that require indices (must appear after all classifiers are declared) -->
+
+  <!-- Set the type of subMeta.D.color to this Status enum (index 3 in root eClassifiers) -->
+  <eSubpackages xsi:type="ecore:EPackage" xmi:id="_fixRefs_sub" eSuperPackage="//@">
+    <!-- Dummy wrapper to allow setting cross refs; actual content already above -->
+  </eSubpackages>
+
+  <!-- Explicitly set remaining cross-references using indices -->
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_fixRefs_A"/>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_fixRefs_B"/>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_fixRefs_C"/>
+  <eClassifiers xsi:type="ecore:EEnum" xmi:id="_fixRefs_Status"/>
+
+</ecore:EPackage>

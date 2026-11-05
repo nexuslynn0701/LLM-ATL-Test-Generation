@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="MyRootMeta"
+    nsURI="http://myrootmeta/1.0"
+    nsPrefix="myroot">
+
+  <!-- Subpackage to trigger super/sub package handling -->
+  <eSubpackages name="SubBlock"
+                nsURI="http://myrootmeta/subblock/1.0"
+                nsPrefix="subblk">
+    <!-- Classifier 0 in subpackage: simple class with no features -->
+    <eClassifiers xsi:type="ecore:EClass" name="Node"/>
+  </eSubpackages>
+
+  <!-- Classifier 0 in root: EClass with both attribute and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- Attribute 0: has default value, is ID, EString type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="pid"
+                         iD="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="P-000"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute 1: Int lowerBound 0, upperBound many (-1) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         iD="false"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference 2: containment to Project, no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="projects"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         eType="//@eClassifiers.1"/>
+    <!-- Reference 3: non-containment to Department, with opposite set below -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="department"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eType="//@eClassifiers.2"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- Classifier 1 in root: EClass referenced by Person.projects -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <!-- Attribute 0: String, no default, multiplicity 0..1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         iD="false"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- Classifier 2 in root: EClass with bidirectional reference to Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <!-- Reference 0: opposite of Person.department, many persons -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="staff"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eType="//@eClassifiers.0"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <!-- Classifier 3 in root: EEnum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RoleKind">
+    <eLiterals name="DEV" value="0" literal="DEV"/>
+    <eLiterals name="MGR" value="1" literal="MGR"/>
+  </eClassifiers>
+
+  <!-- Classifier 4 in root: EClass that uses the EEnum as attribute type -->
+  <eClassifiers xsi:type="ecore:EClass" name="Assignment">
+    <!-- Attribute 0: enum-typed, with default literal MGR -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="role"
+                         iD="false"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="MGR"
+                         eType="//@eClassifiers.3"/>
+    <!-- Reference 1: link to Person, non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="assignee"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+</ecore:EPackage>

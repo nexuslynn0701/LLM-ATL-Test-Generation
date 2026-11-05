@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="app-src"
+    description="Complex Ant project exercising many task types"
+    default="build-main">
+
+  <!-- Path used as simple contained structure (no refs) -->
+  <path id="main.path">
+    <pathElement path="lib/util.jar" location="lib"/>
+    <fileset dir="lib">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/old/*.jar"/>
+      </patternset>
+      <include name="**/*.jar"/>
+      <exclude name="**/temp/**"/>
+    </fileset>
+  </path>
+
+  <!-- Properties of all supported kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="conf/build.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="shell.env"/>
+
+  <!-- User-defined task definition and attribute -->
+  <taskdef name="custom.report" classname="com.example.ant.ReportTask"/>
+
+  <!-- Default target -->
+  <targets xmi:id="build-main" name="build-main" description="Main build">
+    <!-- Compile sources with includes/excludes and classpath -->
+    <tasks xsi:type="Ant:Javac" srcdir="app-src/core" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+      <classPath refid="compile.cp"/>
+    </tasks>
+
+    <!-- Generate documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="app-src"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Application API"/>
+
+    <!-- Archive compiled classes -->
+    <tasks xsi:type="Ant:Jar" jarfile="build/app-main.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Prepare output directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/reports"/>
+
+    <!-- Copy resources with filters and mapper -->
+    <tasks xsi:type="Ant:Copy" file="resources/config.xml" todir="build/resources" overwrite="true" filtering="true" flatten="false" includeEmptyDirs="true">
+      <fileset dir="resources">
+        <include name="**/*.xml"/>
+        <exclude name="**/old/**"/>
+      </fileset>
+      <filterset starttoken="@[" endtoken="]@">
+        <filter token="env" value="dev"/>
+      </filterset>
+      <mapper type="glob" from="*.xml" to="*.cfg"/>
+    </tasks>
+
+    <!-- Clean temporary directory -->
+    <tasks xsi:type="Ant:Delete" dir="build/temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="**/*" defaultexcludes="false"/>
+
+    <!-- Timestamp management -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd_HH-mm-ss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Additional target with different tasks -->
+  <targets xmi:id="package-dist" name="package-dist" description="Create distribution package">
+    <!-- Another compilation with different dirs -->
+    <tasks xsi:type="Ant:Javac" srcdir="app-src/tools" destdir="build/tools" debug="false" fork="true" optimize="false" deprecation="true">
+      <inExcludes xsi:type="Ant:IncludesFile" name="includes.list"/>
+      <inExcludes xsi:type="Ant:ExcludesFile" name="excludes.list"/>
+      <classPath refid="tools.cp"/>
+    </tasks>
+
+    <!-- Package tools into separate jar -->
+    <tasks xsi:type="Ant:Jar" jarfile="build/app-tools.jar" basedir="build/tools" compress="false"/>
+
+    <!-- Copy distribution files -->
+    <tasks xsi:type="Ant:Copy" todir="dist" overwrite="true" flatten="true">
+      <fileset dir="build">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        </patternset>
+      </fileset>
+    </tasks>
+
+    <!-- Delete old distribution directory -->
+    <tasks xsi:type="Ant:Delete" dir="dist-old" quiet="true" includeEmptyDirs="false"/>
+  </targets>
+
+</Ant:Project>

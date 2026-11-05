@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataProcessing"
+    default="process"
+    basedir="/opt/data"
+    description="Data processing pipeline">
+  <targets xmi:id="process" name="process" description="Main processing target">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/data.jar" basedir="classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="reports"/>
+    <tasks xsi:type="Ant:Delete" dir="temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="false" includes="*.tmp" excludes="keep.tmp" defaultexcludes="false"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean up artifacts">
+    <tasks xsi:type="Ant:Delete" dir="classes" failonerror="false"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" failonerror="false"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.compiler" value="javac1.8"/>
+  <properties xsi:type="Ant:PropertyValue" name="debug.level" value="high"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="/etc/app"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+</Ant:Project>

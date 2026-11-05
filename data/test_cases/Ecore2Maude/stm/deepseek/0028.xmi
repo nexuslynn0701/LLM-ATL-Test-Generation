@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore" name="dataProcessing" nsURI="http://dataProcessing/1.0" nsPrefix="data">
+  <eClassifiers xsi:type="ecore:EClass" name="DataRecord">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="recordId" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="timestamp" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NumericField" abstract="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="precision" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="scale" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TextProcessor">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="encoding" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fields" upperBound="-1" eType="#//NumericField" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="records" upperBound="-1" eType="#//DataRecord" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ValidationRule">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="ruleName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="severity" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="targetField" eType="#//NumericField"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ProcessingStatus">
+    <eLiterals name="PENDING" value="0" literal="pending"/>
+    <eLiterals name="RUNNING" value="1" literal="running"/>
+    <eLiterals name="COMPLETED" value="2" literal="completed"/>
+    <eLiterals name="FAILED" value="3" literal="failed"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DataPipeline">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="version" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="processors" upperBound="-1" eType="#//TextProcessor" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="validations" upperBound="-1" eType="#//ValidationRule" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status" eType="#//ProcessingStatus"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EDataType" name="ResultSet" instanceClassName="java.util.List"/>
+</ecore:EPackage>

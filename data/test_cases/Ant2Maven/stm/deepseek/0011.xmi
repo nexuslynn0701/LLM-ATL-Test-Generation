@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="CoverageProject"
+    default="build"
+    basedir="."
+    description="Test model covering multiple task types">
+  <targets xmi:id="build" name="build" description="Build target" unless="skip.build" ifCondition="build.ready">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="classes" compress="true" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Delete" dir="temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Copy" file="README.txt" tofile="dist/README.txt" overwrite="true" filtering="false" flatten="true" includeEmptyDirs="false"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Test target">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="test-classes" debug="true" fork="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="test-reports"/>
+  </targets>
+  <targets xmi:id="javadoc" name="generate-javadoc" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="My API Docs"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.ready" value="true"/>
+  <properties xsi:type="Ant:PropertyValue" name="skip.build" value="false"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <properties xsi:type="Ant:PropertyLocation" name="project.home" location="/home/user/project"/>
+</Ant:Project>

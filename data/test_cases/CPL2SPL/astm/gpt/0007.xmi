@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with subActions + incoming/outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="saMain">
+      <!-- contents -> complex Proxy via path -->
+      <contents href="//@elements.4"/>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="saSimple">
+      <!-- contents -> simple Proxy via path -->
+      <contents href="//@elements.8"/>
+    </subActions>
+    <incoming>
+      <!-- contents -> Redirect via path -->
+      <contents href="//@elements.2"/>
+    </incoming>
+    <outgoing>
+      <!-- contents -> SubCall via path -->
+      <contents href="//@elements.1"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: SubCall (ref to saMain to exercise SubCall2Return) -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- 2: Redirect (permanent=false to get MOVED_TEMPORARILY) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 3: Location used for Proxy locations (for Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:proxy@example.com" clear="yes" priority="1">
+    <!-- make this Location itself contain another Location to exercise locations helper -->
+    <contents href="//@elements.7"/>
+  </elements>
+
+  <!-- 4: Complex Proxy (non-simple: all branches present) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- make it complex: define at least one of the branch refs -->
+    <busy>
+      <!-- contents -> Reject to trigger Busy2SelectCase with empty statements (filtered) -->
+      <contents href="//@elements.6"/>
+    </busy>
+    <noAnswer>
+      <!-- contents -> TimeSwitch (also filtered) -->
+      <contents href="//@elements.5"/>
+    </noAnswer>
+    <redirection>
+      <!-- contents -> PrioritySwitch (filtered too) -->
+      <contents href="//@elements.9"/>
+    </redirection>
+    <failure/>
+    <default>
+      <!-- contents -> simple Proxy (index 8) referenced to exercise Default2SelectDefault -->
+      <contents href="//@elements.8"/>
+    </default>
+  </elements>
+
+  <!-- 5: TimeSwitch (to be filtered as contents in multiple places) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <times dtstart="20250101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 6: Reject used inside Busy -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy here"/>
+
+  <!-- 7: Inner Location used only as content of Location 3 -->
+  <elements xsi:type="CPL:Location" url="sip:inner@example.com" clear="no" priority="2"/>
+
+  <!-- 8: Simple Proxy (no branches -> isSimple=true, used by SubAction saSimple and Default.contents) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential"/>
+
+  <!-- 9: PrioritySwitch (to be filtered in redirection.contents) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <!-- add a SwitchedPriority child that itself contains a simple Proxy for nested Proxy2Return -->
+    <priorities less="low" greater="high" equal="medium">
+      <contents href="//@elements.8"/>
+    </priorities>
+  </elements>
+
+  <!-- 10: AddressSwitch to exercise AddressSwitch2SelectStat / SwitchedAddress2SelectCase / NotPresent2ErrorResponse / Otherwise2SelectDefault -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- two SwitchedAddress cases, each with a simple Proxy as contents -->
+    <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com">
+      <contents href="//@elements.8"/>
+    </addresses>
+    <addresses is="sip:bob@example.org" contains="bob" subDomainOf="example.org">
+      <contents href="//@elements.8"/>
+    </addresses>
+    <!-- NotPresent to trigger NotPresent2ErrorResponse -->
+    <notPresent/>
+    <!-- Otherwise with contents=TimeSwitch (filtered) -->
+    <otherwise>
+      <contents href="//@elements.5"/>
+    </otherwise>
+  </elements>
+
+  <!-- 11: StringSwitch to exercise StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="callType">
+    <strings is="emergency" contains="911">
+      <!-- contents -> Reject (filtered) -->
+      <contents href="//@elements.6"/>
+    </strings>
+  </elements>
+
+</CPL:CPLModel>

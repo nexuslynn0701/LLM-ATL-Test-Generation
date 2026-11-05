@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmlns:xmi="http://www.omg.org/XMI"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xmlns:ecore="http://ecore"
+                name="blog"
+                nsURI="http://example.org/blog"
+                nsPrefix="blog">
+  <!-- Classifier indices (for cross-references):
+       0: Blog
+       1: Post
+       2: Comment
+       3: Category
+       4: Visibility (EEnum)
+  -->
+  <eClassifiers xsi:type="ecore:EClass" name="Blog">
+    <!-- attributes: title:String (ID), url:String -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="url"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="http://localhost"/>
+    <!-- reference: posts containment 0..* -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="posts"
+                         eType="//@eClassifiers.1"
+                         containment="true"
+                         lowerBound="0"
+                         upperBound="-1"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Post">
+    <!-- attributes: id:Int (ID), title:String, visibility:Visibility, featured:Boolean -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="1"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="visibility"
+                         eType="//@eClassifiers.4"
+                         lowerBound="1"
+                         defaultValueLiteral="PUBLIC"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="featured"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         lowerBound="0"
+                         defaultValueLiteral="false"/>
+    <!-- references: comments containment 0..*; blog container 1; category non-containment 0..1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="comments"
+                         eType="//@eClassifiers.2"
+                         containment="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="blog"
+                         eType="//@eClassifiers.0"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="category"
+                         eType="//@eClassifiers.3"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Comment">
+    <!-- attributes: content:String, spam:Boolean -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="content"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="spam"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         lowerBound="0"
+                         defaultValueLiteral="false"/>
+    <!-- reference: post container 1..1 opposite to Post.comments -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="post"
+                         eType="//@eClassifiers.1"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Category">
+    <!-- attribute: name:String -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EEnum" name="Visibility">
+    <eLiterals name="PUBLIC" value="0" literal="PUBLIC"/>
+    <eLiterals name="PRIVATE" value="1" literal="PRIVATE"/>
+  </eClassifiers>
+</ecore:EPackage>

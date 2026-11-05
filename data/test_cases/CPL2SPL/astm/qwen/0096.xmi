@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="30">
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="destination">
+            <addresses is="user@example.com">
+              <contents xsi:type="CPL:Location" url="sip:primary@example.com" clear="yes" priority="1"/>
+            </addresses>
+            <notPresent>
+              <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+            </notPresent>
+            <otherwise>
+              <contents xsi:type="CPL:StringSwitch" field="user-agent">
+                <strings is="friendly-bot"/>
+              </strings>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" tzid="UTC">
+        <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+      </times>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities equal="normal"/>
+      </priorities>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction"/>
+  <elements xsi:type="CPL:Location" url="sip:fallback@example.com" clear="yes" priority="0"/>
+</CPL:CPLModel>

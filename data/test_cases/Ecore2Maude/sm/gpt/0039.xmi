@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.com/company"
+    nsPrefix="company">
+
+  <!-- 0: Enum for department types -->
+  <eClassifiers xsi:type="ecore:EEnum" name="DepartmentKind">
+    <eLiterals name="HR" value="0" literal="HR"/>
+    <eLiterals name="ENGINEERING" value="1" literal="ENGINEERING"/>
+    <eLiterals name="SALES" value="2" literal="SALES"/>
+  </eClassifiers>
+
+  <!-- 1: Department class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="kind"
+                         lowerBound="1"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract Person class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="fullName"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         lowerBound="0"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 3: Employee extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="department"
+                         lowerBound="1"
+                         eType="//@eClassifiers.1"
+                         containment="false"
+                         resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="salary"
+                         lowerBound="0"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+  </eClassifiers>
+
+  <!-- 4: Contractor extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contractor" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="agency"
+                         lowerBound="0"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="assignedDepartment"
+                         lowerBound="0"
+                         eType="//@eClassifiers.1"
+                         containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 5: Project class with references to Employee and Contractor -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="projectId"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="lead"
+                         lowerBound="1"
+                         eType="//@eClassifiers.3"
+                         containment="false"
+                         resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="team"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"
+                         containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 6: Address value object used by Person via reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="street"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="city"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="zip"
+                         lowerBound="0"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 7: Customer class with containment of Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Customer">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="customerId"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="billingAddress"
+                         lowerBound="1"
+                         eType="//@eClassifiers.6"
+                         containment="true"
+                         resolveProxies="false"/>
+  </eClassifiers>
+
+</ecore:EPackage>

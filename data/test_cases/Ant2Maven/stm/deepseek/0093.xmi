@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryProject"
+    default="build-all"
+    basedir="/workspace"
+    description="Build library with compilation and packaging">
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="source"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/usr/local/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <targets xmi:id="clean" name="clean" description="Remove build directory">
+    <tasks xsi:type="Ant:Delete" dir="output" verbose="true" quiet="false" failonerror="true"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile source files" unless="skip.compile">
+    <tasks xsi:type="Ant:Javac" srcdir="source" destdir="output/classes" debug="true" fork="false" optimize="true" deprecation="true"/>
+  </targets>
+  <targets xmi:id="create-dirs" name="create-dirs" description="Create build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="output/jars"/>
+    <tasks xsi:type="Ant:Mkdir" dir="output/docs"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Package into JAR">
+    <tasks xsi:type="Ant:Jar" jarfile="output/jars/library.jar" basedir="output/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="init" name="init" description="Initialize build">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyyMMdd-HHmmss" locale="en_US"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="compile-tests" name="compile-tests" description="Compile test files" ifCondition="tests.enabled">
+    <tasks xsi:type="Ant:Javac" srcdir="tests" destdir="output/test-classes" debug="true" fork="true"/>
+  </targets>
+</Ant:Project>

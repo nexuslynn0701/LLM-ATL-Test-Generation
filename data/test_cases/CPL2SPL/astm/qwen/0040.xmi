@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="user@example.com"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+            <busy>
+              <contents xsi:type="CPL:Reject" status="486" reason="Busy Now"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Redirect" permanent="false"/>
+            </noAnswer>
+            <redirection/>
+            <failure/>
+            <default>
+              <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="meeting"/>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:Location" url="sip:backup@example.com" clear="true"/>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction"/>
+  <elements xsi:type="CPL:Location" url="sip:fallback@example.com" clear="true"/>
+  <elements xsi:type="CPL:SubAction" id="fallbackAction">
+    <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+  </elements>
+</CPL:CPLModel>

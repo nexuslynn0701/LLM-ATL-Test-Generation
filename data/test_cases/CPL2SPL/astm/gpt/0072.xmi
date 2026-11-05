@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with both incoming and outgoing, plus one SubAction -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- contents points to a complex Proxy (index 6) -->
+      <contents href="//@elements.6"/>
+    </subActions>
+    <incoming>
+      <!-- contents points to a simple Proxy (index 4) -->
+      <contents href="//@elements.4"/>
+    </incoming>
+    <outgoing>
+      <!-- contents points to an AddressSwitch (index 7) -->
+      <contents href="//@elements.7"/>
+    </outgoing>
+  </elements>
+
+  <!-- SubCall referencing SubAction id "saMain" -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- Location giving a URI for proxies and redirect -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+
+  <!-- Redirect (permanent=false) whose locations come from the Location above -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- Simple Proxy (isSimple = true: no sub-containers set) -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel"/>
+
+  <!-- Location with nested contents (to be used via statement helper) -->
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" clear="false">
+    <!-- contents points to SubCall (index 1) -->
+    <contents href="//@elements.1"/>
+  </elements>
+
+  <!-- Complex Proxy (isSimple = false since it has sub-containers) -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="serial">
+    <busy>
+      <!-- Busy contents is a Redirect (index 3) -->
+      <contents href="//@elements.3"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer contents is a simple Proxy (index 4) -->
+      <contents href="//@elements.4"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection contents is a Location (index 5) -->
+      <contents href="//@elements.5"/>
+    </redirection>
+    <failure/>
+    <default>
+      <!-- Default contents is a SubCall (index 1) -->
+      <contents href="//@elements.1"/>
+    </default>
+  </elements>
+
+  <!-- AddressSwitch for outgoing method -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <!-- SwitchedAddress case with contents = Redirect (index 3) -->
+    <addresses is="sip:callee@example.com">
+      <contents href="//@elements.3"/>
+    </addresses>
+    <!-- NotPresent branch with contents = Location (index 2) -->
+    <notPresent>
+      <contents href="//@elements.2"/>
+    </notPresent>
+    <!-- Otherwise branch with contents = SubCall (index 1) -->
+    <otherwise>
+      <contents href="//@elements.1"/>
+    </otherwise>
+  </elements>
+
+  <!-- StringSwitch used only to trigger its rule (no references from others needed) -->
+  <elements xsi:type="CPL:StringSwitch" field="custom-header"/>
+
+</CPL:CPLModel>

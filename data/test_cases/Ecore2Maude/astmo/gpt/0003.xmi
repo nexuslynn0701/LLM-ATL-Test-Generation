@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="metaRoot"
+    nsURI="http://example/metaroot"
+    nsPrefix="metaRoot">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="subMeta" nsURI="http://example/submeta" nsPrefix="subMeta">
+    <!-- Classifier 0 in subpackage: SubClassX -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClassX">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="subFlag"
+          lowerBound="0"
+          upperBound="1"
+          iD="false"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifier 0: SimpleData as EDataType to exercise non-primitive attribute type -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="SimpleData"
+      instanceClassName="java.lang.String"/>
+
+  <!-- Classifier 1: Enum KindEnum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="KindEnum">
+    <eLiterals name="FIRST" value="0" literal="FIRST"/>
+    <eLiterals name="SECOND" value="1" literal="SECOND"/>
+  </eClassifiers>
+
+  <!-- Classifier 2: Base class, abstract -->
+  <eClassifiers xsi:type="ecore:EClass" name="Base">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="baseId"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- Classifier 3: Person extends Base, has attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person"
+      eSuperTypes="//@eClassifiers.2">
+    <!-- Attribute personName: String with default, non-ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="personName"
+        lowerBound="1"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="John &quot;Doe&quot;"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute age: Int, lowerBound 0, upperBound 1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Attribute rating: SimpleData (non-primitive datatype) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="rating"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        eType="//@eClassifiers.0"/>
+    <!-- Attribute status: KindEnum (enum-typed) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        eType="//@eClassifiers.1"/>
+    <!-- Containment reference addresses to Address, many (-1) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="addresses"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.4"/>
+    <!-- Non-containment reference bestFriend to Person, single, opposite of friends -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="bestFriend"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.6"
+        eType="//@eClassifiers.3"/>
+    <!-- Non-containment reference friends to Person, many, opposite of bestFriend -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="friends"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.5"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Classifier 4: Address class with a containment and a reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- street: String -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="1"
+        upperBound="1"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- zip: Int, upperBound -1 to exercise '*' upperBound case -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="zip"
+        lowerBound="0"
+        upperBound="-1"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- owner: container reference back to Person (non-containment, single) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+</ecore:EPackage>

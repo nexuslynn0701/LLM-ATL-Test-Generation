@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example/root"
+    nsPrefix="root">
+  <!-- Class 0: root-level class with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClass">
+    <!-- Attribute 0 on RootClass: String, iD, default value, custom bounds -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="rootName"
+        lowerBound="1"
+        upperBound="3"
+        ordered="true"
+        unique="true"
+        iD="true"
+        defaultValueLiteral="defaultRootName"
+        eAttributeType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute 1 on RootClass: Boolean -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="isEnabled"
+        lowerBound="0"
+        upperBound="1"
+        ordered="false"
+        unique="true"
+        defaultValueLiteral="true"
+        eAttributeType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Reference 2 on RootClass to ChildClass, containment with multiplicity 0..* -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- Class 1: will be in a subpackage, but declared here to reference from RootClass for indices simplicity -->
+  <eClassifiers xsi:type="ecore:EClass" name="CommonBase" abstract="true"/>
+
+  <!-- Class 2: ChildClass extends CommonBase -->
+  <eClassifiers xsi:type="ecore:EClass" name="ChildClass">
+    <eSuperTypes>//@eClassifiers.1</eSuperTypes>
+    <!-- Attribute 0 on ChildClass: Integer, multiplicity 0..* -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="value"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="false"
+        defaultValueLiteral="5"
+        eAttributeType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- Enum 3: Status with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="CLOSED" value="2" literal="CLOSED"/>
+  </eClassifiers>
+
+  <!-- DataType 4: custom datatype -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData"/>
+
+  <!-- Class 5: EnumHolder with enum-typed attribute using Status -->
+  <eClassifiers xsi:type="ecore:EClass" name="EnumHolder">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="ACTIVE"
+        eAttributeType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Enum 6: Priority with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Priority">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- Class 7: PriorityHolder with enum-typed attribute using Priority -->
+  <eClassifiers xsi:type="ecore:EClass" name="PriorityHolder">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="LOW"
+        eAttributeType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- Subpackage 0 -->
+  <eSubpackages name="subPkg" nsURI="http://example/sub" nsPrefix="sub">
+    <!-- Note: within subPkg, classifiers are indexed locally starting at 0 -->
+    <!-- Class 0 in subPkg: LocalClass with reference back to RootClass and CommonBase -->
+    <eClassifiers xsi:type="ecore:EClass" name="LocalClass">
+      <!-- Reference to RootClass (from parent package classifier 0), non-containment, 1..1 -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="rootRef"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          containment="false"
+          eType="//@eClassifiers.0"/>
+      <!-- Bidirectional reference to subclass in same subpackage (SubLocalClass) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="subLocal"
+          lowerBound="0"
+          upperBound="-1"
+          ordered="true"
+          unique="true"
+          containment="true"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.0"/>
+    </eClassifiers>
+
+    <!-- Class 1 in subPkg: SubLocalClass extends CommonBase and opposite reference to LocalClass -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubLocalClass">
+      <eSuperTypes>//@eClassifiers.1</eSuperTypes>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="owner"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          containment="false"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.1"/>
+    </eClassifiers>
+
+    <!-- Enum 2 in subPkg: Mode with literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Mode">
+      <eLiterals name="AUTO" value="0" literal="AUTO"/>
+      <eLiterals name="MANUAL" value="1" literal="MANUAL"/>
+    </eClassifiers>
+
+    <!-- Class 3 in subPkg: ModeHolder with enum-typed attribute using Mode -->
+    <eClassifiers xsi:type="ecore:EClass" name="ModeHolder">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="mode"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="AUTO"
+          eAttributeType="//@eSubpackages.0/@eClassifiers.2"/>
+    </eClassifiers>
+  </eSubpackages>
+</ecore:EPackage>

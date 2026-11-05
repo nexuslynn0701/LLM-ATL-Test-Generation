@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="universityModel"
+    nsURI="http://example.org/universityModel"
+    nsPrefix="uni">
+
+  <!-- Root-level EClassifiers list -->
+  <!-- Index 0: Department -->
+  <!-- Index 1: Course -->
+  <!-- Index 2: Person -->
+  <!-- Index 3: Student -->
+  <!-- Index 4: Professor -->
+  <!-- Index 5: Room -->
+  <!-- Index 6: DayOfWeek (EEnum) -->
+
+  <!-- Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <!-- Attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="CS"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="foundedYear"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- References -->
+    <!-- One department has many courses -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="courses"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="true"/>
+    <!-- One department has many professors (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="professors"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.4"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- Course -->
+  <eClassifiers xsi:type="ecore:EClass" name="Course">
+    <!-- Attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="&quot;Intro to MDE&quot;"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="credits"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="3"/>
+    <!-- References -->
+    <!-- Many students enrolled in this course -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="enrolledStudents"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.3"
+        containment="false"/>
+    <!-- Course scheduled in a single room -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="room"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.5"
+        containment="false"/>
+    <!-- Professor teaching this course (bidirectional with Professor.teaches) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="instructor"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.4"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.2"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- Person (abstract superclass) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <!-- Attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="email"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- Student (inherits from Person, supertype inside same package) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Student"
+      eSuperTypes="//@eClassifiers.2">
+    <!-- Attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="matriculationNumber"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <!-- References -->
+    <!-- Opposite of Course.enrolledStudents -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="courses"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- Professor (inherits from Person, supertype inside same package and ecore::EClass via EPackage.ecore) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Professor"
+      eSuperTypes="//@eClassifiers.2">
+    <!-- Attributes -->
+    <!-- Uses EBooleanObject to exercise Bool mapping -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="tenured"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"
+        defaultValueLiteral="true"/>
+    <!-- References -->
+    <!-- Department this professor works in (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="department"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.0"
+        containment="false"/>
+    <!-- Courses this professor teaches (bidirectional with Course.instructor) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="teaches"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.3"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- Room -->
+  <eClassifiers xsi:type="ecore:EClass" name="Room">
+    <!-- Attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="number"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Enumeration-typed attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="day"
+        lowerBound="1"
+        eType="//@eClassifiers.6"
+        defaultValueLiteral="MONDAY"/>
+  </eClassifiers>
+
+  <!-- Enum DayOfWeek -->
+  <eClassifiers xsi:type="ecore:EEnum" name="DayOfWeek">
+    <eLiterals name="MONDAY" value="0" literal="MONDAY"/>
+    <eLiterals name="TUESDAY" value="1" literal="TUESDAY"/>
+    <eLiterals name="WEDNESDAY" value="2" literal="WEDNESDAY"/>
+  </eClassifiers>
+
+  <!-- Subpackage to exercise superPackage/subpackage handling -->
+  <eSubpackages name="schedule" nsURI="http://example.org/universityModel/schedule" nsPrefix="sched">
+    <!-- Subpackage classifiers indices (independent, local to this nested EPackage):
+         0: Timeslot
+         1: SemesterEnum
+    -->
+
+    <!-- Timeslot class inside subpackage, references types in root package and enum inside same subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="Timeslot">
+      <!-- Attributes -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="startHour"
+          lowerBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          defaultValueLiteral="9"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="endHour"
+          lowerBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          defaultValueLiteral="11"/>
+      <!-- Enum attribute from same subpackage -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="semester"
+          lowerBound="1"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          defaultValueLiteral="SPRING"/>
+      <!-- Cross-package reference to Course defined in root package -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="course"
+          lowerBound="1"
+          upperBound="1"
+          eType="//@eClassifiers.1"
+          containment="false"/>
+    </eClassifiers>
+
+    <!-- Enum SemesterEnum inside subpackage -->
+    <eClassifiers xsi:type="ecore:EEnum" name="SemesterEnum">
+      <eLiterals name="SPRING" value="0" literal="SPRING"/>
+      <eLiterals name="FALL" value="1" literal="FALL"/>
+    </eClassifiers>
+
+  </eSubpackages>
+
+</ecore:EPackage>

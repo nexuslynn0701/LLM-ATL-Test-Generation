@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cpL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cpL="http://cpl/1.0">
+  <elements xsi:type="cpL:CPL">
+    <subActions id="sub1">
+      <contents xsi:type="cpL:AddressSwitch" field="origin" subField="user">
+        <notPresent/>
+        <otherwise/>
+        <addresses is="sip:alice@example.com" contains="alice"/>
+        <addresses is="sip:bob@example.com" contains="bob" subDomainOf="example.com"/>
+      </contents>
+      <contents xsi:type="cpL:StringSwitch" field="subject">
+        <notPresent/>
+        <otherwise/>
+        <strings is="urgent" contains="urgent"/>
+        <strings is="normal" contains="normal"/>
+      </contents>
+    </subActions>
+    <subActions id="sub2">
+      <contents xsi:type="cpL:LanguageSwitch">
+        <notPresent/>
+        <otherwise/>
+        <languages matches="en"/>
+        <languages matches="fr"/>
+        <languages matches="de"/>
+      </contents>
+    </subActions>
+    <subActions id="sub3">
+      <contents xsi:type="cpL:TimeSwitch" tzid="America/New_York" tzurl="http://timezones.example.com/ny">
+        <notPresent/>
+        <otherwise/>
+        <times dtstart="20240101T090000" dtend="20241231T170000" duration="PT8H" freq="DAILY" until="20241231T235959" count="365" interval="1" wkst="MO" byDay="MO,TU,WE,TH,FR"/>
+        <times dtstart="20240101T000000" dtend="20241231T235959" interval="1" wkst="SU" byMonth="1,6,12"/>
+      </contents>
+    </subActions>
+    <subActions id="sub4">
+      <contents xsi:type="cpL:PrioritySwitch">
+        <notPresent/>
+        <otherwise/>
+        <priorities less="5" greater="1" equal="3"/>
+        <priorities less="10" greater="7"/>
+        <priorities equal="0"/>
+      </contents>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="cpL:Location" url="sip:user@voip.example.com" priority="1" clear="yes"/>
+      <contents xsi:type="cpL:Location" url="sip:user@backup.example.com" priority="2" clear="no"/>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="cpL:SubCall" ref="sub1"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="cpL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.0"/>
+  </elements>
+  <elements xsi:type="cpL:Redirect" permanent="false"/>
+  <elements xsi:type="cpL:Reject" status="603" reason="Decline"/>
+  <elements xsi:type="cpL:AddressSwitch" field="from" subField="host">
+    <notPresent/>
+    <otherwise/>
+    <addresses contains="sip.example.com"/>
+    <addresses contains="sip2.example.com"/>
+  </elements>
+  <elements xsi:type="cpL:StringSwitch" field="method">
+    <notPresent/>
+    <otherwise/>
+    <strings is="INVITE"/>
+    <strings is="BYE"/>
+    <strings is="OPTIONS"/>
+  </elements>
+  <elements xsi:type="cpL:LanguageSwitch">
+    <notPresent/>
+    <otherwise/>
+    <languages matches="ja"/>
+    <languages matches="ko"/>
+  </elements>
+  <elements xsi:type="cpL:TimeSwitch" interval="1" wkst="MO">
+    <notPresent/>
+    <otherwise/>
+    <times dtstart="20240101T000000" interval="1" wkst="MO" byHour="9,10,11,12,13,14,15,16,17"/>
+  </elements>
+  <elements xsi:type="cpL:PrioritySwitch">
+    <notPresent/>
+    <otherwise/>
+    <priorities less="100" greater="50"/>
+  </elements>
+  <elements xsi:type="cpL:SubCall" ref="sub2"/>
+  <elements xsi:type="cpL:SubCall" ref="sub3"/>
+  <elements xsi:type="cpL:SubCall" ref="sub4"/>
+  <elements xsi:type="cpL:Location" url="sip:test@test.com" priority="0" clear="yes"/>
+  <elements xsi:type="cpL:Location" url="sip:example@example.com" priority="0" clear="no"/>
+</cpL:CPLModel>

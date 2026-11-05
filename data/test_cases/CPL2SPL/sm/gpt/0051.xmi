@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL script with multiple subactions and I/O sections -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="mainFlow">
+      <contents>//@elements.3</contents>
+      <contents>//@elements.4</contents>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="backupFlow">
+      <contents>//@elements.6</contents>
+      <contents>//@elements.2</contents>
+    </subActions>
+    <outgoing>
+      <contents>//@elements.7</contents>
+    </outgoing>
+    <incoming>
+      <contents>//@elements.8</contents>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location used by several flows -->
+  <elements xsi:type="CPL:Location" url="sip:agent1@example.com" priority="1" clear="no">
+    <contents>//@elements.9</contents>
+    <contents>//@elements.10</contents>
+  </elements>
+
+  <!-- 2: SubCall referencing backup subaction (by string only) -->
+  <elements xsi:type="CPL:SubCall" ref="backupFlow"/>
+
+  <!-- 3: Address switch inside mainFlow -->
+  <elements xsi:type="CPL:AddressSwitch" field="tel" subField="user">
+    <notPresent>
+      <contents>//@elements.5</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.1</contents>
+    </otherwise>
+    <addresses is="12345" contains="true" subDomainOf="corp.example.com">
+      <contents>//@elements.1</contents>
+    </addresses>
+    <addresses is="67890"/>
+  </elements>
+
+  <!-- 4: Proxy with all result branches -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+    <busy>
+      <contents>//@elements.1</contents>
+    </busy>
+    <noAnswer>
+      <contents>//@elements.11</contents>
+    </noAnswer>
+    <redirection>
+      <contents>//@elements.12</contents>
+    </redirection>
+    <failure>
+      <contents>//@elements.13</contents>
+    </failure>
+    <default>
+      <contents>//@elements.2</contents>
+    </default>
+  </elements>
+
+  <!-- 5: Redirect used when address field not present -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 6: String switch inside backupFlow -->
+  <elements xsi:type="CPL:StringSwitch" field="display-name">
+    <notPresent>
+      <contents>//@elements.14</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.1</contents>
+    </otherwise>
+    <strings is="VIP" contains="yes">
+      <contents>//@elements.4</contents>
+    </strings>
+    <strings is="test" contains="no">
+      <contents>//@elements.5</contents>
+    </strings>
+  </elements>
+
+  <!-- 7: Language switch in outgoing branch -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <contents>//@elements.11</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.1</contents>
+    </otherwise>
+    <languages matches="en">
+      <contents>//@elements.4</contents>
+    </languages>
+    <languages matches="fr">
+      <contents>//@elements.5</contents>
+    </languages>
+  </elements>
+
+  <!-- 8: Time switch in incoming branch -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <notPresent>
+      <contents>//@elements.1</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.4</contents>
+    </otherwise>
+    <times dtstart="20250101T080000" dtend="20250101T180000" interval="1" wkst="MO" freq="DAILY">
+      <contents>//@elements.1</contents>
+    </times>
+    <times dtstart="20250101T000000" interval="7" wkst="SU" byDay="SA,SU"/>
+  </elements>
+
+  <!-- 9: Priority switch inside a Location -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <contents>//@elements.5</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.4</contents>
+    </otherwise>
+    <priorities less="0.3" greater="0.0" equal="0.1">
+      <contents>//@elements.4</contents>
+    </priorities>
+    <priorities greater="0.8">
+      <contents>//@elements.11</contents>
+    </priorities>
+  </elements>
+
+  <!-- 10: Nested Location inside Location (chaining) -->
+  <elements xsi:type="CPL:Location" url="sip:overflow@example.com" clear="yes">
+    <contents>//@elements.3</contents>
+  </elements>
+
+  <!-- 11: Reject used in different branches -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 12: Redirect used for redirection branch -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 13: Proxy used for failure recovery -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <busy>
+      <contents>//@elements.1</contents>
+    </busy>
+    <default>
+      <contents>//@elements.11</contents>
+    </default>
+  </elements>
+
+  <!-- 14: Location used when header string not present -->
+  <elements xsi:type="CPL:Location" url="sip:default@example.com" priority="5" clear="yes"/>
+
+</CPL:CPLModel>

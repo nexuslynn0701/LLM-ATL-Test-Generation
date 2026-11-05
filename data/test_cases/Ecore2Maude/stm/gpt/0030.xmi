@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyHierarchy"
+    nsURI="http://example.org/companyHierarchy"
+    nsPrefix="ch">
+
+  <!-- 0: AbstractPerson -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractPerson" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 1: Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <!-- non-containment cross-ref to Manager -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.2"/>
+    <!-- containment cross-ref to Task -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tasks"
+        eType="//@eClassifiers.5" upperBound="-1" containment="true"/>
+  </eClassifiers>
+
+  <!-- 2: Manager -->
+  <eClassifiers xsi:type="ecore:EClass" name="Manager"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="level"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- opposite reference from Department.employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.3" eOpposite="//@eClassifiers.3/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 3: Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <!-- containment employees, opposite of Manager.department -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        eType="//@eClassifiers.2" upperBound="-1" containment="true"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 4: Project -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <!-- reference to lead Manager -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lead"
+        eType="//@eClassifiers.2"/>
+    <!-- non-containment reference to Task -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="allTasks"
+        eType="//@eClassifiers.5" upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- 5: Task (EEnum-like class using attributes only) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="estimatedHours"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+</ecore:EPackage>

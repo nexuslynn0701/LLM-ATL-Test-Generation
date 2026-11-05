@@ -1,0 +1,1449 @@
+You are an expert in Model-Driven Engineering (MDE) and model transformation testing.
+Your task is to generate one valid source model for testing an ATL model transformation.
+
+--------------------------------
+METAMODELS
+--------------------------------
+Two metamodels are provided below in order: SOURCE first, TARGET second.
+
+The SOURCE metamodel defines the structure your output must conform to.
+The TARGET metamodel is provided only to help you understand the target-side
+types and bindings referenced in the ATL transformation.
+
+Do NOT instantiate target metamodel classes.
+Do NOT generate a target model.
+Do NOT use target-only classes, attributes, references, or namespace prefixes
+in the source model.
+
+--- Ant.ecore ---
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore">
+  <ecore:EPackage name="Ant" nsURI="Ant" nsPrefix="Ant">
+    <eClassifiers xsi:type="ecore:EClass" name="Project">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="basedir" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="default" ordered="false"
+          lowerBound="1" eType="#/0/Target"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="path" ordered="false"
+          eType="#/0/Path" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="properties" upperBound="-1"
+          eType="#/0/Property" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="taskdef" ordered="false"
+          upperBound="-1" eType="#/0/TaskDef" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="targets" lowerBound="1"
+          upperBound="-1" eType="#/0/Target" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Property" abstract="true"/>
+    <eClassifiers xsi:type="ecore:EClass" name="PropertyName" eSuperTypes="#/0/Property">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PropertyValue" eSuperTypes="#/0/PropertyName">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PropertyLocation" eSuperTypes="#/0/PropertyName">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="location" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PropertyFile" eSuperTypes="#/0/Property">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PropertyEnv" eSuperTypes="#/0/Property">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="environment" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Target">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="unless" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="ifCondition" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="depends" ordered="false"
+          upperBound="-1" eType="#/0/Target"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="tasks" upperBound="-1"
+          eType="#/0/Task" containment="true" eOpposite="#/0/Task/target"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Pattern" abstract="true"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Basic" abstract="true" eSuperTypes="#/0/Pattern"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Mapper" eSuperTypes="#/0/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="classname" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="classpath" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="classpathref" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="from" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="to" ordered="false" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="InExcludes" abstract="true" eSuperTypes="#/0/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="ifCondition" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="unless" ordered="false"
+          eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Includes" eSuperTypes="#/0/InExcludes"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Excludes" eSuperTypes="#/0/InExcludes"/>
+    <eClassifiers xsi:type="ecore:EClass" name="IncludesFile" eSuperTypes="#/0/InExcludes"/>
+    <eClassifiers xsi:type="ecore:EClass" name="ExcludesFile" eSuperTypes="#/0/InExcludes"/>
+    <eClassifiers xsi:type="ecore:EClass" name="FileList" eSuperTypes="#/0/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="dir" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="files" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Filter" eSuperTypes="#/0/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="token" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="FiltersFile" eSuperTypes="#/0/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PathElement" eSuperTypes="#/0/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="path" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="location" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Set" abstract="true" eSuperTypes="#/0/Pattern"/>
+    <eClassifiers xsi:type="ecore:EClass" name="PatternSet" eSuperTypes="#/0/Set">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="inexcludes" ordered="false"
+          lowerBound="1" upperBound="-1" eType="#/0/InExcludes" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="FileSet" eSuperTypes="#/0/Set">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="dir" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="patternset" ordered="false"
+          upperBound="-1" eType="#/0/PatternSet" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="include" ordered="false"
+          upperBound="-1" eType="#/0/Includes" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="exclude" ordered="false"
+          upperBound="-1" eType="#/0/Excludes" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="FilterSet" eSuperTypes="#/0/Set">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="starttoken" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="endtoken" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="filter" ordered="false"
+          upperBound="-1" eType="#/0/Filter" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="filtersfile" ordered="false"
+          upperBound="-1" eType="#/0/FiltersFile" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Path" eSuperTypes="#/0/Set">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" ordered="false" lowerBound="1"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="refid" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="path" ordered="false"
+          eType="#/0/Path" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="pathElement" ordered="false"
+          upperBound="-1" eType="#/0/PathElement" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="fileset" ordered="false"
+          upperBound="-1" eType="#/0/FileSet" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ClassPath" eSuperTypes="#/0/Set">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="refid" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="pathElement" ordered="false"
+          upperBound="-1" eType="#/0/PathElement" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="fileset" ordered="false"
+          upperBound="-1" eType="#/0/FileSet" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="true">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="target" ordered="false"
+          lowerBound="1" eType="#/0/Target" eOpposite="#/0/Target/tasks"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="TaskDef">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="classname" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="NewTask" eSuperTypes="#/0/Task">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="taskName" ordered="false"
+          lowerBound="1" eType="#/0/TaskDef"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" ordered="false"
+          upperBound="-1" eType="#/0/Attribut" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Attribut">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PreDefinedTask" abstract="true" eSuperTypes="#/0/Task">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" ordered="false" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="taskname" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" ordered="false"
+          eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ExecutionTask" abstract="true" eSuperTypes="#/0/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Exec">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="executable" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="dir" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Java">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="classname" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="jar" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="fork" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="classPath" ordered="false"
+          eType="#/0/ClassPath" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="MiscellaneousTask" abstract="true"
+        eSuperTypes="#/0/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Echo" eSuperTypes="#/0/MiscellaneousTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="message" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="append" ordered="false"
+          eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Tstamp" eSuperTypes="#/0/MiscellaneousTask">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="format" ordered="false"
+          upperBound="-1" eType="#/0/FormatTstamp" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="FormatTstamp">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="property" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="pattern" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="offset" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="unit" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="locale" ordered="false"
+          eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="CompileTask" abstract="true" eSuperTypes="#/0/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Javac" eSuperTypes="#/0/CompileTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="srcdir" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="destdir" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="debug" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="fork" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="optimize" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="deprecation" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="inExcludes" ordered="false"
+          upperBound="-1" eType="#/0/InExcludes" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="classPath" ordered="false"
+          eType="#/0/ClassPath" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="DocumentationTask" abstract="true"
+        eSuperTypes="#/0/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Javadoc" eSuperTypes="#/0/DocumentationTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="sourcepath" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="destdir" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="packagenames" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="defaultexcludes" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="author" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="version" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="use" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="windowtitle" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ArchiveTask" abstract="true" eSuperTypes="#/0/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Jar" eSuperTypes="#/0/ArchiveTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="jarfile" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="basedir" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="compress" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="encoding" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="manifest" ordered="false"
+          eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="FileTask" abstract="true" eSuperTypes="#/0/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Mkdir" eSuperTypes="#/0/FileTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="dir" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Copy" eSuperTypes="#/0/FileTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="presservelastmodified"
+          ordered="false" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="tofile" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="todir" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="overwrite" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="filtering" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="flatten" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="includeEmptyDirs" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="fileset" ordered="false"
+          eType="#/0/FileSet" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="filterset" ordered="false"
+          eType="#/0/FilterSet" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="mapper" ordered="false"
+          eType="#/0/Mapper" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Delete" eSuperTypes="#/0/FileTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="dir" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="verbose" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="quiet" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="failonerror" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="includeEmptyDirs" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="includes" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="includesfile" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="excludes" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="excludesfile" ordered="false"
+          eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="defaultexcludes" ordered="false"
+          eType="#/1/String"/>
+    </eClassifiers>
+  </ecore:EPackage>
+  <ecore:EPackage name="PrimitiveTypes" nsURI="PrimitiveTypes" nsPrefix="PrimitiveTypes">
+    <eClassifiers xsi:type="ecore:EDataType" name="String" instanceClassName="java.lang.String"/>
+  </ecore:EPackage>
+</xmi:XMI>
+
+
+--- MavenMaven.ecore ---
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore">
+  <ecore:EPackage name="PrimitiveTypes">
+    <eClassifiers xsi:type="ecore:EDataType" name="String" instanceClassName="java.lang.String"/>
+  </ecore:EPackage>
+  <ecore:EPackage name="MavenMaven" nsURI="MavenMaven" nsPrefix="MavenMaven">
+    <eClassifiers xsi:type="ecore:EClass" name="Project">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="xmlns" ordered="false"
+          upperBound="-1" eType="#/1/Xmlns" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="default" ordered="false"
+          eType="#/1/Goal"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="path" ordered="false"
+          eType="#/1/Path" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="properties" upperBound="-1"
+          eType="#/1/AntProperty" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="taskdefs" ordered="false"
+          upperBound="-1" eType="#/1/AntTaskDef" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="prePostGoals" ordered="false"
+          upperBound="-1" eType="#/1/PrePostGoal" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="goals" ordered="false"
+          lowerBound="1" upperBound="-1" eType="#/1/Goal" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Xmlns">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="AntProperty" abstract="true" eSuperTypes="#/1/ContentsGoal"/>
+    <eClassifiers xsi:type="ecore:EClass" name="AntPropertyName" abstract="true" eSuperTypes="#/1/AntProperty">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="AntPropertyValue" eSuperTypes="#/1/AntPropertyName">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="AntPropertyLocation" eSuperTypes="#/1/AntPropertyName">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="location" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="AntPropertyFile" eSuperTypes="#/1/AntProperty">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="AntPropertyEnv" eSuperTypes="#/1/AntProperty">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="environment" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="JellyCommand" abstract="true" eSuperTypes="#/1/ContentsGoal"/>
+    <eClassifiers xsi:type="ecore:EClass" name="JellySet" eSuperTypes="#/1/JellyCommand">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="var" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="AbstractGoal" abstract="true">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="contentsGoal" lowerBound="1"
+          upperBound="-1" eType="#/1/ContentsGoal" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ContentsGoal" abstract="true"/>
+    <eClassifiers xsi:type="ecore:EClass" name="AttainGoal" eSuperTypes="#/1/ContentsGoal">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="attainGoal" ordered="false"
+          lowerBound="1" eType="#/1/Goal"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PrePostGoal" abstract="true" eSuperTypes="#/1/AbstractGoal"/>
+    <eClassifiers xsi:type="ecore:EClass" name="PreGoal" eSuperTypes="#/1/PrePostGoal">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="centralGoal" ordered="false"
+          lowerBound="1" eType="#/1/Goal" eOpposite="#/1/Goal/preGoal"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PostGoal" eSuperTypes="#/1/PrePostGoal">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="centralGoal" ordered="false"
+          lowerBound="1" eType="#/1/Goal" eOpposite="#/1/Goal/postGoal"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Goal" eSuperTypes="#/1/AbstractGoal">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="preGoal" ordered="false"
+          eType="#/1/PreGoal" eOpposite="#/1/PreGoal/centralGoal"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="postGoal" ordered="false"
+          eType="#/1/PostGoal" eOpposite="#/1/PostGoal/centralGoal"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Pattern" abstract="true"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Basic" abstract="true" eSuperTypes="#/1/Pattern"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Mapper" eSuperTypes="#/1/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="classname" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="classpath" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="classpathref" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="from" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="to" ordered="false" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="InExcludes" abstract="true" eSuperTypes="#/1/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="ifCondition" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="unless" ordered="false"
+          eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Includes" eSuperTypes="#/1/InExcludes"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Excludes" eSuperTypes="#/1/InExcludes"/>
+    <eClassifiers xsi:type="ecore:EClass" name="IncludesFile" eSuperTypes="#/1/InExcludes"/>
+    <eClassifiers xsi:type="ecore:EClass" name="ExcludesFile" eSuperTypes="#/1/InExcludes"/>
+    <eClassifiers xsi:type="ecore:EClass" name="FileList" eSuperTypes="#/1/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="dir" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="files" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Filter" eSuperTypes="#/1/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="token" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="FiltersFile" eSuperTypes="#/1/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PathElement" eSuperTypes="#/1/Basic">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="path" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="location" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Set" abstract="true" eSuperTypes="#/1/Pattern"/>
+    <eClassifiers xsi:type="ecore:EClass" name="PatternSet" eSuperTypes="#/1/Set">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="inexcludes" ordered="false"
+          lowerBound="1" upperBound="-1" eType="#/1/InExcludes" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="FileSet" eSuperTypes="#/1/Set">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="dir" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="patternset" ordered="false"
+          upperBound="-1" eType="#/1/PatternSet" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="include" ordered="false"
+          upperBound="-1" eType="#/1/Includes" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="exclude" ordered="false"
+          upperBound="-1" eType="#/1/Excludes" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="FilterSet" eSuperTypes="#/1/Set">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="starttoken" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="endtoken" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="filter" ordered="false"
+          upperBound="-1" eType="#/1/Filter" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="filtersfile" ordered="false"
+          upperBound="-1" eType="#/1/FiltersFile" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Path" eSuperTypes="#/1/Set">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" ordered="false" lowerBound="1"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="refid" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="path" ordered="false"
+          eType="#/1/Path" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="pathElement" ordered="false"
+          upperBound="-1" eType="#/1/PathElement" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="fileset" ordered="false"
+          upperBound="-1" eType="#/1/FileSet" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ClassPath" eSuperTypes="#/1/Set">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="refid" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="pathElement" ordered="false"
+          upperBound="-1" eType="#/1/PathElement" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="fileset" ordered="false"
+          upperBound="-1" eType="#/1/FileSet" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="true" eSuperTypes="#/1/ContentsGoal"/>
+    <eClassifiers xsi:type="ecore:EClass" name="AntTaskDef" eSuperTypes="#/1/ContentsGoal">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="classname" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="NewTask" eSuperTypes="#/1/Task">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="taskName" ordered="false"
+          lowerBound="1" eType="#/1/AntTaskDef"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" ordered="false"
+          upperBound="-1" eType="#/1/Attribut" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Attribut">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PreDefinedTask" abstract="true" eSuperTypes="#/1/Task">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" ordered="false" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="taskname" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" ordered="false"
+          eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ExecutionTask" abstract="true" eSuperTypes="#/1/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Exec" eSuperTypes="#/1/ExecutionTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="executable" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="dir" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Java" eSuperTypes="#/1/ExecutionTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="classname" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="jar" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="fork" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="classPath" ordered="false"
+          eType="#/1/ClassPath" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="MiscellaneousTask" abstract="true"
+        eSuperTypes="#/1/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Echo" eSuperTypes="#/1/MiscellaneousTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="message" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="append" ordered="false"
+          eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Tstamp" eSuperTypes="#/1/MiscellaneousTask">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="format" ordered="false"
+          upperBound="-1" eType="#/1/FormatTstamp" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="FormatTstamp">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="property" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="pattern" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="offset" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="unit" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="locale" ordered="false"
+          eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="CompileTask" abstract="true" eSuperTypes="#/1/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Javac" eSuperTypes="#/1/CompileTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="srcdir" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="destdir" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="debug" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="fork" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="optimize" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="deprecation" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="inExcludes" ordered="false"
+          upperBound="-1" eType="#/1/InExcludes" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="classPath" ordered="false"
+          eType="#/1/ClassPath" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="DocumentationTask" abstract="true"
+        eSuperTypes="#/1/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Javadoc" eSuperTypes="#/1/DocumentationTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="sourcepath" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="destdir" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="packagenames" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="defaultexcludes" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="author" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="version" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="use" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="windowtitle" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ArchiveTask" abstract="true" eSuperTypes="#/1/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Jar" eSuperTypes="#/1/ArchiveTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="jarfile" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="basedir" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="compress" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="encoding" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="manifest" ordered="false"
+          eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="FileTask" abstract="true" eSuperTypes="#/1/PreDefinedTask"/>
+    <eClassifiers xsi:type="ecore:EClass" name="Mkdir" eSuperTypes="#/1/FileTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="dir" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Copy" eSuperTypes="#/1/FileTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="presservelastmodified"
+          ordered="false" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="tofile" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="todir" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="overwrite" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="filtering" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="flatten" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="includeEmptyDirs" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="fileset" ordered="false"
+          eType="#/1/FileSet" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="filterset" ordered="false"
+          eType="#/1/FilterSet" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="mapper" ordered="false"
+          eType="#/1/Mapper" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Delete" eSuperTypes="#/1/FileTask">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="dir" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="verbose" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="quiet" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="failonerror" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="includeEmptyDirs" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="includes" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="includesfile" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="excludes" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="excludesfile" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="defaultexcludes" ordered="false"
+          eType="#/0/String"/>
+    </eClassifiers>
+  </ecore:EPackage>
+</xmi:XMI>
+
+
+--- MavenProject.ecore ---
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore">
+  <ecore:EPackage name="PrimitiveTypes" nsURI="PrimitiveTypes" nsPrefix="PrimitiveTypes">
+    <eClassifiers xsi:type="ecore:EDataType" name="String" instanceClassName="java.lang.String"/>
+  </ecore:EPackage>
+  <ecore:EPackage name="MavenProject">
+    <eClassifiers xsi:type="ecore:EClass" name="Project">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" ordered="false" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="groupId" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="artifactId" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" ordered="false"
+          eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="build" ordered="false"
+          eType="#/1/Build" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="dependencies" ordered="false"
+          upperBound="-1" eType="#/1/Project"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Build">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="defaultGoal" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="sourceDirectory" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Description">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" ordered="false"
+          eType="#/0/String"/>
+    </eClassifiers>
+  </ecore:EPackage>
+</xmi:XMI>
+
+--------------------------------
+OCL CONSTRAINTS
+--------------------------------
+All generated source models must satisfy the following constraints:
+-- Ant2Maven OCL Contract
+-- Transformation-level contract: source-side (Ant) to target-side (Maven) mapping.
+-- Written in the style of Troya et al. 2015 TSE.
+-- Covers: Project → POM, Target → Goal, Properties → AntProperty entries,
+--   Tasks → Plugin/Goal entries, Path → Dependencies, FileSet → Resources.
+
+-- C1 (Rule AntProject2Maven): A MavenProject must be created for each Ant Project,
+-- with groupId and artifactId derived from the Project name.
+context Ant!Project
+inv MavenProjectCreated:
+  MavenProject!Project.allInstances()->exists(mp |
+    mp.artifactId = self.name
+  )
+
+-- C2 (Rule AntProject2Maven): The number of MavenProjects must equal the number of Ant Projects.
+context Ant!Project
+inv MavenProjectCount:
+  MavenProject!Project.allInstances()->size() = Ant!Project.allInstances()->size()
+
+-- C3 (Rule AntProject2Maven): The MavenProject must contain a Build element
+-- whose name matches the Project's basedir.
+context Ant!Project
+inv BuildCreated:
+  self.basedir.oclIsUndefined() or
+  MavenProject!Project.allInstances()->exists(mp |
+    mp.build.name = self.basedir
+  )
+
+-- C4 (Rule AntTarget2MavenMavenGoal): For each Ant Target, a corresponding Maven Goal
+-- must exist with the same name.
+context Ant!Target
+inv MavenGoalCreated:
+  MavenMaven!Goal.allInstances()->exists(g |
+    g.id = self.name
+  )
+
+-- C5 (Rule AntTarget2MavenMavenGoal): The number of Maven Goals must equal
+-- the number of Ant Targets.
+context Ant!Target
+inv GoalTargetCount:
+  MavenMaven!Goal.allInstances()->size() = Ant!Target.allInstances()->size()
+
+-- C6 (Rule AntTarget2MavenMavenGoal): For each Target with dependencies,
+-- the corresponding Goal must reference the dependent Goals.
+context Ant!Target
+inv GoalDependsMapped:
+  self.depends->forAll(d |
+    MavenMaven!Goal.allInstances()->exists(g |
+      g.id = self.name and
+      MavenMaven!Goal.allInstances()->exists(dg |
+        dg.id = d.name and
+        g.dependencies->includes(dg)
+      )
+    )
+  )
+
+-- C7 (Rule AntPropertyValue2MavenMavenAntPropertyValue): Each PropertyValue
+-- must produce a Maven AntPropertyValue with the same name and value.
+context Ant!PropertyValue
+inv AntPropertyCreated:
+  MavenMaven!AntPropertyValue.allInstances()->exists(ap |
+    ap.name = self.name and ap.value = self.value
+  )
+
+-- C8 (Rule AntPropertyLocation2MavenMavenAntPropertyLocation): Each PropertyLocation
+-- must produce a Maven AntPropertyLocation with the same name and location.
+context Ant!PropertyLocation
+inv AntPropertyLocationCreated:
+  MavenMaven!AntPropertyLocation.allInstances()->exists(ap |
+    ap.name = self.name and ap.location = self.location
+  )
+
+-- C9 (Rule AntPropertyFile2MavenMavenAntPropertyFile): Each PropertyFile
+-- must produce a Maven AntPropertyFile referencing the same file path.
+context Ant!PropertyFile
+inv AntPropertyFileCreated:
+  MavenMaven!AntPropertyFile.allInstances()->exists(ap |
+    ap.file = self.file
+  )
+
+-- C10 (Rule AntPropertyEnv2MavenMavenAntPropertyEnv): Each PropertyEnv
+-- must produce a Maven AntPropertyEnv with the same environment key.
+context Ant!PropertyEnv
+inv AntPropertyEnvCreated:
+  MavenMaven!AntPropertyEnv.allInstances()->exists(ap |
+    ap.environment = self.environment
+  )
+
+-- C11 (Rule AntJavac2MavenMavenJavac): Each Javac task must produce
+-- a corresponding Maven Javac plugin configuration.
+context Ant!Javac
+inv JavacMapped:
+  MavenMaven!Javac.allInstances()->exists(j |
+    j.srcdir = self.srcdir and j.destdir = self.destdir
+  )
+
+-- C12 (Rule AntJar2MavenMavenJar): Each Jar task must produce
+-- a corresponding Maven Jar plugin configuration.
+context Ant!Jar
+inv JarMapped:
+  MavenMaven!Jar.allInstances()->exists(j |
+    j.jarfile = self.jarfile and j.basedir = self.basedir
+  )
+
+-- C13 (Rule AntMkdir2MavenMavenMkdir): Each Mkdir task must produce
+-- a corresponding Maven Mkdir plugin entry.
+context Ant!Mkdir
+inv MkdirMapped:
+  MavenMaven!Mkdir.allInstances()->exists(m |
+    m.dir = self.dir
+  )
+
+-- C14 (Rule AntDelete2MavenMavenDelete): Each Delete task must produce
+-- a corresponding Maven Delete plugin entry.
+context Ant!Delete
+inv DeleteMapped:
+  MavenMaven!Delete.allInstances()->exists(d |
+    d.file = self.file
+  )
+
+-- C15 (Rule AntTaskDef2MavenMavenTaskDef): Each TaskDef must produce
+-- a Maven plugin TaskDef entry.
+context Ant!TaskDef
+inv TaskDefMapped:
+  MavenMaven!TaskDef.allInstances()->exists(td |
+    td.name = self.name and td.classname = self.classname
+  )
+
+-- C16 (Rule AntAttribut2MavenMavenAttribut): Each Attribut must produce
+-- a corresponding Maven Attribut with the same name.
+context Ant!Attribut
+inv AttributMapped:
+  MavenMaven!Attribut.allInstances()->exists(a |
+    a.name = self.name
+  )
+
+-- C17 (Rule AntPathElement2MavenMavenPathElement): Each PathElement
+-- must produce a corresponding Maven PathElement.
+context Ant!PathElement
+inv PathElementMapped:
+  MavenMaven!PathElement.allInstances()->exists(pe |
+    pe.location = self.location
+  )
+
+-- C18: All Properties (across subtypes) must be accounted for
+-- in the Maven model's AntProperty entries.
+context Ant!Project
+inv AllPropertiesMapped:
+  Ant!Property.allInstances()->size() =
+  (MavenMaven!AntPropertyValue.allInstances()->size() +
+   MavenMaven!AntPropertyLocation.allInstances()->size() +
+   MavenMaven!AntPropertyFile.allInstances()->size() +
+   MavenMaven!AntPropertyEnv.allInstances()->size())
+
+--------------------------------
+MODEL TRANSFORMATION (ATL)
+--------------------------------
+Study this ATL transformation carefully to understand which source structures
+trigger which rules. Use this knowledge to design a source model that exercises
+as many different transformation rules as possible.
+
+-- @path Ant=/org.eclipse.m2m.atl.tests/data/inputs/Ant2Maven/Ant.ecore
+-- @path MavenProject=/org.eclipse.m2m.atl.tests/data/inputs/Ant2Maven/MavenProject.ecore 
+-- @path MavenMaven=/org.eclipse.m2m.atl.tests/data/inputs/Ant2Maven/MavenMaven.ecore
+
+module Ant2Maven;
+create OUTMaven : MavenMaven ,OUTProject : MavenProject  from IN : Ant;
+
+-- central element : Project
+-- two files to create : MavenMaven (representing maven.xml)
+--				 	and MavenProject (representing project.xml)
+rule AntProject2Maven{
+		from a : Ant!Project(
+		if a.description.oclIsUndefined() 
+			then false
+			else not (a.description='')
+			endif
+	)
+		-- for MavenProject
+		to mp : MavenProject!Project(
+			    id <- a.name,
+			    name <- a.name,
+				description <- a.description,
+				build <- mpBuild
+				),
+			 mpBuild : MavenProject!Build(
+				sourceDirectory <- a.basedir,
+				defaultGoal <- a.default.name
+				),
+		-- for MavenMaven
+			mm : MavenMaven!Project(
+				xmlns <- itsXmlns,
+				default <- a.default,
+				path <- a.path,
+				properties <- a.properties,
+				taskdefs <- a.taskdef,
+				goals <- a.targets
+			 	),
+			itsXmlns : MavenMaven!Xmlns(
+				name <- 'ant',
+				value <- 'jelly:ant'
+			)
+}
+
+rule AntProject2MavenWithoutDescription{
+		from a : Ant!Project(
+		if a.description.oclIsUndefined() 
+			then true
+			else a.description=''
+			endif
+	)
+		-- for MavenProject
+		to mp : MavenProject!Project(
+			    id <- a.name,
+			    name <- a.name,
+				build <- mpBuild
+				),
+			 mpBuild : MavenProject!Build(
+				sourceDirectory <- a.basedir,
+				defaultGoal <- a.default.name
+				),
+		-- for MavenMaven
+			mm : MavenMaven!Project(
+				xmlns <- itsXmlns,
+				default <- a.default,
+				path <- a.path,
+				properties <- a.properties,
+				taskdefs <- a.taskdef,
+				goals <- a.targets--,
+			--	prePostGoals <- a.targets -> select(e|not e.depends.oclIsUndefined() and e.depends->size()>0)
+			 	),
+			itsXmlns : MavenMaven!Xmlns(
+				name <- 'ant',
+				value <- 'jelly:ant'
+			)
+}
+
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+-- rules only for Maven.xml (meta model : MavenMaven)
+
+ -- goals
+-- rule AntTarget2MavenMavenGoal2{
+--	from a : Ant!Target(
+--		a.depends.oclIsUndefined() or a.depends->size()=0
+--	)
+--	to mg : MavenMaven!Goal(
+--		name <- a.name,
+--		contentsGoal <- a.tasks
+--		)
+-- }
+
+rule AntTarget2MavenMavenGoal{
+	from a : Ant!Target
+	using {
+		itsDependencies : Sequence(Ant!Target) = a.depends->asSequence();
+	}
+	to mg : MavenMaven!Goal(
+		name <- a.name,
+		contentsGoal <- Sequence{dependencies,a.tasks}
+		),
+	dependencies : distinct MavenMaven!AttainGoal foreach(g in itsDependencies) (
+		attainGoal <- g
+	)
+ }
+ 
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+-- for the following rules : simple copy
+-----------------------------------------------------------
+-- copy of Ant Properties
+
+rule AntPropertyValue2MavenMavenAntPropertyValue{
+	from a : Ant!PropertyValue
+	to m : MavenMaven!AntPropertyValue(
+		name <- a.name,
+		value <- a.value
+	)
+}
+
+rule AntPropertyLocation2MavenMavenAntPropertyLocation{
+	from a : Ant!PropertyLocation
+	to m : MavenMaven!AntPropertyLocation(
+		name <- a.name,
+		location <- a.location
+	)
+}
+
+
+rule AntPropertyFile2MavenMavenAntPropertyFile{
+	from a : Ant!PropertyFile
+	to m : MavenMaven!AntPropertyFile(
+		file <- a.file)
+}
+
+rule AntPropertyEnv2MavenMavenAntPropertyEnv{
+	from a : Ant!PropertyEnv
+	to m : MavenMaven!AntPropertyEnv(
+		environment <- a.environment)
+}
+
+----------------------------------------------------------------------------------------
+-- copy of tasks
+
+------------------------------------------------------
+-- java tasks
+rule AntJava2MavenMavenJava{
+	from a : Ant!Java
+	to m : MavenMaven!Java(
+		classname <- a.classname,
+		jar <- a.jar,
+		fork <- a.fork,
+  		classPath <- a.classPath
+	)
+}
+
+rule AntJavac2MavenMavenJavac{
+	from a : Ant!Javac
+	to m : MavenMaven!Javac(
+		destdir <- a.destdir,
+		srcdir <- a.srcdir,
+  		classPath <- a.classPath,
+		inExcludes <- a.inExcludes
+	)
+}
+
+rule AntJavadoc2MavenMavenJavadoc{
+	from a : Ant!Javadoc
+	to m : MavenMaven!Javadoc(
+	 	sourcepath <- a.sourcepath,
+  		destdir <- a.destdir,
+  		packagenames <- a.packagenames,
+  		defaultexcludes <- a.defaultexcludes,
+  		author <- a.author,
+  		version <- a.version,
+  		use <- a.use,
+  		windowtitle <- a.windowtitle
+	)
+}
+
+---------------------------------------------------------
+-- MANAGEMENT PROPERTIES tasks 
+rule AntTstamp2MavenMavenTstamp{
+    from a : Ant!Tstamp
+	to m : MavenMaven!Tstamp()
+}
+
+---------------------------------------------------------
+-- MANAGEMENT ARCHIVE tasks 
+rule AntJar2MavenMavenJar{
+	from a : Ant!Jar
+	to m : MavenMaven!Jar(
+		jarfile <- a.jarfile,
+		basedir <- a.basedir)
+}
+
+---------------------------------------------------------
+-- MANAGEMENT FILES tasks 
+rule AntMkdir2MavenMavenMkdir{
+	from a : Ant!Mkdir
+	to m : MavenMaven!Mkdir(
+		dir <- a.dir)
+}
+
+rule AntCopy2MavenMavenCopy{
+	from a : Ant!Copy
+	to m : MavenMaven!Copy(
+		todir <- a.todir,
+		fileset <- a.fileset,
+		filterset <- a.filterset
+	)
+}
+
+
+rule AntDelete2MavenMavenDelete{
+	from a : Ant!Delete
+	to m : MavenMaven!Delete(
+		dir <- a.dir)
+}
+
+------------------------------------------------------------
+-- tasks defined by the user
+rule AntTaskDef2MavenMavenTaskDef{
+	from a : Ant!TaskDef
+	to m : MavenMaven!AntTaskDef(
+		name <- a.name,
+		classname <- a.classname
+	)
+}
+
+rule AntNewTask2MavenMavenNewTask{
+	from a : Ant!NewTask
+	to m : MavenMaven!NewTask(
+		taskName <- a.taskName,
+		attributes <- a.attributes
+	)
+}
+
+rule AntAttribut2MavenMavenAttribut{
+	from a : Ant!Attribut
+	to m : MavenMaven!Attribut(
+		name <- a.name,
+		value <- a.value
+	)
+}
+-------------------------------------------------------------------------------------
+-- copy for Path
+
+ rule AntPath2MavenMavenPath{
+	from a : Ant!Path
+	to mm : MavenMaven!Path(
+		id <- a.id,
+		refid <- a.refid,
+		fileset <- a.fileset,
+		path <- a.path,
+	 	pathElement <- a.pathElement
+	)
+}
+
+ rule AntClassPath2MavenMavenClassPath{
+	from a : Ant!ClassPath
+	to mm : MavenMaven!ClassPath(
+		refid <- a.refid,
+		pathElement <- a.pathElement,
+        fileset <- a.fileset
+	)
+ }
+ 
+rule AntPathElement2MavenMavenPathElement{
+	from a : Ant!PathElement
+	to mm : MavenMaven!PathElement(
+		path <- a.path,
+		location <- a.location
+	)
+}
+
+rule AntFileSet2MavenMavenFileSet{
+	from a : Ant!FileSet
+	to m : MavenMaven!FileSet(
+		dir <- a.dir,
+        patternset <- a.patternset,
+        include <- a.include,
+        exclude <- a.exclude
+	)
+}
+
+-- filters
+rule AntFilterSet2MavenMavenFilterSet{
+	from a : Ant!FilterSet
+	to m : MavenMaven!FilterSet(
+		starttoken <- a.starttoken,
+   		endtoken <- a.endtoken,
+		filter <- a.filter,
+		filtersfile <- a.filtersfile
+	)
+}
+
+rule AntFilter2MavenMavenFilter{
+	from a : Ant!Filter
+	to m : MavenMaven!Filter(
+		token <- a.token,
+		value <- a.value
+	)
+}
+
+rule AntFiltersFile2MavenMavenFiltersFile{
+	from a : Ant!FiltersFile
+	to m : MavenMaven!FiltersFile(
+		file <- a.file
+	)
+}
+
+-- pattern
+rule AntPatternset2MavenMavenPatternset{
+	from a : Ant!PatternSet
+	to m : MavenMaven!PatternSet(
+		inexcludes <- a.inexcludes
+	)
+}
+ 
+
+ rule AntIncludes2MavenMavenIncludes{
+	from a : Ant!Includes
+	to m : MavenMaven!Includes(
+		name <- a.name,
+		ifCondition <- a.ifCondition,
+		unless <- a.unless
+	)
+}
+ 
+rule AntExcludes2MavenMavenExcludes{
+	from a : Ant!Excludes
+	to m : MavenMaven!Excludes(
+		name <- a.name,
+		ifCondition <- a.ifCondition,
+		unless <- a.unless
+		)
+}
+
+rule AntIncludesFile2MavenMavenIncludesFile{
+	from a : Ant!IncludesFile
+	to m : MavenMaven!IncludesFile(
+		name <- a.name,
+		ifCondition <- a.ifCondition,
+		unless <- a.unless
+	)
+}
+
+rule AntExcludesFile2MavenMavenExcludesFile{
+	from a : Ant!ExcludesFile
+	to m : MavenMaven!ExcludesFile(
+		name <- a.name,
+		ifCondition <- a.ifCondition,
+		unless <- a.unless
+		)
+}
+
+--------------------------------
+EXAMPLE SOURCE MODELS
+--------------------------------
+Below are example source models that conform to the source metamodel.
+Use them only to understand the correct source-side XMI format and structure.
+Generate a NEW and DIFFERENT source model that covers different ATL rules.
+
+--- Example 1: scenario1_minimal_project.xmi ---
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MinimalBuild"
+    basedir="."
+    default="compile">
+  <targets xmi:id="compile" name="compile"/>
+</Ant:Project>
+
+
+--- Example 2: scenario2_project_dependencies.xmi ---
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ApplicationBuild"
+    basedir="."
+    description="Compile and package application"
+    default="package">
+  <properties xsi:type="Ant:PropertyValue" name="encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build"/>
+  <targets xmi:id="compile" name="compile"/>
+  <targets xmi:id="package" name="package" depends="compile"/>
+</Ant:Project>
+
+
+--- Example 3: scenario3_project_classpath.xmi ---
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ClasspathBuild"
+    basedir="."
+    description="Compile with a filtered classpath"
+    default="compile">
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src"
+        destdir="build/classes"
+        debug="true">
+      <classPath refid="compile.classpath">
+        <pathElement path="lib/core.jar" location="lib"/>
+        <pathElement path="lib/test.jar" location="lib"/>
+        <fileset dir="lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+            <inexcludes xsi:type="Ant:Excludes" name="**/*-sources.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+  </targets>
+</Ant:Project>
+
+--------------------------------
+GENERATION REQUIREMENTS
+--------------------------------
+The source model must:
+1. Conform to the source metamodel.
+2. Satisfy all OCL constraints.
+3. Exercise as many different ATL rules as possible.
+4. Be structurally different from the example source models.
+5. Be syntactically valid XMI.
+6. Use ONLY classes, attributes, references, and namespace prefixes defined
+   in the source metamodel.
+7. Never instantiate target metamodel classes.
+8. Express attribute values as XMI attributes, not as XML text content nodes.
+   CORRECT:   <Entry title="My Title" year="2024"/>
+   INCORRECT: <Entry><title>My Title</title></Entry>
+9. Containment references may be represented as nested XMI elements when
+   required by the source metamodel.
+
+--------------------------------
+SOURCE FORMAT NOTES
+--------------------------------
+
+Ant2Maven source XMI safety rules. Follow these exactly.
+
+You are generating an Ant source model only. Do not generate Maven output models.
+
+HARD EXECUTABILITY GATE. Violating any item makes the generated model invalid:
+- Project.default is the only allowed reference-valued attribute. It MUST equal
+  the xmi:id of one contained <targets> element in the same model.
+- Never use depends="..." attributes and never create nested <depends> elements.
+- Never generate <tasks xsi:type="Ant:Echo"> or <tasks xsi:type="Ant:Exec">.
+- Never generate <tasks xsi:type="Ant:NewTask"> and never use taskName references.
+- A standalone contained <taskdef .../> element is allowed, but do not reference
+  it from any task.
+- Keep all generated structures contained. Do not add href, refid, classpathref,
+  path references, or external ID references.
+
+The provided minimal_project.xmi is a syntax exemplar only. It demonstrates
+the minimum valid Ant XMI serialization structure, including containment
+element names and the Project.default reference. Do not copy its content or
+task composition. Generate a new source model using independently selected
+valid Ant elements and values.
+
+Use the Ant.ecore XML element names exactly:
+- Root Project element: <Ant:Project ...>
+- Project contains targets using <targets>, not <target>.
+- Target contains tasks using <tasks>, not <task>.
+- Project.default is an EReference to a contained Target, not a plain string attribute.
+  Therefore every default target must have xmi:id, and Project.default must equal that id.
+  Correct:
+    <Ant:Project ... default="compile">
+      <targets xmi:id="compile" name="compile"> ... </targets>
+    </Ant:Project>
+- Never set Project.default to an id that is not defined.
+- Never invent references such as compileTarget, mytask, //@path.0 unless the referenced object exists.
+- If you use any reference-valued attribute, the target object must have a matching xmi:id in the same model.
+- Keep the model simple and executable. Prefer one Project with one or two contained targets.
+
+Important typing rule:
+- Ant Project.default must reference an Ant Target object.
+- Do not confuse Ant Target with Maven Goal. The source model must never contain Maven classes.
+- Do not use <Target> as a project child; use <targets>.
+- Do not use <Goal> in the Ant source model.
+
+Minimal valid pattern:
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MyProject"
+    default="compile"
+    basedir=".">
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="bin"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar"/>
+  </targets>
+</Ant:Project>
+
+For this experiment, avoid fragile cross references.
+Allowed reference:
+- Project.default -> one contained <targets xmi:id="...">.
+
+Forbidden references in generated Ant source models:
+- Do not use Target.depends.
+- Do not use taskName references.
+- Do not use path references, pathElement references, fileset references, classpathref, refid, or any external ID reference.
+- Do not use attributes whose value names another object, except Project.default.
+- Do not use unsupported task types such as <tasks xsi:type="Ant:Echo"> or <tasks xsi:type="Ant:Exec">.
+  Ant2Maven.atl has no matched rules for Echo or Exec, so these source objects cannot be transformed safely.
+- Use only Ant source types handled by matched rules in Ant2Maven.atl.
+- Do not invent ids such as mytask, compileTarget, init, main unless the same xmi:id is defined in the model.
+
+To increase coverage safely, add only contained elements:
+- Additional <targets xmi:id="test" name="test"> with no depends.
+- Tasks as contained <tasks xsi:type="Ant:Javac" srcdir="src" destdir="bin"/>.
+- Tasks as contained <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar"/>.
+- Tasks as contained <tasks xsi:type="Ant:Mkdir" dir="build"/>.
+- Tasks as contained <tasks xsi:type="Ant:Delete" dir="build"/>.
+Avoid classpaths, path, fileset, filterset, taskdef, and nested references until the model is executable.
+
+--------------------------------
+OUTPUT FORMAT
+--------------------------------
+Return exactly one source model and nothing else:
+
+<source_model>
+[source XMI here]
+</source_model>
+
+Do not include: target_model, expected output, coverage notes,
+explanation, or Markdown fences.

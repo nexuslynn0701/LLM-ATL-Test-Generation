@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://example/root"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise superPackage/subPackages -->
+  <eSubpackages name="subpkg"
+                nsURI="http://example/sub"
+                nsPrefix="sub">
+    <!-- Class in subpackage, used as EReference type -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClass">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subAttr"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           lowerBound="0"
+                           upperBound="1"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Class 0: no super types, with 1 attribute and 1 reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseClass">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="baseName"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="toDetail"
+                         eType="//@eClassifiers.1"
+                         containment="true"
+                         lowerBound="0"
+                         upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- Class 1: extends BaseClass, has attribute with default and upperBound -1 -->
+  <eClassifiers xsi:type="ecore:EClass" name="DetailClass">
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="detailCode"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="0"
+                         upperBound="-1"
+                         defaultValueLiteral="0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="toSub"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         containment="false"
+                         lowerBound="1"
+                         upperBound="1"/>
+  </eClassifiers>
+
+  <!-- EEnum 2 with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- Class 3: uses enum as attribute type, no super types -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         eType="//@eClassifiers.2"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="NEW"/>
+  </eClassifiers>
+
+</ecore:EPackage>

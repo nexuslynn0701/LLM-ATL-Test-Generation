@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="."
+    description="Build and test a sample library"
+    default="build-target">
+
+  <!-- Optional properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/classes"/>
+  <properties xsi:type="Ant:PropertyValue" name="dist.dir" value="dist"/>
+
+  <!-- Optional task definition (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default build target -->
+  <targets xmi:id="build-target" name="build" description="Compile sources and create jar">
+    <!-- Prepare build directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+
+    <!-- Clean old classes if any -->
+    <tasks xsi:type="Ant:Delete" dir="build/classes" verbose="true" includeEmptyDirs="true"/>
+
+    <!-- Recreate build directory after clean -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="on"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+
+    <!-- Package compiled classes into a jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/library.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Separate target for preparing distribution directory -->
+  <targets xmi:id="dist-setup-target" name="dist-setup" description="Prepare distribution output directory">
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Delete" dir="dist/temp" quiet="true" failonerror="false"/>
+  </targets>
+
+  <!-- Test compilation target -->
+  <targets xmi:id="test-compile-target" name="test-compile" description="Compile test sources if they exist">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="build/test-classes"
+           debug="off"
+           fork="false"
+           optimize="false"
+           deprecation="false"/>
+  </targets>
+
+</Ant:Project>

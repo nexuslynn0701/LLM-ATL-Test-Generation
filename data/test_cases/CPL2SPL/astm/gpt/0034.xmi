@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.4" id="saAlpha"/>
+    <subActions contents="//@elements.5" id="saBeta"/>
+    <incoming contents="//@elements.6"/>
+    <outgoing contents="//@elements.7"/>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy (inside SubAction saAlpha) -->
+  <elements xsi:type="CPL:Location" url="sip:alpha@example.com" clear="true" priority="1"/>
+
+  <!-- 2: Location used by Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:redir@example.net" clear="false" priority="2"/>
+
+  <!-- 3: Location used by complex Proxy (inside SubAction saBeta) -->
+  <elements xsi:type="CPL:Location" url="sip:beta@example.org" clear="true" priority="3"/>
+
+  <!-- 4: Redirect, referenced from Default inside complex Proxy and from StringSwitch -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 5: SubAction saAlpha with simple Proxy (triggers Proxy2Return in SubAction2Function) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="20">
+    <!-- simple proxy: no busy/noAnswer/redirection/failure/default children -->
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 6: SubAction saBeta with complex Proxy (has all children) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential" timeout="40">
+    <!-- complex proxy because at least one of these is present -->
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.4"/>
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 7: SubCall referencing saAlpha by name (SubCall2Return) -->
+  <elements xsi:type="CPL:SubCall" ref="saAlpha"/>
+
+  <!-- 8: Reject used as contents of Incoming -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 9: TimeSwitch used as contents of Outgoing (won't produce statements) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 10: Failure used inside complex Proxy (Failure2ErrorResponse) -->
+  <elements xsi:type="CPL:Failure"/>
+
+  <!-- 11: Busy used inside complex Proxy (Busy2SelectCase) -->
+  <elements xsi:type="CPL:Busy">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 12: NoAnswer used inside complex Proxy (NoAnswer2SelectCase) -->
+  <elements xsi:type="CPL:NoAnswer">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 13: Redirection used inside complex Proxy (Redirection2SelectCase) -->
+  <elements xsi:type="CPL:Redirection">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 14: Default used inside complex Proxy (Default2SelectDefault) -->
+  <elements xsi:type="CPL:Default">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 15: NotPresent used inside AddressSwitch (NotPresent2ErrorResponse) -->
+  <elements xsi:type="CPL:NotPresent">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 16: Otherwise used inside AddressSwitch (Otherwise2SelectDefault) -->
+  <elements xsi:type="CPL:Otherwise">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 17: SwitchedAddress used inside AddressSwitch (SwitchedAddress2SelectCase) -->
+  <elements xsi:type="CPL:SwitchedAddress" is="user@example.com" contains="user" subDomainOf="example.com">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 18: AddressSwitch (AddressSwitch2SelectStat) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="from">
+    <notPresent contents="//@elements.15"/>
+    <otherwise contents="//@elements.16"/>
+    <addresses contents="//@elements.17"/>
+  </elements>
+
+  <!-- 19: StringSwitch (StringSwitch2SelectStat) -->
+  <elements xsi:type="CPL:StringSwitch" field="X-Custom-Header">
+    <strings is="alpha" contains="a">
+      <contents xsi:nil="true"/>
+    </strings>
+  </elements>
+
+  <!-- 20: LanguageSwitch used as contents in Busy (no extra statements) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en-US">
+      <contents xsi:nil="true"/>
+    </languages>
+  </elements>
+
+  <!-- 21: PrioritySwitch used as contents in NoAnswer (no extra statements) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.7" equal="0.5">
+      <contents xsi:nil="true"/>
+    </priorities>
+  </elements>
+
+  <!-- 22: Incoming (Incoming2Method) -->
+  <elements xsi:type="CPL:Incoming">
+    <contents contents="//@elements.8"/>
+  </elements>
+
+  <!-- 23: Outgoing (Outgoing2Method) -->
+  <elements xsi:type="CPL:Outgoing">
+    <contents contents="//@elements.9"/>
+  </elements>
+
+</CPL:CPLModel>

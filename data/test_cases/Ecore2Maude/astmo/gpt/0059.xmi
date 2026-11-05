@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryRoot"
+    nsURI="http://example.org/libraryRoot"
+    nsPrefix="libroot">
+
+  <!-- Root package has one subpackage and several classifiers -->
+  <eSubpackages name="mediaSub"
+                nsURI="http://example.org/mediaSub"
+                nsPrefix="media">
+    <!-- Class in subpackage, to trigger subpackage handling -->
+    <eClassifiers xsi:type="ecore:EClass" name="MediaItem">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="title"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           iD="false"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="rating"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                           iD="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- EClasses in root package -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <!-- Reference to Book, multi-valued, containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="books"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"
+                         containment="true"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Book">
+    <!-- Attribute serving as ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="isbn"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"/>
+    <!-- String attribute with default value to trigger AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"
+                         defaultValueLiteral="&quot;Untitled&quot;"/>
+    <!-- Int attribute with non-default bounds -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="pages"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         iD="false"/>
+    <!-- Reference to Author, single valued, non-containment, bidirectional -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="author"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.2"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"
+                         containment="false"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Author">
+    <!-- Opposite reference, multi-valued, non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="writtenBooks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.3"
+                         containment="false"/>
+  </eClassifiers>
+
+  <!-- Enumeration with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Genre">
+    <eLiterals name="Fiction" literal="Fiction" value="0"/>
+    <eLiterals name="NonFiction" literal="NonFiction" value="1"/>
+  </eClassifiers>
+
+</ecore:EPackage>

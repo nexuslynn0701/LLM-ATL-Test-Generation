@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL (triggers CPL2Program, Incoming2Method, Outgoing2Method, SubAction2Function) -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions for SubCall and as declarations -->
+    <subActions xsi:type="CPL:SubAction" id="mainAction">
+      <!-- contents -> complex Proxy via contents reference -->
+      <contents href="//@elements.2"/>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="simpleProxyAction">
+      <!-- contents -> simple Proxy -->
+      <contents href="//@elements.3"/>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="redirectAction">
+      <!-- contents -> Redirect -->
+      <contents href="//@elements.4"/>
+    </subActions>
+
+    <!-- Incoming branch using a SubCall as its contents (SubCall2Return) -->
+    <incoming xsi:type="CPL:Incoming">
+      <contents href="//@elements.1"/>
+    </incoming>
+
+    <!-- Outgoing branch using AddressSwitch as contents (AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault) -->
+    <outgoing xsi:type="CPL:Outgoing">
+      <contents href="//@elements.5"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: SubCall referring to "mainAction" (SubCall2Return) -->
+  <elements xsi:type="CPL:SubCall" ref="mainAction"/>
+
+  <!-- 2: Complex Proxy with all branches (Proxy2Select, Busy2SelectCase, NoAnswer2SelectCase, Redirection2SelectCase,
+           Default2SelectDefault, Failure2ErrorResponse, Location2URIConstant through locations helper) -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <!-- define locations so Proxy2Select and nested Redirect can use them -->
+    <contents href="//@elements.6"/>
+    <busy>
+      <!-- Busy contents -> simple Proxy (statements from Proxy2Return) -->
+      <contents href="//@elements.3"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer contents -> Redirect (Redirect2Return) -->
+      <contents href="//@elements.4"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection contents -> simple Proxy -->
+      <contents href="//@elements.3"/>
+    </redirection>
+    <failure/>
+    <default>
+      <!-- Default contents -> SubCall -->
+      <contents href="//@elements.1"/>
+    </default>
+  </elements>
+
+  <!-- 3: Simple Proxy (Proxy2Return, Location2URIConstant via its Location contents) -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+    <contents href="//@elements.7"/>
+  </elements>
+
+  <!-- 4: Redirect (Redirect2Return, Location2URIConstant via locations) -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents href="//@elements.8"/>
+  </elements>
+
+  <!-- 5: AddressSwitch with SwitchedAddress, NotPresent, Otherwise
+         (AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault) -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination" subField="user">
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <!-- contents -> simple Proxy -->
+      <contents href="//@elements.3"/>
+    </addresses>
+    <addresses is="bob@example.net" contains="bob" subDomainOf="example.net">
+      <!-- contents -> Redirect -->
+      <contents href="//@elements.4"/>
+    </addresses>
+    <notPresent/>
+    <otherwise>
+      <!-- contents -> SubCall -->
+      <contents href="//@elements.1"/>
+    </otherwise>
+  </elements>
+
+  <!-- 6: Location for complex Proxy (used via locations helper and Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:proxy-complex@example.com" priority="1" clear="yes"/>
+
+  <!-- 7: Location for simple Proxy (used via locations helper and Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:proxy-simple@example.com" priority="2" clear="yes"/>
+
+  <!-- 8: Location for Redirect (used via locations helper and Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.org" priority="3" clear="no"/>
+
+</CPL:CPLModel>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Outgoing and one Incoming -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents: complex Proxy (exercises Proxy2Select) -->
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="true" ordering="parallel">
+        <!-- locations for this Proxy come from top-level Location elements -->
+        <busy>
+          <!-- Busy case contains a SubCall -> SubCall2Return used inside Busy2SelectCase -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <!-- Default branch contains a Redirect -> Redirect2Return used in Default2SelectDefault -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </default>
+      </contents>
+    </subActions>
+    <!-- Outgoing with simple Proxy contents -> Outgoing2Method + Proxy2Return -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" timeout="15" recurse="false" ordering="sequential"/>
+    </outgoing>
+    <!-- Incoming with Reject contents (no statements generated) -> Incoming2Method only -->
+    <incoming>
+      <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location used by both Proxies and Redirect via locations helper (Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" priority="1" clear="true"/>
+
+  <!-- 2: AddressSwitch top-level (AddressSwitch2SelectStat, SwitchedAddress2SelectCase, Otherwise2SelectDefault, NotPresent2ErrorResponse) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- SwitchedAddress with SubCall contents -> SwitchedAddress2SelectCase + SubCall2Return -->
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </addresses>
+    <!-- NotPresent and Otherwise without contents -->
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 3: SwitchedString top-level via a StringSwitch (StringSwitch2SelectStat only) -->
+  <elements xsi:type="CPL:StringSwitch" field="callId">
+    <strings is="CID-123" contains="123"/>
+  </elements>
+
+  <!-- 4: LanguageSwitch top-level with no contents (only created, no statements) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+  </elements>
+
+  <!-- 5: TimeSwitch top-level with minimal required attributes -->
+  <elements xsi:type="CPL:TimeSwitch">
+    <times dtstart="20250101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 6: PrioritySwitch top-level -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.7" equal="0.5"/>
+  </elements>
+
+  <!-- 7: Redirect top-level (Redirect2Return, creates RedirectionErrorResponse and ResponseConstant) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

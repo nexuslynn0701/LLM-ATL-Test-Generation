@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="src/main"
+    description="Complex Ant project with multiple targets and tasks."
+    default="buildTarget">
+
+  <!-- Global properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="env/project.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Custom task definition (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with several tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile, document and package the project">
+    <!-- Compile task using includes/excludes -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+    <!-- Create JAR -->
+    <tasks xsi:type="Ant:Jar" jarfile="target/complexbuild.jar" basedir="target/classes" compress="true" encoding="UTF-8"/>
+  </targets>
+
+  <!-- Target with filtering copy using FileSet, PatternSet, FilterSet and Mapper -->
+  <targets xmi:id="resourcesTarget" name="process-resources" description="Copy and filter resource files">
+    <!-- Prepare output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/filtered-resources"/>
+    <!-- Copy resources with patterns and filters -->
+    <tasks xsi:type="Ant:Copy" todir="target/filtered-resources" overwrite="true" filtering="true" flatten="false" includeEmptyDirs="false">
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/secret/**"/>
+        </patternset>
+        <include name="**/*.xml"/>
+        <exclude name="**/temp/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexBuild"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.template" to="*.cfg"/>
+    </tasks>
+  </targets>
+
+  <!-- Cleanup target using Delete -->
+  <targets xmi:id="cleanTarget" name="clean" description="Clean all generated artifacts">
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="**/*" defaultexcludes="false"/>
+  </targets>
+
+  <!-- Timestamp management target -->
+  <targets xmi:id="timestampTarget" name="timestamp" description="Generate build timestamp properties">
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Path and ClassPath demonstrated in an isolated target (no cross references) -->
+  <targets xmi:id="pathDemoTarget" name="path-demo" description="Demonstrate path and classpath structures">
+    <!-- A Path with nested PathElement and FileSet/PatternSet -->
+    <tasks xsi:type="Ant:Java" classname="com.example.tools.PathPrinter" fork="true">
+      <classPath refid="compile.classpath">
+        <pathElement path="lib/commons-lang3.jar" location="lib/commons-lang3.jar"/>
+        <fileset dir="lib/optional">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+  </targets>
+
+  <!-- Top-level reusable Path and ClassPath (not referenced) -->
+  <path id="main.path">
+    <pathElement path="lib/core.jar" location="lib/core.jar"/>
+    <fileset dir="lib/ext">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+</Ant:Project>

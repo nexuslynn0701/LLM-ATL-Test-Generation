@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with both incoming and outgoing, plus subActions -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction whose contents is the simple Proxy -->
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+
+    <!-- One SubAction whose contents is the complex Proxy -->
+    <subActions id="sa2">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.1"/>
+      </contents>
+    </subActions>
+
+    <!-- Outgoing using the simple Proxy as statement -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- same simple proxy semantics as subAction sa1 -->
+      </contents>
+    </outgoing>
+
+    <!-- Incoming using the complex Proxy as statement -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.1"/>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- Location used by proxies and redirect to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:example@example.com" clear="true"/>
+
+  <!-- SubCall matching sa1 -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- Redirect using the Location above to trigger Location2URIConstant as well -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- AddressSwitch with SwitchedAddress and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- Simple StringSwitch for diversity (does not create statements) -->
+  <elements xsi:type="CPL:StringSwitch" field="fieldName"/>
+
+  <!-- LanguageSwitch with NotPresent to get another ErrorResponse -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- PrioritySwitch with Failure to get yet another ErrorResponse -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <failure/>
+  </elements>
+
+  <!-- TimeSwitch with Busy and NoAnswer to produce additional SelectCases and ResponseConstants -->
+  <elements xsi:type="CPL:TimeSwitch">
+    <busy/>
+    <noAnswer/>
+  </elements>
+
+  <!-- PrioritySwitch with Redirection to increase RedirectionErrorResponses -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <redirection/>
+  </elements>
+
+</CPL:CPLModel>

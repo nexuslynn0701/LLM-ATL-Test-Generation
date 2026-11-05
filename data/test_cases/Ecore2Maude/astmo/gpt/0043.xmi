@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example.org/rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages / PackEqSupPackage / PackEqSubPackages -->
+  <eSubpackages name="subPkg"
+      nsURI="http://example.org/subPkg"
+      nsPrefix="sub">
+    <!-- Class in subpackage, with supertype from root package (cross-package inheritance) -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClass">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="subAttr"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="0"
+          upperBound="-1"
+          iD="false"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="backToMain"
+          eType="//@eClassifiers.0"
+          lowerBound="0"
+          upperBound="1"
+          containment="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Class 0: main class, abstract, with attribute and reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="MainClass" abstract="true" interface="false">
+    <!-- Attribute: ID, Int, default value, bounds 1..1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="mainId"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        defaultValueLiteral="42"/>
+    <!-- Reference: containment, many, opposite set later -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Class 1: secondary class, concrete, supertype = MainClass, has attribute and bidirectional ref -->
+  <eClassifiers xsi:type="ecore:EClass" name="SecondaryClass" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- Attribute: non-ID, BooleanObject, default, 0..1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="flag"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="true"/>
+    <!-- Reference: opposite of MainClass.children, non-containment, single -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="parent"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.1"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Enum 2: for Enum-related rules -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="RED" literal="RED" value="0"/>
+    <eLiterals name="GREEN" literal="GREEN" value="1"/>
+    <eLiterals name="BLUE" literal="BLUE" value="2"/>
+  </eClassifiers>
+
+  <!-- Data type 3: extra primitive-like type to appear in classifier lists -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ExtraNumber" instanceClassName="int"/>
+
+  <!-- Class 4: class using the enum as attribute type -->
+  <eClassifiers xsi:type="ecore:EClass" name="EnumHolder" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="color"
+        eType="//@eClassifiers.2"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="RED"/>
+  </eClassifiers>
+
+</ecore:EPackage>

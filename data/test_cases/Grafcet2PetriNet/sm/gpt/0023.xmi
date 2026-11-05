@@ -1,0 +1,195 @@
+<xmi:XMI xmi:version="2.0"
+         xmlns:xmi="http://www.omg.org/XMI"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_grafcet_main"
+                   location="example/grafcet0023.gcd"
+                   name="ComplexBranchingGrafcet">
+
+    <!-- Elements: Steps and Transitions -->
+
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_step_start"
+              location="example/grafcet0023.gcd#S1"
+              name="Start"
+              isInitial="true"
+              isActive="true"
+              action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_step_branchA"
+              location="example/grafcet0023.gcd#S2"
+              name="BranchA"
+              isInitial="false"
+              isActive="false"
+              action="performBranchAActions"/>
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_step_branchB"
+              location="example/grafcet0023.gcd#S3"
+              name="BranchB"
+              isInitial="false"
+              isActive="false"
+              action="performBranchBActions"/>
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_step_merge"
+              location="example/grafcet0023.gcd#S4"
+              name="Merge"
+              isInitial="false"
+              isActive="false"
+              action="synchronizeBranches"/>
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_step_loop"
+              location="example/grafcet0023.gcd#S5"
+              name="LoopStep"
+              isInitial="false"
+              isActive="false"
+              action="loopProcessing"/>
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_step_final"
+              location="example/grafcet0023.gcd#S6"
+              name="Final"
+              isInitial="false"
+              isActive="false"
+              action="shutdownSystem"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_trans_start_to_branch"
+              location="example/grafcet0023.gcd#T1"
+              name="T_Start_to_Branch"
+              condition="startCommand && systemReady"/>
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_trans_branchA_to_merge"
+              location="example/grafcet0023.gcd#T2"
+              name="T_BranchA_to_Merge"
+              condition="branchACompleted"/>
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_trans_branchB_to_merge"
+              location="example/grafcet0023.gcd#T3"
+              name="T_BranchB_to_Merge"
+              condition="branchBCompleted"/>
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_trans_merge_to_loop"
+              location="example/grafcet0023.gcd#T4"
+              name="T_Merge_to_Loop"
+              condition="allBranchesOk"/>
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_trans_loop_self"
+              location="example/grafcet0023.gcd#T5"
+              name="T_Loop_Self"
+              condition="loopCondition"/>
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_trans_loop_to_final"
+              location="example/grafcet0023.gcd#T6"
+              name="T_Loop_to_Final"
+              condition="loopDone"/>
+
+    <!-- Connections -->
+
+    <!-- From Start to branching transition -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_conn_S1_T1"
+                 location="example/grafcet0023.gcd#C1"
+                 name="C_Start_to_T1"
+                 from="/0/@elements.0"
+                 to="/0/@elements.6"/>
+
+    <!-- From branching transition to BranchA -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_conn_T1_S2"
+                 location="example/grafcet0023.gcd#C2"
+                 name="C_T1_to_BranchA"
+                 from="/0/@elements.6"
+                 to="/0/@elements.1"/>
+
+    <!-- From branching transition to BranchB -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_conn_T1_S3"
+                 location="example/grafcet0023.gcd#C3"
+                 name="C_T1_to_BranchB"
+                 from="/0/@elements.6"
+                 to="/0/@elements.2"/>
+
+    <!-- From BranchA to its transition -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_conn_S2_T2"
+                 location="example/grafcet0023.gcd#C4"
+                 name="C_BranchA_to_T2"
+                 from="/0/@elements.1"
+                 to="/0/@elements.7"/>
+
+    <!-- From BranchB to its transition -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_conn_S3_T3"
+                 location="example/grafcet0023.gcd#C5"
+                 name="C_BranchB_to_T3"
+                 from="/0/@elements.2"
+                 to="/0/@elements.8"/>
+
+    <!-- From BranchA transition to Merge -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_conn_T2_S4"
+                 location="example/grafcet0023.gcd#C6"
+                 name="C_T2_to_Merge"
+                 from="/0/@elements.7"
+                 to="/0/@elements.3"/>
+
+    <!-- From BranchB transition to Merge -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_conn_T3_S4"
+                 location="example/grafcet0023.gcd#C7"
+                 name="C_T3_to_Merge"
+                 from="/0/@elements.8"
+                 to="/0/@elements.3"/>
+
+    <!-- From Merge step to transition leading to LoopStep -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_conn_S4_T4"
+                 location="example/grafcet0023.gcd#C8"
+                 name="C_Merge_to_T4"
+                 from="/0/@elements.3"
+                 to="/0/@elements.9"/>
+
+    <!-- From Merge->Loop transition to LoopStep -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_conn_T4_S5"
+                 location="example/grafcet0023.gcd#C9"
+                 name="C_T4_to_Loop"
+                 from="/0/@elements.9"
+                 to="/0/@elements.4"/>
+
+    <!-- Loop: from LoopStep to self-transition -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_conn_S5_T5"
+                 location="example/grafcet0023.gcd#C10"
+                 name="C_LoopStep_to_T5"
+                 from="/0/@elements.4"
+                 to="/0/@elements.10"/>
+
+    <!-- Loop: from self-transition back to LoopStep -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_conn_T5_S5"
+                 location="example/grafcet0023.gcd#C11"
+                 name="C_T5_to_LoopStep"
+                 from="/0/@elements.10"
+                 to="/0/@elements.4"/>
+
+    <!-- From LoopStep to transition leading to Final -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_conn_S5_T6"
+                 location="example/grafcet0023.gcd#C12"
+                 name="C_LoopStep_to_T6"
+                 from="/0/@elements.4"
+                 to="/0/@elements.11"/>
+
+    <!-- From final transition to Final step -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_conn_T6_S6"
+                 location="example/grafcet0023.gcd#C13"
+                 name="C_T6_to_Final"
+                 from="/0/@elements.11"
+                 to="/0/@elements.5"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

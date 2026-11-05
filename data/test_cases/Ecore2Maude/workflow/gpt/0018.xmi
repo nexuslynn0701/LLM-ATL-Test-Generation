@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="testpkg"
+    nsURI="http://testpkg"
+    nsPrefix="tp">
+
+  <!-- Class Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="false" interface="false">
+    <!-- ID Attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        eAttributeType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"/>
+    <!-- Name Attribute with default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        eAttributeType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="unknown"/>
+    <!-- Reference to Address (non-containment, single, with opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="address"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- Class Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address" abstract="false" interface="false">
+    <!-- Opposite reference to Person (containment, many) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="residents"
+        eType="//@eClassifiers.0"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+    <!-- Street attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        eAttributeType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0"
+        upperBound="1"/>
+  </eClassifiers>
+
+  <!-- Enum Gender with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Gender">
+    <eLiterals name="MALE" value="0" literal="MALE"/>
+    <eLiterals name="FEMALE" value="1" literal="FEMALE"/>
+  </eClassifiers>
+
+  <!-- Class Employee extends Person, has enum-typed attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- Attribute of enum type Gender -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="gender"
+        eAttributeType="//@eClassifiers.2"
+        lowerBound="0"
+        upperBound="1"/>
+  </eClassifiers>
+
+  <!-- Pure EDataType, to exercise @DataType path via attributes without primitive guess -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData" instanceClassName="com.example.CustomData"/>
+
+  <!-- Class Project with attribute of custom EDataType -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="metadata"
+        eAttributeType="//@eClassifiers.4"
+        lowerBound="0"
+        upperBound="1"/>
+  </eClassifiers>
+
+</ecore:EPackage>

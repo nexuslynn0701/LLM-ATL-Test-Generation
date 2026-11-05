@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="metamodel72"
+    nsURI="http://example.org/metamodel72"
+    nsPrefix="mm72">
+
+  <!-- Root package classifiers -->
+  <!-- 0: Base superclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseEntity">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="BASE"
+        lowerBound="0"/>
+  </eClassifiers>
+
+  <!-- 1: Subclass with superType and attributes of different primitive kinds -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0"
+        upperBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="true"/>
+  </eClassifiers>
+
+  <!-- 2: Class with references (single, multi, with and without opposite) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        defaultValueLiteral="&quot;Acme&quot; Inc."/>
+    <!-- Single-valued non-containment reference with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="ceo"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.3"/>
+    <!-- Multi-valued containment reference without opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 3: Enum with multiple literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="DepartmentKind">
+    <eLiterals name="HR" value="0" literal="HR"/>
+    <eLiterals name="DEV" value="1" literal="DEV"/>
+    <eLiterals name="SALES" value="2" literal="SALES"/>
+  </eClassifiers>
+
+  <!-- 4: Class using the enum and with upperBound = -1 attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="kind"
+        eType="//@eClassifiers.3"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="tags"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0"
+        upperBound="-1"/>
+    <!-- Reference without explicit eOpposite (to test null opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="company"
+        eType="//@eClassifiers.2"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- 5: Additional enum to be used as default value type -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusFlag">
+    <eLiterals name="ENABLED" value="0" literal="ENABLED"/>
+    <eLiterals name="DISABLED" value="1" literal="DISABLED"/>
+  </eClassifiers>
+
+  <!-- 6: Class with enum-typed attribute having defaultValueLiteral (enum case in AttEqSpecificDefaultValue) -->
+  <eClassifiers xsi:type="ecore:EClass" name="FeatureToggle">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        eType="//@eClassifiers.5"
+        lowerBound="1"
+        defaultValueLiteral="ENABLED"/>
+  </eClassifiers>
+
+  <!-- 7: Class with BooleanObject and DoubleObject to exercise generic @DataType branch -->
+  <eClassifiers xsi:type="ecore:EClass" name="Metrics">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="flagObj"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"
+        lowerBound="0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="ratio"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDoubleObject"
+        lowerBound="0"/>
+  </eClassifiers>
+
+  <!-- 8: Third enum with single literal (to drive EqLiterals single-element path) -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityLevel">
+    <eLiterals name="NORMAL" value="0" literal="NORMAL"/>
+  </eClassifiers>
+
+  <!-- 9: Class referring to PriorityLevel, no defaultValueLiteral -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        eType="//@eClassifiers.8"
+        lowerBound="0"/>
+  </eClassifiers>
+
+  <!-- 10: Utility class to host opposite for Company.ceo -->
+  <eClassifiers xsi:type="ecore:EClass" name="PersonExtension">
+    <!-- Opposite side of Company.ceo -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employer"
+        eType="//@eClassifiers.2"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 11: Alias class (another subclass of BaseEntity) to have multiple eSuperTypes in a list -->
+  <eClassifiers xsi:type="ecore:EClass" name="SpecialPerson"
+      eSuperTypes="//@eClassifiers.0 //@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="alias"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0"/>
+  </eClassifiers>
+
+  <!-- Subpackage to exercise subpackage listing / superPackage handling -->
+  <eSubpackages name="sub72"
+      nsURI="http://example.org/metamodel72/sub"
+      nsPrefix="mm72sub">
+    <!-- 0: Class in subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubItem">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="label"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

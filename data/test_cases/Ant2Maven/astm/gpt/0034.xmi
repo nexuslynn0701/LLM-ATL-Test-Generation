@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexProject"
+    basedir="."
+    description="Ant project with multiple targets and tasks."
+    default="mainTarget">
+
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="conf/config.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A standalone TaskDef to trigger AntTaskDef2MavenMavenTaskDef -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Target that will be the default, with a variety of tasks -->
+  <targets xmi:id="mainTarget" name="mainTarget" description="Main build target">
+    <!-- Compile task with inExcludes and classPath (to hit Javac and accessory rules) -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="false">
+      <!-- InExcludes directly under Javac to trigger Includes/Excludes/IncludesFile/ExcludesFile rules -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="compile.if" unless="compile.unless"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="exclude.if" unless="exclude.unless"/>
+      <inExcludes xsi:type="Ant:IncludesFile" name="includes.list" ifCondition="incfile.if" unless="incfile.unless"/>
+      <inExcludes xsi:type="Ant:ExcludesFile" name="excludes.list" ifCondition="excfile.if" unless="excfile.unless"/>
+
+      <!-- ClassPath with PathElement and FileSet (to trigger PathElement, FileSet, PatternSet, FilterSet, Filter, FiltersFile) -->
+      <classPath refid="compile.classpath">
+        <pathElement path="lib/commons-lang3.jar" location="lib/commons-lang3.jar"/>
+        <pathElement path="lib/guava.jar" location="lib/guava.jar"/>
+
+        <fileset dir="lib">
+          <!-- PatternSet containing Includes/Excludes -->
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar" ifCondition=" jars.if " unless=" jars.unless "/>
+            <inexcludes xsi:type="Ant:Excludes" name="**/test-*.jar" ifCondition=" testjars.if " unless=" testjars.unless "/>
+          </patternset>
+
+          <!-- Direct include/exclude under FileSet -->
+          <include name="core/*.jar" ifCondition="core.if" unless="core.unless"/>
+          <exclude name="old/*.jar" ifCondition="old.if" unless="old.unless"/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Java task with ClassPath (trigger AntJava2MavenMavenJava, AntClassPath2MavenMavenClassPath, PathElement/FileSet again) -->
+    <tasks xsi:type="Ant:Java" classname="com.example.Main" jar="app/main.jar" fork="true">
+      <classPath refid="runtime.classpath">
+        <pathElement path="target/classes" location="target/classes"/>
+        <fileset dir="lib/runtime">
+          <include name="**/*.jar" ifCondition="rt.if" unless="rt.unless"/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Javadoc task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexProject API"/>
+
+    <!-- Tstamp task with nested FormatTstamp (FormatTstamp not transformed but valid) -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd HH:mm:ss"
+              offset="0"
+              unit="hour"
+              locale="en_US"/>
+    </tasks>
+
+    <!-- Jar task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/complexproject.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Mkdir task -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/generated-sources"/>
+
+    <!-- Copy task with FileSet, FilterSet, Mapper -->
+    <tasks xsi:type="Ant:Copy"
+           todir="target/dist"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="resources">
+        <include name="**/*.*" ifCondition="res.if" unless="res.unless"/>
+      </fileset>
+      <filterset starttoken="@@" endtoken="@@">
+        <filter token="project.name" value="ComplexProject"/>
+        <filtersfile file="conf/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="com.example.Mapper" classpath="lib/mapper.jar" classpathref="mapper.path" from="*.tpl" to="*.txt"/>
+    </tasks>
+
+    <!-- Delete task -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           includesfile="conf/delete-includes.txt"
+           excludes="**/*.keep"
+           excludesfile="conf/delete-excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target with property-like tasks to ensure coverage repeats with a different structure -->
+  <targets xmi:id="cleanupTarget" name="cleanupTarget" description="Cleanup and prepare directories">
+    <tasks xsi:type="Ant:Mkdir" dir="target/logs"/>
+    <tasks xsi:type="Ant:Delete" dir="target/old" verbose="false" quiet="true" failonerror="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="target/empty-artifact.jar" basedir="target/empty"/>
+  </targets>
+
+</Ant:Project>

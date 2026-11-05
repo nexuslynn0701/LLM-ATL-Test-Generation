@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL, drives R1, R3, R4 -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions for R2 and R13 -->
+    <subActions xsi:type="CPL:SubAction" id="subA">
+      <!-- contents points to simple Proxy at index 4 (R7 through helper Node.statement) -->
+      <contents href="//@elements.4"/>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="subB">
+      <!-- contents points to complex Proxy at index 5 (R8 through helper Node.statement) -->
+      <contents href="//@elements.5"/>
+    </subActions>
+
+    <!-- Incoming and Outgoing for R3/R4, statement taken from contents -->
+    <incoming>
+      <!-- contents points to Redirect at index 3 (R14) -->
+      <contents href="//@elements.3"/>
+    </incoming>
+    <outgoing>
+      <!-- contents points to SubCall at index 2 (R13) -->
+      <contents href="//@elements.2"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by Proxies (R7, R8, R19) and Redirect (R14) via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="true">
+    <!-- contents points to AddressSwitch at index 6 (R15, R17, R18) -->
+    <contents href="//@elements.6"/>
+  </elements>
+
+  <!-- 2: SubCall that refers to SubAction "subA" (R13), used as statement via contents -->
+  <elements xsi:type="CPL:SubCall" ref="subA"/>
+
+  <!-- 3: Redirect (R14), used as statement via contents -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 4: Simple Proxy (R7), used as statement via contents -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- isSimple = true (no children set) -->
+  </elements>
+
+  <!-- 5: Complex Proxy (R8, R9, R10, R11, R12, R5) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- children defined so isSimple = false -->
+    <busy>
+      <!-- contents points to Reject at index 9 (used as statement in R9) -->
+      <contents href="//@elements.9"/>
+    </busy>
+    <noAnswer>
+      <!-- contents points to AddressSwitch at index 6 (used as statement in R10 via Node.statement) -->
+      <contents href="//@elements.6"/>
+    </noAnswer>
+    <redirection>
+      <!-- contents points to SubCall at index 2 (used as statement in R11 via Node.statement) -->
+      <contents href="//@elements.2"/>
+    </redirection>
+    <failure/>
+    <default>
+      <!-- contents points to Reject at index 9 (used as statement in R12) -->
+      <contents href="//@elements.9"/>
+    </default>
+  </elements>
+
+  <!-- 6: AddressSwitch (R15) with SwitchedAddress and NotPresent (R17, R6, R18) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- one switched address (R17) -->
+    <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com">
+      <!-- contents points to Redirect at index 3 (used as statement in R17 via Node.statement) -->
+      <contents href="//@elements.3"/>
+    </addresses>
+
+    <!-- notPresent (R6) without contents -->
+    <notPresent/>
+
+    <!-- otherwise (R18) with contents pointing to SubCall (R13 via Node.statement) -->
+    <otherwise>
+      <contents href="//@elements.2"/>
+    </otherwise>
+  </elements>
+
+  <!-- 7: StringSwitch (R16) -->
+  <elements xsi:type="CPL:StringSwitch" field="callId">
+    <!-- no contents needed for this rule -->
+  </elements>
+
+  <!-- 8: TimeSwitch (tested in statement filters) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://time.example.com">
+    <times dtstart="20260101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 9: Reject (used as terminal statement by several contents) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+</CPL:CPLModel>

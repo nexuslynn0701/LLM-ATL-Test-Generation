@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleBuild"
+    default="build"
+    basedir="."
+    description="A sample Ant project for testing transformation">
+  <targets xmi:id="build" name="build">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="classes"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/myapp.jar" basedir="classes"/>
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="docs"
+        packagenames="com.example"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="MyApp API"/>
+    <tasks xsi:type="Ant:Copy" todir="backup">
+      <fileset dir="src">
+        <include name="**/*.java"/>
+        <exclude name="**/test/**"/>
+      </fileset>
+    </tasks>
+    <tasks xsi:type="Ant:Delete" dir="tmp"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Javac" srcdir="testsrc" destdir="testclasses">
+      <inExcludes xsi:type="Ant:Includes" name="**/failing/*.java"/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/tests.jar" basedir="testclasses"/>
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="testsrc"
+        destdir="testdocs"
+        packagenames="com.example.tests"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Test API"/>
+    <tasks xsi:type="Ant:Mkdir" dir="reports"/>
+  </targets>
+  <taskdef name="mytask" classname="com.example.MyTask"/>
+  <properties xsi:type="Ant:PropertyValue" name="version" value="1.0"/>
+  <properties xsi:type="Ant:PropertyLocation" name="src.dir" location="/home/user/src"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+  <path id="build.classpath">
+    <pathElement path="/lib/tools.jar" location="/lib/tools.jar"/>
+  </path>
+</Ant:Project>

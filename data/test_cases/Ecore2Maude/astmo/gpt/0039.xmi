@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryRoot"
+    nsURI="http://example.org/libraryRoot"
+    nsPrefix="libroot">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="librarySub"
+                nsURI="http://example.org/librarySub"
+                nsPrefix="libsub">
+    <!-- Classifiers inside subpackage -->
+
+    <!-- EClass: Person, with attributes and references -->
+    <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="false" interface="false">
+      <!-- Attribute: id (EInt, isID, default set) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="id"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="1"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                           iD="true"
+                           defaultValueLiteral="0"/>
+      <!-- Attribute: name (EString) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="name"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="1"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           iD="false"/>
+      <!-- Reference: books (multi-valued, containment, upper=-1) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="books"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="-1"
+                           eType="//@eSubpackages.0/@eClassifiers.1"
+                           containment="true"
+                           resolveProxies="true"/>
+    </eClassifiers>
+
+    <!-- EClass: Book, with enum-typed attribute and container ref -->
+    <eClassifiers xsi:type="ecore:EClass" name="Book" abstract="false" interface="false">
+      <!-- Attribute: title (EString, has default) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="title"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="1"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           iD="false"
+                           defaultValueLiteral="Untitled"/>
+      <!-- Attribute: genre (EEnum Genre) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="genre"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="//@eSubpackages.0/@eClassifiers.2"
+                           iD="false"/>
+      <!-- Container reference: owner (Person, opposite of books) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="owner"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="//@eSubpackages.0/@eClassifiers.0"
+                           containment="false"
+                           resolveProxies="true"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.2"/>
+    </eClassifiers>
+
+    <!-- EEnum: Genre with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Genre">
+      <eLiterals name="Fiction" value="0" literal="Fiction"/>
+      <eLiterals name="NonFiction" value="1" literal="NonFiction"/>
+    </eClassifiers>
+
+  </eSubpackages>
+
+  <!-- Top-level classifiers in root package -->
+
+  <!-- Abstract superclass: NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true" interface="false">
+    <!-- Attribute to exercise feature rules on abstract class -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="internalCode"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"/>
+  </eClassifiers>
+
+  <!-- EClass: Library extends NamedElement, with attributes and non-containment ref -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Library"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.0">
+    <!-- Attribute: libraryName -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="libraryName"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"/>
+    <!-- Reference: members (Person, non-containment, multi) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="members"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

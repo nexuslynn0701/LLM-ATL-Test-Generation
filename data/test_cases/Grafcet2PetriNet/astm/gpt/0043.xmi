@@ -1,0 +1,107 @@
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcetExample" location="model://grafcet/0043">
+    <!-- Elements: 4 Steps, 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="model://grafcet/0043#s0" isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="ProcessingStep" location="model://grafcet/0043#s1" isInitial="false" isActive="false" action="processData"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="DecisionStep" location="model://grafcet/0043#s2" isInitial="false" isActive="false" action="evaluateCondition"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="FinalStep" location="model://grafcet/0043#s3" isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="InitToProcess" location="model://grafcet/0043#t0" condition="startPressed"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="ProcessToDecision" location="model://grafcet/0043#t1" condition="processingDone"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="DecisionToFinal" location="model://grafcet/0043#t2" condition="ok AND NOT error"/>
+
+    <!-- Connections forming a non-trivial graph with fan-out and fan-in -->
+    <!-- s0 -> t0, s1 -> t0 (fan-in) -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c0"
+                 name="c_s0_t0"
+                 location="model://grafcet/0043#c0"
+                 grafcet="/0"
+                 from="/0/@elements.0"
+                 to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c1"
+                 name="c_s1_t0"
+                 location="model://grafcet/0043#c1"
+                 grafcet="/0"
+                 from="/0/@elements.1"
+                 to="/0/@elements.4"/>
+
+    <!-- t0 -> s1, t0 -> s2 (fan-out) -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c2"
+                 name="c_t0_s1"
+                 location="model://grafcet/0043#c2"
+                 grafcet="/0"
+                 from="/0/@elements.4"
+                 to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c3"
+                 name="c_t0_s2"
+                 location="model://grafcet/0043#c3"
+                 grafcet="/0"
+                 from="/0/@elements.4"
+                 to="/0/@elements.2"/>
+
+    <!-- s1 -> t1, s2 -> t1 (another fan-in) -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c4"
+                 name="c_s1_t1"
+                 location="model://grafcet/0043#c4"
+                 grafcet="/0"
+                 from="/0/@elements.1"
+                 to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c5"
+                 name="c_s2_t1"
+                 location="model://grafcet/0043#c5"
+                 grafcet="/0"
+                 from="/0/@elements.2"
+                 to="/0/@elements.5"/>
+
+    <!-- t1 -> s2 (loop back), t1 -> s3 -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c6"
+                 name="c_t1_s2"
+                 location="model://grafcet/0043#c6"
+                 grafcet="/0"
+                 from="/0/@elements.5"
+                 to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c7"
+                 name="c_t1_s3"
+                 location="model://grafcet/0043#c7"
+                 grafcet="/0"
+                 from="/0/@elements.5"
+                 to="/0/@elements.3"/>
+
+    <!-- s2 -> t2, s3 -> t2 (final fan-in) -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c8"
+                 name="c_s2_t2"
+                 location="model://grafcet/0043#c8"
+                 grafcet="/0"
+                 from="/0/@elements.2"
+                 to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c9"
+                 name="c_s3_t2"
+                 location="model://grafcet/0043#c9"
+                 grafcet="/0"
+                 from="/0/@elements.3"
+                 to="/0/@elements.6"/>
+
+    <!-- t2 -> s3 (stabilizing back edge) -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c10"
+                 name="c_t2_s3"
+                 location="model://grafcet/0043#c10"
+                 grafcet="/0"
+                 from="/0/@elements.6"
+                 to="/0/@elements.3"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

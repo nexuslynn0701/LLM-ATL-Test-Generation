@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction and one outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents: complex Proxy (non simple) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- make it non-simple: create all branches -->
+        <busy>
+          <!-- Busy contents: SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer/>
+        <redirection>
+          <!-- Redirection contents: Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default contents: AddressSwitch -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <!-- AddressSwitch children: notPresent, otherwise, one SwitchedAddress -->
+            <notPresent/>
+            <otherwise/>
+            <addresses is="addrCase1"/>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <outgoing>
+      <!-- Outgoing contents: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <!-- simple proxy: no branches; one Location child -->
+        <contents xsi:type="CPL:Location" url="sip:user@example.com" clear="yes"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+</CPL:CPLModel>

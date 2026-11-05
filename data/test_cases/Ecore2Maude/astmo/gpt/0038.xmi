@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libRoot"
+    nsURI="http://example.org/libRoot"
+    nsPrefix="libRoot">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="libSub"
+                nsURI="http://example.org/libSub"
+                nsPrefix="libSub">
+    <!-- Class in subpackage, used as superclass and as reference target -->
+    <eClassifiers xsi:type="ecore:EClass" name="ExternalType">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="extCode"
+                           lowerBound="0"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root package classifiers -->
+  <!-- 0: EClass Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <!-- id attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="libId"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- name attribute with default value to trigger AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="libName"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="Central &quot;Library&quot;"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- containment reference books, multivalued with upperBound -1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="books"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.1"/>
+    <!-- non-containment reference to ExternalType in subpackage -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="externalTypeRef"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="false"
+                         unique="true"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 1: EClass Book, subclass of ExternalType (in subpackage) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book"
+                eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+    <!-- title attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- pages attribute with upperBound -1 to exercise '*' mapping -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="pages"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="false"
+                         unique="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- reference to Author, non-containment with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="authors"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.2"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.2"/>
+    <!-- reference to Category enum as EAttribute (enum-typed attribute) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="category"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="//@eClassifiers.4"/>
+    <!-- reference to ExternalType (superclass) just to add another reference -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="baseExternal"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="false"
+                         unique="true"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 2: EClass Author with opposite ref to Book.authors -->
+  <eClassifiers xsi:type="ecore:EClass" name="Author">
+    <!-- name attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="authorName"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- age attribute (boolean-like for variety: use EBoolean) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="isActive"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- opposite of Book.authors -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="writtenBooks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="false"
+                         unique="true"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.1"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 3: EDataType just to ensure presence of non-classifier types -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="CustomNumber"
+                instanceClassName="java.lang.Double"/>
+
+  <!-- 4: EEnum Category with two literals to exercise Enum rules -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Category">
+    <eLiterals name="Fiction"  value="0" literal="Fiction"/>
+    <eLiterals name="Science"  value="1" literal="Science"/>
+  </eClassifiers>
+
+</ecore:EPackage>

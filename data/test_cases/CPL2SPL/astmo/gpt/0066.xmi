@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : main CPL root, with one SubAction, one Outgoing, one Incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction SA1 -->
+    <subActions xsi:type="CPL:SubAction" id="SA1">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- make this Proxy NON simple by adding at least one branch -->
+        <busy/>
+        <!-- busy.contents -> Redirect (top-level elements[4]) -->
+        <busy>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </busy>
+        <noAnswer/>
+        <!-- noAnswer.contents -> SubCall (top-level elements[1]) -->
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="SA2"/>
+        </noAnswer>
+        <redirection/>
+        <!-- redirection.contents -> AddressSwitch (top-level elements[2]) -->
+        <redirection>
+          <contents xsi:type="CPL:AddressSwitch" field="origin"/>
+        </redirection>
+        <failure/>
+        <!-- failure.contents -> Reject (top-level elements[3]) -->
+        <failure>
+          <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+        </failure>
+        <default/>
+        <!-- default.contents -> SubCall (top-level elements[1]) -->
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="SA2"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- One Outgoing and one Incoming so that Dialog has 2 methods -->
+    <outgoing xsi:type="CPL:Outgoing">
+      <!-- outgoing.contents -> simple Proxy (top-level elements[5]) -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential"/>
+    </outgoing>
+
+    <incoming xsi:type="CPL:Incoming">
+      <!-- incoming.contents -> AddressSwitch (top-level elements[2]) -->
+      <contents xsi:type="CPL:AddressSwitch" field="destination"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1] : SubCall used from SA1 and also from Busy/Default contents -->
+  <elements xsi:type="CPL:SubCall" ref="SA2"/>
+
+  <!-- elements[2] : AddressSwitch with notPresent, otherwise and one SwitchedAddress -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <notPresent/>
+    <!-- notPresent.contents -> Redirect (elements[4]) -->
+    <notPresent>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </notPresent>
+    <otherwise/>
+    <!-- otherwise.contents -> simple Proxy (elements[5]) -->
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel"/>
+    </otherwise>
+    <addresses xsi:type="CPL:SwitchedAddress" is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <!-- SwitchedAddress.contents -> Location (elements[6]) -->
+      <contents xsi:type="CPL:Location" url="sip:alice@example.com" clear="true" priority="0.5"/>
+    </addresses>
+  </elements>
+
+  <!-- elements[3] : Reject referenced from Failure.contents -->
+  <elements xsi:type="CPL:Reject" status="405" reason="Method Not Allowed"/>
+
+  <!-- elements[4] : Redirect, referenced from busy.contents and notPresent.contents -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- elements[5] : simple Proxy (isSimple = true, no branches) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+
+  <!-- elements[6] : Location used as SwitchedAddress.contents and as Location2URIConstant source -->
+  <elements xsi:type="CPL:Location" url="sip:backup@example.net" priority="1.0" clear="false"/>
+
+  <!-- elements[7] : second CPL to satisfy OCL1/2/3 counts, minimal: only subAction and directions -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="SA2">
+      <!-- SA2.contents -> simple Proxy (elements[5]) -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential"/>
+    </subActions>
+    <outgoing xsi:type="CPL:Outgoing"/>
+    <incoming xsi:type="CPL:Incoming"/>
+  </elements>
+
+</CPL:CPLModel>

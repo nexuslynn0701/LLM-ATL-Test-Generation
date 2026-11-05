@@ -1,0 +1,52 @@
+<SimpleUml:Package xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:SimpleUml="http://SimpleUML"
+    name="LibrarySystem">
+
+  <!-- Class 0: Book, only primitive attributes -->
+  <ownedElements name="Book">
+    <ownedProperty name="title" primitiveType="String" isContainment="false"/>
+    <!-- primitiveType omitted to trigger 'NoType' in Attributes -->
+    <ownedProperty name="isbn" isContainment="false"/>
+  </ownedElements>
+
+  <!-- Class 1: Author, primitive and complex refs -->
+  <ownedElements name="Author">
+    <ownedProperty name="name" primitiveType="String" isContainment="false"/>
+    <!-- Weak reference to Book (non-containment complexType) -->
+    <ownedProperty name="mainPublication" complexType="//@ownedElements.0" isContainment="false"/>
+  </ownedElements>
+
+  <!-- Class 2: Publisher, strong reference to Book -->
+  <ownedElements name="Publisher">
+    <ownedProperty name="name" primitiveType="String" isContainment="false"/>
+    <!-- Strong reference to Book (containment complexType) -->
+    <ownedProperty name="publishedBook" complexType="//@ownedElements.0" isContainment="true"/>
+  </ownedElements>
+
+  <!-- Class 3: Library, superclass of DigitalLibrary and Member, mixed properties -->
+  <ownedElements name="Library">
+    <ownedProperty name="libraryName" primitiveType="String" isContainment="false"/>
+    <!-- Strong containment reference to Book -->
+    <ownedProperty name="books" complexType="//@ownedElements.0" isContainment="true"/>
+    <!-- Weak reference to Publisher -->
+    <ownedProperty name="partnerPublisher" complexType="//@ownedElements.2" isContainment="false"/>
+  </ownedElements>
+
+  <!-- Class 4: DigitalLibrary, subclass of Library and Publisher -->
+  <ownedElements name="DigitalLibrary" superClasses="//@ownedElements.3 //@ownedElements.2">
+    <ownedProperty name="url" primitiveType="String" isContainment="false"/>
+    <!-- Strong containment reference to Author -->
+    <ownedProperty name="featuredAuthor" complexType="//@ownedElements.1" isContainment="true"/>
+  </ownedElements>
+
+  <!-- Class 5: Member, subclass of Library, multiple complex references -->
+  <ownedElements name="Member" superClasses="//@ownedElements.3">
+    <ownedProperty name="memberId" primitiveType="String" isContainment="false"/>
+    <!-- Weak reference to Book -->
+    <ownedProperty name="borrowedBook" complexType="//@ownedElements.0" isContainment="false"/>
+    <!-- Strong containment reference to Author (e.g., favorite author record) -->
+    <ownedProperty name="favoriteAuthor" complexType="//@ownedElements.1" isContainment="true"/>
+  </ownedElements>
+
+</SimpleUml:Package>

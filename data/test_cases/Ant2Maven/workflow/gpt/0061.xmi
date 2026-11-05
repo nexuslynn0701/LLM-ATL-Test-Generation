@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuildPipeline"
+    basedir="project-root"
+    description="End-to-end build, package and cleanup pipeline"
+    default="build-main">
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="project-root/build/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="project-root/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+  <targets xmi:id="build-main" name="build-main">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="project-root/src/main/java"
+        destdir="project-root/build/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="project-root/dist/fullbuild.jar"
+        basedir="project-root/build/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="project-root/META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+        dir="project-root/dist/logs"/>
+    <tasks xsi:type="Ant:Copy"
+        file="project-root/resources/app-config.xml"
+        presservelastmodified="true"
+        tofile="project-root/dist/config/app-config.xml"
+        todir="project-root/dist/config"
+        overwrite="false"
+        filtering="false"
+        flatten="false"
+        includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete"
+        file="project-root/temp/old-build.log"
+        dir="project-root/temp"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="false"
+        includes="**/*.tmp"
+        includesfile="project-root/config/delete-includes.txt"
+        excludes="**/keep/**"
+        excludesfile="project-root/config/delete-excludes.txt"
+        defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="project-root/src/main/java"
+        destdir="project-root/dist/javadoc"
+        packagenames="com.example.fullbuild.*"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Full Build API Documentation"/>
+  </targets>
+  <targets xmi:id="aux-utilities" name="aux-utilities">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="project-root/src/util/java"
+        destdir="project-root/build/util-classes"
+        debug="false"
+        fork="false"
+        optimize="false"
+        deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="project-root/dist/utilities.jar"
+        basedir="project-root/build/util-classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="project-root/META-INF/UTIL-MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+        dir="project-root/dist/util-temp"/>
+    <tasks xsi:type="Ant:Copy"
+        todir="project-root/dist/util-resources"/>
+    <tasks xsi:type="Ant:Delete"
+        dir="project-root/dist/util-temp"/>
+  </targets>
+</Ant:Project>

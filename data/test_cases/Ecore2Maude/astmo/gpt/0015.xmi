@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="blogMM"
+    nsURI="http://example.org/blog"
+    nsPrefix="blog">
+
+  <!-- Classifiers order (for path-based references):
+       0 Blog
+       1 Post
+       2 Comment
+       3 Status (EEnum)
+  -->
+
+  <!-- Blog class with one attribute and one reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Blog">
+    <!-- title : EString, lowerBound=0, upperBound=1 (no default, not ID) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral=""
+        iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <!-- posts : Post[*] containment, ordered, unique -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="posts"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.1"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- Post class with an ID attribute, an enum attribute with default,
+       a container reference and a cross reference with opposite -->
+  <eClassifiers xsi:type="ecore:EClass" name="Post">
+    <!-- id : EInt [1..1], is ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        iD="true">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+
+    <!-- status : Status [0..1], default = DRAFT -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="DRAFT">
+      <eType xsi:type="ecore:EEnum" href="//@eClassifiers.3"/>
+    </eStructuralFeatures>
+
+    <!-- blog : Blog [0..1], container -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="blog"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.1">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.0"/>
+    </eStructuralFeatures>
+
+    <!-- comments : Comment[*], containment, opposite = post -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="comments"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.1">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.2"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- Comment class, with name, content and a non-containment opposite ref -->
+  <eClassifiers xsi:type="ecore:EClass" name="Comment">
+    <!-- authorName : EString [0..1], default with quotes to test escaping -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="authorName"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="&quot;anonymous&quot;">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <!-- content : EString [0..*] to exercise upperBound = -1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="content"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        defaultValueLiteral="">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <!-- post : Post [0..1], non-containment, opposite = comments -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="post"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.3">
+      <eType xsi:type="ecore:EClass" href="//@eClassifiers.1"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- Status enumeration with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="DRAFT" value="0" literal="DRAFT"/>
+    <eLiterals name="PUBLISHED" value="1" literal="PUBLISHED"/>
+  </eClassifiers>
+
+</ecore:EPackage>

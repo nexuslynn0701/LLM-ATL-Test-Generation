@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://example/rootpkg"
+    nsPrefix="root">
+
+  <!-- Root package contains everything; no eSuperPackage so it's the metamodel root -->
+
+  <!-- Class Person with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- name: String, lower=0, upper=1 (default upper=1), non-ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- age: Int, lower=0, upper=1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- id: String, is ID, default value, ordered/unique true (defaults) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="pid"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="defaultId"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- reference to Address, containment, lower=0, upper=-1 (many) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="addresses"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- Class Employee extends Person, has a reference back to Person (non-containment, opposite), and an enum-typed attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="true">
+    <!-- extend Person -->
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+    <!-- reference to manager Person, non-containment, opposite set later on Person's side via another ref -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="manager"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"/>
+    <!-- attribute status: EmploymentStatus enum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Class Address, referenced from Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- street: String -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- city: String -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="city"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- Enum EmploymentStatus with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmploymentStatus">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+    <eLiterals name="INACTIVE" value="1" literal="INACTIVE"/>
+  </eClassifiers>
+
+</ecore:EPackage>

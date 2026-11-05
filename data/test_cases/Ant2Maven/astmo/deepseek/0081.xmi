@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    description="A sample project for testing"
+    basedir="/home/user/project"
+    default="build">
+  <targets xmi:id="build" name="build" description="Main build target">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="target/app.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/docs"/>
+    <tasks xsi:type="Ant:Delete" dir="target/temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="false" includes="*.tmp" excludes="*.log" defaultexcludes="true"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Test target">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src/main/java" destdir="target/docs" packagenames="com.example.*" defaultexcludes="true" author="true" version="true" use="true" windowtitle="Sample API"/>
+    <tasks xsi:type="Ant:Copy" file="README.md" todir="target/docs" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" offset="1" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean target">
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="false" quiet="true" failonerror="false" includeEmptyDirs="true" defaultexcludes="false"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="app.version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.number" value="42"/>
+  <properties xsi:type="Ant:PropertyLocation" name="project.home" location="/home/user/project"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+  <path id="compile.path">
+    <pathElement path="lib/one.jar" location="lib/one.jar"/>
+    <pathElement path="lib/two.jar" location="lib/two.jar"/>
+  </path>
+  <path id="resource.path">
+    <pathElement path="resources" location="resources"/>
+  </path>
+</Ant:Project>

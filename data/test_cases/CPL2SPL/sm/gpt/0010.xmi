@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with subActions and incoming/outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="sa_root_1"
+      contents="//@elements.3 //@elements.4 //@elements.5"/>
+    <subActions xsi:type="CPL:SubAction" id="sa_root_2"
+      contents="//@elements.6 //@elements.8"/>
+    <outgoing contents="//@elements.1 //@elements.2"/>
+    <incoming contents="//@elements.7"/>
+  </elements>
+
+  <!-- 1: SubCall referencing first subaction by name-like string -->
+  <elements xsi:type="CPL:SubCall" ref="sa_root_1"/>
+
+  <!-- 2: Location that contains another Location -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" priority="1" clear="yes">
+    <contents xsi:type="CPL:Location" url="sip:backup@example.com" priority="2" clear="no"/>
+  </elements>
+
+  <!-- 3: AddressSwitch with full children and NotPresent/Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="user" subField="host">
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com"/>
+    <addresses is="bob@example.org" contains="bob" subDomainOf="example.org"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 4: TimeSwitch using many attributes in SwitchedTime -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Berlin" tzurl="http://tz.example.com/berlin">
+    <times dtstart="20250101T080000" dtend="20250101T180000" duration="PT2H"
+      freq="DAILY" until="20251231T235959" count="10" interval="1"
+      bySecond="0" byMinute="0" byHour="8,9,10" byDay="MO,TU,WE,TH,FR"
+      byMonthDay="1,15" byYearDay="100" byWeekNo="1" byMonth="1,6"
+      wkst="MO" bySetPos="1,-1"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 5: Proxy with all outcome branches, some linking to other elements -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+    <busy contents="//@elements.2"/>
+    <noAnswer contents="//@elements.7"/>
+    <redirection contents="//@elements.3"/>
+    <failure contents="//@elements.4"/>
+    <default contents="//@elements.6"/>
+  </elements>
+
+  <!-- 6: StringSwitch with multiple strings and NotPresent/Otherwise -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <strings is="support" contains="help"/>
+    <strings is="sales" contains="buy"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 7: Redirect signalling action -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 8: LanguageSwitch with multiple languages and NotPresent/Otherwise -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="fr"/>
+    <languages matches="de"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 9: PrioritySwitch with three cases and NotPresent/Otherwise -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="" equal=""/>
+    <priorities less="" greater="0.7" equal=""/>
+    <priorities less="" greater="" equal="0.5"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 10: Another SubCall using a different ref string -->
+  <elements xsi:type="CPL:SubCall" ref="sa_root_2"/>
+
+  <!-- 11: Reject signalling action with status and reason -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+</CPL:CPLModel>

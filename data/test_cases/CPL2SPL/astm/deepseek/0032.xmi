@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="firstSub"/>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:alice@example.com"/>
+        <notPresent/>
+        <otherwise/>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="Windows-RTC-Engine"/>
+        <notPresent/>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="firstSub">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <busy>
+        <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+      </busy>
+      <noAnswer>
+        <contents xsi:type="CPL:Redirect" permanent="false"/>
+      </noAnswer>
+      <redirection>
+        <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="yes"/>
+      </redirection>
+      <failure/>
+      <default>
+        <contents xsi:type="CPL:SubCall" ref="secondSub"/>
+      </default>
+    </contents>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="secondSub">
+    <contents xsi:type="CPL:Location" url="sip:admin@example.com" priority="1" clear="no"/>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" tzid="America/New_York">
+    <times dtstart="20250101T000000" interval="1" wkst="MO"/>
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5"/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+</CPL:CPLModel>

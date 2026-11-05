@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleBuild"
+    default="package"
+    basedir="."
+    description="Sample project for transformation testing">
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <path id="main.path" refid="unused.ref">
+    <pathElement path="lib/dep1.jar" location="lib/dep1.jar"/>
+    <fileset dir="src">
+      <include name="**/*.java"/>
+      <exclude name="**/test/**"/>
+    </fileset>
+  </path>
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="${build.dir}/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="${build.dir}/dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="${build.dir}/classes" debug="true">
+      <classPath refid="main.path"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="doc" name="doc">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="${build.dir}/docs"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="API Docs"/>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar"
+        jarfile="${build.dir}/dist/app.jar"
+        basedir="${build.dir}/classes"
+        compress="true"
+        manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="${build.dir}" includeEmptyDirs="true"/>
+  </targets>
+</Ant:Project>

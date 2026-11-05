@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="workflow"
+    nsURI="http://example.org/workflow"
+    nsPrefix="wf">
+
+  <!-- 0: Primitive wrapper datatype (custom) -->
+  <eClassifiers xsi:type="ecore:EDataType" name="TaskStatusType" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum for priority -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityLevel">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 2: Root workflow class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Workflow">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- containment of steps -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="steps" upperBound="-1"
+        containment="true" eType="//@eClassifiers.3"/>
+    <!-- non-containment reference to the start step -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="startStep"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract Step supertype -->
+  <eClassifiers xsi:type="ecore:EClass" name="Step" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- priority as enum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        eType="//@eClassifiers.1"/>
+    <!-- derived transient property (no type set, allowed unsettable) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="skippable" transient="true" derived="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+  </eClassifiers>
+
+  <!-- 4: ManualTask extends Step -->
+  <eClassifiers xsi:type="ecore:EClass" name="ManualTask" eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="assignee" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- status using custom datatype -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 5: AutomatedTask extends Step -->
+  <eClassifiers xsi:type="ecore:EClass" name="AutomatedTask" eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="serviceName" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="retryCount"
+        defaultValueLiteral="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 6: Decision extends Step -->
+  <eClassifiers xsi:type="ecore:EClass" name="Decision" eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="conditionExpr" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- non-containment references to next steps -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="onTrue"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="onFalse"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 7: AuditLogEntry -->
+  <eClassifiers xsi:type="ecore:EClass" name="AuditLogEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="timestamp" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="message" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 8: Container class with bidirectional containment reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="workflow" containment="true"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="logs" upperBound="-1" containment="true"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+</ecore:EPackage>

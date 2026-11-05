@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="mavenized-app"
+    basedir="app-src"
+    description="Ant build for mavenized-app"
+    default="build-main">
+
+  <!-- Properties: one of each concrete subtype -->
+  <properties xsi:type="Ant:PropertyValue" name="app.name" value="mavenized-app"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="config"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Task definition for a custom task (not referenced by any task) -->
+  <taskdef name="custom.logger" classname="com.example.ant.CustomLogger"/>
+
+  <!-- Default build target with multiple tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Compile, package and cleanup">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="app-src"
+           destdir="app-bin"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="app-src"
+           destdir="docs"
+           packagenames="com.example.app.*"
+           defaultexcludes="true"
+           author="Example Team"
+           version="1.0.0"
+           use="true"
+           windowtitle="mavenized-app API"/>
+    <!-- Package into JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/mavenized-app.jar"
+           basedir="app-bin"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Create distribution directory -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="dist"/>
+    <!-- Delete temporary directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="temp-build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile="config/includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/excludes.txt"
+           defaultexcludes="true"/>
+    <!-- Timestamp task (management properties) -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Secondary target with additional tasks -->
+  <targets xmi:id="build-resources" name="build-resources" description="Prepare resources">
+    <!-- Compile generated sources in a different directory -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="generated-src"
+           destdir="generated-bin"
+           debug="false"
+           fork="false"
+           optimize="false"
+           deprecation="false"/>
+    <!-- Package resources into a separate JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/resources.jar"
+           basedir="resources"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/RESOURCES.MF"/>
+    <!-- Create resource output directory -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="resources-out"/>
+    <!-- Delete old resource output directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="old-resources-out"
+           verbose="false"
+           quiet="true"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="config/res-includes.txt"
+           excludes=""
+           excludesfile=""
+           defaultexcludes="false"/>
+  </targets>
+
+</Ant:Project>

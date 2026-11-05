@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with subActions, outgoing and incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction sa1 with simple Proxy (uses Location -> Location2URIConstant) -->
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.4"/>
+      </contents>
+    </subActions>
+
+    <!-- SubAction sa2 with SubCall -->
+    <subActions id="sa2">
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </subActions>
+
+    <!-- Outgoing with complex Proxy (non-simple) -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.4"/>
+      </contents>
+    </outgoing>
+
+    <!-- Incoming with simple Proxy -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.4"/>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- Top-level SubCall referencing sa2 -->
+  <elements xsi:type="CPL:SubCall" ref="sa2"/>
+
+  <!-- Top-level Location used by proxies (triggers Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="true"/>
+
+  <!-- Top-level Redirect using same Location -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- Top-level Proxy: simple, with Busy contents (uses Location via locations helper) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy contents="//@elements.2"/>
+  </elements>
+
+  <!-- Top-level Proxy: non-simple, with Busy/NoAnswer/Redirection/Failure/Default children -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.2"/>
+  </elements>
+
+  <!-- Top-level AddressSwitch with SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="subF">
+    <addresses is="addr1" contains="cont1" subDomainOf="dom1">
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa2"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </otherwise>
+  </elements>
+
+  <!-- Top-level StringSwitch (no specific ATL statements, just coverage) -->
+  <elements xsi:type="CPL:StringSwitch" field="hdr">
+    <strings is="match" contains="val"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- Top-level LanguageSwitch with NotPresent -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- Top-level TimeSwitch (unused contents) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="tz" tzurl="url">
+    <times dtstart="20250101T000000" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- Top-level PrioritySwitch (unused contents) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="l" greater="g" equal="e"/>
+  </elements>
+
+</CPL:CPLModel>

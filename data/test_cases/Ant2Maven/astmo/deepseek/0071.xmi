@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataPipeline"
+    basedir="/opt/data"
+    description="Data processing pipeline">
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="/opt/data/build"/>
+    <tasks xsi:type="Ant:Mkdir" dir="/opt/data/dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="/opt/data/src" destdir="/opt/data/build" debug="true" fork="false" optimize="true" deprecation="false"/>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar" jarfile="/opt/data/dist/data-pipeline.jar" basedir="/opt/data/build" compress="true" encoding="UTF-8" manifest="/opt/data/MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="/opt/data/build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="**/*.class" excludes="**/*.java" defaultexcludes="false"/>
+  </targets>
+  <targets xmi:id="docs" name="docs">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="/opt/data/src" destdir="/opt/data/docs" packagenames="com.example.*" defaultexcludes="true" author="true" version="true" use="true" windowtitle="Data Pipeline API"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Java" classname="com.example.TestRunner" jar="/opt/data/lib/test.jar" fork="true"/>
+  </targets>
+  <targets xmi:id="timestamp" name="timestamp">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" offset="1" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="copy-resources" name="copy-resources">
+    <tasks xsi:type="Ant:Copy" file="/opt/data/config.xml" tofile="/opt/data/build/config.xml" overwrite="true" filtering="true" flatten="false" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="default" name="default">
+    <tasks xsi:type="Ant:Javac" srcdir="/opt/data/src" destdir="/opt/data/build" debug="false" fork="true" optimize="false" deprecation="true"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.number" value="42"/>
+  <properties xsi:type="Ant:PropertyLocation" name="home.dir" location="/opt/data/home"/>
+  <properties xsi:type="Ant:PropertyFile" file="/opt/data/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customTask" classname="com.example.CustomTask"/>
+  <path id="main.path">
+    <pathElement path="/opt/data/lib" location="/opt/data/lib/core.jar"/>
+    <pathElement path="/opt/data/extra" location="/opt/data/extra/utils.jar"/>
+  </path>
+  <path id="test.path">
+    <pathElement path="/opt/data/test-lib" location="/opt/data/test-lib/junit.jar"/>
+  </path>
+  <default="default"/>
+</Ant:Project>

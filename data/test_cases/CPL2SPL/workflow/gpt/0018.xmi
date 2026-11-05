@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Outgoing and one Location -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- complex Proxy with all branches, default points to SubCall (elements[3]) -->
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.3"/>
+      </contents>
+    </subActions>
+    <outgoing>
+      <!-- simple Proxy used as statement of Outgoing, default points to SubCall (elements[3]) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <default contents="//@elements.3"/>
+      </contents>
+    </outgoing>
+    <!-- Location to trigger Location2URIConstant via Proxies' locations helper -->
+    <incoming>
+      <contents xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+    </incoming>
+  </elements>
+
+  <!-- SubCall referring to SubAction 'sa1' -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- Location as top-level element (allowed) with nested simple Proxy to also use it as statement -->
+  <elements xsi:type="CPL:Location" url="sip:top@example.com" clear="true">
+    <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+      <!-- simple Proxy: no branches, will trigger Proxy2Return and Location2URIConstant via this Location -->
+    </contents>
+  </elements>
+
+  <!-- Redirect using Location (elements[2]) through locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- AddressSwitch with one SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1">
+      <!-- SwitchedAddress contents: simple Proxy using CPL root Location (elements[0]/incoming/location) via locations helper -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+    </addresses>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+</CPL:CPLModel>

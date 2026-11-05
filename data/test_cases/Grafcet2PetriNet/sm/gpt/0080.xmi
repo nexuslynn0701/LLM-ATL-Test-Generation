@@ -1,0 +1,45 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:id="g1" name="ComplexGrafcet" location="file://grafcet/complex.grafcet">
+    <!-- Elements: steps and transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="s1" name="InitStep" location="file://grafcet/complex.grafcet#s1" isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s2" name="CheckInputs" location="file://grafcet/complex.grafcet#s2" isInitial="false" isActive="false" action="readSensors"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s3" name="ProcessData" location="file://grafcet/complex.grafcet#s3" isInitial="false" isActive="false" action="computeResults"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s4" name="Finalize" location="file://grafcet/complex.grafcet#s4" isInitial="false" isActive="false" action="shutdown"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t1" name="InitToCheck" location="file://grafcet/complex.grafcet#t1" condition="startButtonPressed"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t2" name="CheckToProcess" location="file://grafcet/complex.grafcet#t2" condition="inputsValid"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t3" name="ProcessToFinalize" location="file://grafcet/complex.grafcet#t3" condition="processingDone"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t4" name="LoopBack" location="file://grafcet/complex.grafcet#t4" condition="retryRequested"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t5" name="DirectToFinalize" location="file://grafcet/complex.grafcet#t5" condition="fatalError"/>
+
+    <!-- Connections: multiple incoming/outgoing to cover cases -->
+    <!-- s1 -> t1, t4 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c1" name="C_Init_to_InitToCheck" location="file://grafcet/complex.grafcet#c1" from="/0/@elements.0" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c2" name="C_Init_to_LoopBack" location="file://grafcet/complex.grafcet#c2" from="/0/@elements.0" to="/0/@elements.7"/>
+
+    <!-- s2 -> t2 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c3" name="C_Check_to_CheckToProcess" location="file://grafcet/complex.grafcet#c3" from="/0/@elements.1" to="/0/@elements.5"/>
+
+    <!-- s3 -> t3 and t4 (branch) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c4" name="C_Process_to_ProcessToFinalize" location="file://grafcet/complex.grafcet#c4" from="/0/@elements.2" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c5" name="C_Process_to_LoopBack" location="file://grafcet/complex.grafcet#c5" from="/0/@elements.2" to="/0/@elements.7"/>
+
+    <!-- s2 -> t5 (direct error path) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c6" name="C_Check_to_DirectToFinalize" location="file://grafcet/complex.grafcet#c6" from="/0/@elements.1" to="/0/@elements.8"/>
+
+    <!-- t1 -> s2 -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c7" name="C_InitToCheck_to_Check" location="file://grafcet/complex.grafcet#c7" from="/0/@elements.4" to="/0/@elements.1"/>
+
+    <!-- t2 -> s3 -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c8" name="C_CheckToProcess_to_Process" location="file://grafcet/complex.grafcet#c8" from="/0/@elements.5" to="/0/@elements.2"/>
+
+    <!-- t3 -> s4 -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c9" name="C_ProcessToFinalize_to_Finalize" location="file://grafcet/complex.grafcet#c9" from="/0/@elements.6" to="/0/@elements.3"/>
+
+    <!-- t4 -> s1 and s2 (loop and alternative entry) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c10" name="C_LoopBack_to_Init" location="file://grafcet/complex.grafcet#c10" from="/0/@elements.7" to="/0/@elements.0"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c11" name="C_LoopBack_to_Check" location="file://grafcet/complex.grafcet#c11" from="/0/@elements.7" to="/0/@elements.1"/>
+
+    <!-- t5 -> s4 (error to finalize) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c12" name="C_DirectToFinalize_to_Finalize" location="file://grafcet/complex.grafcet#c12" from="/0/@elements.8" to="/0/@elements.3"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

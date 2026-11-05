@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryPkg"
+    nsURI="http://example.org/library"
+    nsPrefix="lib">
+
+  <!-- Subpackage to exercise eSuperPackage/eSubpackages and PackEqSupPackage/PackEqSubPackages -->
+  <eSubpackages name="inventorySub"
+      nsURI="http://example.org/library/inventory"
+      nsPrefix="inv">
+    <!-- Classifiers in subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="Shelf">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="code"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          iD="true"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="books"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="-1"
+          eType="//@eClassifiers.1"
+          containment="true"
+          resolveProxies="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Warehouse">
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="mainShelf"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          containment="false"
+          resolveProxies="true"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root package classifiers -->
+  <!-- 0: EClass Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="Central &quot;City&quot; Library"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- non-containment, opposite ref to books -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="allBooks"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+    <!-- containment ref to Member to test EqContainingClass via nested structure -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="members"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.2"
+        containment="true"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 1: EClass Book, subclass of LibraryItem (index 3) and ExternalItem (index 4) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book">
+    <eSuperTypes>//@eClassifiers.3 //@eClassifiers.4</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="Unknown Book"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- attribute with Integer type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="pages"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- attribute with Double type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="weight"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <!-- attribute typed by local enum BookStatus (index 5) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        iD="false"
+        eType="//@eClassifiers.5"/>
+    <!-- non-containment ref back to Library, opposite of allBooks -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="library"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.0"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 2: EClass Member with an ID attribute and enum default string -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="memberId"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        defaultValueLiteral="M-000"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- attribute to exercise Boolean mapping -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- attribute with enum type and default literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="level"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="GOLD"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 3: EClass LibraryItem (supertype) -->
+  <eClassifiers xsi:type="ecore:EClass" name="LibraryItem" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="catalogNumber"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: EClass ExternalItem in a different package (simulate by instanceClassName to trigger createSort) -->
+  <eClassifiers xsi:type="ecore:EClass" name="ExternalItem" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="sourceSystem"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 5: Local enum for Book status -->
+  <eClassifiers xsi:type="ecore:EEnum" name="BookStatus">
+    <eLiterals name="AVAILABLE" value="0" literal="AVAILABLE"/>
+    <eLiterals name="LOANED" value="1" literal="LOANED"/>
+    <eLiterals name="RESERVED" value="2" literal="RESERVED"/>
+  </eClassifiers>
+
+  <!-- 6: Local enum for Member level, used with defaultValueLiteral -->
+  <eClassifiers xsi:type="ecore:EEnum" name="MemberLevel">
+    <eLiterals name="BRONZE" value="0" literal="BRONZE"/>
+    <eLiterals name="SILVER" value="1" literal="SILVER"/>
+    <eLiterals name="GOLD" value="2" literal="GOLD"/>
+  </eClassifiers>
+
+</ecore:EPackage>

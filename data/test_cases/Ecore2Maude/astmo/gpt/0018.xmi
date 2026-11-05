@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryRoot"
+    nsURI="http://example.org/libraryRoot"
+    nsPrefix="libroot">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="mediaSub"
+                nsURI="http://example.org/mediaSub"
+                nsPrefix="med">
+    <!-- Classifiers of subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="AudioItem">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="title"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="1"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           iD="false"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="duration"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="-1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                           iD="false"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="MusicTrack"
+                  eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="composer"
+                           ordered="false"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="//@eClassifiers.0"
+                           containment="false"
+                           resolveProxies="true"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root package classifiers -->
+  <!-- 0: Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"/>
+  </eClassifiers>
+
+  <!-- 1: Item (base class) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Item">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"/>
+  </eClassifiers>
+
+  <!-- 2: Book extends Item -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Book"
+                eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rating"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.5"
+                         iD="false"
+                         defaultValueLiteral="GOOD"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="author"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.0"
+                         containment="false"
+                         resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="library"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.3"
+                         containment="false"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.3/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 3: Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="books"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"
+                         containment="true"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.2"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="address"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"
+                         defaultValueLiteral="&quot;Main&quot; Street 1"/>
+  </eClassifiers>
+
+  <!-- 4: Magazine extends Item and uses cross-package reference -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Magazine"
+                eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="issueNumber"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         iD="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="featuredTrack"
+                         ordered="false"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eSubpackages.0/@eClassifiers.1"
+                         containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 5: Rating enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Rating">
+    <eLiterals name="GOOD"  value="0" literal="GOOD"/>
+    <eLiterals name="BAD"   value="1" literal="BAD"/>
+    <eLiterals name="UGLY"  value="2" literal="UGLY"/>
+  </eClassifiers>
+
+</ecore:EPackage>

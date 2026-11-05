@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryModel"
+    nsURI="http://example.org/libraryModel"
+    nsPrefix="lib">
+
+  <!-- 0: Primitive String -->
+  <eClassifiers xsi:type="ecore:EDataType" name="StringType" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Primitive Int -->
+  <eClassifiers xsi:type="ecore:EDataType" name="IntType" instanceClassName="int"/>
+
+  <!-- 2: Enum RoleKind -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RoleKind">
+    <eLiterals name="ADMIN" value="0" literal="ADMIN"/>
+    <eLiterals name="MEMBER" value="1" literal="MEMBER"/>
+    <eLiterals name="GUEST" value="2" literal="GUEST"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1"
+        eType="//@eClassifiers.1">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="ConsistentTransient"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role" lowerBound="1"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 4: Concrete Author -->
+  <eClassifiers xsi:type="ecore:EClass" name="Author" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="penName"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books" upperBound="-1"
+        containment="false" eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 5: Concrete Member -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="email" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="loans" upperBound="-1"
+        containment="true" eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 6: Book -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isbn" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="year"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mainAuthor" lowerBound="1"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="coAuthors" upperBound="-1"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 7: Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books" upperBound="-1"
+        containment="true" eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="members" upperBound="-1"
+        containment="true" eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees" upperBound="-1"
+        containment="true" eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+  <!-- 8: Loan -->
+  <eClassifiers xsi:type="ecore:EClass" name="Loan" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="loanId" lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="book" lowerBound="1"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 9: Employee extends Person, has operations -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="staffNumber" lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullTime"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+
+    <eOperations name="canApproveLoan">
+      <eParameters name="amount"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eOperations>
+
+    <eOperations name="assignBook">
+      <eParameters name="book"
+          eType="//@eClassifiers.6"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

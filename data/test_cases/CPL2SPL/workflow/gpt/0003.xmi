@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- e0: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <!-- contents is a simple Proxy (simple because no busy/noAnswer/redirection/failure/default) -->
+      <contents xsi:type="CPL:Proxy" timeout="5" recurse="yes" ordering="parallel"/>
+    </subActions>
+    <incoming>
+      <!-- incoming contents: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="sequential"/>
+    </incoming>
+    <outgoing>
+      <!-- outgoing contents: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" timeout="15" recurse="yes" ordering="parallel"/>
+    </outgoing>
+  </elements>
+
+  <!-- e1: Location used by Redirect and by a complex Proxy via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true" priority="1"/>
+
+  <!-- e2: SubCall referencing SubAction id "sa1" -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- e3: Redirect (non-permanent) that will use Location e1 via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- e4: Complex Proxy (non-simple because it has all branches) -->
+  <elements xsi:type="CPL:Proxy" timeout="20" recurse="yes" ordering="parallel">
+    <busy>
+      <!-- Busy contents: SubCall to trigger SubCall2Return inside R9 -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.3"/>
+  </elements>
+
+  <!-- e5: AddressSwitch with one SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="dest1" contains="foo" subDomainOf="example.com">
+      <!-- SwitchedAddress contents: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" timeout="25" recurse="yes" ordering="sequential"/>
+    </addresses>
+    <notPresent/>
+    <otherwise>
+      <!-- Otherwise contents: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel"/>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

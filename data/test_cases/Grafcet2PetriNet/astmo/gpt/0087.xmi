@@ -1,0 +1,109 @@
+<xmi:XMI xmi:version="2.0"
+         xmlns:xmi="http://www.omg.org/XMI"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="MainProcess" location="file://model/grafcet/MainProcess.gcf">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_s0"
+              name="InitStep"
+              location="file://model/grafcet/MainProcess.gcf#InitStep"
+              isInitial="true"
+              isActive="true"
+              action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_s1"
+              name="CheckSensors"
+              location="file://model/grafcet/MainProcess.gcf#CheckSensors"
+              isInitial="false"
+              isActive="false"
+              action="readSensors"/>
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_s2"
+              name="ProcessData"
+              location="file://model/grafcet/MainProcess.gcf#ProcessData"
+              isInitial="false"
+              isActive="false"
+              action="computeResults"/>
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_s3"
+              name="Shutdown"
+              location="file://model/grafcet/MainProcess.gcf#Shutdown"
+              isInitial="false"
+              isActive="false"
+              action="stopSystem"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_t0"
+              name="SensorsReady"
+              location="file://model/grafcet/MainProcess.gcf#SensorsReady"
+              condition="allSensorsOk"/>
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_t1"
+              name="DataProcessed"
+              location="file://model/grafcet/MainProcess.gcf#DataProcessed"
+              condition="processingDone"/>
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_t2"
+              name="StopOrder"
+              location="file://model/grafcet/MainProcess.gcf#StopOrder"
+              condition="shutdownCommand"/>
+
+    <!-- Connections: StepToTransition -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c0"
+                 name="InitToSensorsReady"
+                 location="file://model/grafcet/MainProcess.gcf#InitToSensorsReady"
+                 from="/0/@elements.0"
+                 to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c1"
+                 name="CheckToDataProcessed"
+                 location="file://model/grafcet/MainProcess.gcf#CheckToDataProcessed"
+                 from="/0/@elements.1"
+                 to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c2"
+                 name="ProcessToStopOrder"
+                 location="file://model/grafcet/MainProcess.gcf#ProcessToStopOrder"
+                 from="/0/@elements.2"
+                 to="/0/@elements.6"/>
+    <!-- Additional StepToTransition to create branching -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c3"
+                 name="InitToStopOrder"
+                 location="file://model/grafcet/MainProcess.gcf#InitToStopOrder"
+                 from="/0/@elements.0"
+                 to="/0/@elements.6"/>
+
+    <!-- Connections: TransitionToStep -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c4"
+                 name="SensorsReadyToCheck"
+                 location="file://model/grafcet/MainProcess.gcf#SensorsReadyToCheck"
+                 from="/0/@elements.4"
+                 to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c5"
+                 name="DataProcessedToProcess"
+                 location="file://model/grafcet/MainProcess.gcf#DataProcessedToProcess"
+                 from="/0/@elements.5"
+                 to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c6"
+                 name="StopOrderToShutdown"
+                 location="file://model/grafcet/MainProcess.gcf#StopOrderToShutdown"
+                 from="/0/@elements.6"
+                 to="/0/@elements.3"/>
+    <!-- Loop-back TransitionToStep to exercise multiple arcs per transition/place -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c7"
+                 name="StopOrderToInit"
+                 location="file://model/grafcet/MainProcess.gcf#StopOrderToInit"
+                 from="/0/@elements.6"
+                 to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+
+</xmi:XMI>

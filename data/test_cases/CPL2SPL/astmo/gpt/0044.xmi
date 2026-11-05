@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents is the complex Proxy (element 4) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+    </subActions>
+    <incoming>
+      <!-- Incoming contents is the simple Proxy (element 3) -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential"/>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing contents is the AddressSwitch (element 5) -->
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="from-user"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy (2) and Redirect (6) -->
+  <elements xsi:type="CPL:Location" url="sip:simple@example.com" clear="no" priority="1"/>
+
+  <!-- 2: Location used by complex Proxy (3) and AddressSwitch (5) -->
+  <elements xsi:type="CPL:Location" url="sip:complex@example.org" clear="yes" priority="2"/>
+
+  <!-- 3: Simple Proxy (isSimple = true) => Proxy2Return (R7)
+           contents unresolved, but locations non-empty due to element 1 -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- Location in same composite so that locations helper is non-empty -->
+    <contents xsi:type="CPL:Location" url="sip:proxy-simple@example.com" clear="yes" priority="3"/>
+  </elements>
+
+  <!-- 4: Complex Proxy (isSimple = false) => Proxy2Select (R8)
+           with all child branches present; uses Busy, NoAnswer, Redirection, Failure, Default -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- attached Location so locations helper is non-empty -->
+    <contents xsi:type="CPL:Location" url="sip:proxy-complex@example.net" clear="yes" priority="4"/>
+    <busy>
+      <!-- Busy has contents = SubCall (8) -->
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer has contents = Redirect (6) -->
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection has no contents -->
+    </redirection>
+    <failure>
+      <!-- Failure has no contents -->
+    </failure>
+    <default>
+      <!-- Default has contents = AddressSwitch (5) -->
+      <contents xsi:type="CPL:AddressSwitch" field="destination" subField="to-user"/>
+    </default>
+  </elements>
+
+  <!-- 5: AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="from-user">
+    <!-- notPresent branch with contents = SubCall (8) -->
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </notPresent>
+    <!-- otherwise branch with contents = Redirect (6) -->
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </otherwise>
+    <!-- one SwitchedAddress with contents = Redirect (6) -->
+    <addresses is="alice" contains="user" subDomainOf="example.com">
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </addresses>
+  </elements>
+
+  <!-- 6: Redirect (two instances logically via multiple references) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 7: TimeSwitch (present but unused as contents in this model) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 8: SubCall referencing SubAction saMain -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+</CPL:CPLModel>

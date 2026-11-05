@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="maudeTestPkg33"
+    nsURI="http://example.org/maudeTestPkg33"
+    nsPrefix="mt33">
+
+  <!-- 0: Kind for data kinds -->
+  <eClassifiers xsi:type="ecore:EClass" name="DataKind">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- sorts reference back to Sort.eType (see Sort below) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sorts"
+        lowerBound="1" upperBound="-1"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 1: Sort as an EClass (types for terms/variables) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Sort">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 2: Operation class, will be referenced from EStructuralFeatures and for OpMapping -->
+  <eClassifiers xsi:type="ecore:EClass" name="OperationDecl">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="opName"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- coarity: one Sort -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="coarity"
+        eType="//@eClassifiers.1"/>
+    <!-- arity: multiple Sorts -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="arity"
+        upperBound="-1"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 3: A Kind representing a BOOL-like type, used by BooleanCond -->
+  <eClassifiers xsi:type="ecore:EClass" name="BoolKind">
+    <eStructuralFeatures xsi-type="ecore:EAttribute" xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sorts"
+        lowerBound="1" upperBound="-1"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 4: View class, mapped from EClass that plays role of View -->
+  <eClassifiers xsi:type="ecore:EClass" name="ViewSpec">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 5: MaudeSpec-like container EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="SpecRoot">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- modules and theories as contained elements -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="modules"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="theories"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="views"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 6: Module EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="ModuleDef">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- elements: operations, statements, imports, sorts, subsortrels -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="els"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.8"/>
+    <!-- parameters -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="params"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+  <!-- 7: Theory EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="TheoryDef">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="els"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 8: ModElement base EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="ModEl" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="module"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="theory"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 9: Parameter EClass (ModExpression-like) -->
+  <eClassifiers xsi:type="ecore:EClass" name="ParamExp">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 10: ModImportation EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="ImportEl">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 11: Statement EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Stmt">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 12: Membership statement EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="MembershipStmt" eSuperTypes="//@eClassifiers.11">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="flag"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 13: Equation EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="EquationStmt" eSuperTypes="//@eClassifiers.11">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="eqName"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 14: Rule EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="RuleStmt" eSuperTypes="//@eClassifiers.11">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 15: Condition base EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="CondBase">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="descr"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 16: EquationalCond EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="EqCond" eSuperTypes="//@eClassifiers.15">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 17: RewriteCond EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="RwCond" eSuperTypes="//@eClassifiers.15">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="mode"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 18: MembershipCond EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="MembershipCondEl" eSuperTypes="//@eClassifiers.16">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tag"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 19: BooleanCond EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="BoolCondEl" eSuperTypes="//@eClassifiers.16">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="boolExpr"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 20: MatchingCond EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="MatchCondEl" eSuperTypes="//@eClassifiers.16">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pattern"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 21: EqualCond EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="EqualCondEl" eSuperTypes="//@eClassifiers.16">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="reason"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 22: Term base EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="TermBase">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 23: Constant term -->
+  <eClassifiers xsi:type="ecore:EClass" name="ConstTerm" eSuperTypes="//@eClassifiers.22">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 24: RecTerm -->
+  <eClassifiers xsi:type="ecore:EClass" name="RecTermEl" eSuperTypes="//@eClassifiers.22">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="args"
+        lowerBound="1" upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.22"/>
+  </eClassifiers>
+
+  <!-- 25: Variable -->
+  <eClassifiers xsi:type="ecore:EClass" name="VarTerm" eSuperTypes="//@eClassifiers.22">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 26: SubsortRel -->
+  <eClassifiers xsi:type="ecore:EClass" name="SubsortRelEl" eSuperTypes="//@eClassifiers.8">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="subsorts"
+        lowerBound="1" upperBound="-1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="supersorts"
+        lowerBound="1" upperBound="-1"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 27: ViewMapping base -->
+  <eClassifiers xsi:type="ecore:EClass" name="ViewMapBase"/>
+
+  <!-- 28: TermMapping -->
+  <eClassifiers xsi:type="ecore:EClass" name="TermMapEl" eSuperTypes="//@eClassifiers.27">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="from"
+        lowerBound="1" containment="true"
+        eType="//@eClassifiers.22"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="to"
+        lowerBound="1" containment="true"
+        eType="//@eClassifiers.22"/>
+  </eClassifiers>
+
+  <!-- 29: RenMapping base -->
+  <eClassifiers xsi:type="ecore:EClass" name="RenMapBase" eSuperTypes="//@eClassifiers.27"/>
+
+  <!-- 30: SortMapping -->
+  <eClassifiers xsi:type="ecore:EClass" name="SortMapEl" eSuperTypes="//@eClassifiers.29">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="from"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="to"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 31: OpTypedMapping -->
+  <eClassifiers xsi:type="ecore:EClass" name="OpTypedMapEl" eSuperTypes="//@eClassifiers.29">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="from"
+        lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="to"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="atts"
+        upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 32: OpMapping -->
+  <eClassifiers xsi:type="ecore:EClass" name="OpMapEl" eSuperTypes="//@eClassifiers.29">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="from"
+        lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="to"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 33: LabelMapping -->
+  <eClassifiers xsi:type="ecore:EClass" name="LabelMapEl" eSuperTypes="//@eClassifiers.29">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="from"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="to"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

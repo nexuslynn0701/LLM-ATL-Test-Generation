@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="checkAddress"/>
+    <subActions id="handleCall"/>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:user@domain1.com">
+          <contents xsi:type="CPL:SubCall" ref="checkAddress"/>
+        </addresses>
+        <addresses is="sip:user@domain2.com">
+          <contents xsi:type="CPL:StringSwitch" field="subject">
+            <strings contains="urgent">
+              <contents xsi:type="CPL:Location" url="sip:urgent@domain.com" clear="yes"/>
+            </strings>
+            <notPresent>
+              <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+            </notPresent>
+            <otherwise>
+              <contents xsi:type="CPL:SubCall" ref="handleCall"/>
+            </otherwise>
+          </contents>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy>
+              <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Redirection"/>
+            </noAnswer>
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:voicemail@domain.com" priority="1" clear="no"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities less="5">
+          <contents xsi:type="CPL:LanguageSwitch">
+            <languages matches="en">
+              <contents xsi:type="CPL:Location" url="sip:english-support@domain.com" clear="yes"/>
+            </languages>
+            <languages matches="fr">
+              <contents xsi:type="CPL:Reject" status="403" reason="French not supported"/>
+            </languages>
+            <otherwise>
+              <contents xsi:type="CPL:TimeSwitch" dtstart="20240101T000000" interval="1" wkst="MO"/>
+            </otherwise>
+          </contents>
+        </priorities>
+        <priorities greater="8">
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+            <failure>
+              <contents xsi:type="CPL:NotPresent"/>
+            </failure>
+            <redirection/>
+          </contents>
+        </priorities>
+        <notPresent>
+          <contents xsi:type="CPL:Busy"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Default">
+            <contents xsi:type="CPL:Location" url="sip:default@domain.com" clear="yes"/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+</CPLModel>

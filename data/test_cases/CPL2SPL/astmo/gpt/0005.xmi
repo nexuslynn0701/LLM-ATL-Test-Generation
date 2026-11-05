@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Single CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents is a complex Proxy (non-simple), so SubAction2Function produces statements -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- child handlers for complex Proxy -->
+        <busy>
+          <!-- Busy contents is a SubCall, triggering SubCall2Return inside Busy2SelectCase -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer/>
+        <redirection>
+          <!-- Redirection contents is a Redirect, triggering Redirect2Return inside Redirection2SelectCase -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default.contents is a simple Proxy, triggering Proxy2Return inside Default2SelectDefault -->
+          <contents xsi:type="CPL:Proxy" recurse="false" ordering="serial">
+            <!-- make it simple: no busy/noAnswer/redirection/failure/default children -->
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <!-- Incoming.method will be INVITE, in-direction method -->
+    <incoming>
+      <!-- contents is the same complex Proxy instance is not allowed (must be reference), so leave contents undefined -->
+    </incoming>
+    <!-- Outgoing.method will be NOTIFY, out-direction method -->
+    <outgoing>
+      <!-- contents undefined as well -->
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by proxies/redirect via locations helper (contained under CPL through locations chain) -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" clear="no">
+    <!-- Location is a Node and NodeContainer; give it a trivial internal node so statement helper can resolve -->
+    <contents xsi:type="CPL:Reject" status="480"/>
+  </elements>
+
+  <!-- 2: Redirect top-level element (used also from Redirection.contents) -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- this redirect will also see Location via locations helper: it is under CPLModel, so locations is empty;
+         OclUndefined is allowed for URIConstant in ATL -->
+  </elements>
+
+  <!-- 3: Simple Proxy as top-level element (triggers Proxy2Return) -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <!-- No busy/noAnswer/redirection/failure/default children: isSimple = true -->
+  </elements>
+
+  <!-- 4: AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- one SwitchedAddress with is attribute set -->
+    <addresses is="sip:alice@example.com" contains="local" subDomainOf="example.com">
+      <!-- SwitchedAddress.contents is a SubCall to saMain -->
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </addresses>
+    <!-- NotPresent branch -->
+    <notPresent/>
+    <!-- Otherwise branch with contents a Reject (ignored in statements) -->
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

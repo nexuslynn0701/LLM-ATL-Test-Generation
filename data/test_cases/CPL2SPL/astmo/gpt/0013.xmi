@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : main CPL root -->
+  <elements xsi:type="CPL:CPL">
+    <!-- one SubAction to trigger SubAction2Function -->
+    <subActions xsi:type="CPL:SubAction" id="mainAction">
+      <!-- contents -> simple Proxy (isSimple = true) to trigger Proxy2Return -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- no children => simple proxy -->
+      </contents>
+    </subActions>
+
+    <!-- outgoing with complex Proxy to trigger Outgoing2Method + Proxy2Select + Busy/NoAnswer/Redirection/Failure/Default rules -->
+    <outgoing xsi:type="CPL:Outgoing">
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="parallel">
+        <!-- make it non-simple by adding all five branches -->
+        <busy>
+          <!-- Busy contents -> SubCall to exercise Busy2SelectCase + SubCall2Return -->
+          <contents xsi:type="CPL:SubCall" ref="mainAction"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents -> Redirect to exercise NoAnswer2SelectCase + Redirect2Return -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents -> AddressSwitch to exercise Redirection2SelectCase + AddressSwitch2SelectStat -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <!-- SwitchedAddress with is attribute set to trigger SwitchedAddress2SelectCase and OCL7 -->
+            <addresses xsi:type="CPL:SwitchedAddress" is="user@example.com"/>
+            <!-- notPresent and otherwise created and used in AddressSwitch2SelectStat -->
+            <notPresent>
+              <!-- NotPresent is just present to trigger NotPresent2ErrorResponse; no contents -->
+            </notPresent>
+            <otherwise>
+              <!-- Otherwise with Redirect content to be used by Otherwise2SelectDefault + Redirect2Return -->
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </otherwise>
+          </contents>
+        </redirection>
+        <failure>
+          <!-- Failure to trigger Failure2ErrorResponse; no contents -->
+        </failure>
+        <default>
+          <!-- Default contents -> Location to be used by Default2SelectDefault (no statements due to Location) -->
+          <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="true"/>
+        </default>
+      </contents>
+    </outgoing>
+
+    <!-- incoming with Reject to exercise Incoming2Method with empty statements -->
+    <incoming xsi:type="CPL:Incoming">
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1] : Location used by simple Proxy (location computation for Proxy2Return / ForwardExp / URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user1@example.com" clear="true"/>
+
+  <!-- elements[2] : Location used by complex Proxy (Proxy2Select initial forward/URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user2@example.com" clear="false"/>
+
+  <!-- elements[3] : AddressSwitch as separate top-level switch (also exercises AddressSwitch2SelectStat again) -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <!-- SwitchedAddress with 'is' to trigger another SwitchedAddress2SelectCase -->
+    <addresses xsi:type="CPL:SwitchedAddress" is="alt@example.org"/>
+    <!-- attach NotPresent and Otherwise here as well -->
+    <notPresent/>
+    <otherwise>
+      <!-- Otherwise contents -> SubCall to mainAction to get statements via Otherwise2SelectDefault + SubCall2Return -->
+      <contents xsi:type="CPL:SubCall" ref="mainAction"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[4] : StringSwitch to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents xsi:type="CPL:Location" url="sip:string@example.net" clear="true"/>
+  </elements>
+
+  <!-- elements[5] : extra Redirect as top level to further exercise Redirect2Return and OCL28/OCL15 -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- give it a Location child so locations helper has something to use -->
+    <contents xsi:type="CPL:Location" url="sip:redirect@example.org" clear="true"/>
+  </elements>
+
+</CPL:CPLModel>

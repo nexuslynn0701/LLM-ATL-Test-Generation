@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryPkg"
+    nsURI="http://example.org/library"
+    nsPrefix="lib">
+
+  <!-- 0: Primitive-ish datatypes for attributes -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ISBNType" instanceClassName="java.lang.String"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="YearType" instanceClassName="int"/>
+
+  <!-- 2: An enumeration with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="GenreKind">
+    <eLiterals name="Fiction" value="0" literal="Fiction"/>
+    <eLiterals name="NonFiction" value="1" literal="NonFiction"/>
+    <eLiterals name="SciFi" value="2" literal="SciFi"/>
+  </eClassifiers>
+
+  <!-- 3: Map entry class to exercise WellFormedMapEntryClass constraint -->
+  <eClassifiers xsi:type="ecore:EClass" name="StringToString" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: Abstract super class for people -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+  </eClassifiers>
+
+  <!-- 5: Concrete subclass Author -->
+  <eClassifiers xsi:type="ecore:EClass" name="Author"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="birthYear"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books" upperBound="-1"
+        containment="false" eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 6: Concrete subclass Editor with opposite reference to Book.editor -->
+  <eClassifiers xsi:type="ecore:EClass" name="Editor"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="editedBooks" upperBound="-1"
+        containment="false" eType="//@eClassifiers.7"
+        eOpposite="//@eClassifiers.7/@eStructuralFeatures.4"/>
+  </eClassifiers>
+
+  <!-- 7: Main Book class with attributes, enum usage, refs, containment, map -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book">
+    <!-- ISBN as ID attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isbn" lowerBound="1"
+        eType="//@eClassifiers.0" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="publishedYear"
+        eType="//@eClassifiers.1"/>
+    <!-- enum-typed feature -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="genre"
+        eType="//@eClassifiers.2"/>
+    <!-- opposite to Editor.editedBooks -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="editor"
+        eType="//@eClassifiers.6"
+        eOpposite="//@eClassifiers.6/@eStructuralFeatures.0"/>
+    <!-- containment reference to BookDetail -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="detail" lowerBound="0"
+        upperBound="1" containment="true"
+        eType="//@eClassifiers.8"/>
+    <!-- map-like containment using StringToString -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tags" upperBound="-1"
+        containment="true" eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 8: Contained detail for Book, with EDataType-typed attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="BookDetail">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pages"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="hardcover"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 9: Library root class with containment of authors, editors, and books -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="libraryName" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="authors" upperBound="-1"
+        containment="true" eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="editors" upperBound="-1"
+        containment="true" eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books" upperBound="-1"
+        containment="true" eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+</ecore:EPackage>

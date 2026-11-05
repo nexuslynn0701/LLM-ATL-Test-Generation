@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataProcessing"
+    basedir="/opt/data"
+    description="Data processing pipeline">
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/reports"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="false" deprecation="false">
+      <inExcludes xsi:type="Ant:Excludes" name="**/*Test.java" ifCondition="skip.tests" unless="run.tests"/>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/data-processor.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="build" failonerror="false" quiet="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" file="dist/data-processor.jar" verbose="false"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes" debug="true">
+      <inExcludes xsi:type="Ant:IncludesFile" name="**/Test*.java"/>
+      <inExcludes xsi:type="Ant:ExcludesFile" name="**/Abstract*.java"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="docs" name="docs">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="build/docs" packagenames="com.example.*" defaultexcludes="true" author="true" version="true" use="true" windowtitle="Data Processing API"/>
+  </targets>
+  <targets xmi:id="all" name="all">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" offset="1" unit="hour" locale="en_US"/>
+      <format property="build.date" pattern="yyyy-MM-dd"/>
+    </tasks>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="/etc/data/config.xml"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+  <path id="compile.path">
+    <pathElement path="lib/commons.jar" location="lib/commons.jar"/>
+    <pathElement path="lib/guava.jar" location="lib/guava.jar"/>
+  </path>
+  <path id="test.path">
+    <pathElement path="build/test-classes" location="build/test-classes"/>
+  </path>
+  <default xmi:id="all" name="all"/>
+</Ant:Project>

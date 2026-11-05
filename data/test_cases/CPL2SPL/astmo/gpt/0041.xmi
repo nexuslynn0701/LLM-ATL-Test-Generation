@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions -->
+    <subActions id="sa_in">
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="yes" ordering="sequential">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa_redirect"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="sa_simple_proxy"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="sa_redirect"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa_addr_switch"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <subActions id="sa_out">
+      <contents xsi:type="CPL:SubCall" ref="sa_simple_proxy"/>
+    </subActions>
+
+    <subActions id="sa_simple_proxy">
+      <contents xsi:type="CPL:Proxy" timeout="15" recurse="no" ordering="parallel"/>
+    </subActions>
+
+    <subActions id="sa_redirect">
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </subActions>
+
+    <subActions id="sa_addr_switch">
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="">
+        <addresses is="sip:alice@example.com" contains="" subDomainOf="">
+          <contents xsi:type="CPL:SubCall" ref="sa_redirect"/>
+        </addresses>
+        <addresses is="sip:bob@example.net" contains="" subDomainOf="">
+          <contents xsi:type="CPL:SubCall" ref="sa_simple_proxy"/>
+        </addresses>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="sa_simple_proxy"/>
+        </otherwise>
+      </contents>
+    </subActions>
+
+    <!-- Outgoing -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa_out"/>
+        </default>
+      </contents>
+    </outgoing>
+
+    <!-- Incoming -->
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="sa_in"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location used by Proxies and Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" priority="1" clear="yes"/>
+
+</CPL:CPLModel>

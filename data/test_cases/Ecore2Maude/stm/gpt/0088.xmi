@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyHierarchy"
+    nsURI="http://example.org/companyHierarchy"
+    nsPrefix="ch">
+
+  <!-- 0: Root package acts as "MaudeSpec" analog -->
+  <eClassifiers xsi:type="ecore:EClass" name="CompanyModel">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="packages" upperBound="-1"
+        containment="true" eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rootModule" lowerBound="1"
+        containment="true" eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 1: Nested package -> will exercise EPackage-as-MaudeTopEl rules -->
+  <eClassifiers xsi:type="ecore:EClass" name="DepartmentPackage">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract base for modules (Module) -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractUnit" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="unitName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 3: Functional module (FModule) -->
+  <eClassifiers xsi:type="ecore:EClass" name="ServiceUnit" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="elements" upperBound="-1"
+        containment="true" eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
+        containment="true" eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 4: System module (SModule) -->
+  <eClassifiers xsi:type="ecore:EClass" name="InfrastructureUnit" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="elements" upperBound="-1"
+        containment="true" eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 5: ModElement base -->
+  <eClassifiers xsi:type="ecore:EClass" name="UnitElement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owningService"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owningInfra"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 6: Parameter (mod-exp wrapper) -->
+  <eClassifiers xsi:type="ecore:EClass" name="UnitParameter">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="boundExpression" lowerBound="1"
+        containment="true" eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 7: ModExpression base -->
+  <eClassifiers xsi:type="ecore:EClass" name="UnitExpression" abstract="true"/>
+
+  <!-- 8: Instantiation mod-exp (InstModExp) -->
+  <eClassifiers xsi:type="ecore:EClass" name="InstantiationExpression" eSuperTypes="//@eClassifiers.7">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="body" lowerBound="1"
+        containment="true" eType="//@eClassifiers.10"/>
+  </eClassifiers>
+
+  <!-- 9: Renaming mod-exp (RenModExp) -->
+  <eClassifiers xsi:type="ecore:EClass" name="RenamingExpression" eSuperTypes="//@eClassifiers.7">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="base" lowerBound="1"
+        containment="true" eType="//@eClassifiers.10"/>
+  </eClassifiers>
+
+  <!-- 10: Module-id mod-exp (ModuleIdModExp) -->
+  <eClassifiers xsi:type="ecore:EClass" name="ServiceRefExpression" eSuperTypes="//@eClassifiers.7">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ref" lowerBound="1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 11: Theory-like element (Theory) -->
+  <eClassifiers xsi:type="ecore:EClass" name="PolicyTheory">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rules" upperBound="-1"
+        containment="true" eType="//@eClassifiers.12"/>
+  </eClassifiers>
+
+  <!-- 12: ModElement under theory (e.g., Rule/Equation-like) -->
+  <eClassifiers xsi:type="ecore:EClass" name="PolicyRule" eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 13: Type base (Type) -->
+  <eClassifiers xsi:type="ecore:EClass" name="DataType" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 14: Kind -->
+  <eClassifiers xsi:type="ecore:EClass" name="CategoryKind" eSuperTypes="//@eClassifiers.13">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sorts" lowerBound="1" upperBound="-1"
+        eType="//@eClassifiers.15"/>
+  </eClassifiers>
+
+  <!-- 15: Sort -->
+  <eClassifiers xsi:type="ecore:EClass" name="CategorySort" eSuperTypes="//@eClassifiers.13 //@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="kind" lowerBound="1"
+        eType="//@eClassifiers.14"/>
+  </eClassifiers>
+
+  <!-- 16: Operation -->
+  <eClassifiers xsi:type="ecore:EClass" name="ServiceOperation" eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="coarity"
+        eType="//@eClassifiers.13"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="arity" upperBound="-1"
+        eType="//@eClassifiers.13"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="atts" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 17: Term base -->
+  <eClassifiers xsi:type="ecore:EClass" name="Expr" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1"
+        eType="//@eClassifiers.13"/>
+  </eClassifiers>
+
+  <!-- 18: Constant term -->
+  <eClassifiers xsi:type="ecore:EClass" name="ConstExpr" eSuperTypes="//@eClassifiers.17">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 19: Recursive term -->
+  <eClassifiers xsi:type="ecore:EClass" name="CompoundExpr" eSuperTypes="//@eClassifiers.17">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="args" lowerBound="1" upperBound="-1"
+        containment="true" eType="//@eClassifiers.17"/>
+  </eClassifiers>
+
+  <!-- 20: Variable term -->
+  <eClassifiers xsi:type="ecore:EClass" name="VarExpr" eSuperTypes="//@eClassifiers.17">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- Instances -->
+  <eSubpackages name="structure" nsURI="http://example.org/companyHierarchy/structure" nsPrefix="chs">
+    <!-- This subpackage demonstrates EPackage containment and classifier references -->
+    <eClassifiers xsi:type="ecore:EClass" name="CompanyRoot">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="model" lowerBound="1"
+          containment="true" eType="//@eClassifiers.0"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root instance as EPackage contents: a single CompanyModel acting as top-level spec -->
+  <eAnnotations source="instances">
+    <details key="root" value="true"/>
+  </eAnnotations>
+
+</ecore:EPackage>

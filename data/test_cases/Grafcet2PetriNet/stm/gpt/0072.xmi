@@ -1,0 +1,45 @@
+<xmi:XMI xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcetExample72" location="loc_grafcet_72">
+    <!-- Elements: 4 Steps + 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="loc_s0" isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="ProcessingStep" location="loc_s1" isInitial="false" isActive="false" action="processData"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="DecisionStep" location="loc_s2" isInitial="false" isActive="false" action="evaluateConditions"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="FinalStep" location="loc_s3" isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="ToProcessing" location="loc_t0" condition="startPressed"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="BranchTransition" location="loc_t1" condition="dataValid"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="ToFinal" location="loc_t2" condition="completeOrTimeout"/>
+
+    <!-- Connections: form a small graph with branching and merging -->
+    <!-- InitStep -> ToProcessing -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="c_s0_t0" location="loc_c0"
+                 from="/0/@elements.0" to="/0/@elements.4"/>
+    <!-- ToProcessing -> ProcessingStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c1" name="c_t0_s1" location="loc_c1"
+                 from="/0/@elements.4" to="/0/@elements.1"/>
+
+    <!-- ProcessingStep -> BranchTransition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c2" name="c_s1_t1" location="loc_c2"
+                 from="/0/@elements.1" to="/0/@elements.5"/>
+    <!-- BranchTransition -> DecisionStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c3" name="c_t1_s2" location="loc_c3"
+                 from="/0/@elements.5" to="/0/@elements.2"/>
+    <!-- BranchTransition -> FinalStep (alternate path) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c4" name="c_t1_s3" location="loc_c4"
+                 from="/0/@elements.5" to="/0/@elements.3"/>
+
+    <!-- DecisionStep -> ToFinal -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c5" name="c_s2_t2" location="loc_c5"
+                 from="/0/@elements.2" to="/0/@elements.6"/>
+    <!-- FinalStep -> ToFinal (merge) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c6" name="c_s3_t2" location="loc_c6"
+                 from="/0/@elements.3" to="/0/@elements.6"/>
+    <!-- ToFinal -> FinalStep (loop back) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c7" name="c_t2_s3" location="loc_c7"
+                 from="/0/@elements.6" to="/0/@elements.3"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

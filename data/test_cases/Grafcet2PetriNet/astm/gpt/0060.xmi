@@ -1,0 +1,31 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:id="g1" location="file://grafcet/test60.grafcet" name="ComplexGrafcet">
+    <!-- Elements: 4 Steps + 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="s1" location="file://grafcet/test60.grafcet#s1" name="InitStep" isInitial="true" isActive="true" action="initialize_system"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s2" location="file://grafcet/test60.grafcet#s2" name="CheckInputs" isInitial="false" isActive="false" action="check_inputs"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s3" location="file://grafcet/test60.grafcet#s3" name="ProcessData" isInitial="false" isActive="false" action="process_data"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s4" location="file://grafcet/test60.grafcet#s4" name="Finalize" isInitial="false" isActive="false" action="finalize_sequence"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t1" location="file://grafcet/test60.grafcet#t1" name="T_InitToCheck" condition="init_complete"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t2" location="file://grafcet/test60.grafcet#t2" name="T_CheckToProcessOrInit" condition="inputs_valid"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t3" location="file://grafcet/test60.grafcet#t3" name="T_ProcessToFinalize" condition="processing_done"/>
+
+    <!-- Connections: multiple in/out on both steps and transitions -->
+    <!-- s1 -> t1, t1 -> s2 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c1" location="file://grafcet/test60.grafcet#c1" name="C_s1_t1" from="/0/@elements.0" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c2" location="file://grafcet/test60.grafcet#c2" name="C_t1_s2" from="/0/@elements.4" to="/0/@elements.1"/>
+
+    <!-- s2 -> t2, t2 -> s3 (main path) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c3" location="file://grafcet/test60.grafcet#c3" name="C_s2_t2_main" from="/0/@elements.1" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c4" location="file://grafcet/test60.grafcet#c4" name="C_t2_s3" from="/0/@elements.5" to="/0/@elements.2"/>
+
+    <!-- Alternative arc: t2 can go back to s1 (gives t2 two outgoing, s1 multiple incoming) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c5" location="file://grafcet/test60.grafcet#c5" name="C_t2_s1_alt" from="/0/@elements.5" to="/0/@elements.0"/>
+
+    <!-- s3 -> t3, t3 -> s4 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c6" location="file://grafcet/test60.grafcet#c6" name="C_s3_t3" from="/0/@elements.2" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c7" location="file://grafcet/test60.grafcet#c7" name="C_t3_s4" from="/0/@elements.6" to="/0/@elements.3"/>
+
+    <!-- Extra branch: s2 can also jump directly to t3 (gives t3 multiple incoming, s2 multiple outgoing) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c8" location="file://grafcet/test60.grafcet#c8" name="C_s2_t3_alt" from="/0/@elements.1" to="/0/@elements.6"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

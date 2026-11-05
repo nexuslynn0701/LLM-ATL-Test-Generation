@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- elements[0]: Root CPL with subActions, incoming and outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <!-- SubAction contents: simple Proxy using Location via locations helper -->
+      <contents xsi:type="CPL:Proxy" recurse="r1" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+    <subActions id="sa2">
+      <!-- SubAction contents: complex Proxy with Busy & SubCall -->
+      <contents xsi:type="CPL:Proxy" recurse="r2" ordering="sequential">
+        <busy contents="//@elements.3"/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.2"/>
+      </contents>
+    </subActions>
+    <outgoing>
+      <!-- Outgoing contents: complex Proxy with Default + SubCall -->
+      <contents xsi:type="CPL:Proxy" recurse="r3" ordering="parallel">
+        <default contents="//@elements.3"/>
+      </contents>
+    </outgoing>
+    <incoming>
+      <!-- Incoming contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1]: Location used by both simple and complex proxies (locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes">
+    <!-- Location contents: SubCall to sa2 -->
+    <contents xsi:type="CPL:SubCall" ref="sa2"/>
+  </elements>
+
+  <!-- elements[2]: AddressSwitch with SwitchedAddress, NotPresent, Otherwise, SubCall -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1">
+      <!-- SwitchedAddress contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <notPresent>
+      <!-- NotPresent contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa2"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[3]: Redirect that also uses Location via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- Redirect contents: SubCall -->
+    <contents xsi:type="CPL:SubCall" ref="sa2"/>
+  </elements>
+</CPL:CPLModel>

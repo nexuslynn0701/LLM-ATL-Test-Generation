@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions>
+      <id>sa1</id>
+      <contents xsi:type="CPL:SubCall" ref="sa2"/>
+    </subActions>
+    <subActions>
+      <id>sa2</id>
+    </subActions>
+    <outgoing/>
+    <incoming/>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:user@host" priority="1" clear="false">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <busy>
+        <contents xsi:type="CPL:SubCall" ref="sa1"/>
+      </busy>
+      <noAnswer>
+        <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+      </noAnswer>
+      <redirection/>
+      <failure/>
+      <default>
+        <contents xsi:type="CPL:SubCall" ref="sa2"/>
+      </default>
+    </contents>
+  </elements>
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses>
+      <is>user@domain</is>
+      <contains/>
+      <subDomainOf/>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses>
+      <is>another@domain</is>
+      <contains/>
+      <subDomainOf/>
+    </addresses>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="someField">
+    <strings>
+      <is>someString</is>
+      <contains/>
+    </strings>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:SubCall" ref="sa2"/>
+  <elements xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+</CPL:CPLModel>

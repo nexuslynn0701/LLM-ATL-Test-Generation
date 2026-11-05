@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="actionOne"/>
+    <subActions id="actionTwo"/>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="user@domain.com">
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </addresses>
+        <addresses is="admin@company.org"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="actionOne"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities less="5" greater="10" equal="7">
+          <contents xsi:type="CPL:Location" url="sip:operator@example.com" priority="1" clear="yes"/>
+        </priorities>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="actionOne"/>
+  <elements xsi:type="CPL:SubCall" ref="actionTwo"/>
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" priority="1" clear="yes"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy>
+      <contents xsi:type="CPL:Location" url="sip:alt@example.com" priority="2" clear="no"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:SubCall" ref="actionTwo"/>
+    </noAnswer>
+    <default>
+      <contents xsi:type="CPL:LanguageSwitch">
+        <languages matches="en">
+          <contents xsi:type="CPL:Location" url="sip:en-support@example.com" priority="1" clear="yes"/>
+        </languages>
+        <languages matches="fr"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </otherwise>
+      </contents>
+    </default>
+  </elements>
+</CPL:CPLModel>

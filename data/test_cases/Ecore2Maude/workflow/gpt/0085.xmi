@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMM"
+    nsURI="http://rootMM"
+    nsPrefix="rootMM">
+
+  <!-- Subpackage to trigger subPackages logic -->
+  <eSubpackages name="subMM" nsURI="http://subMM" nsPrefix="subMM">
+    <!-- Class in subpackage, with super type in root package via eSuperTypes -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubOnly">
+      <!-- No own structural features -->
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- EClass 0: SuperClass with one ID attribute and one reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="SuperClass">
+    <!-- ID attribute, String, lowerBound 1, upperBound 1, with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        defaultValueLiteral="ID-DEFAULT">
+      <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <!-- Reference to SubClass, containment, lowerBound 0, upperBound -1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- EClass 1: SubClass extending SuperClass, with one attribute and one reference with opposite -->
+  <eClassifiers xsi:type="ecore:EClass" name="SubClass" abstract="true">
+    <!-- Super type is SuperClass (index 0) and also SubOnly from subpackage (index 0 inside subpackage) -->
+    <eSuperTypes>//@eClassifiers.0 //@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+
+    <!-- Attribute: count, Int, lowerBound 0, upperBound -1, non-ID, without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="count"
+        lowerBound="0"
+        upperBound="-1">
+      <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+
+    <!-- Reference with opposite to SuperClass.children; non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="parent"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- EEnum 2: Status with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- EEnum 3: Flag with one literal, used as attribute type -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Flag">
+    <eLiterals name="ON" value="0" literal="ON"/>
+  </eClassifiers>
+
+  <!-- EClass 4: EnumHolder uses enums as attribute types -->
+  <eClassifiers xsi:type="ecore:EClass" name="EnumHolder">
+    <!-- Attribute of enum type Status -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="NEW">
+      <eGenericType eClassifier="//@eClassifiers.2"/>
+    </eStructuralFeatures>
+    <!-- Attribute of enum type Flag -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="flag"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="ON">
+      <eGenericType eClassifier="//@eClassifiers.3"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- EDataType 5: a custom datatype used as attribute type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData" instanceTypeName="java.lang.String"/>
+
+  <!-- EClass 6: DataUser uses CustomData as attribute type -->
+  <eClassifiers xsi:type="ecore:EClass" name="DataUser">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="data"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="someText">
+      <eGenericType eClassifier="//@eClassifiers.5"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+</ecore:EPackage>

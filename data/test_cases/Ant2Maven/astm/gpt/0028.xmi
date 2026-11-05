@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AdvancedAntBuild"
+    basedir="src/main/java"
+    description="Ant build with compile, package and cleanup steps."
+    default="compileTarget">
+
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/defaults.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A taskdef, not referenced by any task -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple task types -->
+  <targets xmi:id="compileTarget" name="compile" description="Compile sources and generate docs.">
+    <!-- Compile task with minimal attributes -->
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes"/>
+
+    <!-- Documentation task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src"
+           destdir="build/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API"/>
+
+    <!-- Archive task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/lib/example.jar"
+           basedir="build/classes"/>
+
+    <!-- File management tasks -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/temp"/>
+    <tasks xsi:type="Ant:Copy"
+           todir="build/distribution"/>
+    <tasks xsi:type="Ant:Delete" dir="build/temp"/>
+
+    <!-- Timestamp task with one format child -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyyMMdd-HHmmss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Additional target to exercise more tasks and patterns -->
+  <targets xmi:id="packageTarget" name="package" description="Prepare distributable artifacts.">
+    <!-- Another Javac task with different options -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="build/test-classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+
+    <!-- Another Jar task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/lib/example-tests.jar"
+           basedir="build/test-classes"
+           compress="true"
+           encoding="UTF-8"/>
+
+    <!-- Copy with nested FileSet, PatternSet, Includes/Excludes and FilterSet -->
+    <tasks xsi:type="Ant:Copy" todir="build/package">
+      <fileset dir="resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.xml"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/secret/**"/>
+        </patternset>
+        <include name="**/*.properties"/>
+        <exclude name="**/*.tmp"/>
+      </fileset>
+      <filterset starttoken="@[" endtoken="]@">
+        <filter token="app.name" value="AdvancedAntBuild"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+    </tasks>
+
+    <!-- Delete with different directory -->
+    <tasks xsi:type="Ant:Delete" dir="build/old"/>
+  </targets>
+
+</Ant:Project>

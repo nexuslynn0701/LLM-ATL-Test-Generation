@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="build"
+    basedir="."
+    description="Main build project">
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="build" name="build">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Copy" todir="build/classes/resources" overwrite="true" flatten="false">
+      <fileset dir="resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/secret.properties"/>
+      </fileset>
+    </tasks>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true" manifest="src/META-INF/MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="build" failonerror="false"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" failonerror="false"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes" debug="true"/>
+    <tasks xsi:type="Ant:Javac" srcdir="test/integration" destdir="build/test-classes" fork="true"/>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="TODAY" pattern="yyyy-MM-dd" locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="API Documentation"/>
+  </targets>
+</Ant:Project>

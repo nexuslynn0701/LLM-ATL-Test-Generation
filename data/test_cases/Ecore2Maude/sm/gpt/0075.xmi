@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="universityModel"
+    nsURI="http://example.org/universityModel"
+    nsPrefix="uni">
+
+  <!-- 0: Simple data type specific to this package -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CourseCode" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with multiple literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="DayOfWeek">
+    <eLiterals name="MONDAY" value="0" literal="MON"/>
+    <eLiterals name="WEDNESDAY" value="1" literal="WED"/>
+    <eLiterals name="FRIDAY" value="2" literal="FRI"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract Person superclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" lowerBound="1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 3: Student subclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Student" abstract="false" interface="false" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="enrollmentYear" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="advisor" eType="//@eClassifiers.4" lowerBound="0" upperBound="1" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 4: Professor subclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Professor" abstract="false" interface="false" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tenured" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="advisees" eType="//@eClassifiers.3" upperBound="-1" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 5: Room class used as non-containment reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Room" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="building" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="number" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="capacity" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 6: Department with recursive sub-departments and opposite references to Course -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="subDepartments" eType="//@eClassifiers.6" upperBound="-1" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parentDepartment" eType="//@eClassifiers.6" upperBound="1" containment="false" resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="courses" eType="//@eClassifiers.7" upperBound="-1" containment="true" resolveProxies="false" eOpposite="//@eClassifiers.7/@eStructuralFeatures.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="professors" eType="//@eClassifiers.4" upperBound="-1" containment="true" resolveProxies="false"/>
+  </eClassifiers>
+
+  <!-- 7: Course with bidirectional reference to Department and reference to Room -->
+  <eClassifiers xsi:type="ecore:EClass" name="Course" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" eType="//@eClassifiers.0" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department" eType="//@eClassifiers.6" upperBound="1" containment="false" resolveProxies="true" eOpposite="//@eClassifiers.6/@eStructuralFeatures.4"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="credits" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="offeredOn" eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="room" eType="//@eClassifiers.5" upperBound="1" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 8: Enrollment linking Student and Course with additional attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Enrollment" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="year" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="grade" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="student" eType="//@eClassifiers.3" upperBound="1" containment="false" resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="course" eType="//@eClassifiers.7" upperBound="1" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 9: Administrative interface (no super types besides implicit Object) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Administrative" abstract="true" interface="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="roleName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 10: Registrar implementing interface and with operations and parameters -->
+  <eClassifiers xsi:type="ecore:EClass" name="Registrar" abstract="false" interface="false" eSuperTypes="//@eClassifiers.9">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="office" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eOperations name="registerStudent">
+      <eParameters name="stud" eType="//@eClassifiers.3"/>
+      <eParameters name="course" eType="//@eClassifiers.7"/>
+    </eOperations>
+    <eOperations name="getTranscript">
+      <eParameters name="stud" eType="//@eClassifiers.3"/>
+      <eParameters name="yearFilter" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

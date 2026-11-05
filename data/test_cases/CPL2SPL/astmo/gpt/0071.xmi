@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : CPL root -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction so SubAction2Function and related constraints are exercised -->
+    <subActions>
+      <!-- elements[1] is the SubCall used as contents -->
+      <contents href="//@elements.1"/>
+    </subActions>
+    <!-- One Outgoing so Outgoing2Method and OCLs on Outgoing are exercised -->
+    <outgoing>
+      <!-- elements[2] is a simple Proxy used as contents -->
+      <contents href="//@elements.2"/>
+    </outgoing>
+    <!-- One Incoming so Incoming2Method and Dialog method counting work -->
+    <incoming>
+      <!-- elements[3] is a complex Proxy used as contents -->
+      <contents href="//@elements.3"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1] : SubCall, referring to SubAction id "sa1" -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[2] : simple Proxy (no busy/noAnswer/redirection/failure/default) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+
+  <!-- elements[3] : complex Proxy with all branches present -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <!-- Default contents is the Redirect at elements[4] -->
+    <default contents="//@elements.4"/>
+  </elements>
+
+  <!-- elements[4] : Redirect used inside Default of complex Proxy -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+</CPL:CPLModel>

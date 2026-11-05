@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AdvancedAntProject"
+    basedir="project-root"
+    description="Ant project exercising multiple tasks and properties"
+    default="build-main">
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by any NewTask) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes"/>
+    <tasks xsi:type="Ant:Jar" jarfile="target/app-main.jar" basedir="target/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/tmp"/>
+    <tasks xsi:type="Ant:Delete" dir="target/old"/>
+  </targets>
+
+  <targets xmi:id="build-docs" name="build-docs" description="Generate project documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="AdvancedAntProject API"/>
+  </targets>
+
+  <!-- Simple path structure to cover Path, PathElement, FileSet, PatternSet, Includes/Excludes -->
+  <path id="compile.path">
+    <pathElement path="lib/util.jar" location="lib/util.jar"/>
+    <fileset dir="lib">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/test-*"/>
+      </patternset>
+      <include name="**/*.jar"/>
+      <exclude name="**/old/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- ClassPath covering ClassPath, PathElement and FileSet again -->
+  <path>
+    <pathElement path="lib/runtime.jar" location="lib/runtime.jar"/>
+    <fileset dir="ext-libs">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- Filter-related structures -->
+  <properties xsi:type="Ant:PropertyValue" name="filter.token" value="@TOKEN@"/>
+  <taskdef name="filter.task" classname="com.example.ant.FilterTask"/>
+</Ant:Project>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://complexPkg/1.0"
+    nsPrefix="complex">
+
+  <!-- 0: Simple data-type based class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Node">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="next"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 1: Abstract superclass with operations -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractElement" abstract="true">
+    <eOperations name="getId"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eOperations name="compute"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt">
+      <eParameters name="factor"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 2: Concrete subclass with attribute and containment reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="ConcreteElement"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ownedNode"
+        containment="true"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 3: Enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="KindEnum">
+    <eLiterals name="PRIMARY" value="0" literal="PRIMARY"/>
+    <eLiterals name="SECONDARY" value="1" literal="SECONDARY"/>
+  </eClassifiers>
+
+  <!-- 4: Class that uses the enum and a cross-reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="TypedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        lowerBound="1"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 5: Map entry type -->
+  <eClassifiers xsi:type="ecore:EClass" name="StringToElementMapEntry"
+      eSuperTypes="http://www.eclipse.org/emf/2002/Ecore#//EStringToStringMapEntry">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="element"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 6: Container root with various kinds of features -->
+  <eClassifiers xsi:type="ecore:EClass" name="Root">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="elements"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="typedElements"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entries"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Top-level CPL root -->
+  <elements xsi:type="CPL:CPL"/>
+
+  <!-- SubCall directly at top level (drives SubCall2Return, independent of others) -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- Location used by simple Proxy (via locations helper) and by Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:loc1@example.com" clear="yes" priority="1">
+    <!-- Location contents: SubCall to SubAction -->
+    <contents xsi:type="CPL:SubCall" ref="sa1"/>
+  </elements>
+
+  <!-- Outgoing method contents: simple Proxy (uses Location via locations helper) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- simple proxy: all handlers undefined -->
+  </elements>
+
+  <!-- Incoming method contents: complex Proxy using Busy/NoAnswer/Redirection/Failure/Default -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <busy>
+      <!-- Busy contents: SubCall to same SubAction -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer contents: SubCall to same SubAction -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection contents: SubCall to same SubAction -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </redirection>
+    <failure/>
+    <!-- Default contents: SubCall to same SubAction -->
+    <default>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </default>
+  </elements>
+
+  <!-- Redirect using same Location (via locations helper) -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- Redirect contents: SubCall to SubAction -->
+    <contents xsi:type="CPL:SubCall" ref="sa1"/>
+  </elements>
+
+  <!-- AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="from">
+    <addresses is="user@example.com" contains="foo" subDomainOf="example.com">
+      <!-- SwitchedAddress contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <notPresent>
+      <!-- NotPresent contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </otherwise>
+  </elements>
+
+  <!-- StringSwitch just to exercise its rule (no contents needed) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerName"/>
+
+  <!-- LanguageSwitch with NotPresent to trigger NotPresent2ErrorResponse once more (allowed top-level) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- TimeSwitch (no specific effect but allowed and different from examples) -->
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20240101T000000" interval="1" wkst="MO"/>
+
+  <!-- PrioritySwitch (no contents) -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+
+  <!-- Reject to add one more leaf action (no transformation rule but allowed) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy"/>
+
+</CPL:CPLModel>

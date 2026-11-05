@@ -1,0 +1,59 @@
+<xmi:XMI xmi:version="2.0"
+         xmlns:xmi="http://www.omg.org/XMI"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcet0078" location="file.grafcet#1">
+    <!-- Elements: 5 Steps + 4 Transitions (9 total) -->
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="file.grafcet#2"
+              isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="CheckInputs" location="file.grafcet#3"
+              isInitial="false" isActive="false" action="verifyInputs"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="NormalOperation" location="file.grafcet#4"
+              isInitial="false" isActive="true" action="runMainLoop"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="ErrorHandling" location="file.grafcet#5"
+              isInitial="false" isActive="false" action="handleError"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s4" name="Shutdown" location="file.grafcet#6"
+              isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="T_InitToCheck" location="file.grafcet#7"
+              condition="init_done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="T_CheckToNormal" location="file.grafcet#8"
+              condition="inputs_ok"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="T_NormalToError" location="file.grafcet#9"
+              condition="fault_detected"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" name="T_ErrorToShutdown" location="file.grafcet#10"
+              condition="unrecoverable"/>
+
+    <!-- Connections: a linear chain with a branch back from ErrorHandling to NormalOperation -->
+    <!-- s0 -> t0 -> s1 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="C_s0_t0" location="file.grafcet#11"
+                 from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c1" name="C_t0_s1" location="file.grafcet#12"
+                 from="/0/@elements.5" to="/0/@elements.1"/>
+
+    <!-- s1 -> t1 -> s2 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c2" name="C_s1_t1" location="file.grafcet#13"
+                 from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c3" name="C_t1_s2" location="file.grafcet#14"
+                 from="/0/@elements.6" to="/0/@elements.2"/>
+
+    <!-- s2 -> t2 -> s3 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c4" name="C_s2_t2" location="file.grafcet#15"
+                 from="/0/@elements.2" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c5" name="C_t2_s3" location="file.grafcet#16"
+                 from="/0/@elements.7" to="/0/@elements.3"/>
+
+    <!-- s3 -> t3 -> s4 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c6" name="C_s3_t3" location="file.grafcet#17"
+                 from="/0/@elements.3" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c7" name="C_t3_s4" location="file.grafcet#18"
+                 from="/0/@elements.8" to="/0/@elements.4"/>
+
+    <!-- additional branch: s3 -> t1 (reuse) -> s2 (loopback via shared transition) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c8" name="C_s3_t1_loop" location="file.grafcet#19"
+                 from="/0/@elements.3" to="/0/@elements.6"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

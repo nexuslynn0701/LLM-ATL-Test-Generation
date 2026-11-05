@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="bankRoot"
+    nsURI="http://example.org/bankRoot"
+    nsPrefix="bankRoot">
+
+  <!-- Root package classifiers -->
+  <!-- 0 -->  
+  <eClassifiers xsi:type="ecore:EClass" name="Account" abstract="false" interface="false">
+    <!-- attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="balance"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        iD="false"
+        defaultValueLiteral="0.0"/>
+    <!-- references -->
+    <!-- one ref with opposite to exercise RefEqOpposite/maudeMaybeRefSort -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="primaryOwner"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.1"
+        containment="false"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+    <!-- multi-valued containment ref without opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="transactions"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.2"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 1 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Customer" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"
+        defaultValueLiteral="&quot;anonymous&quot;"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="accounts"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.0"
+        containment="false"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 2 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Transaction" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="amount"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        iD="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="kind"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.3"
+        iD="false"
+        defaultValueLiteral="DEPOSIT"/>
+  </eClassifiers>
+
+  <!-- 3 -->
+  <eClassifiers xsi:type="ecore:EEnum" name="TransactionKind">
+    <eLiterals name="DEPOSIT" value="0" literal="DEPOSIT"/>
+    <eLiterals name="WITHDRAWAL" value="1" literal="WITHDRAWAL"/>
+    <eLiterals name="TRANSFER_OUT" value="2" literal="TRANSFER_OUT"/>
+  </eClassifiers>
+
+  <!-- 4 -->
+  <eClassifiers xsi:type="ecore:EClass" name="InternalRefOwner" abstract="false" interface="false">
+    <!-- This attribute uses EInt basic type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="false"/>
+    <!-- containment ref to nested EClass in subpackage (no opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="details"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eSubpackages.0/@eClassifiers.0"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 5 -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData" instanceClassName="java.lang.String"/>
+
+  <!-- 6 -->
+  <eClassifiers xsi:type="ecore:EClass" name="CustomHolder" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="payload"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.5"
+        iD="false"
+        defaultValueLiteral="rawValue"/>
+  </eClassifiers>
+
+  <!-- Subpackage with its own classifiers, to trigger nested package handling -->
+  <eSubpackages name="security" nsURI="http://example.org/bankRoot/security" nsPrefix="sec">
+    <!-- 0 in subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="Credentials" abstract="false" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="userName"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          iD="false"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="passwordHash"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          eType="//@eSuperPackage/@eClassifiers.5"
+          iD="false"/>
+    </eClassifiers>
+    <!-- 1 in subpackage -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Role">
+      <eLiterals name="ADMIN" value="0" literal="ADMIN"/>
+      <eLiterals name="TELLER" value="1" literal="TELLER"/>
+    </eClassifiers>
+    <!-- 2 in subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="Staff" abstract="false" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="staffId"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          iD="true"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="role"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          eType="//@eClassifiers.1"
+          iD="false"
+          defaultValueLiteral="ADMIN"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="creds"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="//@eClassifiers.0"
+          containment="true"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

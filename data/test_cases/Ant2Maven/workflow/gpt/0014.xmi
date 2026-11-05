@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullPipelineBuild"
+    basedir="project-root"
+    description="Build, test, document, package and clean pipeline"
+    default="build-all">
+  <!-- Ant properties covering all subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.build.CustomTask"/>
+
+  <!-- Default target with a rich set of tasks -->
+  <targets xmi:id="build-all" name="build-all">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- Simple inExcludes to be copied to Maven -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Project API"/>
+
+    <!-- Create main application JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/example-app.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Create build directory -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/build-temp"/>
+
+    <!-- Copy resources with filters and mapper -->
+    <tasks xsi:type="Ant:Copy"
+           file="src/main/resources/app.properties"
+           tofile="target/classes/app.properties"
+           todir="target/classes"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="false"
+           presservelastmodified="true">
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+        </patternset>
+        <include name="**/*.properties"/>
+        <exclude name="**/test/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="app.name" value="FullPipelineBuild"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="com.example.build.ResourceMapper" classpath="lib/resources" classpathref="resources.path" from="*.properties" to="*.conf"/>
+    </tasks>
+
+    <!-- Timestamp management -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" offset="+0" unit="second" locale="en_US"/>
+      <format property="release.timestamp" pattern="yyyy-MM-dd" offset="+1" unit="day" locale="en_US"/>
+    </tasks>
+
+    <!-- Clean temporary build directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/build-temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes="**/*.log"
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target for packaging tests -->
+  <targets xmi:id="package-tests" name="package-tests">
+    <!-- Compile test sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="target/test-classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*Test.java"/>
+    </tasks>
+
+    <!-- Package tests into a separate JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/example-app-tests.jar"
+           basedir="target/test-classes"
+           compress="true"/>
+  </targets>
+
+  <!-- Attributes to be transformed -->
+  <targets xmi:id="configure-environment" name="configure-environment">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/env/java"
+           destdir="target/env-classes">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+    </tasks>
+    <tasks xsi:type="Ant:Mkdir" dir="target/env-temp"/>
+    <tasks xsi:type="Ant:Delete" dir="target/env-temp"/>
+  </targets>
+
+  <!-- Standalone attributes (not part of any NewTask) -->
+  <targets xmi:id="set-attributes" name="set-attributes">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/attributes/java"
+           destdir="target/attributes-classes">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+    </tasks>
+    <!-- Attributes to be copied to MavenMaven!Attribut -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/extra/java"
+           destdir="target/extra-classes">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+    </tasks>
+  </targets>
+
+  <!-- Attribute elements at project level to exercise AntAttribut2MavenMavenAttribut -->
+  <taskdef name="extra.task" classname="com.example.build.ExtraTask"/>
+</Ant:Project>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuild"
+    basedir="project-root"
+    description="Full build with compilation, packaging, and cleanup"
+    default="buildTarget">
+
+  <!-- Properties to trigger all AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="java.version" value="17"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="project-root/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="project-root/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition (for AntTaskDef2MavenMavenTaskDef) -->
+  <taskdef name="custom.task" classname="org.example.build.CustomTask"/>
+
+  <!-- Default target with several tasks -->
+  <targets xmi:id="buildTarget" name="buildTarget">
+    <!-- Directory creation -->
+    <tasks xsi:type="Ant:Mkdir" dir="project-root/target/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="project-root/target/jar"/>
+
+    <!-- Compilation -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="project-root/src/main/java"
+           destdir="project-root/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- Local classpath (no refid / external refs) -->
+      <classPath>
+        <pathElement path="project-root/lib/runtime.jar" location="project-root/lib"/>
+        <fileset dir="project-root/lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+            <inexcludes xsi:type="Ant:Excludes" name="**/*-sources.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+      <!-- Explicit include/exclude patterns on javac -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="compile.sources" unless="skip.sources"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- Documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="project-root/src/main/java"
+           destdir="project-root/target/site/apidocs"
+           packagenames="org.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API"/>
+
+    <!-- Packaging -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="project-root/target/example-app.jar"
+           basedir="project-root/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="project-root/src/main/resources/META-INF/MANIFEST.MF"/>
+
+    <!-- Copy resources with FileSet, FilterSet, Mapper, FiltersFile, Filter rules -->
+    <tasks xsi:type="Ant:Copy"
+           todir="project-root/target/classes"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="project-root/src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.*"/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="projectName" value="FullBuild"/>
+        <filtersfile file="project-root/config/filter.properties"/>
+      </filterset>
+      <mapper type="glob"
+              classname="org.example.build.ResourceMapper"
+              classpath="project-root/lib/mapper.jar"
+              classpathref=""
+              from="*.template"
+              to="*.conf"/>
+    </tasks>
+
+    <!-- Cleanup -->
+    <tasks xsi:type="Ant:Delete"
+           dir="project-root/target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="false"/>
+  </targets>
+
+  <!-- Additional target with Java execution and timestamp -->
+  <targets xmi:id="runTarget" name="runTarget">
+    <!-- Tstamp to trigger AntTstamp2MavenMavenTstamp -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd'T'HH:mm:ss"
+              offset="+0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+
+    <!-- Java execution using a local ClassPath -->
+    <tasks xsi:type="Ant:Java"
+           classname="org.example.Main"
+           jar="project-root/target/example-app.jar"
+           fork="true">
+      <classPath>
+        <pathElement path="project-root/target/example-app.jar" location="project-root/target"/>
+        <fileset dir="project-root/lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+  </targets>
+
+</Ant:Project>

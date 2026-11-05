@@ -1,0 +1,35 @@
+context LocatedElement
+inv HasLocation:
+  not self.location.oclIsUndefined() and self.location <> ''
+
+context NamedElement
+inv HasName:
+  not self.name.oclIsUndefined() and self.name <> ''
+
+context Grafcet
+inv HasElements:
+  self.elements->notEmpty()
+
+context Grafcet
+inv HasInitialStep:
+  self.elements->exists(e |
+    e.oclIsKindOf(Step) and e.oclAsType(Step).isInitial
+  )
+
+context Grafcet
+inv UniqueElementLocations:
+  self.elements->isUnique(location)
+
+context Grafcet
+inv UniqueConnectionLocations:
+  self.connections->isUnique(location)
+
+context StepToTransition
+inv EndpointsBelongToSameGrafcet:
+  self.from.grafcet = self.grafcet and
+  self.to.grafcet = self.grafcet
+
+context TransitionToStep
+inv EndpointsBelongToSameGrafcet:
+  self.from.grafcet = self.grafcet and
+  self.to.grafcet = self.grafcet

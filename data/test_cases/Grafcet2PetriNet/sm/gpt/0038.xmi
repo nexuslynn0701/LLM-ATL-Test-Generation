@@ -1,0 +1,40 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet name="ComplexCycleGrafcet" location="file:///models/grafcet_0038.gcf">
+    <!-- Elements: 6 Steps + 4 Transitions = 10 elements -->
+    <elements xsi:type="Grafcet:Step" name="InitStep" location="0:0-0:10" isInitial="true" isActive="true" action="resetCounters"/>
+    <elements xsi:type="Grafcet:Step" name="CheckSensors" location="1:0-1:12" isInitial="false" isActive="false" action="readSensors"/>
+    <elements xsi:type="Grafcet:Step" name="ProcessData" location="2:0-2:11" isInitial="false" isActive="false" action="computeValues"/>
+    <elements xsi:type="Grafcet:Step" name="ErrorHandler" location="3:0-3:13" isInitial="false" isActive="false" action="logError"/>
+    <elements xsi:type="Grafcet:Step" name="FinalizeCycle" location="4:0-4:13" isInitial="false" isActive="false" action="storeResults"/>
+    <elements xsi:type="Grafcet:Step" name="Idle" location="5:0-5:4" isInitial="false" isActive="false" action="wait"/>
+    <elements xsi:type="Grafcet:Transition" name="T_InitToCheck" location="6:0-6:14" condition="startButtonPressed"/>
+    <elements xsi:type="Grafcet:Transition" name="T_CheckToProcess" location="7:0-7:16" condition="sensorsOK"/>
+    <elements xsi:type="Grafcet:Transition" name="T_ProcessToFinalize" location="8:0-8:18" condition="processingDone"/>
+    <elements xsi:type="Grafcet:Transition" name="T_ProcessToError" location="9:0-9:16" condition="errorDetected"/>
+    <!-- Connections: a complex branching and merging structure -->
+    <!-- InitStep -> T_InitToCheck -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Init_Check" location="10:0-10:15" from="/0/@elements.0" to="/0/@elements.6"/>
+    <!-- T_InitToCheck -> CheckSensors -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_CheckSensors" location="11:0-11:16" from="/0/@elements.6" to="/0/@elements.1"/>
+    <!-- CheckSensors -> T_CheckToProcess -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Check_Process" location="12:0-12:18" from="/0/@elements.1" to="/0/@elements.7"/>
+    <!-- T_CheckToProcess -> ProcessData -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_ProcessData" location="13:0-13:16" from="/0/@elements.7" to="/0/@elements.2"/>
+    <!-- ProcessData -> T_ProcessToFinalize -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Process_Final" location="14:0-14:20" from="/0/@elements.2" to="/0/@elements.8"/>
+    <!-- T_ProcessToFinalize -> FinalizeCycle -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Finalize" location="15:0-15:14" from="/0/@elements.8" to="/0/@elements.4"/>
+    <!-- ProcessData -> T_ProcessToError -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Process_Error" location="16:0-16:19" from="/0/@elements.2" to="/0/@elements.9"/>
+    <!-- T_ProcessToError -> ErrorHandler -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_ErrorHandler" location="17:0-17:18" from="/0/@elements.9" to="/0/@elements.3"/>
+    <!-- ErrorHandler -> T_CheckToProcess (rejoin into main branch) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Error_Recheck" location="18:0-18:19" from="/0/@elements.3" to="/0/@elements.7"/>
+    <!-- FinalizeCycle -> T_InitToCheck (loop back near the start, but not initial step directly) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Final_Loop" location="19:0-19:17" from="/0/@elements.4" to="/0/@elements.6"/>
+    <!-- Idle step branching: Idle -> T_CheckToProcess (alternative entry into main processing) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Idle_AltStart" location="20:0-20:19" from="/0/@elements.5" to="/0/@elements.7"/>
+    <!-- FinalizeCycle -> Idle (end of cycle parking) -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Final_Idle" location="21:0-21:16" from="/0/@elements.8" to="/0/@elements.5"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

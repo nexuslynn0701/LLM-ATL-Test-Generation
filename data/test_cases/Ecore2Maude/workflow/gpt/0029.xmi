@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://rootpkg"
+    nsPrefix="root">
+  <!-- Root package classifiers:
+       0: Person (EClass)
+       1: Employee (EClass, extends Person)
+       2: StatusEnum (EEnum)
+       3: Address (EClass)
+       4: titleType (EDataType, custom)
+  -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- Attribute: name : EString, lowerBound=1, upperBound=1, id=false -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="personName"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="John Doe"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute: age : EInt, lowerBound=0, upperBound=1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="true">
+    <!-- super type Person -->
+    <eSuperTypes href="//@eClassifiers.0"/>
+    <!-- Attribute: title : custom data type titleType -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="0"
+        upperBound="1"
+        ordered="false"
+        unique="false"
+        defaultValueLiteral="junior"
+        eType="//@eClassifiers.4"/>
+    <!-- Reference: manager : Employee (non-containment, opposite reports, upperBound=-1) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="manager"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"/>
+    <!-- Reference: reports : Employee (containment, upperBound=-1) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="reports"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- EEnum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+    <eLiterals name="INACTIVE" value="1" literal="INACTIVE"/>
+  </eClassifiers>
+
+  <!-- Another class to create more structural features and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- Attribute: street : EString -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute: zip : EInt -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="zip"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference: occupant : Person (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="occupant"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- Custom data type used by Employee.title -->
+  <eClassifiers xsi:type="ecore:EDataType" name="titleType"
+      instanceClassName="java.lang.String"/>
+</ecore:EPackage>

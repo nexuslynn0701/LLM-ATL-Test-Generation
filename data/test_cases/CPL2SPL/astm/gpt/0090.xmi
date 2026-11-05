@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction -->
+    <subActions>
+      <subActions xsi:type="CPL:SubAction" id="subMain">
+        <!-- SubAction body is a Proxy (complex) -->
+        <contents href="#//@elements.2"/>
+      </subActions>
+    </subActions>
+
+    <!-- Incoming method: contents = Redirect -->
+    <incoming>
+      <incoming xsi:type="CPL:Incoming">
+        <contents href="#//@elements.3"/>
+      </incoming>
+    </incoming>
+
+    <!-- Outgoing method: contents = simple Proxy -->
+    <outgoing>
+      <outgoing xsi:type="CPL:Outgoing">
+        <contents href="#//@elements.4"/>
+      </outgoing>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: Location used by complex Proxy and Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" clear="yes">
+    <!-- No nested contents, acts as a leaf location -->
+  </elements>
+
+  <!-- elements[2]: Complex Proxy (triggers Proxy2Select) -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <!-- Make it complex by defining at least one of these -->
+    <busy>
+      <busy>
+        <!-- Busy contents is a SubCall to "subMain" -->
+        <contents href="#//@elements.5"/>
+      </busy>
+    </busy>
+    <noAnswer>
+      <noAnswer/>
+    </noAnswer>
+    <redirection>
+      <redirection/>
+    </redirection>
+    <failure>
+      <failure/>
+    </failure>
+    <default>
+      <default>
+        <!-- Default contents is a Redirect -->
+        <contents href="#//@elements.3"/>
+      </default>
+    </default>
+    <!-- Location inside proxy so locations helper returns it -->
+    <contents href="#//@elements.1"/>
+  </elements>
+
+  <!-- elements[3]: Redirect (triggers Redirect2Return) -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <!-- Use same location as proxy via locations helper path -->
+    <contents href="#//@elements.1"/>
+  </elements>
+
+  <!-- elements[4]: Simple Proxy (triggers Proxy2Return) -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+    <!-- No busy/noAnswer/redirection/failure/default => isSimple = true -->
+    <!-- Provide its own location -->
+    <contents href="#//@elements.6"/>
+  </elements>
+
+  <!-- elements[5]: SubCall used from Busy contents and Default contents -->
+  <elements xsi:type="CPL:SubCall" ref="subMain"/>
+
+  <!-- elements[6]: Location used by simple Proxy -->
+  <elements xsi:type="CPL:Location" url="sip:outgoing@example.org" priority="1" clear="no"/>
+
+  <!-- elements[7]: AddressSwitch (triggers AddressSwitch2SelectStat) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- SwitchedAddress with contents = Reject -->
+    <contents href="#//@elements.8"/>
+    <addresses>
+      <addresses xsi:type="CPL:SwitchedAddress" is="alice@example.com" contains="alice" subDomainOf="example.com">
+        <contents href="#//@elements.9"/>
+      </addresses>
+    </addresses>
+    <notPresent>
+      <notPresent/>
+    </notPresent>
+    <otherwise>
+      <otherwise>
+        <!-- Otherwise contents is a SubCall -->
+        <contents href="#//@elements.5"/>
+      </otherwise>
+    </otherwise>
+  </elements>
+
+  <!-- elements[8]: StringSwitch (triggers StringSwitch2SelectStat) -->
+  <elements xsi:type="CPL:StringSwitch" field="X-Custom-Header">
+    <!-- No strings needed to trigger rule -->
+    <contents href="#//@elements.9"/>
+  </elements>
+
+  <!-- elements[9]: Reject used as contents for SwitchedAddress and StringSwitch -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- elements[10]: LanguageSwitch (top-level, no specific rule but covered in guards) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <!-- A switched language with a SubCall as contents -->
+    <contents href="#//@elements.5"/>
+    <contents>
+      <contents xsi:type="CPL:SwitchedLanguage" matches="en-US">
+        <contents href="#//@elements.3"/>
+      </contents>
+    </contents>
+  </elements>
+
+  <!-- elements[11]: TimeSwitch (top-level, no direct rule but used in guards and locations) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org/utc">
+    <contents href="#//@elements.1"/>
+    <times>
+      <times xsi:type="CPL:SwitchedTime" dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+    </times>
+  </elements>
+
+  <!-- elements[12]: PrioritySwitch (top-level, also used in guards) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <contents href="#//@elements.1"/>
+    <priorities>
+      <priorities xsi:type="CPL:SwitchedPriority" less="0.5" greater="0.8" equal="0.7"/>
+    </priorities>
+  </elements>
+
+</CPL:CPLModel>

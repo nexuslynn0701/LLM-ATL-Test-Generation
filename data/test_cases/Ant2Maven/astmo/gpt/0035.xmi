@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="CompositeBuild"
+    basedir="workspace"
+    description="Composite build with multiple targets and properties."
+    default="build-main">
+
+  <!-- Properties: one of each subtype -->
+  <properties xsi:type="Ant:PropertyValue" name="java.version" value="17"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="workspace/target"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="CI_ENV"/>
+
+  <!-- Task definition (unreferenced by tasks, as required) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: build-main -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src/main/java"
+           destdir="workspace/target/classes"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="workspace/src/main/java"
+           destdir="workspace/target/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="Example Author"
+           version="1.0.0"
+           use="true"
+           windowtitle="CompositeBuild API"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/target/composite-build.jar"
+           basedir="workspace/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="workspace/META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="workspace/target/temp"/>
+    <tasks xsi:type="Ant:Copy"
+           file="workspace/resources/config.xml"
+           presservelastmodified="true"
+           tofile="workspace/target/config.xml"
+           todir="workspace/target"
+           overwrite="false"
+           filtering="false"
+           flatten="true"
+           includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Delete"
+           file="workspace/target/temp/obsolete.tmp"
+           dir="workspace/target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           includesfile="workspace/config/includes.txt"
+           excludes="**/keep/**"
+           excludesfile="workspace/config/excludes.txt"
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Secondary target: build-tests -->
+  <targets xmi:id="build-tests" name="build-tests" description="Compile tests">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src/test/java"
+           destdir="workspace/target/test-classes"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="workspace/target/test-output"/>
+    <tasks xsi:type="Ant:Delete"
+           file="workspace/target/test-output/old-results.txt"
+           dir="workspace/target/test-output"
+           verbose="false"
+           quiet="true"
+           failonerror="false"
+           includeEmptyDirs="false"
+           includes="**/*.log"
+           includesfile="workspace/config/test-includes.txt"
+           excludes="**/current/**"
+           excludesfile="workspace/config/test-excludes.txt"
+           defaultexcludes="false"/>
+  </targets>
+
+</Ant:Project>

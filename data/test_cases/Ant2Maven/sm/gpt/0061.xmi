@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="."
+    description="Build and package a simple library"
+    default="compileTarget">
+
+  <!-- Standalone task definition, not referenced by any task -->
+  <taskdef name="custom.task" classname="com.example.BuildTask"/>
+
+  <!-- Default target: compiles sources -->
+  <targets xmi:id="compileTarget" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+  </targets>
+
+  <!-- Secondary target: packages compiled classes -->
+  <targets xmi:id="packageTarget" name="package" description="Create jar artifact">
+    <tasks xsi:type="Ant:Mkdir" dir="build/libs"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/libs/library-1.0.0.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="cleanTarget" name="clean" description="Remove build outputs">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

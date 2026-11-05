@@ -1,0 +1,77 @@
+<xmi:XMI xmi:version="2.0"
+         xmlns:xmi="http://www.omg.org/XMI"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcet0017" location="loc_g0">
+
+    <!-- Elements: steps and transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="loc_s0"
+              isInitial="true" isActive="true" action="initialize_system"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="ParallelStep1" location="loc_s1"
+              isInitial="false" isActive="false" action="run_task_1"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="ParallelStep2" location="loc_s2"
+              isInitial="false" isActive="false" action="run_task_2"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="JoinStep" location="loc_s3"
+              isInitial="false" isActive="false" action="synchronize_tasks"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s4" name="FinalStep" location="loc_s4"
+              isInitial="false" isActive="false" action="shutdown_system"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="SplitTransition" location="loc_t0"
+              condition="after_init"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="ToJoinFromP1" location="loc_t1"
+              condition="task1_done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="ToJoinFromP2" location="loc_t2"
+              condition="task2_done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" name="ToFinal" location="loc_t3"
+              condition="all_synced"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t4" name="LoopBack" location="loc_t4"
+              condition="restart_requested"/>
+
+    <!-- Connections: step-to-transition and transition-to-step -->
+    <!-- InitStep -> SplitTransition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="c_Init_to_Split"
+                 location="loc_c0" from="/0/@elements.0" to="/0/@elements.5"/>
+
+    <!-- SplitTransition -> ParallelStep1 -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c1" name="c_Split_to_P1"
+                 location="loc_c1" from="/0/@elements.5" to="/0/@elements.1"/>
+
+    <!-- SplitTransition -> ParallelStep2 -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c2" name="c_Split_to_P2"
+                 location="loc_c2" from="/0/@elements.5" to="/0/@elements.2"/>
+
+    <!-- ParallelStep1 -> ToJoinFromP1 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c3" name="c_P1_to_JoinT1"
+                 location="loc_c3" from="/0/@elements.1" to="/0/@elements.6"/>
+
+    <!-- ParallelStep2 -> ToJoinFromP2 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c4" name="c_P2_to_JoinT2"
+                 location="loc_c4" from="/0/@elements.2" to="/0/@elements.7"/>
+
+    <!-- ToJoinFromP1 -> JoinStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c5" name="c_JoinT1_to_Join"
+                 location="loc_c5" from="/0/@elements.6" to="/0/@elements.3"/>
+
+    <!-- ToJoinFromP2 -> JoinStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c6" name="c_JoinT2_to_Join"
+                 location="loc_c6" from="/0/@elements.7" to="/0/@elements.3"/>
+
+    <!-- JoinStep -> ToFinal -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c7" name="c_Join_to_FinalT"
+                 location="loc_c7" from="/0/@elements.3" to="/0/@elements.8"/>
+
+    <!-- ToFinal -> FinalStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c8" name="c_FinalT_to_Final"
+                 location="loc_c8" from="/0/@elements.8" to="/0/@elements.4"/>
+
+    <!-- FinalStep -> LoopBack -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c9" name="c_Final_to_Loop"
+                 location="loc_c9" from="/0/@elements.4" to="/0/@elements.9"/>
+
+    <!-- LoopBack -> InitStep (cycle) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c10" name="c_Loop_to_Init"
+                 location="loc_c10" from="/0/@elements.9" to="/0/@elements.0"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

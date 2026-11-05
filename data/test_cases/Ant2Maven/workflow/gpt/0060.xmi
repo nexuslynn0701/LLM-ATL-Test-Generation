@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullLifecycleBuild"
+    basedir="project-root"
+    description="Build, test and package the application"
+    default="build">
+  <!-- Ant Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default build target -->
+  <targets xmi:id="build" name="build" description="Compile sources and prepare artifacts">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/full-lifecycle-app.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/logs"/>
+    <tasks xsi:type="Ant:Copy"
+           file="README.md"
+           presservelastmodified="true"
+           tofile="target/README.md"
+           overwrite="false"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+  </targets>
+
+  <!-- Auxiliary target (no dependencies, different tasks) -->
+  <targets xmi:id="cleanup" name="cleanup" description="Clean temporary and output directories">
+    <tasks xsi:type="Ant:Delete"
+           file="target/full-lifecycle-app.jar"
+           dir="target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="config/includes.txt"
+           excludes="**/*.cfg"
+           excludesfile="config/excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

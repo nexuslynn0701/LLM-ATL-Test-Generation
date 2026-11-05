@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildSystem"
+    default="build"
+    basedir="."
+    description="Comprehensive build script for testing ATL transformation">
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target/classes"/>
+  <properties xsi:type="Ant:PropertyValue" name="dist.dir" value="target/dist"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="env"/>
+  <targets xmi:id="init" name="init" description="Initialize directories">
+    <tasks xsi:type="Ant:Mkdir" dir="${build.dir}"/>
+    <tasks xsi:type="Ant:Mkdir" dir="${dist.dir}"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Javac" srcdir="${src.dir}" destdir="${build.dir}" debug="true" fork="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/test/**"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="doc" name="doc" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="${src.dir}"
+        destdir="${dist.dir}/apidocs"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Example API"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create JAR archive">
+    <tasks xsi:type="Ant:Jar"
+        jarfile="${dist.dir}/app.jar"
+        basedir="${build.dir}"
+        compress="true"
+        manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="${build.dir}" quiet="true"/>
+    <tasks xsi:type="Ant:Delete" dir="${dist.dir}" quiet="true"/>
+  </targets>
+  <targets xmi:id="build" name="build" description="Full build cycle">
+    <tasks xsi:type="Ant:Copy"
+        todir="${build.dir}/resources"
+        overwrite="true"
+        filtering="true">
+      <fileset dir="src/main/resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/secret.properties"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="VERSION" value="1.0.0"/>
+        <filtersfile file="filters.txt"/>
+      </filterset>
+      <mapper type="glob" from="*.template" to="*"/>
+    </tasks>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/>
+      <format property="build.date" pattern="yyyyMMdd" offset="1" unit="day"/>
+    </tasks>
+  </targets>
+</Ant:Project>

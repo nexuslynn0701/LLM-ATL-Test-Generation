@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataPipeline"
+    basedir="/opt/data"
+    description="Build and package the data pipeline application"
+    default="package">
+  <targets xmi:id="package" name="package" description="Package the application">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="true" optimize="false" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="target/data-pipeline.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+    <tasks xsi:type="Ant:Copy" todir="target/dist" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="target/temp" verbose="false" quiet="false" failonerror="true" includeEmptyDirs="false" includes="*.tmp" excludes="keep.txt" defaultexcludes="true"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run unit tests">
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="target/test-classes" debug="false" fork="false" optimize="true" deprecation="true"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src/main/java" destdir="target/docs" packagenames="com.example.*" defaultexcludes="false" author="true" version="true" use="true" windowtitle="Data Pipeline API"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="true" quiet="false" failonerror="false" includeEmptyDirs="true" defaultexcludes="false"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="app.version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.number" value="42"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="/etc/data-pipeline"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customTask" classname="com.example.CustomTask"/>
+</Ant:Project>

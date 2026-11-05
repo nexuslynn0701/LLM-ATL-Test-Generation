@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Project with multiple targets and various predefined tasks"
+    default="build-main">
+
+  <!-- Target: prepare directories -->
+  <targets xmi:id="prepare" name="prepare" description="Create build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/lib"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/docs"/>
+  </targets>
+
+  <!-- Target: compile sources -->
+  <targets xmi:id="compile-main" name="compile-main" description="Compile main sources">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+  </targets>
+
+  <!-- Target: package jar -->
+  <targets xmi:id="package-jar" name="package-jar" description="Package compiled classes into a jar">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/lib/complexbuild-main.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"/>
+  </targets>
+
+  <!-- Target: generate javadoc -->
+  <targets xmi:id="javadoc" name="javadoc" description="Generate API documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+  </targets>
+
+  <!-- Target: clean build artifacts -->
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Target: build main pipeline (default) -->
+  <targets xmi:id="build-main" name="build-main" description="Main build pipeline">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="false"
+           fork="false"
+           optimize="false"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/lib/complexbuild-pipeline.jar"
+           basedir="build/classes"
+           compress="true"/>
+  </targets>
+
+</Ant:Project>

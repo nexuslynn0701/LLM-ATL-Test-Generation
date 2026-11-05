@@ -1,0 +1,35 @@
+CRITICAL CONSTRAINTS for CPL2SPL models:
+
+1. ONLY these types can appear as top-level <elements> entries:
+   CPL, SubCall, Location, Redirect, Reject, Proxy,
+   AddressSwitch, StringSwitch, LanguageSwitch, TimeSwitch, PrioritySwitch
+   DO NOT use Failure, Busy, Default, NoAnswer, Redirection, NotPresent,
+   Otherwise, SubAction, Outgoing, Incoming as top-level elements.
+   These types ONLY appear as child elements inside Proxy or Switch nodes.
+
+2. SubCall.ref is a plain STRING, NOT an object reference:
+   CORRECT: <elements xsi:type="CPL:SubCall" ref="anyStringValue"/>
+   WRONG:   <elements xsi:type="CPL:SubCall" ref="sub1"/>
+
+3. Child elements of Proxy use containment, not xsi:type:
+   <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+     <busy/>
+     <noAnswer/>
+     <redirection/>
+     <failure/>
+     <default contents="//@elements.2"/>
+   </elements>
+
+4. contents references use XMI path format (0-based index):
+   contents="//@elements.2" means the 3rd <elements> entry.
+
+5. All string attributes can be arbitrary values (e.g. "abc", "xyz").
+
+CORRECT minimal example:
+  <elements xsi:type="CPL:CPL"/>
+  <elements xsi:type="CPL:SubCall" ref="someAction"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <default contents="//@elements.1"/>
+  </elements>
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy"/>

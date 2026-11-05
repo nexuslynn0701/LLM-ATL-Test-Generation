@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL element (triggers R1) -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One subaction (R2) whose contents is a SubCall (R13) -->
+    <subActions xsi:type="CPL:SubAction" id="sa_main">
+      <contents xsi:type="CPL:SubCall" ref="sa_other"/>
+    </subActions>
+
+    <!-- Second subaction (R2) whose contents is a complex Proxy (R8 + R9-12) -->
+    <subActions xsi:type="CPL:SubAction" id="sa_other">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- Busy case with Reject as contents (R9 + empty statements) -->
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+        </busy>
+        <!-- NoAnswer case with TimeSwitch as contents (R10 + empty statements) -->
+        <noAnswer>
+          <contents xsi:type="CPL:TimeSwitch" interval="15" wkst="MO" dtstart="20240101T000000Z"/>
+        </noAnswer>
+        <!-- Redirection case with LanguageSwitch as contents (R11 + empty statements) -->
+        <redirection>
+          <contents xsi:type="CPL:LanguageSwitch">
+            <contents xsi:type="CPL:SwitchedLanguage" matches="en"/>
+          </contents>
+        </redirection>
+        <!-- Failure case (R5) with PrioritySwitch as contents (empty statements via filter) -->
+        <failure>
+          <contents xsi:type="CPL:PrioritySwitch">
+            <priorities xsi:type="CPL:SwitchedPriority" less="1"/>
+          </contents>
+        </failure>
+        <!-- Default case with simple Proxy as contents (R12 + R7) -->
+        <default>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default/>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- One Incoming and one Outgoing (R3, R4). Both share same contents AddressSwitch -->
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+        <!-- SwitchedAddress (R17) with contents Redirect (R14) -->
+        <addresses xsi:type="CPL:SwitchedAddress" is="sip:alice@example.com" contains="user">
+          <contents xsi:type="CPL:Redirect" permanent="true">
+            <!-- Location that contributes to locations sequence for Redirect (R19) -->
+            <contents xsi:type="CPL:Location" url="sip:alice@new.example.com" clear="yes" priority="1"/>
+          </contents>
+        </addresses>
+        <!-- NotPresent (R6) with contents Location (ignored in statements by filter) -->
+        <notPresent>
+          <contents xsi:type="CPL:Location" url="sip:backup@example.com" clear="no" priority="2"/>
+        </notPresent>
+        <!-- Otherwise (R18) with contents SubCall (R13) -->
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </otherwise>
+      </contents>
+    </incoming>
+
+    <outgoing>
+      <!-- Reuse same AddressSwitch structure via contents pointing to top-level element 2 below -->
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses xsi:type="CPL:SwitchedAddress" is="sip:bob@example.org">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <!-- Simple Proxy (R7) using top-level Location 3 for its location -->
+          </contents>
+        </addresses>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="sa_other"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Top-level SubCall (allowed, triggers R13) -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- Top-level Location used by simple Proxy above (R19) -->
+  <elements xsi:type="CPL:Location" url="sip:bob@fallback.example.org" clear="yes" priority="5"/>
+
+  <!-- Top-level Redirect (R14) with its own Location (R19) -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:redirect@example.net" clear="yes" priority="3"/>
+  </elements>
+
+  <!-- Top-level Proxy that is simple (no children set => R7, also used via locations from Location4) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+
+  <!-- Top-level AddressSwitch (R15, R17, R6, R18) not referenced elsewhere -->
+  <elements xsi:type="CPL:AddressSwitch" field="original-destination">
+    <addresses xsi:type="CPL:SwitchedAddress" is="sip:carol@example.org">
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </addresses>
+    <notPresent/>
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="true">
+        <contents xsi:type="CPL:Location" url="sip:carol@new.example.org" clear="no" priority="4"/>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- Top-level StringSwitch (R16) -->
+  <elements xsi:type="CPL:StringSwitch">
+    <!-- field is mandatory in ATL rule usage, so give it a name -->
+    <contents xsi:type="CPL:SubCall" ref="sa_other"/>
+  </elements>
+
+  <!-- Top-level LanguageSwitch to diversify model (no direct rule other than filters) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <contents xsi:type="CPL:SwitchedLanguage" matches="fr"/>
+  </elements>
+
+  <!-- Top-level TimeSwitch to diversify model (no direct rule other than filters) -->
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20240101T120000Z" interval="30" wkst="MO"/>
+
+  <!-- Top-level PrioritySwitch to diversify model (no direct rule other than filters) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities xsi:type="CPL:SwitchedPriority" equal="10"/>
+  </elements>
+
+</CPL:CPLModel>

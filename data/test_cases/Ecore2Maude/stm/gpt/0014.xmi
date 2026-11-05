@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="librarySpec"
+    nsURI="http://example.org/librarySpec"
+    nsPrefix="libspec">
+
+  <!-- 0: LibraryModule -->
+  <eClassifiers xsi:type="ecore:EClass" name="LibraryModule">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="books"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="members"
+        upperBound="-1"
+        eType="//@eClassifiers.2"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="loans"
+        upperBound="-1"
+        eType="//@eClassifiers.3"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 1: Book -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="isbn"
+        lowerBound="1"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="authors"
+        upperBound="-1"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 2: Person (supertype of Member and Librarian) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="eccore:EAttribute"
+        xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 3: Loan -->
+  <eClassifiers xsi:type="ecore:EClass" name="Loan">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="book"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="borrower"
+        lowerBound="1"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="days"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 4: Member extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 5: Librarian extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Librarian"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="employeeNumber"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 6: Category enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Category">
+    <eLiterals name="FICTION" value="0" literal="FICTION"/>
+    <eLiterals name="NON_FICTION" value="1" literal="NON_FICTION"/>
+    <eLiterals name="REFERENCE" value="2" literal="REFERENCE"/>
+  </eClassifiers>
+
+  <!-- 7: CategorizedBook extends Book and uses EEnum -->
+  <eClassifiers xsi:type="ecore:EClass" name="CategorizedBook"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="category"
+        lowerBound="1"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 8: Simple data type for Code -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="Code"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 9: Shelf with custom datatype and containment of books -->
+  <eClassifiers xsi:type="ecore:EClass" name="Shelf">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="1"
+        eType="//@eClassifiers.8"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="stored"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 10: MapEntry EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="StringToBookMapEntry"
+      instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="key"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="value"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+</ecore:EPackage>

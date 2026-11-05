@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="blogExample"
+    nsURI="http://example.org/blog"
+    nsPrefix="blog">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="blogSub" nsURI="http://example.org/blog/sub" nsPrefix="blogsub">
+    <eClassifiers xsi:type="ecore:EClass" name="Tag">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="label"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="Visibility">
+      <eLiterals name="PUBLIC" value="0" literal="PUBLIC"/>
+      <eLiterals name="PRIVATE" value="1" literal="PRIVATE"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers in root package -->
+  <!-- Index 0 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Blog">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="&quot;My &quot;Blog&quot;&quot;"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="posts"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="true"
+        ordered="true"
+        unique="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mainAuthor"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.2"
+        containment="false"
+        ordered="false"
+        unique="true"/>
+  </eClassifiers>
+
+  <!-- Index 1 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Post">
+    <eSuperTypes>//@eClassifiers.4</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="content"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="rating"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="visibility"
+        lowerBound="1"
+        eType="//@eSubpackages.0/@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="blog"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.1"
+        containment="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="author"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.2"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.1"
+        containment="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tags"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eSubpackages.0/@eClassifiers.0"
+        containment="false"
+        ordered="false"
+        unique="false"/>
+  </eClassifiers>
+
+  <!-- Index 2 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Author" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="posts"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.5"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- Index 3 -->
+  <eClassifiers xsi:type="ecore:EClass" name="RegisteredAuthor">
+    <eSuperTypes>//@eClassifiers.2</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="email"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="user@example.org"/>
+  </eClassifiers>
+
+  <!-- Index 4: superclass for Post -->
+  <eClassifiers xsi:type="ecore:EClass" name="ContentItem" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="createdOn"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+  </eClassifiers>
+
+</ecore:EPackage>

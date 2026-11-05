@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject75"
+    basedir="project-root"
+    description="Ant project for ATL Ant2Maven test case 75"
+    default="build-main">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by tasks, per safety rules) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Path with contained PathElement and FileSet (no external refs) -->
+  <path id="main.path">
+    <pathElement path="lib/dependency.jar" location="lib/dependency.jar"/>
+    <fileset dir="lib">
+      <include name="**/*.jar"/>
+      <exclude name="**/test-*.jar"/>
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/secret/*.properties"/>
+      </patternset>
+    </fileset>
+  </path>
+
+  <!-- Additional standalone ClassPath -->
+  <path>
+    <pathElement path="ext/tools.jar" location="ext/tools.jar"/>
+    <fileset dir="ext-libs">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- FilterSet with Filter and FiltersFile -->
+  <path>
+    <fileset dir="resources">
+      <include name="**/*.txt"/>
+    </fileset>
+  </path>
+
+  <!-- Targets -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar" jarfile="target/app-75.jar" basedir="target/classes" compress="true"/>
+    <tasks xsi:type="Ant:Delete" dir="target/tmp"/>
+  </targets>
+
+  <targets xmi:id="generate-docs" name="generate-docs" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.project"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Project 75 API"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ssZ"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

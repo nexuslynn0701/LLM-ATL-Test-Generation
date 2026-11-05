@@ -1,0 +1,124 @@
+<xmi:XMI xmi:version="2.0"
+         xmlns:xmi="http://www.omg.org/XMI"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="g1" name="ComplexGrafcetExample" location="loc:/grafcet/complex">
+
+    <!-- Steps and Transitions (elements) -->
+    <elements xmi:id="s1" xsi:type="Grafcet:Step"
+              name="InitialStep"
+              location="loc:/grafcet/complex/s1"
+              isInitial="true"
+              isActive="true"
+              action="initializeSystem"/>
+
+    <elements xmi:id="s2" xsi:type="Grafcet:Step"
+              name="ParallelBranchStepA"
+              location="loc:/grafcet/complex/s2"
+              isInitial="false"
+              isActive="false"
+              action="runBranchA"/>
+
+    <elements xmi:id="s3" xsi:type="Grafcet:Step"
+              name="ParallelBranchStepB"
+              location="loc:/grafcet/complex/s3"
+              isInitial="false"
+              isActive="false"
+              action="runBranchB"/>
+
+    <elements xmi:id="s4" xsi:type="Grafcet:Step"
+              name="MergeStep"
+              location="loc:/grafcet/complex/s4"
+              isInitial="false"
+              isActive="false"
+              action="mergeBranches"/>
+
+    <elements xmi:id="s5" xsi:type="Grafcet:Step"
+              name="FinalStep"
+              location="loc:/grafcet/complex/s5"
+              isInitial="false"
+              isActive="false"
+              action="shutdownSystem"/>
+
+    <elements xmi:id="t1" xsi:type="Grafcet:Transition"
+              name="T_Init_To_Parallel"
+              location="loc:/grafcet/complex/t1"
+              condition="startRequested"/>
+
+    <elements xmi:id="t2" xsi:type="Grafcet:Transition"
+              name="T_ParallelA_To_Merge"
+              location="loc:/grafcet/complex/t2"
+              condition="branchACompleted"/>
+
+    <elements xmi:id="t3" xsi:type="Grafcet:Transition"
+              name="T_ParallelB_To_Merge"
+              location="loc:/grafcet/complex/t3"
+              condition="branchBCompleted"/>
+
+    <elements xmi:id="t4" xsi:type="Grafcet:Transition"
+              name="T_Merge_To_Final"
+              location="loc:/grafcet/complex/t4"
+              condition="bothBranchesDone"/>
+
+    <!-- Connections -->
+    <!-- From InitialStep to Transition t1, then t1 to both s2 and s3 (fork) -->
+    <connections xmi:id="c1" xsi:type="Grafcet:StepToTransition"
+                 name="C_Initial_to_T1"
+                 location="loc:/grafcet/complex/c1"
+                 from="/0/@elements.0"
+                 to="/0/@elements.5"/>
+
+    <connections xmi:id="c2" xsi:type="Grafcet:TransitionToStep"
+                 name="C_T1_to_StepA"
+                 location="loc:/grafcet/complex/c2"
+                 from="/0/@elements.5"
+                 to="/0/@elements.1"/>
+
+    <connections xmi:id="c3" xsi:type="Grafcet:TransitionToStep"
+                 name="C_T1_to_StepB"
+                 location="loc:/grafcet/complex/c3"
+                 from="/0/@elements.5"
+                 to="/0/@elements.2"/>
+
+    <!-- From parallel steps to merge transition (join-like structure) -->
+    <connections xmi:id="c4" xsi:type="Grafcet:StepToTransition"
+                 name="C_StepA_to_T2"
+                 location="loc:/grafcet/complex/c4"
+                 from="/0/@elements.1"
+                 to="/0/@elements.6"/>
+
+    <connections xmi:id="c5" xsi:type="Grafcet:StepToTransition"
+                 name="C_StepB_to_T3"
+                 location="loc:/grafcet/complex/c5"
+                 from="/0/@elements.2"
+                 to="/0/@elements.7"/>
+
+    <!-- Transitions t2 and t3 both go to MergeStep (two paths converging) -->
+    <connections xmi:id="c6" xsi:type="Grafcet:TransitionToStep"
+                 name="C_T2_to_Merge"
+                 location="loc:/grafcet/complex/c6"
+                 from="/0/@elements.6"
+                 to="/0/@elements.3"/>
+
+    <connections xmi:id="c7" xsi:type="Grafcet:TransitionToStep"
+                 name="C_T3_to_Merge"
+                 location="loc:/grafcet/complex/c7"
+                 from="/0/@elements.7"
+                 to="/0/@elements.3"/>
+
+    <!-- From MergeStep via t4 to FinalStep -->
+    <connections xmi:id="c8" xsi:type="Grafcet:StepToTransition"
+                 name="C_Merge_to_T4"
+                 location="loc:/grafcet/complex/c8"
+                 from="/0/@elements.3"
+                 to="/0/@elements.8"/>
+
+    <connections xmi:id="c9" xsi:type="Grafcet:TransitionToStep"
+                 name="C_T4_to_Final"
+                 location="loc:/grafcet/complex/c9"
+                 from="/0/@elements.8"
+                 to="/0/@elements.4"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

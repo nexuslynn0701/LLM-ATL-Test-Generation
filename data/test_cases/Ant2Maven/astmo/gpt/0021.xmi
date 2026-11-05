@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-root"
+    description="Ant project with multiple targets and tasks for ATL Ant2Maven testing."
+    default="build">
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by tasks, but transformed by AntTaskDef2MavenMavenTaskDef) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <!-- Default target -->
+  <targets xmi:id="build" name="build" description="Compile sources and package jar.">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- ClassPath used only as containment, no external references -->
+      <classPath refid="compile.classpath">
+        <pathElement path="lib/commons-lang3.jar" location="lib/commons-lang3.jar"/>
+        <pathElement path="lib/log4j.jar" location="lib/log4j.jar"/>
+      </classPath>
+      <!-- InExcludes patterns -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="" unless=""/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="" unless=""/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/complex-ant-project.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Secondary target -->
+  <targets xmi:id="prepare" name="prepare" description="Prepare build directories.">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/test-classes"/>
+    <tasks xsi:type="Ant:Copy"
+           file="README.md"
+           presservelastmodified="true"
+           tofile="target/README.md"
+           todir=""
+           overwrite="false"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false">
+      <!-- FileSet -->
+      <fileset dir="resources">
+        <include xsi:type="Ant:Includes" name="**/*.properties" ifCondition="" unless=""/>
+        <exclude xsi:type="Ant:Excludes" name="**/secret/**" ifCondition="" unless=""/>
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="include.list" ifCondition="" unless=""/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="exclude.list" ifCondition="" unless=""/>
+        </patternset>
+      </fileset>
+      <!-- FilterSet -->
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexAntProject"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <!-- Mapper -->
+      <mapper type="glob" classname="" classpath="" classpathref="" from="*.properties" to="*.cfg"/>
+    </tasks>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts.">
+    <tasks xsi:type="Ant:Delete"
+           file=""
+           dir="target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes="**/.git/**"
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Documentation target -->
+  <targets xmi:id="doc" name="doc" description="Generate Javadoc.">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntProject API"/>
+  </targets>
+
+  <!-- Timestamp target (management properties) -->
+  <targets xmi:id="timestamp" name="timestamp" description="Generate build timestamp.">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd'T'HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Path definition (dependencies / resources mapping) -->
+  <path id="project.path" refid="">
+    <pathElement path="lib/commons-io.jar" location="lib/commons-io.jar"/>
+    <pathElement path="lib/guava.jar" location="lib/guava.jar"/>
+    <fileset dir="lib">
+      <include xsi:type="Ant:Includes" name="**/*.jar" ifCondition="" unless=""/>
+      <exclude xsi:type="Ant:Excludes" name="**/old/**" ifCondition="" unless=""/>
+    </fileset>
+  </path>
+</Ant:Project>

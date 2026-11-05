@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="src/main/java"
+    description="Ant build with multiple compilation and packaging steps."
+    default="mainTarget">
+    
+  <!-- Property definitions exercising PropertyValue, PropertyLocation, PropertyFile, PropertyEnv -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A standalone taskdef (no references from tasks) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with several different tasks -->
+  <targets xmi:id="mainTarget" name="main" description="Compile sources, create jar and clean temp.">
+    <!-- Javac task -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <!-- Javadoc task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.project.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntProject API"/>
+    <!-- Jar task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/complexantproject.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Mkdir task -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/temp"/>
+    <!-- Delete task -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           includesfile="config/delete-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/delete-excludes.txt"
+           defaultexcludes="false"/>
+  </targets>
+
+  <!-- Secondary target to exercise additional task variants and Tstamp -->
+  <targets xmi:id="resourcesTarget" name="process-resources" description="Prepare resources and filtered copy.">
+    <!-- Tstamp task -->
+    <tasks xsi:type="Ant:Tstamp"/>
+    <!-- Mkdir for resources -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/processed-resources"/>
+    <!-- Copy with FileSet, PatternSet, Includes/Excludes and FilterSet/Filter/FiltersFile/Mapper -->
+    <tasks xsi:type="Ant:Copy"
+           file="src/main/resources/application.properties"
+           presservelastmodified="true"
+           tofile="target/processed-resources/application.properties"
+           todir="target/processed-resources"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/secret/**" ifCondition="skip.secrets" unless="force.secrets"/>
+        </patternset>
+        <include name="**/*.xml"/>
+        <exclude name="**/temp/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexAntProject"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.properties" to="*.cfg" classname="org.example.Mapper" classpath="lib/mappers.jar" classpathref="mapper.path"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

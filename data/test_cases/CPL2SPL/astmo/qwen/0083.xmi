@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmi:id="cpl_root">
+    <subActions id="action1" xmi:id="subact1">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="30" xmi:id="proxy1">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.1"/>
+      </contents>
+    </subActions>
+    <subActions id="action2" xmi:id="subact2">
+      <contents xsi:type="CPL:SubCall" ref="action1" xmi:id="subcall1"/>
+    </subActions>
+    <outgoing xmi:id="out1">
+      <contents xsi:type="CPL:AddressSwitch" field="destination" xmi:id="addrsw1">
+        <addresses is="user@example.com" xmi:id="swaddr1"/>
+        <notPresent/>
+        <otherwise contents="//@elements.3"/>
+      </contents>
+    </outgoing>
+    <incoming xmi:id="in1">
+      <contents xsi:type="CPL:Redirect" permanent="true" xmi:id="redir1"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="action2" xmi:id="subcall2"/>
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" priority="medium" clear="true" xmi:id="loc1"/>
+  <elements xsi:type="CPL:Reject" status="403" reason="Forbidden" xmi:id="rej1"/>
+</CPL:CPLModel>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.com/company"
+    nsPrefix="company">
+
+  <!-- Subpackage to exercise superPackage/subPackages logic -->
+  <eSubpackages name="hr"
+      nsURI="http://example.com/company/hr"
+      nsPrefix="hr">
+    <!-- hr subpackage classifiers -->
+    <!-- 0: EClass HRPerson -->
+    <eClassifiers xsi:type="ecore:EClass" name="HRPerson">
+      <!-- attribute: fullName (String, lower=1, upper=1, default with quotes to exercise escapeQuotes) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="fullName"
+          lowerBound="1"
+          upperBound="1"
+          defaultValueLiteral="&quot;Unknown&quot;"
+          ordered="true"
+          unique="true"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <!-- attribute: employeeId (Int, is ID, lower=1) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="employeeId"
+          lowerBound="1"
+          upperBound="1"
+          iD="true"
+          ordered="true"
+          unique="true"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <!-- reference: manager (self-reference, non-containment, 0..1, with opposite subordinates) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="manager"
+          lowerBound="0"
+          upperBound="1"
+          containment="false"
+          resolveProxies="true"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.3"/>
+      <!-- reference: subordinates (opposite of manager, many, non-containment) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="subordinates"
+          lowerBound="0"
+          upperBound="-1"
+          containment="false"
+          resolveProxies="true"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.2"/>
+    </eClassifiers>
+
+    <!-- 1: EEnum HRLevel with 3 literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="HRLevel">
+      <eLiterals name="junior" value="0" literal="junior"/>
+      <eLiterals name="mid_level" value="1" literal="mid level"/>
+      <eLiterals name="senior`lead" value="2" literal="senior`lead"/>
+    </eClassifiers>
+
+    <!-- 2: EClass HRRole using enum and attributes with different datatypes -->
+    <eClassifiers xsi:type="ecore:EClass" name="HRRole">
+      <!-- attribute: level (HRLevel enum, default 'mid_level') -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="level"
+          lowerBound="1"
+          upperBound="1"
+          defaultValueLiteral="mid_level"
+          ordered="true"
+          unique="true"
+          eType="//@eSubpackages.0/@eClassifiers.1"/>
+      <!-- attribute: active (BooleanObject, default true) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="active"
+          lowerBound="0"
+          upperBound="1"
+          defaultValueLiteral="true"
+          ordered="true"
+          unique="true"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+      <!-- attribute: salary (EDouble, no specific default) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="salary"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="false"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root package classifiers -->
+
+  <!-- 0: EClass Person (abstract) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <!-- attribute: name (String, no default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1: EClass Department (no super, to test EmptyList for superTypes) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <!-- attribute: deptCode (String, default without quotes, to exercise string default handling) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="deptCode"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral=ABC123
+        ordered="false"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- reference: employees (many, containment, to Employee) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 2: EClass Employee extends Person and HRPerson -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.0 //@eSubpackages.0/@eClassifiers.0">
+    <!-- attribute: age (EInt, default 30) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="30"
+        ordered="true"
+        unique="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- attribute: title (String, default with embedded quote to stress escapeQuotes) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="Senior &quot;Architect&quot;"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- reference: department (non-containment, opposite employees) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="department"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+    <!-- attribute: role (HRRole reference via enum type used as data type? no, must be EDataType or EEnum; we already have HRLevel used in subpackage; here we use Boolean) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="onProbation"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="false"
+        ordered="false"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 3: EClass Project using cross-references and upperBound = -1 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <!-- attribute: code (String, ID) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- reference: members (many, non-containment, to Employee) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="members"
+        lowerBound="1"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.2"/>
+    <!-- reference: lead (single, non-containment, to Employee) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="lead"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 4: EEnum DepartmentKind with 1 literal to trigger single-literal path -->
+  <eClassifiers xsi:type="ecore:EEnum" name="DepartmentKind">
+    <eLiterals name="standard" value="0" literal="standard"/>
+  </eClassifiers>
+
+  <!-- 5: EClass DepartmentInfo using DepartmentKind enum attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="DepartmentInfo">
+    <!-- attribute: kind (enum with default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="kind"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="standard"
+        ordered="true"
+        unique="true"
+        eType="//@eClassifiers.4"/>
+    <!-- attribute: description (String, no default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="description"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 6: EDataType CustomData to exercise non-primitive attribute types resolving to @DataType -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="CustomData"
+      instanceClassName="java.lang.Object"/>
+</ecore:EPackage>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction whose contents is a simple Proxy (uses Location, triggers Location2URIConstant) -->
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" recurse="r1" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+    <!-- Outgoing whose contents is the same simple Proxy (reused) -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="r2" ordering="serial">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </outgoing>
+    <!-- Incoming whose contents is a Location (statement is its contents, triggers Location2URIConstant) -->
+    <incoming>
+      <contents xsi:type="CPL:Location" url="sip:user@example.com" clear="yes">
+        <!-- Location contents is a Redirect, so Location.statement = Redirect -->
+        <contents xsi:type="CPL:Redirect" permanent="true"/>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- Top-level Location so that its URI is used by Proxies and Redirects; triggers Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:top@example.com" clear="yes"/>
+
+  <!-- Complex Proxy with all handlers and a Default that calls a SubCall (subcall ref is plain string) -->
+  <elements xsi:type="CPL:Proxy" recurse="recComplex" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.3"/>
+  </elements>
+
+  <!-- SubCall referenced from the Default above -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- Redirect that will also use Location2URIConstant via locations helper (uses the top-level Location) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+</CPL:CPLModel>

@@ -1,0 +1,40 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet name="ComplexGrafcet_0030" location="file://complexGrafcet_0030.gcf">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" name="InitStep" location="L1" isInitial="true" isActive="true" action="initialize_system"/>
+    <elements xsi:type="Grafcet:Step" name="CheckSensors" location="L2" isInitial="false" isActive="false" action="verify_sensors"/>
+    <elements xsi:type="Grafcet:Step" name="PrepareActuators" location="L3" isInitial="false" isActive="false" action="prepare_actuators"/>
+    <elements xsi:type="Grafcet:Step" name="ParallelBranchLeft" location="L4" isInitial="false" isActive="false" action="run_left_branch"/>
+    <elements xsi:type="Grafcet:Step" name="ParallelBranchRight" location="L5" isInitial="false" isActive="false" action="run_right_branch"/>
+    <elements xsi:type="Grafcet:Step" name="MergeResults" location="L6" isInitial="false" isActive="false" action="merge_branch_results"/>
+    <elements xsi:type="Grafcet:Step" name="FinalStep" location="L7" isInitial="false" isActive="false" action="shutdown_sequence"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" name="T_Init_To_Check" location="T1" condition="start_button_pressed"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Check_To_Prepare" location="T2" condition="sensors_ok"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Prepare_To_Parallel" location="T3" condition="actuators_ready"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Parallel_To_MergeLeft" location="T4" condition="left_done"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Parallel_To_MergeRight" location="T5" condition="right_done"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Merge_To_Final" location="T6" condition="both_done"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Final_Loop" location="T7" condition="restart_requested"/>
+
+    <!-- Connections: Step -> Transition -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Init_Check" location="C1" from="/0/@elements.0" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Check_Prepare" location="C2" from="/0/@elements.1" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Prepare_Parallel" location="C3" from="/0/@elements.2" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Left_To_Merge" location="C4" from="/0/@elements.3" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Right_To_Merge" location="C5" from="/0/@elements.4" to="/0/@elements.11"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Merge_To_Final" location="C6" from="/0/@elements.5" to="/0/@elements.12"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Final_To_Loop" location="C7" from="/0/@elements.6" to="/0/@elements.13"/>
+
+    <!-- Connections: Transition -> Step -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Init_Check_Back" location="C8" from="/0/@elements.7" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Check_Prepare_Back" location="C9" from="/0/@elements.8" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Parallel_Left" location="C10" from="/0/@elements.9" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Parallel_Right" location="C11" from="/0/@elements.9" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Merge_From_Left" location="C12" from="/0/@elements.10" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Merge_From_Right" location="C13" from="/0/@elements.11" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Final_From_Merge" location="C14" from="/0/@elements.12" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_Loop_To_Init" location="C15" from="/0/@elements.13" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction whose contents is a simple Proxy (exercises R2 + R7) -->
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+
+    <!-- Outgoing whose contents is a complex Proxy (exercises R4 + R8..R12) -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy>
+          <!-- Busy contents: SubCall to sa1 (exercises R9 + R13 + OCL6) -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents: Redirect (non-permanent) (R10 + R11 + R14) -->
+          <contents xsi:type="CPL:Redirect" permanent="false">
+            <contents xsi:type="CPL:Location" url="sip:bob@example.com" clear="yes"/>
+          </contents>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents: simple Proxy (R11 + R7) -->
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <!-- simple, no children -->
+          </contents>
+        </redirection>
+        <failure>
+          <!-- Failure contents: Reject (R5 + filtered in statements) -->
+          <contents xsi:type="CPL:Reject" status="500" reason="Server error"/>
+        </failure>
+        <default>
+          <!-- Default contents: AddressSwitch (R12 + R15..R18) -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <!-- One SwitchedAddress with is attribute set (R17 + OCL7) -->
+            <addresses is="sip:carol@example.org" contains="ignore" subDomainOf="">
+              <!-- SwitchedAddress contents: simple Proxy (R17 + R7) -->
+              <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+            </addresses>
+            <!-- notPresent and otherwise are required to exercise R6, R18 -->
+            <notPresent>
+              <!-- NotPresent contents: Redirect (permanent) (R6 + R14) -->
+              <contents xsi:type="CPL:Redirect" permanent="true">
+                <contents xsi:type="CPL:Location" url="sip:np@example.org" clear="yes"/>
+              </contents>
+            </notPresent>
+            <otherwise>
+              <!-- Otherwise contents: Reject (R18 + filtered in statements) -->
+              <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </outgoing>
+
+    <!-- One Incoming whose contents is a Location (filtered out in R3) -->
+    <incoming>
+      <contents xsi:type="CPL:Location" url="sip:alice@example.com" clear="yes"/>
+    </incoming>
+  </elements>
+
+  <!-- Top-level SubCall (R13, OCL9) -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- Top-level Location used by simple Proxy in SubAction (R7, R19) -->
+  <elements xsi:type="CPL:Location" url="sip:proxy1@example.com" clear="yes"/>
+
+  <!-- Top-level Redirect (permanent) used independently (R14, OCL15, OCL28) -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:Location" url="sip:redirect@example.net" clear="yes"/>
+  </elements>
+
+  <!-- Top-level simple Proxy whose contents is that Redirect (R7 + R14) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <contents xsi:type="CPL:Redirect" permanent="false">
+      <contents xsi:type="CPL:Location" url="sip:proxy-redirect@example.net" clear="yes"/>
+    </contents>
+  </elements>
+
+</CPL:CPLModel>

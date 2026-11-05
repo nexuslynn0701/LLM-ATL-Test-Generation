@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL element to trigger CPL2Program, Incoming2Method, Outgoing2Method, SubAction2Function -->
+  <elements xsi:type="CPL:CPL">
+    <!-- Two subactions -->
+    <subActions xsi:type="CPL:SubAction" id="saAlpha">
+      <!-- Simple proxy as content to trigger Proxy2Return via statement helper inside SubAction2Function -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- no busy/noAnswer/redirection/failure/default => isSimple = true -->
+      </contents>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="saBeta">
+      <!-- SubCall as content, to trigger SubCall2Return through statement helper -->
+      <contents xsi:type="CPL:SubCall" ref="saAlpha"/>
+    </subActions>
+
+    <!-- Incoming with a complex proxy in its contents -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+        <!-- non-simple proxy: all events present => Proxy2Select, Busy2SelectCase, NoAnswer2SelectCase,
+             Redirection2SelectCase, Failure2ErrorResponse, Default2SelectDefault, NotPresent2ErrorResponse (via AddressSwitch below) -->
+        <busy>
+          <!-- busy.contents points to Redirect (elements[5]) -->
+          <contents>//@elements.5</contents>
+        </busy>
+        <noAnswer>
+          <!-- noAnswer.contents points to SubCall (elements[6]) -->
+          <contents>//@elements.6</contents>
+        </noAnswer>
+        <redirection>
+          <!-- redirection.contents points to AddressSwitch (elements[8]) -->
+          <contents>//@elements.8</contents>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- default.contents points to StringSwitch (elements[9]) -->
+          <contents>//@elements.9</contents>
+        </default>
+      </contents>
+    </incoming>
+
+    <!-- Outgoing with Location as contents: statements will be empty because Location is filtered out -->
+    <outgoing>
+      <contents xsi:type="CPL:Location" url="sip:outgoing@example.com" priority="1" clear="yes"/>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by Redirect and also as top-level element to exercise Location.locations/statement and Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:simple@example.com" priority="5" clear="no"/>
+
+  <!-- Simple proxy on top level, whose locations come from the top-level Location above (elements[1]) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- No children => simple proxy, using locations from refImmediateComposite (CPLModel) => Sequence{}.
+         However, Proxy2Return uses locations of this proxy; since top-level Location has its own locations sequence
+         including itself, this proxy has empty locations (its container is CPLModel). This still triggers Proxy2Return,
+         but URIConstant will be OclUndefined. -->
+  </elements>
+
+  <!-- Redirect that uses the top-level Location (elements[1]) through locations helper to trigger Redirect2Return and Location2URIConstant -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- SubCall that refers to a subaction by id (saBeta) to exercise SubCall2Return with allInstancesFrom filter -->
+  <elements xsi:type="CPL:SubCall" ref="saBeta"/>
+
+  <!-- Reject used as a leaf statement from Busy (elements[0].incoming.contents.busy.contents) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy here"/>
+
+  <!-- TimeSwitch used as a top-level switch to ensure its type is seen (though no direct rule) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <times dtstart="20240101T090000" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- AddressSwitch to trigger AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <!-- Address case points its contents to a simple proxy (elements[2]) -->
+      <contents>//@elements.2</contents>
+    </addresses>
+    <addresses is="bob@example.com" contains="bob" subDomainOf="example.org">
+      <!-- Address case with contents filtered out (Location is ignored in statements) -->
+      <contents>//@elements.1</contents>
+    </addresses>
+    <notPresent>
+      <!-- NotPresent has no contents; only error mapping is used -->
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise points to Reject (elements[7]) -->
+      <contents>//@elements.7</contents>
+    </otherwise>
+  </elements>
+
+  <!-- StringSwitch to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="event-type">
+    <strings is="REGISTER" contains="REG"/>
+    <strings is="INVITE" contains="INV"/>
+  </elements>
+
+  <!-- LanguageSwitch at top level (no specific rule, but appears in filters) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="fr"/>
+  </elements>
+
+  <!-- PrioritySwitch at top level (no specific rule, but appears in filters) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.8" equal="0.5"/>
+  </elements>
+
+</CPL:CPLModel>

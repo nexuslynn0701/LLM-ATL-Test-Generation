@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="host">
+        <addresses is="192.168.1.*" contains="*@company.com" subDomainOf="company.com"/>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:backup@voip.com" priority="1" clear="no"/>
+        </otherwise>
+      </contents>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <busy/>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="no"/>
+        </noAnswer>
+        <default contents="//@elements.2"/>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="defaultProxy">
+    <contents xsi:type="CPL:TimeSwitch" tzid="America/New_York" tzurl="http://tz.example.com">
+      <times dtstart="20250301T090000" dtend="20250331T170000" duration="PT1H" freq="DAILY" byDay="MO,TU,WE,TH,FR" interval="1" wkst="MO"/>
+      <otherwise>
+        <contents xsi:type="CPL:Reject" status="503" reason="Outside business hours"/>
+      </otherwise>
+    </contents>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="user">
+    <strings is="john.doe" contains="admin"/>
+    <strings is="jane.smith"/>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="fallbackHandler"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:LanguageSwitch">
+        <languages matches="en"/>
+        <languages matches="fr" contents="//@elements.4"/>
+      </contents>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:support@company.com" priority="10" clear="yes"/>
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <default>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities less="5" greater="3" equal="4"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not found"/>
+        </notPresent>
+      </contents>
+    </default>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="yes"/>
+</CPL:CPLModel>

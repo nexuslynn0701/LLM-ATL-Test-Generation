@@ -1,0 +1,41 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:id="_grafcetMain" location="file:/models/grafcet/main.grafcet" name="ComplexProcess">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_stepS1" location="file:/models/grafcet/main.grafcet#S1" name="InitStep" isInitial="true" isActive="true" action="initialize_system"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_stepS2" location="file:/models/grafcet/main.grafcet#S2" name="LoadConfig" isInitial="false" isActive="false" action="load_configuration"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_stepS3" location="file:/models/grafcet/main.grafcet#S3" name="ValidateInput" isInitial="false" isActive="false" action="validate_input"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_stepS4" location="file:/models/grafcet/main.grafcet#S4" name="ProcessData" isInitial="false" isActive="false" action="process_data"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_stepS5" location="file:/models/grafcet/main.grafcet#S5" name="Finalize" isInitial="false" isActive="false" action="finalize_sequence"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_stepS6" location="file:/models/grafcet/main.grafcet#S6" name="ErrorHandler" isInitial="false" isActive="false" action="handle_error"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_transT1" location="file:/models/grafcet/main.grafcet#T1" name="t_init_to_load" condition="system_ready"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_transT2" location="file:/models/grafcet/main.grafcet#T2" name="t_load_to_validate" condition="config_ok"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_transT3" location="file:/models/grafcet/main.grafcet#T3" name="t_validate_to_process" condition="input_valid"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_transT4" location="file:/models/grafcet/main.grafcet#T4" name="t_process_to_finalize" condition="processing_done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_transT5" location="file:/models/grafcet/main.grafcet#T5" name="t_any_to_error" condition="error_detected"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_transT6" location="file:/models/grafcet/main.grafcet#T6" name="t_error_to_init" condition="reset_requested"/>
+
+    <!-- StepToTransition connections (PlaceToTransition in target) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_cST1" location="file:/models/grafcet/main.grafcet#C_ST1" name="c_S1_T1" from="/0/@elements.0" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_cST2" location="file:/models/grafcet/main.grafcet#C_ST2" name="c_S2_T2" from="/0/@elements.1" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_cST3" location="file:/models/grafcet/main.grafcet#C_ST3" name="c_S3_T3" from="/0/@elements.2" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_cST4" location="file:/models/grafcet/main.grafcet#C_ST4" name="c_S4_T4" from="/0/@elements.3" to="/0/@elements.9"/>
+    <!-- Branch allowing direct error from ValidateInput -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_cST5" location="file:/models/grafcet/main.grafcet#C_ST5" name="c_S3_T5" from="/0/@elements.2" to="/0/@elements.10"/>
+    <!-- Branch allowing direct error from ProcessData -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_cST6" location="file:/models/grafcet/main.grafcet#C_ST6" name="c_S4_T5" from="/0/@elements.3" to="/0/@elements.10"/>
+    <!-- Branch allowing direct error from Finalize -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_cST7" location="file:/models/grafcet/main.grafcet#C_ST7" name="c_S5_T5" from="/0/@elements.4" to="/0/@elements.10"/>
+
+    <!-- TransitionToStep connections (TransitionToPlace in target) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_cTS1" location="file:/models/grafcet/main.grafcet#C_TS1" name="c_T1_S2" from="/0/@elements.6" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_cTS2" location="file:/models/grafcet/main.grafcet#C_TS2" name="c_T2_S3" from="/0/@elements.7" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_cTS3" location="file:/models/grafcet/main.grafcet#C_TS3" name="c_T3_S4" from="/0/@elements.8" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_cTS4" location="file:/models/grafcet/main.grafcet#C_TS4" name="c_T4_S5" from="/0/@elements.9" to="/0/@elements.4"/>
+    <!-- Error transition to ErrorHandler -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_cTS5" location="file:/models/grafcet/main.grafcet#C_TS5" name="c_T5_S6" from="/0/@elements.10" to="/0/@elements.5"/>
+    <!-- Loop from error back to init -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_cTS6" location="file:/models/grafcet/main.grafcet#C_TS6" name="c_T6_S1" from="/0/@elements.11" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

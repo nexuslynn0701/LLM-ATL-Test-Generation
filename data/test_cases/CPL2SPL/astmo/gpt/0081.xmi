@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with 1 SubAction and 1 Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <!-- SubAction contents: complex Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- default executes SubCall to sa1 -->
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </default>
+      </contents>
+    </subActions>
+    <outgoing>
+      <!-- Outgoing contents: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <!-- no children => simple proxy -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by both Proxies and the Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+
+  <!-- SubCall referencing sa1 (by id string) -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- AddressSwitch with one SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1" contains="foo" subDomainOf="bar"/>
+    <notPresent/>
+    <!-- Otherwise executes Redirect -->
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

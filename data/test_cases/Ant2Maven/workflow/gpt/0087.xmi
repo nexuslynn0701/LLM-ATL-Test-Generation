@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="workspace"
+    description="Complex Ant build with multiple tasks"
+    default="buildTarget">
+
+  <!-- Ant properties to exercise PropertyValue, PropertyLocation, PropertyFile, PropertyEnv -->
+  <properties xsi:type="Ant:PropertyValue" name="build.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="out/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A simple path with nested elements to exercise Path, PathElement, FileSet, PatternSet, Includes, Excludes, FilterSet, Filter, FiltersFile -->
+  <path id="main.path">
+    <pathElement path="lib/runtime.jar" location="lib"/>
+    <fileset dir="lib/ext">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/*-sources.jar"/>
+      </patternset>
+      <include name="**/optional/*.jar"/>
+      <exclude name="**/old/*.jar"/>
+    </fileset>
+    <fileset dir="resources">
+      <patternset>
+        <inexcludes xsi:type="Ant:IncludesFile" name="includes.list"/>
+        <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list"/>
+      </patternset>
+    </fileset>
+    <fileset dir="config">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.xml"/>
+      </patternset>
+    </fileset>
+  </path>
+
+  <!-- FilterSet with Filter and FiltersFile -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+  
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <tasks xsi:type="Ant:Mkdir" dir="out/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="out/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <classPath>
+        <pathElement path="out/classes" location="out"/>
+        <fileset dir="lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/complex-build.jar"
+           basedir="out/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Test target with Delete and FilterSet/Copy to exercise more rules -->
+  <targets xmi:id="cleanTarget" name="clean">
+    <tasks xsi:type="Ant:Delete"
+           dir="out"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/.git/**"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Documentation target with Javadoc -->
+  <targets xmi:id="docsTarget" name="docs">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="out/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+  </targets>
+
+</Ant:Project>

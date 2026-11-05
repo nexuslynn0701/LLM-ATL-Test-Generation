@@ -1,0 +1,70 @@
+-- Grafcet2PetriNet OCL Contract
+-- Transformation-level contract: source-side (Grafcet) to target-side (PetriNet) mapping.
+-- Written in the style of Troya et al. 2015 TSE.
+
+-- C1 (Rule PetriNet): For each Grafcet, a PetriNet must be created with the same name and location.
+context Grafcet!Grafcet
+inv PetriNetCreated:
+  PetriNet!PetriNet.allInstances()->exists(p |
+    p.name = self.name and p.location = self.location
+  )
+
+-- C2 (Rule PetriNet): The number of PetriNet instances must equal the number of Grafcet instances.
+context Grafcet!Grafcet
+inv PetriNetCount:
+  PetriNet!PetriNet.allInstances()->size() = Grafcet!Grafcet.allInstances()->size()
+
+-- C3 (Rule Place): For each Step, a Place must be created with the same name and location.
+context Grafcet!Step
+inv PlaceCreated:
+  PetriNet!Place.allInstances()->exists(p |
+    p.name = self.name and p.location = self.location
+  )
+
+-- C4 (Rule Place): The number of Place instances must equal the number of Step instances.
+context Grafcet!Step
+inv PlaceCount:
+  PetriNet!Place.allInstances()->size() = Grafcet!Step.allInstances()->size()
+
+-- C5 (Rule Place): For each Step marked as isInitial=true, the corresponding Place must have initToken=true.
+context Grafcet!Step
+inv InitialStepBecomesInitialPlace:
+  self.isInitial implies
+  PetriNet!Place.allInstances()->exists(p |
+    p.name = self.name and p.initToken = true
+  )
+
+-- C6 (Rule Transition): For each Grafcet Transition, a PetriNet Transition must be created with the same name.
+context Grafcet!Transition
+inv TransitionCreated:
+  PetriNet!Transition.allInstances()->exists(t |
+    t.name = self.name
+  )
+
+-- C7 (Rule Transition): The number of PetriNet Transition instances must equal the number of Grafcet Transition instances.
+context Grafcet!Transition
+inv TransitionCount:
+  PetriNet!Transition.allInstances()->size() = Grafcet!Transition.allInstances()->size()
+
+-- C8 (Rule PlaceToTransition): For each StepToTransition, a PlaceToTransition Arc must connect the corresponding Place and Transition.
+context Grafcet!StepToTransition
+inv ArcCreated:
+  PetriNet!PlaceToTransition.allInstances()->exists(a |
+    a.from.name = self.from.name and
+    a.to.name = self.to.name and
+    a.name = self.name
+  )
+
+-- C9 (Rule TransitionToPlace): For each TransitionToStep, a TransitionToPlace Arc must connect the corresponding Transition and Place.
+context Grafcet!TransitionToStep
+inv ArcCreated:
+  PetriNet!TransitionToPlace.allInstances()->exists(a |
+    a.from.name = self.from.name and
+    a.to.name = self.to.name and
+    a.name = self.name
+  )
+
+-- C10 (Rule PlaceToTransition + Rule TransitionToPlace): The total number of Arcs must equal the total number of Connections.
+context PetriNet!PetriNet
+inv ArcConnectionCount:
+  self.arcs->size() = Grafcet!Grafcet.allInstances()->collect(g | g.connections)->flatten()->size()

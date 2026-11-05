@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL for R1, with Incoming (R3), Outgoing (R4), SubAction (R2) -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction used by SubCall 3 (R13) -->
+    <subActions id="actionMain">
+      <!-- contents is a complex Proxy at index 4 -->
+      <contents href="//@elements.4"/>
+    </subActions>
+    <!-- Incoming method: contents is simple Proxy at index 5 (R7) -->
+    <incoming>
+      <contents href="//@elements.5"/>
+    </incoming>
+    <!-- Outgoing method: contents is Redirect at index 2 (R14) -->
+    <outgoing>
+      <contents href="//@elements.2"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location for root CPL and others (R19 via R7,R8,R14) -->
+  <elements xsi:type="CPL:Location" url="sip:root@example.com" clear="no">
+    <!-- contents points to SubCall 3 so Location.statement = that SubCall -->
+    <contents href="//@elements.3"/>
+  </elements>
+
+  <!-- 2: Redirect (R14), with permanent="false" to use MOVED_TEMPORARILY -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 3: SubCall (R13) referring to existing SubAction id "actionMain" -->
+  <elements xsi:type="CPL:SubCall" ref="actionMain"/>
+
+  <!-- 4: Complex Proxy (R8) used as SubAction contents from 0 -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- Busy with contents = Reject 7 (R9, then inner Reject suppressed by guards) -->
+    <busy>
+      <contents href="//@elements.7"/>
+    </busy>
+    <!-- NoAnswer with contents = Location 8 (R10, Location suppressed by guards) -->
+    <noAnswer>
+      <contents href="//@elements.8"/>
+    </noAnswer>
+    <!-- Redirection with contents = TimeSwitch 9 (R11, TimeSwitch suppressed) -->
+    <redirection>
+      <contents href="//@elements.9"/>
+    </redirection>
+    <!-- Failure with contents = simple Proxy 5 (R5, inner Proxy suppressed) -->
+    <failure>
+      <contents href="//@elements.5"/>
+    </failure>
+    <!-- Default with contents = StringSwitch 10 (R12, StringSwitch suppressed) -->
+    <default>
+      <contents href="//@elements.10"/>
+    </default>
+  </elements>
+
+  <!-- 5: Simple Proxy (R7). No children => isSimple = true -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential"/>
+
+  <!-- 6: AddressSwitch (R15) with addresses + notPresent + otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- SwitchedAddress 11 (R17), contents = simple Proxy 5 -->
+    <addresses is="sip:alice@example.com">
+      <contents href="//@elements.5"/>
+    </addresses>
+    <!-- notPresent -> NotPresent2ErrorResponse (R6) -->
+    <notPresent/>
+    <!-- otherwise with contents = Location 1 (R18, Location suppressed) -->
+    <otherwise>
+      <contents href="//@elements.1"/>
+    </otherwise>
+  </elements>
+
+  <!-- 7: Reject used inside Busy 4 (R9) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 8: Location used as contents of NoAnswer 4 (guards suppress it) -->
+  <elements xsi:type="CPL:Location" url="sip:noanswer@example.com" priority="1" clear="yes"/>
+
+  <!-- 9: TimeSwitch used as contents of Redirection 4 (guards suppress it) -->
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20240101T080000" interval="1" wkst="MO"/>
+
+  <!-- 10: StringSwitch used as contents of Default 4 (R16, but suppressed in Default2SelectDefault) -->
+  <elements xsi:type="CPL:StringSwitch" field="callLabel"/>
+
+  <!-- 11: SwitchedAddress used as address in 6 (R17) -->
+  <elements xsi:type="CPL:SwitchedAddress" is="sip:alice@example.com"/>
+
+</CPL:CPLModel>

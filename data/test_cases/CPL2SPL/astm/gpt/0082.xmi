@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL element (triggers R1 and roots locations) -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction (R2) -->
+    <subActions id="saComplex">
+      <!-- Its first contents: a complex Proxy (R8) -->
+      <!-- Proxy.locations will include pLoc1 and inherit CPL.locations (empty) -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- Complex proxy: all outcome branches present (R8, R9–R12, R5 via Failure contents) -->
+        <busy>
+          <!-- Busy.contents -> a Reject, triggers Busy2SelectCase with empty statements (R9) -->
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer.contents -> SubCall (R10 + R13) -->
+          <contents xsi:type="CPL:SubCall" ref="saSimple"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection.contents -> simple Proxy (R11 + R7) -->
+          <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+            <!-- Simple proxy has no branches; locations inherited from pLoc2 below -->
+          </contents>
+        </redirection>
+        <failure>
+          <!-- Failure alone triggers R5 (Failure2ErrorResponse); contents ignored by that rule -->
+          <contents xsi:type="CPL:Location" url="sip:fail@proxy.example.com" clear="no"/>
+        </failure>
+        <default>
+          <!-- Default.contents -> Redirect (R12 + R14) -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </default>
+      </contents>
+
+      <!-- Second contents of SubAction: an AddressSwitch (R15, R17, R6 via NotPresent) -->
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+        <!-- two switched addresses (R17), both delegating to a Reject via contents -->
+        <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com">
+          <contents xsi:type="CPL:Reject" status="404" reason="Alice Not Found"/>
+        </addresses>
+        <addresses is="sip:bob@example.net" contains="bob" subDomainOf="example.net">
+          <contents xsi:type="CPL:Reject" status="480" reason="Bob Unavailable"/>
+        </addresses>
+        <!-- NotPresent branch (R6), with contents a simple Proxy to be ignored for R6 -->
+        <notPresent>
+          <contents xsi:type="CPL:Proxy" recurse="false" ordering="parallel"/>
+        </notPresent>
+        <!-- Otherwise branch (R18), contents is a Redirect (ignored in R18 statements) -->
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </otherwise>
+      </contents>
+    </subActions>
+
+    <!-- Incoming and Outgoing (R3, R4) both refer to the same SubAction Proxy via contents -->
+    <incoming>
+      <!-- contents points to SubAction saComplex (index 1 in elements list) -->
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="parallel">
+        <!-- simple proxy: no branches, locations from pLoc1 -->
+      </contents>
+    </incoming>
+
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="sequential">
+        <!-- simple proxy: no branches, locations from pLoc2 -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Location for first simple proxy used in Incoming and complex proxy (R7 via Location2URIConstant R19) -->
+  <elements xsi:type="CPL:Location" url="sip:primary@example.com" priority="1" clear="yes"/>
+
+  <!-- Second Location for other proxies / Redirects -->
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" priority="2" clear="yes"/>
+
+  <!-- Simple SubAction that SubCall refers to (R2 + R7 via its Proxy contents) -->
+  <elements xsi:type="CPL:SubAction" id="saSimple">
+    <!-- contents: a simple Proxy so SubAction2Function gets a ReturnStat (R7) -->
+    <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+      <!-- simple proxy, relies on saSimple.locations: includes this Location below -->
+    </contents>
+  </elements>
+
+  <!-- Location used by saSimple's Proxy -->
+  <elements xsi:type="CPL:Location" url="sip:simple@example.org" priority="3" clear="no"/>
+
+  <!-- Top-level Redirect to exercise R14 and use location 1 as contact -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- StringSwitch to trigger R16 -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <!-- no strings children needed for R16 -->
+  </elements>
+
+  <!-- LanguageSwitch to appear as a contents in some branches (handled as "no statements") -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <contents xsi:type="CPL:Redirect" permanent="false"/>
+  </elements>
+
+  <!-- TimeSwitch to also appear in contents for "ignored statements" cases -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com/utc">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- PrioritySwitch for same purpose -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.7" equal="0.5"/>
+  </elements>
+
+</CPL:CPLModel>

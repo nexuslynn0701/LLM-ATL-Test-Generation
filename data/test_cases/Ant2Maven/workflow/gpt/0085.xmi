@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiStageBuild"
+    basedir="project-root"
+    description="Full build lifecycle with compilation, packaging, and cleanup"
+    default="build-main">
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="project-root/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="project-root/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+  <targets xmi:id="build-main" name="build-main">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="project-root/src/main/java"
+        destdir="project-root/target/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false">
+      <classPath refid="">
+        <pathElement path="project-root/lib/runtime.jar" location="project-root/lib"/>
+      </classPath>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="" unless=""/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="" unless=""/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="project-root/target/app-main.jar"
+        basedir="project-root/target/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="project-root/META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="project-root/target/dist"/>
+  </targets>
+  <targets xmi:id="package-dist" name="package-dist">
+    <tasks xsi:type="Ant:Copy"
+        file=""
+        presservelastmodified=""
+        tofile=""
+        todir="project-root/target/dist"
+        overwrite="true"
+        filtering="true"
+        flatten="false"
+        includeEmptyDirs="true">
+      <fileset dir="project-root/target">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.jar" ifCondition="" unless=""/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="MultiStageBuild"/>
+        <filtersfile file="project-root/config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="" classpath="" classpathref="" from="*.jar" to="dist-*.jar"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="cleanup" name="cleanup">
+    <tasks xsi:type="Ant:Delete"
+        file=""
+        dir="project-root/target"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        includes="**/*"
+        includesfile=""
+        excludes=""
+        excludesfile=""
+        defaultexcludes="false"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" offset="" unit="" locale=""/>
+    </tasks>
+  </targets>
+</Ant:Project>

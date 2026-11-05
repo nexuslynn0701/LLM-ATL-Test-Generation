@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="ParallelAndMergeFlow">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="Init" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="BranchA" isInitial="false" isActive="false" action="runA"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="BranchB" isInitial="false" isActive="false" action="runB"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="Join" isInitial="false" isActive="false" action="joinBranches"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="Final" isInitial="false" isActive="false" action="finish"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t001" name="Split" condition="startParallel"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="CompleteA" condition="aDone"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="CompleteB" condition="bDone"/>
+    <elements xsi:type="Grafcet:Transition" location="t004" name="ToFinal" condition="readyToFinish"/>
+
+    <!-- Connections: indices refer to the order of elements above -->
+    <!-- Init (step 0) -> Split (transition 5) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="initToSplit" from="/0/@elements.0" to="/0/@elements.5"/>
+
+    <!-- Split (transition 5) -> BranchA (step 1) -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c002" name="splitToBranchA" from="/0/@elements.5" to="/0/@elements.1"/>
+
+    <!-- Split (transition 5) -> BranchB (step 2) -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c003" name="splitToBranchB" from="/0/@elements.5" to="/0/@elements.2"/>
+
+    <!-- BranchA (step 1) -> CompleteA (transition 6) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c004" name="branchAToCompleteA" from="/0/@elements.1" to="/0/@elements.6"/>
+
+    <!-- BranchB (step 2) -> CompleteB (transition 7) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c005" name="branchBToCompleteB" from="/0/@elements.2" to="/0/@elements.7"/>
+
+    <!-- CompleteA (transition 6) -> Join (step 3) -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c006" name="completeAToJoin" from="/0/@elements.6" to="/0/@elements.3"/>
+
+    <!-- CompleteB (transition 7) -> Join (step 3) -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c007" name="completeBToJoin" from="/0/@elements.7" to="/0/@elements.3"/>
+
+    <!-- Join (step 3) -> ToFinal (transition 8) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c008" name="joinToToFinal" from="/0/@elements.3" to="/0/@elements.8"/>
+
+    <!-- ToFinal (transition 8) -> Final (step 4) -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c009" name="toFinalToFinalStep" from="/0/@elements.8" to="/0/@elements.4"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

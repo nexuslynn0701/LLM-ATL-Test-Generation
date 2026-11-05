@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="financeSpec"
+    nsURI="http://example.org/financeSpec"
+    nsPrefix="fin">
+
+  <!-- 0: AccountKind enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="AccountKind">
+    <eLiterals name="CHECKING" value="0" literal="checking"/>
+    <eLiterals name="SAVINGS" value="1" literal="savings"/>
+    <eLiterals name="CREDIT" value="2" literal="credit"/>
+  </eClassifiers>
+
+  <!-- 1: Currency enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Currency">
+    <eLiterals name="USD" value="0" literal="USD"/>
+    <eLiterals name="EUR" value="1" literal="EUR"/>
+    <eLiterals name="JPY" value="2" literal="JPY"/>
+  </eClassifiers>
+
+  <!-- 2: TransactionKind enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="TransactionKind">
+    <eLiterals name="DEBIT" value="0" literal="debit"/>
+    <eLiterals name="CREDIT" value="1" literal="credit"/>
+    <eLiterals name="TRANSFER" value="2" literal="transfer"/>
+  </eClassifiers>
+
+  <!-- 3: PartyKind enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PartyKind">
+    <eLiterals name="PERSON" value="0" literal="person"/>
+    <eLiterals name="ORGANIZATION" value="1" literal="organization"/>
+  </eClassifiers>
+
+  <!-- 4: NamedElement base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 5: IdentifiedElement with ID -->
+  <eClassifiers xsi:type="ecore:EClass" name="IdentifiedElement"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 6: Party abstract -->
+  <eClassifiers xsi:type="ecore:EClass" name="Party" abstract="true"
+      eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        lowerBound="1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 7: Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person"
+      eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 8: Organization -->
+  <eClassifiers xsi:type="ecore:EClass" name="Organization"
+      eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="registrationNumber"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 9: Account -->
+  <eClassifiers xsi:type="ecore:EClass" name="Account"
+      eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="currency"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="balance"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+        lowerBound="1"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="limits"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.11"/>
+  </eClassifiers>
+
+  <!-- 10: AccountSummary (no ID, derived flag example) -->
+  <eClassifiers xsi:type="ecore:EClass" name="AccountSummary">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="totalBalance"
+        derived="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="accounts"
+        upperBound="-1"
+        eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+  <!-- 11: LimitRule -->
+  <eClassifiers xsi:type="ecore:EClass" name="LimitRule"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxAmount"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="perDay"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 12: Transaction -->
+  <eClassifiers xsi:type="ecore:EClass" name="Transaction"
+      eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="amount"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="timestamp"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source"
+        eType="//@eClassifiers.9"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target"
+        eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+  <!-- 13: Ledger (root aggregate) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Ledger"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parties"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="accounts"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.9"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="transactions"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.12"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="summary"
+        containment="true"
+        eType="//@eClassifiers.10"/>
+  </eClassifiers>
+
+</ecore:EPackage>

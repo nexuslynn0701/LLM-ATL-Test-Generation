@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project-root"
+    description="Full build including compilation, packaging, and cleanup"
+    default="buildTarget">
+
+  <!-- Properties covering all concrete Property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="src.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A standalone TaskDef (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target containing most tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true">
+      <!-- Local classpath and includes/excludes, fully contained and id-local -->
+      <classPath refid="">
+        <pathElement path="lib/runtime.jar" location="lib"/>
+        <fileset dir="lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+            <inexcludes xsi:type="Ant:Excludes" name="**/*-sources.jar"/>
+          </patternset>
+          <include name="**/*.jar"/>
+          <exclude name="**/test-*.jar"/>
+        </fileset>
+      </classPath>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/generated/**"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/complex-build.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <tasks xsi:type="Ant:Copy"
+           todir="target/distribution"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.*"/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@@" endtoken="@@">
+        <filter token="project.name" value="ComplexBuild"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.txt" to="*.cfg"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Secondary target with cleanup tasks only, no dependencies -->
+  <targets xmi:id="cleanupTarget" name="cleanup">
+    <tasks xsi:type="Ant:Delete"
+           dir="target"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/.git/**"
+           defaultexcludes="yes"/>
+  </targets>
+
+  <!-- A reusable Path definition exercising Path, PathElement, FileSet, PatternSet, FiltersFile -->
+  <path>
+    <path id="runtime.path" refid="">
+      <pathElement path="lib/core.jar" location="lib"/>
+      <pathElement path="lib/utils.jar" location="lib"/>
+      <fileset dir="ext">
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="include.patterns" ifCondition="" unless=""/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="exclude.patterns" ifCondition="" unless=""/>
+        </patternset>
+        <include name="**/*.jar"/>
+      </fileset>
+    </path>
+  </path>
+
+</Ant:Project>

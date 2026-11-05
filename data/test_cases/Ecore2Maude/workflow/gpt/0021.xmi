@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://rootpkg"
+    nsPrefix="root">
+  <!-- Class Person with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- id attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="personId"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- name attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="unknown"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- age attribute, int -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- primaryAddress reference (to Address, containment, opposite backOwner) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="primaryAddress"
+        lowerBound="0"
+        upperBound="1"
+        containment="true"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+    <!-- contacts reference (multi, non containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="contacts"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- Class Address with back reference and list of residents -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- street attribute, default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="Main St"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- backOwner reference, opposite of Person.primaryAddress -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="backOwner"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.3"/>
+    <!-- residents reference, multi, non opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="residents"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- Enumeration Gender with literals MALE, FEMALE -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Gender">
+    <eLiterals name="MALE" value="0" literal="MALE"/>
+    <eLiterals name="FEMALE" value="1" literal="FEMALE"/>
+  </eClassifiers>
+
+  <!-- AttributeType class to use as EAttribute.eAttributeType (non-primitive, to trigger @DataType branch) -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData"/>
+
+  <!-- Class Employee extending Person, with enum-based attribute and reference to Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="true">
+    <!-- superclass Person -->
+    <eSuperTypes href="//@eClassifiers.0"/>
+    <!-- gender attribute using Gender enum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="gender"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="MALE"
+        eType="//@eClassifiers.2"/>
+    <!-- code attribute using custom data type (to go to @DataType) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="empCode"
+        lowerBound="0"
+        upperBound="1"
+        eAttributeType="//@eClassifiers.3"/>
+    <!-- reference to Department -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="department"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- Class Department with supertype from ecore package (EClass) to trigger createSort -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <!-- add a supertype from the standard ecore package: EClass -->
+    <eSuperTypes href="http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+  </eClassifiers>
+
+</ecore:EPackage>

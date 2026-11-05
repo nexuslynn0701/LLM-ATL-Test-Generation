@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example/root"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise eSuperPackage/eSubpackages -->
+  <eSubpackages name="subPkg"
+                nsURI="http://example/sub"
+                nsPrefix="sub">
+    <!-- Class in subpackage with a reference back to a class in root package -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClass">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subName"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root package classifiers -->
+  <!-- 0: Class with attributes and references, no supertypes -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootA">
+    <!-- String attribute with default value, isID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="aName"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true"
+                         defaultValueLiteral="defaultA"/>
+    <!-- Int attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="aCount"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="0"
+                         upperBound="10"/>
+    <!-- Reference to RootB (classifier 1), containment, with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="bRef"
+                         eType="//@eClassifiers.1"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 1: Class with supertype RootA and references/attributes -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="RootB"
+                eSuperTypes="//@eClassifiers.0">
+    <!-- Reference back to RootA (opposite of bRef) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="aParent"
+                         eType="//@eClassifiers.0"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+    <!-- Non-containment reference to SubClass in subPkg -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subLink"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"/>
+  </eClassifiers>
+
+  <!-- 2: Enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ColorEnum">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+  </eClassifiers>
+
+  <!-- 3: Class using the enum and String attributes with defaults -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootC">
+    <!-- Enum-typed attribute with default enum literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="favoriteColor"
+                         eType="//@eClassifiers.2"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="RED"/>
+    <!-- String attribute with quotes in default to exercise escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="description"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="&quot;quoted text&quot;"/>
+  </eClassifiers>
+
+</ecore:EPackage>

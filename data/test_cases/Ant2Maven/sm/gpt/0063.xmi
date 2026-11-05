@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiStageBuild"
+    basedir="."
+    description="Project with separate compile, docs, package, and clean targets."
+    default="t_compile">
+
+  <targets xmi:id="t_compile" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+  </targets>
+
+  <targets xmi:id="t_docs" name="docs" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Mkdir" dir="build/docs/api"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="MultiStageBuild API"/>
+  </targets>
+
+  <targets xmi:id="t_package" name="package" description="Create application JAR">
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multistagebuild.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <targets xmi:id="t_clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           includesfile=""
+           excludesfile=""
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="dist"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           includesfile=""
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

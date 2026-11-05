@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to trigger subpackage-related rules -->
+  <eSubpackages name="subOne" nsURI="http://rootPkg/subOne" nsPrefix="sub1">
+    <!-- Classifiers of subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClass">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="subAttr"
+          iD="false"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="0"
+          upperBound="1"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers of root package -->
+
+  <!-- 0: Regular class with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- id attribute with default literal to trigger AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="identifier"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="ID-001"/>
+    <!-- non-id attribute with Int bounds and default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="18"/>
+    <!-- reference to Address, containment, bounded -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="homeAddress"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="1"
+        containment="true"
+        resolveProxies="true"/>
+    <!-- multi-valued, non-containment reference with upperBound -1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="otherAddresses"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"/>
+    <!-- reference to enum-typed class for usage diversity -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="statusHolder"
+        eType="//@eClassifiers.2"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 1: Address class referenced by Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="number"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0"
+        upperBound="1"/>
+  </eClassifiers>
+
+  <!-- 2: Class with enum-typed attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="StatusHolder">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="currentStatus"
+        iD="false"
+        eType="//@eClassifiers.3"
+        lowerBound="1"
+        upperBound="1"/>
+  </eClassifiers>
+
+  <!-- 3: Enumeration with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="OLD" value="1" literal="OLD"/>
+  </eClassifiers>
+
+</ecore:EPackage>

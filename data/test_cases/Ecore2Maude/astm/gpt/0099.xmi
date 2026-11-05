@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMeta"
+    nsURI="http://example.org/rootMeta"
+    nsPrefix="root">
+
+  <!-- Classifier 0: Embedded Enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- Classifier 1: Base abstract class with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="5"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- Classifier 2: Subclass with superclass, attributes (one enum with default), and reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false">
+    <eSuperTypes>//@eClassifiers.1</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="summary"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="&quot;default summary&quot;"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="NEW"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="subTasks"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- Classifier 3: Independent class with attributes and bidirectional reference to Task -->
+  <eClassifiers xsi:type="ecore:EClass" name="User" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="username"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="anonymous"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="assignedTasks"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.2"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- Classifier 4: Extra enum with more than one literal, no default used yet -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RoleEnum">
+    <eLiterals name="ADMIN" value="0" literal="ADMIN"/>
+    <eLiterals name="GUEST" value="1" literal="GUEST"/>
+    <eLiterals name="USER" value="2" literal="USER"/>
+  </eClassifiers>
+
+  <!-- Classifier 5: Class that uses RoleEnum and has no super types -->
+  <eClassifiers xsi:type="ecore:EClass" name="Membership" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="role"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="ADMIN"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="user"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Subpackage to trigger subPackage and superPackage equations -->
+  <eSubpackages name="auditPkg"
+      nsURI="http://example.org/audit"
+      nsPrefix="audit">
+    <!-- Classifier 0 in subpackage: simple class using primitive attribute only -->
+    <eClassifiers xsi:type="ecore:EClass" name="AuditEntry" abstract="false" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="message"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          defaultValueLiteral="logged"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

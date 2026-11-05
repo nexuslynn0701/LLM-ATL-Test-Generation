@@ -1,0 +1,37 @@
+<xmi:XMI xmi:version="2.0"
+         xmlns:xmi="http://www.omg.org/XMI"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcet" location="file://complex.grafcet">
+    <!-- Steps and Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="Start" location="1,1" isInitial="true" isActive="true" action="initSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="CheckSensors" location="2,1" isInitial="false" isActive="false" action="readSensors"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="ProcessData" location="3,1" isInitial="false" isActive="false" action="computeValues"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="HandleError" location="2,2" isInitial="false" isActive="false" action="logAndRecover"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s4" name="Finalize" location="4,1" isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="T_StartToCheck" location="1.5,1" condition="systemReady"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="T_CheckToProcess" location="2.5,1" condition="sensorsOk"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="T_CheckToError" location="2,1.5" condition="sensorsFail"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" name="T_ProcessLoop" location="3,1.5" condition="moreData"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t4" name="T_ProcessToFinalize" location="3.5,1" condition="done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t5" name="T_ErrorToStart" location="1.5,2" condition="retryAllowed"/>
+
+    <!-- Connections: StepToTransition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="C_StartToT0" location="1.25,1" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c1" name="C_S1ToT1" location="2.25,1" from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c2" name="C_S1ToT2" location="2,1.25" from="/0/@elements.1" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c3" name="C_S2ToT3" location="3,1.25" from="/0/@elements.2" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c4" name="C_S2ToT4" location="3.25,1" from="/0/@elements.2" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c5" name="C_S3ToT5" location="1.75,2" from="/0/@elements.3" to="/0/@elements.10"/>
+
+    <!-- Connections: TransitionToStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c6" name="C_T0ToS1" location="1.75,1" from="/0/@elements.5" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c7" name="C_T1ToS2" location="2.75,1" from="/0/@elements.6" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c8" name="C_T2ToS3" location="2,1.75" from="/0/@elements.7" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c9" name="C_T3ToS2" location="3,1.75" from="/0/@elements.8" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c10" name="C_T4ToS4" location="3.75,1" from="/0/@elements.9" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c11" name="C_T5ToS0" location="1.25,2" from="/0/@elements.10" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

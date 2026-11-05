@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="handleCall"/>
+    <outgoing>
+      <contents xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:alice@example.com" contains="alice" subDomainOf="">
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </addresses>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="handleCall">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="10">
+      <busy>
+        <contents xsi:type="CPL:SubCall" ref="handleCall"/>
+      </busy>
+      <noAnswer>
+        <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="2" clear="no"/>
+      </noAnswer>
+      <redirection>
+        <contents xsi:type="CPL:Redirect" permanent="true"/>
+      </redirection>
+      <failure>
+        <contents xsi:type="CPL:Reject" status="500" reason="Server Error"/>
+      </failure>
+      <default>
+        <contents xsi:type="CPL:SubCall" ref="handleCall"/>
+      </default>
+    </contents>
+  </elements>
+</CPL:CPLModel>

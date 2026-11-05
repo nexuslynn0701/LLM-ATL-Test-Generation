@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <!-- 0: Root CPL with one SubCall and one Outgoing Proxy -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions, Outgoing, Incoming must not be top-level elements; keep CPL minimal -->
+  </elements>
+
+  <!-- 1: Top-level SubCall (ref is plain string, not object reference) -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- 2: Top-level SubAction is not allowed; represent its behavior via SubCall above and a Proxy here -->
+  <!-- Simple proxy to trigger Proxy2Return and use Location -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <default>
+      <contents xsi:type="CPL:Location" url="sip:user@example.com" clear="true">
+        <!-- Location has no contents, so statement is undefined, but locations will include this Location -->
+      </contents>
+    </default>
+  </elements>
+
+  <!-- 3: Top-level Location to participate in locations sequence if needed -->
+  <elements xsi:type="CPL:Location" url="sip:top@example.org" priority="1" clear="false"/>
+
+  <!-- 4: Top-level Proxy complex, using the SubCall (1) via XMI path -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- Non-simple proxy thanks to children -->
+    <busy>
+      <!-- Busy with SubCall contents -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer with SubCall contents -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection with SubCall contents -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </redirection>
+    <failure/>
+    <default>
+      <!-- Default with SubCall contents -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </default>
+  </elements>
+
+  <!-- 5: Top-level Redirect, also using Location2URIConstant via locations helper from Location (3) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 6: Top-level AddressSwitch with SwitchedAddress, NotPresent, Otherwise;
+           Otherwise contents is SubCall so that SubCall2Return is used inside default of AddressSwitch -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="fromField">
+    <addresses is="addr1" contains="x" subDomainOf="sub">
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </otherwise>
+  </elements>
+
+  <!-- 7: Top-level StringSwitch (just to exercise StringSwitch2SelectStat differently) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField">
+    <strings is="value1" contains="part1"/>
+  </elements>
+
+  <!-- 8: Top-level TimeSwitch, unused as content anywhere (no statements will be created from it) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 9: Top-level PrioritySwitch, also unused directly -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="low" greater="high" equal="mid"/>
+  </elements>
+</CPL:CPLModel>

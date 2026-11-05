@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL root, exercises Incoming2Method and Outgoing2Method with complex proxies -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions used by SubCall and as content of Switch/Proxy -->
+    <subActions xsi:type="CPL:SubAction" id="saMain"/>
+    <subActions xsi:type="CPL:SubAction" id="saSecondary"/>
+
+    <!-- Incoming with complex Proxy (has error branches) -->
+    <incoming xsi:type="CPL:Incoming">
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="saSecondary"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </default>
+      </contents>
+    </incoming>
+
+    <!-- Outgoing with simple Proxy (no error branches) -->
+    <outgoing xsi:type="CPL:Outgoing">
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+        <!-- simple proxy: all branches undefined -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by both proxies and by Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" clear="yes" priority="1"/>
+
+  <!-- 2: Redirect with permanent='false' to exercise Redirect2Return (MOVED_TEMPORARILY) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 3: AddressSwitch with Address, NotPresent, Otherwise, contents driven by SubCall and Redirect -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses xsi:type="CPL:SwitchedAddress" is="alice@example.com" contains="local" subDomainOf="example.com">
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </addresses>
+    <notPresent/>
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </otherwise>
+  </elements>
+
+  <!-- 4: StringSwitch to exercise StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="callTag">
+    <strings xsi:type="CPL:SwitchedString" is="tag123" contains="session"/>
+  </elements>
+
+  <!-- 5: LanguageSwitch as a node with no statements generated -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages xsi:type="CPL:SwitchedLanguage" matches="en"/>
+  </elements>
+
+  <!-- 6: TimeSwitch as a node with no statements generated -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com/utc">
+    <times xsi:type="CPL:SwitchedTime"
+           dtstart="20260101T000000Z"
+           dtend="20261231T235959Z"
+           duration="0"
+           freq="DAILY"
+           until="20261231T235959Z"
+           count="0"
+           interval="1"
+           bySecond="0"
+           byMinute="0"
+           byHour="0"
+           byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1"
+           byYearDay="1"
+           byWeekNo="1"
+           byMonth="1"
+           wkst="MO"
+           bySetPos="1"/>
+  </elements>
+
+  <!-- 7: PrioritySwitch as a node with no statements generated -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities xsi:type="CPL:SwitchedPriority" less="0.3" equal="0.5" greater="0.7"/>
+  </elements>
+
+  <!-- 8: Another CPL root with no incoming/outgoing, to exercise CPL2Program counts -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="saIsolated"/>
+  </elements>
+
+</CPL:CPLModel>

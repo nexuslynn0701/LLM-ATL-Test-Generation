@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="subCallAction"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+        <addresses is="sip:alice@example.com" contents="//@elements.1"/>
+        <notPresent contents="//@elements.2"/>
+        <otherwise contents="//@elements.3"/>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="sequential">
+        <busy contents="//@elements.4"/>
+        <noAnswer contents="//@elements.5"/>
+        <redirection contents="//@elements.6"/>
+        <failure contents="//@elements.7"/>
+        <default contents="//@elements.8"/>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+  <elements xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="no"/>
+  <elements xsi:type="CPL:SubCall" ref="subCallAction"/>
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20230101T000000" dtend="20231231T235959" duration="PT1H" freq="DAILY" until="20231231T235959" count="365" interval="1" bySecond="0" byMinute="0" byHour="9" byDay="MO,TU,WE,TH,FR" byMonthDay="1" byYearDay="1" byWeekNo="1" byMonth="1" wkst="MO" bySetPos="1">
+    <times dtstart="20230101T090000" dtend="20230101T170000" interval="1" wkst="MO"/>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="fr" contents="//@elements.4"/>
+    <notPresent contents="//@elements.9"/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5" greater="2" equal="3"/>
+    <otherwise contents="//@elements.10"/>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="user-agent">
+    <strings is="MySoftPhone" contains="softphone"/>
+    <strings is="MyHardPhone" contents="//@elements.11"/>
+    <notPresent/>
+  </elements>
+</CPLModel>

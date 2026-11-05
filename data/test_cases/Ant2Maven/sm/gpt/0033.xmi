@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiPhaseBuild"
+    basedir="."
+    description="Project with separate compile, test, and package phases."
+    default="compilePhase">
+
+  <!-- Default compile phase -->
+  <targets xmi:id="compilePhase" name="compile" description="Compile main sources">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/classes"/>
+  </targets>
+
+  <!-- Test phase -->
+  <targets xmi:id="testPhase" name="test" description="Prepare test directories">
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/test-results"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           excludes="**/keep/**"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Package phase -->
+  <targets xmi:id="packagePhase" name="package" description="Create application JAR">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multiphase-app.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+</Ant:Project>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction and one Outgoing (for methods and dialog) -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa_main">
+      <!-- contents points to complex Proxy at index 3 -->
+      <contents href="//@elements.3"/>
+    </subActions>
+    <outgoing>
+      <!-- contents points to Redirect at index 2 -->
+      <contents href="//@elements.2"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by complex Proxy as URI for ForwardExp -->
+  <elements xsi:type="CPL:Location" url="sip:proxy@domain.com" clear="yes" priority="1"/>
+
+  <!-- 2: Redirect, also using same Location via locations helper (root CPL has empty locations, but this Redirect is not contained by Location; it will still use locations of its container CPLModel, which is empty, so URI is undefined; still exercises rule R14) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 3: Complex Proxy (non-simple) with all branches and default containing a SubCall -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default>
+      <!-- contents points to SubCall at index 4 -->
+      <contents href="//@elements.4"/>
+    </default>
+    <!-- locations will be { Location at index 1 } via Location.locations helper -->
+    <contents href="//@elements.1"/>
+  </elements>
+
+  <!-- 4: SubCall referencing SubAction sa_main (string ref) -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- 5: AddressSwitch with one SwitchedAddress, a NotPresent and an Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- SwitchedAddress case, contents is SubCall at index 4 (same as above) -->
+    <addresses is="userA" contains="foo" subDomainOf="example.com">
+      <contents href="//@elements.4"/>
+    </addresses>
+    <!-- NotPresent branch, empty contents just to create ErrorResponse -->
+    <notPresent/>
+    <!-- Otherwise branch, contents is Redirect at index 2 -->
+    <otherwise>
+      <contents href="//@elements.2"/>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="action1"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="user@example.com">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default contents="//@elements.1"/>
+          </contents>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:SubCall" ref="action1"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="urgent" contains="meeting">
+          <contents xsi:type="CPL:Location" url="sip:user@backup.com" priority="1" clear="yes"/>
+        </strings>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:TimeSwitch" dtstart="20240101T000000" interval="P1D" wkst="MO">
+            <times dtstart="20240101T080000" interval="PT1H" wkst="MO"/>
+            <notPresent>
+              <contents xsi:type="CPL:LanguageSwitch">
+                <languages matches="en"/>
+                <notPresent>
+                  <contents xsi:type="CPL:PrioritySwitch">
+                    <priorities less="5" greater="3" equal="4"/>
+                    <notPresent>
+                      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+                        <busy/>
+                        <default contents="//@elements.1"/>
+                      </contents>
+                    </notPresent>
+                    <otherwise>
+                      <contents xsi:type="CPL:SubCall" ref="action1"/>
+                    </otherwise>
+                  </contents>
+                </notPresent>
+                <otherwise>
+                  <contents xsi:type="CPL:Redirect" permanent="true"/>
+                </otherwise>
+              </contents>
+            </notPresent>
+            <otherwise>
+              <contents xsi:type="CPL:Location" url="sip:user@night.com" priority="2" clear="no"/>
+            </otherwise>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="action1"/>
+  <elements xsi:type="CPL:Location" url="sip:user@home.com" priority="1" clear="yes"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="603" reason="Decline"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.1"/>
+  </elements>
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses is="other@domain.com"/>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="action1"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:user@fallback.com" priority="3" clear="yes"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="call-id">
+    <strings is="test-call"/>
+    <notPresent>
+      <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+    </notPresent>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="fr"/>
+    <notPresent>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </notPresent>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20240101T000000" interval="P1D" wkst="MO">
+    <times dtstart="20240101T090000" interval="PT2H" wkst="MO"/>
+    <notPresent>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities less="10" greater="5" equal="7"/>
+        <notPresent>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+            <busy/>
+            <default contents="//@elements.1"/>
+          </contents>
+        </notPresent>
+      </contents>
+    </notPresent>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="3" greater="1" equal="2"/>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="action1"/>
+    </notPresent>
+  </elements>
+</CPL:CPLModel>

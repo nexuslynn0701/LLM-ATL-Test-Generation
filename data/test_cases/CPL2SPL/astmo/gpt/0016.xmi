@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions>
+      <contents xsi:nil="true"/>
+    </subActions>
+    <incoming>
+      <contents xsi:nil="true"/>
+    </incoming>
+    <outgoing>
+      <contents xsi:nil="true"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: SubAction referenced by SubCall (id used as string) -->
+  <elements xsi:type="CPL:SubAction" id="actMain">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 2: Location used by Proxy and Redirect (for URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" clear="true">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 3: Simple Proxy (isSimple = true, no children, uses Location 2) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- no busy/noAnswer/... => isSimple = true -->
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 4: SubCall whose ref string equals SubAction.id -->
+  <elements xsi:type="CPL:SubCall" ref="actMain"/>
+
+  <!-- 5: Redirect, permanent='true', uses Location 2 -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 6: AddressSwitch with one SwitchedAddress, NotPresent, Otherwise;
+           contents chains to SubCall (4) and Redirect (5) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="userA" contains="" subDomainOf="">
+      <contents xsi:nil="true"/>
+    </addresses>
+    <notPresent>
+      <contents xsi:nil="true"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:nil="true"/>
+    </otherwise>
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 7: Busy with contents = SubCall (4) -->
+  <elements xsi:type="CPL:Busy">
+    <contents href="#//@elements.4"/>
+  </elements>
+
+  <!-- 8: NoAnswer with contents = Redirect (5) -->
+  <elements xsi:type="CPL:NoAnswer">
+    <contents href="#//@elements.5"/>
+  </elements>
+
+  <!-- 9: Redirection with no contents -->
+  <elements xsi:type="CPL:Redirection">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 10: Failure with no contents -->
+  <elements xsi:type="CPL:Failure">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 11: NotPresent with no contents -->
+  <elements xsi:type="CPL:NotPresent">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- 12: Otherwise with contents = SubCall (4) -->
+  <elements xsi:type="CPL:Otherwise">
+    <contents href="#//@elements.4"/>
+  </elements>
+
+  <!-- 13: Default with contents = Redirect (5) -->
+  <elements xsi:type="CPL:Default">
+    <contents href="#//@elements.5"/>
+  </elements>
+
+  <!-- 14: Non-simple Proxy using Busy/NoAnswer/Redirection/Failure/Default -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <busy href="#//@elements.7"/>
+    <noAnswer href="#//@elements.8"/>
+    <redirection href="#//@elements.9"/>
+    <failure href="#//@elements.10"/>
+    <default href="#//@elements.13"/>
+    <contents xsi:nil="true"/>
+  </elements>
+
+</CPL:CPLModel>

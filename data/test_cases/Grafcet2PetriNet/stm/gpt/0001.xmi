@@ -1,0 +1,64 @@
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcetExample" location="file://complex_grafcet.gcf">
+
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="1:1-1:50"
+              isInitial="true" isActive="true" action="initialize_system"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="CheckSensors" location="2:1-2:60"
+              isInitial="false" isActive="false" action="read_sensors"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="ProcessData" location="3:1-3:60"
+              isInitial="false" isActive="false" action="compute_values"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="HandleError" location="4:1-4:60"
+              isInitial="false" isActive="false" action="raise_alarm"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s4" name="Shutdown" location="5:1-5:50"
+              isInitial="false" isActive="false" action="stop_system"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="T_InitToCheck" location="10:1-10:60"
+              condition="system_ready"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="T_CheckToProcess" location="11:1-11:60"
+              condition="sensors_ok"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="T_CheckToError" location="12:1-12:60"
+              condition="sensors_fail"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" name="T_ProcessLoop" location="13:1-13:60"
+              condition="more_data"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t4" name="T_ProcessToShutdown" location="14:1-14:70"
+              condition="processing_done"/>
+
+    <!-- Connections: linear path Init -> Check -> Process -> Shutdown plus branches and loop -->
+    <!-- InitStep -> T_InitToCheck -> CheckSensors -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="C_Init_to_T0" location="20:1-20:50"
+                 from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c1" name="C_T0_to_Check" location="21:1-21:50"
+                 from="/0/@elements.5" to="/0/@elements.1"/>
+
+    <!-- CheckSensors -> T_CheckToProcess -> ProcessData -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c2" name="C_Check_to_T1" location="22:1-22:50"
+                 from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c3" name="C_T1_to_Process" location="23:1-23:50"
+                 from="/0/@elements.6" to="/0/@elements.2"/>
+
+    <!-- CheckSensors -> T_CheckToError -> HandleError -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c4" name="C_Check_to_T2" location="24:1-24:50"
+                 from="/0/@elements.1" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c5" name="C_T2_to_Error" location="25:1-25:50"
+                 from="/0/@elements.7" to="/0/@elements.3"/>
+
+    <!-- ProcessData -> T_ProcessLoop -> CheckSensors (loop back) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c6" name="C_Process_to_T3" location="26:1-26:50"
+                 from="/0/@elements.2" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c7" name="C_T3_to_Check" location="27:1-27:50"
+                 from="/0/@elements.8" to="/0/@elements.1"/>
+
+    <!-- ProcessData -> T_ProcessToShutdown -> Shutdown -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c8" name="C_Process_to_T4" location="28:1-28:50"
+                 from="/0/@elements.2" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c9" name="C_T4_to_Shutdown" location="29:1-29:50"
+                 from="/0/@elements.9" to="/0/@elements.4"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMM"
+    nsURI="http://example.org/rootMM"
+    nsPrefix="root">
+
+  <!-- Subpackage -->
+  <eSubpackages name="subMM" nsURI="http://example.org/subMM" nsPrefix="sub">
+    <!-- Classifiers in subpackage (start at index 0 in this package) -->
+
+    <!-- 0: EClass SubEntity (no features, supertype from root package) -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubEntity">
+      <!-- eSuperTypes set from root package via cross-reference -->
+      <!-- will be referenced from root package as well -->
+    </eClassifiers>
+
+    <!-- 1: EEnum Priority with three literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Priority">
+      <eLiterals name="LOW" value="0" literal="LOW"/>
+      <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+      <eLiterals name="HIGH" value="2" literal="HIGH"/>
+    </eClassifiers>
+
+  </eSubpackages>
+
+  <!-- Classifiers in root package -->
+
+  <!-- 0: EClass Base (supertype target for others, has one attribute) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Base">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1: EClass Item (has supertype, attributes, references, opposite, containment, multiplicities, defaults) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Item">
+    <!-- Supertype: Base -->
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+
+    <!-- Attributes -->
+    <!-- name: String, with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="unnamed item"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+
+    <!-- priority: enum Priority from subpackage, with default literal HIGH -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="HIGH"
+        iD="false"
+        eType="//@eSubpackages.0/@eClassifiers.1"/>
+
+    <!-- flags: Boolean, multi-valued (*), no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="flags"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+
+    <!-- references -->
+
+    <!-- details: containment reference to Detail, 1..* -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="details"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.2">
+      <!-- opposite set on Detail.item -->
+    </eStructuralFeatures>
+
+    <!-- related: non-containment, many, opposite set on Item.relatedBack -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="related"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.1">
+      <!-- opposite defined on relatedBack below -->
+    </eStructuralFeatures>
+
+    <!-- relatedBack: non-containment, many, opposite of related -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="relatedBack"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 2: EClass Detail (contained by Item, with opposite, ref to SubEntity) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Detail">
+    <!-- Supertype SubEntity from sub package -->
+    <eSuperTypes>//@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+
+    <!-- back-reference to containing Item, opposite of Item.details -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="item"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.1"/>
+
+    <!-- reference to SubEntity (no opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="relatedSub"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 3: EEnum Status with single literal to trigger mtOrdConstant -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+  </eClassifiers>
+
+  <!-- 4: EClass Simple (no supertypes, no attributes, no refs) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Simple"/>
+
+  <!-- Fix cross-package references and opposites after all definitions -->
+
+  <!-- Connect SubEntity supertype to Base -->
+  <eSubpackages xsi:type="ecore:EPackage" xmi:id="_subPkgFix"/>
+
+  <!-- Explicitly set supertype and opposites via additional XMI (EMF-style augment not needed; handled above). -->
+
+  <!-- Now define proper cross-references using index-based paths: -->
+  <!-- SubEntity.eSuperTypes -> Base -->
+  <eSubpackages.0.eClassifiers.0.eSuperTypes>//@eClassifiers.0</eSubpackages.0.eClassifiers.0.eSuperTypes>
+
+  <!-- Opposites between Item.details and Detail.item -->
+  <eClassifiers.1.eStructuralFeatures.3.eOpposite>//@eClassifiers.2/@eStructuralFeatures.0</eClassifiers.1.eStructuralFeatures.3.eOpposite>
+  <eClassifiers.2.eStructuralFeatures.0.eOpposite>//@eClassifiers.1/@eStructuralFeatures.3</eClassifiers.2.eStructuralFeatures.0.eOpposite>
+
+  <!-- Opposites between Item.related and Item.relatedBack -->
+  <eClassifiers.1.eStructuralFeatures.4.eOpposite>//@eClassifiers.1/@eStructuralFeatures.5</eClassifiers.1.eStructuralFeatures.4.eOpposite>
+  <eClassifiers.1.eStructuralFeatures.5.eOpposite>//@eClassifiers.1/@eStructuralFeatures.4</eClassifiers.1.eStructuralFeatures.5.eOpposite>
+
+</ecore:EPackage>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainFlow"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="destination" subField="user">
+        <addresses is="sip:user1@domain.com" contains="domain.com"/>
+        <addresses is="sip:user2@domain.com"/>
+        <notPresent>
+          <contents xsi:type="CPL:Location" url="sip:backup@domain.com" priority="1" clear="no"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:StringSwitch" field="subject">
+            <strings contains="urgent"/>
+            <strings contains="normal" is="high"/>
+            <notPresent>
+              <contents xsi:type="CPL:SubCall" ref="defaultHandler"/>
+            </notPresent>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" tzid="America/New_York" tzurl="http://timezones.example.com/ny">
+        <times dtstart="2024-01-01T09:00:00" dtend="2024-12-31T17:00:00" interval="1" wkst="MO"/>
+        <times dtstart="2024-01-01T00:00:00" interval="1" wkst="MO" byDay="SA,SU"/>
+        <otherwise>
+          <contents xsi:type="CPL:PrioritySwitch">
+            <priorities less="5" greater="3" equal="4"/>
+            <priorities less="10"/>
+            <notPresent>
+              <contents xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+                <busy/>
+                <noAnswer/>
+                <redirection/>
+                <failure/>
+                <default contents="//@elements.1"/>
+              </contents>
+            </notPresent>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:default@voicemail.com" priority="0" clear="yes"/>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:Reject" status="603" reason="Declined"/>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="fr"/>
+    <languages matches="de"/>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy/>
+        <default contents="//@elements.2"/>
+      </contents>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="emergencyHandler"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.4"/>
+  </elements>
+</CPL:CPLModel>

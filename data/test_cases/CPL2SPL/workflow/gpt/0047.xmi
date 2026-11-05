@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: CPL root with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction inside CPL -->
+    <subActions id="sa_main">
+      <!-- SubAction.contents -> complex Proxy (non-simple) at elements[6] -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- make it non-simple: all continuations present -->
+        <busy>
+          <!-- Busy.contents -> SubCall at elements[4] -->
+          <contents xsi:type="CPL:SubCall" ref="sa_aux1"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer.contents -> simple Proxy at elements[5] -->
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+            <!-- make it simple: only default present -->
+            <default contents="//@elements.3"/>
+          </contents>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection.contents -> Redirect at elements[3] -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </redirection>
+        <failure>
+          <!-- Failure has no contents -->
+        </failure>
+        <default>
+          <!-- Default.contents -> AddressSwitch at elements[2] -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Incoming inside CPL -->
+    <incoming>
+      <!-- Incoming.contents -> Reject at elements[8] -->
+      <contents xsi:type="CPL:Reject" status="in_status" reason="in_reason"/>
+    </incoming>
+
+    <!-- Outgoing inside CPL -->
+    <outgoing>
+      <!-- Outgoing.contents -> complex Proxy at elements[6] (same as SubAction contents) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa_aux1"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+            <default contents="//@elements.3"/>
+          </contents>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </redirection>
+        <failure/>
+        <default contents="//@elements.2"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: Location used by both proxies and by Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true">
+    <!-- Location.contents -> SubCall at elements[4] -->
+    <contents xsi:type="CPL:SubCall" ref="sa_aux1"/>
+  </elements>
+
+  <!-- elements[2]: AddressSwitch, referenced from Default and complex Proxy -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- notPresent and otherwise present to exercise switch branches -->
+    <notPresent/>
+    <otherwise>
+      <!-- Otherwise.contents -> SubCall at elements[7] -->
+      <contents xsi:type="CPL:SubCall" ref="sa_aux2"/>
+    </otherwise>
+    <!-- one SwitchedAddress with contents -> simple Proxy at elements[5] -->
+    <addresses is="addr1" contains="c1" subDomainOf="sd1">
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+        <!-- simple proxy with default only -->
+        <default contents="//@elements.1"/>
+      </contents>
+    </addresses>
+  </elements>
+
+  <!-- elements[3]: Redirect top-level, referenced from Redirection in complex Proxy -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- elements[4]: SubCall with plain string ref -->
+  <elements xsi:type="CPL:SubCall" ref="sa_aux1"/>
+
+  <!-- elements[5]: simple Proxy top-level, referenced from AddressSwitch.SwitchedAddress.contents -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <!-- simple proxy: only default present -->
+    <default contents="//@elements.1"/>
+  </elements>
+
+  <!-- elements[6]: complex Proxy top-level, structurally equal to the complex proxy in CPL -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="sa_aux1"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <default contents="//@elements.3"/>
+      </contents>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </redirection>
+    <failure/>
+    <default contents="//@elements.2"/>
+  </elements>
+
+  <!-- elements[7]: SubCall with plain string ref -->
+  <elements xsi:type="CPL:SubCall" ref="sa_aux2"/>
+
+  <!-- elements[8]: Reject top-level, same type as Incoming.contents -->
+  <elements xsi:type="CPL:Reject" status="out_status" reason="out_reason"/>
+
+</CPL:CPLModel>

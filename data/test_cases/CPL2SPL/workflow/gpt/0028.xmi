@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <!-- SubAction contents is a simple Proxy using Location (to trigger Location2URIConstant) -->
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="parallel">
+        <!-- Simple proxy (no children), so Proxy2Return will be used and the Location
+             reachable via CPL.locations will trigger Location2URIConstant -->
+      </contents>
+    </subActions>
+    <outgoing>
+      <!-- Outgoing contents is the same simple Proxy -->
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="parallel">
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by the simple Proxy via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:example@example.com" clear="true"/>
+
+  <!-- 2: Complex Proxy with all branches and default whose contents is a SubCall -->
+  <elements xsi:type="CPL:Proxy" timeout="5" recurse="no" ordering="sequential">
+    <busy>
+      <contents>//@elements.3</contents>
+    </busy>
+    <noAnswer>
+      <contents>//@elements.3</contents>
+    </noAnswer>
+    <redirection>
+      <contents>//@elements.3</contents>
+    </redirection>
+    <failure>
+      <contents>//@elements.3</contents>
+    </failure>
+    <default>
+      <contents>//@elements.3</contents>
+    </default>
+  </elements>
+
+  <!-- 3: SubCall whose ref matches SubAction id "sa1" -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- 4: AddressSwitch with one SwitchedAddress and Otherwise; contents of
+           SwitchedAddress and Otherwise is SubCall to exercise SubCall2Return inside switches -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <contents>//@elements.3</contents>
+    </addresses>
+    <notPresent>
+      <contents>//@elements.3</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.3</contents>
+    </otherwise>
+  </elements>
+
+  <!-- 5: Redirect that will also use Location via locations (root CPL has no Location,
+           so this one will not be reached by the helpers, avoiding extra Location2URIConstant) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

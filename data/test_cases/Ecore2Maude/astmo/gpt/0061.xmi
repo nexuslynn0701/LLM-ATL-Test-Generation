@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example/rootPkg"
+    nsPrefix="root">
+
+  <!-- Root package classifiers -->
+  <!-- 0 -->  
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- Attribute with default value, int type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="18"
+        iD="false"/>
+    <!-- Boolean attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="true"
+        iD="false"/>
+    <!-- Reference to Address, containment, bounded -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="address"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="1"
+        containment="true"
+        resolveProxies="true"/>
+    <!-- Reference to children (self type), many, containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        eType="//@eClassifiers.0"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 1 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- String attribute with default, will drive AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="Main &quot;Street&quot;"
+        iD="false"/>
+    <!-- Enum-typed attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="type"
+        eType="//@eClassifiers.4"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"/>
+    <!-- Non-containment reference to Person, opposite of persons -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        eType="//@eClassifiers.0"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 2 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- Reference to employees (Person), opposite of Company.owner -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="persons"
+        eType="//@eClassifiers.0"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"/>
+    <!-- Attribute with Ecore primitive type (String) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="ACME"
+        iD="true"/>
+  </eClassifiers>
+
+  <!-- 3 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department"
+      eSuperTypes="//@eClassifiers.2">
+    <!-- Reference to Company, containment false -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="company"
+        eType="//@eClassifiers.2"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"/>
+    <!-- Int attribute with custom bounds -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="100"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 4 -->
+  <eClassifiers xsi:type="ecore:EEnum" name="AddressKind">
+    <eLiterals name="HOME" value="0" literal="HOME"/>
+    <eLiterals name="WORK" value="1" literal="WORK"/>
+  </eClassifiers>
+
+  <!-- 5 -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Role">
+    <eLiterals name="ADMIN" value="0" literal="ADMIN"/>
+    <eLiterals name="USER" value="1" literal="USER"/>
+    <eLiterals name="GUEST" value="2" literal="GUEST"/>
+  </eClassifiers>
+
+  <!-- Subpackage to exercise superPackage/subPackages -->
+  <eSubpackages name="subPkg"
+      nsURI="http://example/subPkg"
+      nsPrefix="sub">
+    <!-- 0 in subPkg -->
+    <eClassifiers xsi:type="ecore:EClass" name="Project">
+      <!-- Attribute typed with IntegerObject by name -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="priority"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"
+          lowerBound="0"
+          upperBound="1"
+          defaultValueLiteral="1"
+          iD="false"/>
+      <!-- Reference to Task, many, containment -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="tasks"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          lowerBound="0"
+          upperBound="-1"
+          containment="true"
+          resolveProxies="true"/>
+    </eClassifiers>
+
+    <!-- 1 in subPkg -->
+    <eClassifiers xsi:type="ecore:EClass" name="Task">
+      <!-- Enum-typed attribute with default literal, to trigger enum default handling -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="role"
+          eType="//@eClassifiers.5"
+          lowerBound="0"
+          upperBound="1"
+          defaultValueLiteral="ADMIN"
+          iD="false"/>
+      <!-- Boolean attribute without default -->
+      <eStructuralFeatures xsi:type="eccore:EAttribute"
+          xmlns:eccore="http://www.eclipse.org/emf/2002/Ecore"
+          name="done"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+          lowerBound="0"
+          upperBound="1"
+          iD="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

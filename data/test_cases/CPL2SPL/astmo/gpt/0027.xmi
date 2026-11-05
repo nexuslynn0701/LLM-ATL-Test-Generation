@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL root to exercise Incoming/Outgoing and complex Proxy -->
+  <elements xsi:type="CPL:CPL">
+    <!-- one subaction so SubAction2Function is triggered -->
+    <subActions id="mainSub">
+      <!-- contents is a simple Proxy via reference below -->
+      <contents xsi:nil="true"/>
+    </subActions>
+    <!-- one outgoing using complexProxy as contents -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="mainSub"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <addresses is="friend@example.com"/>
+            <notPresent/>
+            <otherwise>
+              <contents xsi:type="CPL:SubCall" ref="mainSub"/>
+            </otherwise>
+          </contents>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="serial"/>
+        </default>
+      </contents>
+    </outgoing>
+    <!-- one incoming using simpleProxy as contents -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Simple Proxy used as SubAction contents (referenced indirectly) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel"/>
+
+  <!-- 2: Complex Proxy used by CPL.outgoing.contents and by Default.contents -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- 3: Location used by complex and simple proxies through locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:proxy@example.com" clear="yes" priority="1"/>
+
+  <!-- 4: Redirect used in NoAnswer.contents to trigger Redirect2Return -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 5: AddressSwitch used in Redirection.contents to trigger AddressSwitch2SelectStat -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="office@example.com"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 6: SubCall used in Busy.contents and Otherwise.contents to trigger SubCall2Return -->
+  <elements xsi:type="CPL:SubCall" ref="mainSub"/>
+
+</CPL:CPLModel>

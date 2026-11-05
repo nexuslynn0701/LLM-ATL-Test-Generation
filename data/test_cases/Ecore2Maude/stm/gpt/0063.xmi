@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="university"
+    nsURI="http://example.org/university"
+    nsPrefix="uni">
+
+  <!-- 0: Primitive alias datatype -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="Code"
+                instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Grade">
+    <eLiterals name="A" value="0" literal="A"/>
+    <eLiterals name="B" value="1" literal="B"/>
+    <eLiterals name="C" value="2" literal="C"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         iD="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="1"
+                         defaultValueLiteral="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 3: Student extends Person, has reference to Course -->
+  <eClassifiers xsi:type="ecore:EClass" name="Student" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="matriculationNumber"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="courses"
+                         upperBound="-1"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 4: Course class with attributes and reference to Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Course" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         lowerBound="1"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="credits"
+                         lowerBound="1"
+                         defaultValueLiteral="3"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="department"
+                         lowerBound="1"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 5: Department with containment of Course and Reference to University -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="courses"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="university"
+                         lowerBound="1"
+                         eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 6: University as root container -->
+  <eClassifiers xsi:type="ecore:EClass" name="University" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="departments"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="students"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 7: Enrollment links Student, Course, and Grade -->
+  <eClassifiers xsi:type="ecore:EClass" name="Enrollment" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="student"
+                         lowerBound="1"
+                         eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="course"
+                         lowerBound="1"
+                         eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="grade"
+                         lowerBound="1"
+                         eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 8: Address, referenced from Person subclasses -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="street"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="city"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="zip"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 9: Professor extends Person and references Department and Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Professor" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="office"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="department"
+                         lowerBound="1"
+                         eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="address"
+                         containment="true"
+                         lowerBound="1"
+                         eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+</ecore:EPackage>

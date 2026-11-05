@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="subA"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="192.168.1.1" contains="example" subDomainOf="test.com">
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </addresses>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="subA"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:user@host.com" priority="1" clear="yes">
+    <contents xsi:type="CPL:Reject" status="603" reason="Declined"/>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="user-agent">
+    <strings is="Firefox" contains="Mozilla"/>
+    <notPresent>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </busy>
+        <noAnswer/>
+        <failure/>
+        <default/>
+      </contents>
+    </notPresent>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5" greater="10" equal="7"/>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" tzid="America/New_York">
+    <times dtstart="20250101T000000" interval="1" wkst="MO"/>
+    <notPresent/>
+  </elements>
+</CPL:CPLModel>

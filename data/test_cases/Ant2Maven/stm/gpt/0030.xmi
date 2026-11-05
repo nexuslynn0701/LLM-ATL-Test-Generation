@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiPhaseBuild"
+    basedir="."
+    description="Ant project with multiple targets and various predefined tasks"
+    default="build-main">
+
+  <!-- Properties exercising different Property* subclasses -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="build/main"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="env."/>
+
+  <!-- A standalone taskdef (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: main build pipeline -->
+  <targets xmi:id="build-main" name="build-main" description="Compile sources, package jar, and cleanup temporary files">
+    <!-- Ensure build directories exist -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/main/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+
+    <!-- Compile Java sources with simple configuration -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/main/classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+
+    <!-- Package classes into a jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/main-app.jar"
+           basedir="build/main/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="conf/manifest.mf"/>
+
+    <!-- Clean temporary compilation directory after packaging -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/main/classes"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           excludes="**/keep/**"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target: generate API documentation -->
+  <targets xmi:id="generate-docs" name="generate-docs" description="Generate Javadoc for public APIs">
+    <tasks xsi:type="Ant:Mkdir" dir="build/docs"/>
+
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.api.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+  </targets>
+
+</Ant:Project>

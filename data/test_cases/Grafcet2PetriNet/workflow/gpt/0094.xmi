@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="ParallelBranchesWithMerge">
+    <!-- Steps: one initial, several non-initial, exercising multiple fan-in/fan-out patterns -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="StartUp" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="LoadConfig" isInitial="false" isActive="false" action="load"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="CheckSensors" isInitial="false" isActive="false" action="check"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="RunPrimary" isInitial="false" isActive="false" action="primary"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="RunSecondary" isInitial="false" isActive="false" action="secondary"/>
+    <elements xsi:type="Grafcet:Step" location="s006" name="MergeResults" isInitial="false" isActive="false" action="merge"/>
+    <elements xsi:type="Grafcet:Step" location="s007" name="Shutdown" isInitial="false" isActive="false" action="shutdown"/>
+
+    <!-- Transitions: multiple, some with multiple incoming/outgoing connections -->
+    <elements xsi:type="Grafcet:Transition" location="t001" name="ConfigReady" condition="configLoaded"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="SensorsReady" condition="sensorsOk"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="BranchStart" condition="startBranches"/>
+    <elements xsi:type="Grafcet:Transition" location="t004" name="PrimaryDone" condition="primaryComplete"/>
+    <elements xsi:type="Grafcet:Transition" location="t005" name="SecondaryDone" condition="secondaryComplete"/>
+    <elements xsi:type="Grafcet:Transition" location="t006" name="AllDone" condition="allBranchesComplete"/>
+    <elements xsi:type="Grafcet:Transition" location="t007" name="StopCommand" condition="stopRequested"/>
+
+    <!-- Connections: StepToTransition (PlaceToTransition rule) -->
+    <!-- Initial step fans out to two different transitions -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="startupToConfig" from="/0/@elements.0" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c002" name="startupToSensors" from="/0/@elements.0" to="/0/@elements.8"/>
+
+    <!-- Sequential path: LoadConfig and CheckSensors to a common transition -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c003" name="loadToBranchStart" from="/0/@elements.1" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c004" name="sensorsToBranchStart" from="/0/@elements.2" to="/0/@elements.9"/>
+
+    <!-- Parallel branches from BranchStart -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c005" name="primaryToPrimaryDone" from="/0/@elements.3" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c006" name="secondaryToSecondaryDone" from="/0/@elements.4" to="/0/@elements.11"/>
+
+    <!-- Merge point receives from two different transitions -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c007" name="mergeToAllDone" from="/0/@elements.5" to="/0/@elements.12"/>
+
+    <!-- Final step to stop transition -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c008" name="shutdownToStop" from="/0/@elements.6" to="/0/@elements.13"/>
+
+    <!-- Connections: TransitionToStep (TransitionToPlace rule) -->
+    <!-- ConfigReady and SensorsReady lead to their respective steps -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c009" name="configReadyToLoad" from="/0/@elements.7" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c010" name="sensorsReadyToCheck" from="/0/@elements.8" to="/0/@elements.2"/>
+
+    <!-- BranchStart activates two parallel steps -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c011" name="branchStartToPrimary" from="/0/@elements.9" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c012" name="branchStartToSecondary" from="/0/@elements.9" to="/0/@elements.4"/>
+
+    <!-- PrimaryDone and SecondaryDone both go to merge step -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c013" name="primaryDoneToMerge" from="/0/@elements.10" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c014" name="secondaryDoneToMerge" from="/0/@elements.11" to="/0/@elements.5"/>
+
+    <!-- AllDone leads to Shutdown -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c015" name="allDoneToShutdown" from="/0/@elements.12" to="/0/@elements.6"/>
+
+    <!-- StopCommand creates a small loop back to StartUp to exercise cyclic behavior -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c016" name="stopToStartup" from="/0/@elements.13" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

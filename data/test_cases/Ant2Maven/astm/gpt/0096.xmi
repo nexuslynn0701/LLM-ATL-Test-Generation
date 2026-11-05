@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="Ant2MavenTest0096"
+    basedir="project-src"
+    description="Ant project with multiple targets and tasks for ATL testing."
+    default="buildTarget">
+
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="Ant2MavenTest0096"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="conf/config.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/main.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A TaskDef so AntTaskDef2MavenMavenTaskDef and NewTask-related rules have source -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default Target: buildTarget -->
+  <targets xmi:id="buildTarget" name="build" description="Main build target">
+    <!-- Compile Java sources: triggers AntJavac2MavenMavenJavac -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Create distribution JAR: triggers AntJar2MavenMavenJar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/ant2maven-test-0096.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Secondary Target: docs -->
+  <targets xmi:id="docsTarget" name="docs" description="Generate Javadoc API">
+    <!-- Javadoc task: triggers AntJavadoc2MavenMavenJavadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.ant2maven.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Ant2Maven Test 0096 API"/>
+  </targets>
+
+  <!-- Secondary Target: clean -->
+  <targets xmi:id="cleanTarget" name="clean" description="Clean build artifacts">
+    <!-- Delete old build directory: triggers AntDelete2MavenMavenDelete -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           defaultexcludes="true"/>
+    <!-- Recreate necessary directory: triggers AntMkdir2MavenMavenMkdir -->
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+  </targets>
+
+  <!-- Target with property/timestamp and copy/filterset behavior -->
+  <targets xmi:id="resourcesTarget" name="process-resources" description="Process and copy resources">
+    <!-- Tstamp task: triggers AntTstamp2MavenMavenTstamp -->
+    <tasks xsi:type="Ant:Tstamp"/>
+    <!-- Copy with nested structures: triggers AntCopy2MavenMavenCopy and several pattern/filter rules -->
+    <tasks xsi:type="Ant:Copy"
+           todir="target/classes"
+           overwrite="true"
+           filtering="true"
+           includeEmptyDirs="false">
+      <!-- FileSet: triggers AntFileSet2MavenMavenFileSet -->
+      <fileset dir="src/main/resources">
+        <!-- PatternSet with Includes/Excludes* to trigger pattern rules -->
+        <patternset>
+          <!-- PatternSet.inexcludes: Includes -->
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties" ifCondition="true" unless=""/>
+          <!-- PatternSet.inexcludes: Excludes -->
+          <inexcludes xsi:type="Ant:Excludes" name="**/*~" ifCondition="" unless="true"/>
+          <!-- IncludesFile and ExcludesFile to exercise corresponding rules -->
+          <inexcludes xsi:type="Ant:IncludesFile" name="includes.list" ifCondition="" unless="false"/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list" ifCondition="false" unless=""/>
+        </patternset>
+        <!-- Direct include/exclude elements on FileSet -->
+        <include name="**/*.xml" ifCondition="true" unless=""/>
+        <exclude name="**/temp/**" ifCondition="" unless="true"/>
+      </fileset>
+
+      <!-- FilterSet with Filters and FiltersFile -->
+      <filterset starttoken="@{" endtoken="}">
+        <!-- Individual Filter: triggers AntFilter2MavenMavenFilter -->
+        <filter token="project.name" value="Ant2MavenTest0096"/>
+        <filter token="build.year" value="2024"/>
+        <!-- FiltersFile: triggers AntFiltersFile2MavenMavenFiltersFile -->
+        <filtersfile file="conf/filters.properties"/>
+      </filterset>
+    </tasks>
+  </targets>
+
+  <!-- Path definition with nested ClassPath, FileSet and PathElement to trigger remaining rules -->
+  <path id="compile.classpath">
+    <!-- Nested PathElement: triggers AntPathElement2MavenMavenPathElement -->
+    <pathElement path="lib/dependency-1.jar" location="lib/dependency-1.jar"/>
+    <!-- Nested FileSet inside Path: reused by path/file-related rules -->
+    <fileset dir="lib/extensions">
+      <include name="**/*.jar" ifCondition="" unless=""/>
+    </fileset>
+    <!-- Nested Path to ensure AntPath2MavenMavenPath handles containment -->
+    <path id="nested.path">
+      <pathElement path="lib/nested.jar" location="lib/nested.jar"/>
+    </path>
+  </path>
+
+  <!-- Standalone ClassPath with PathElement and FileSet: triggers AntClassPath2MavenMavenClassPath -->
+  <path xsi:type="Ant:ClassPath" refid="compile.path.ref">
+    <pathElement path="build/output" location="build/output"/>
+    <fileset dir="build/lib">
+      <include name="**/*.jar" ifCondition="" unless=""/>
+    </fileset>
+  </path>
+
+</Ant:Project>

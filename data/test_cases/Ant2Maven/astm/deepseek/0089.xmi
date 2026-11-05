@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="CoverageTest"
+    description="A model to cover many transformation rules"
+    default="build"
+    basedir="src">
+  <targets xmi:id="build" name="build">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="classes"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="classes"/>
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="docs"
+        packagenames="com.example"
+        defaultexcludes="yes"
+        author="yes"
+        version="yes"
+        use="yes"
+        windowtitle="API"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build"/>
+    <tasks xsi:type="Ant:Copy" todir="dist">
+      <fileset dir="resources">
+        <include name="*.txt"/>
+        <exclude name="secret.txt"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0"/>
+        <filtersfile file="filters.properties"/>
+      </filterset>
+    </tasks>
+    <tasks xsi:type="Ant:Delete" dir="tmp"/>
+    <tasks xsi:type="Ant:Java" classname="com.example.Main" jar="tools/runner.jar" fork="true"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Copy" todir="test-reports">
+      <fileset dir="test-results">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="*.xml"/>
+          <inexcludes xsi:type="Ant:Excludes" name="*.tmp"/>
+        </patternset>
+      </fileset>
+    </tasks>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="debug" value="true"/>
+  <properties xsi:type="Ant:PropertyLocation" name="home" location="/usr/local"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+  <path id="compile.path">
+    <pathElement path="lib" location="lib/classes"/>
+  </path>
+  <taskdef name="mytask" classname="com.example.MyTask"/>
+</Ant:Project>

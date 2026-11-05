@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one incoming, one outgoing, and three subActions -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions (must not be top-level elements of CPLModel) -->
+    <subActions id="saIn">
+      <contents xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+        <!-- complex proxy: all children present to exercise Proxy2Select and Busy/NoAnswer/Redirection/Failure/Default -->
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="saIn"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="saOut"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="saAddr"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <subActions id="saOut">
+      <!-- contents is a simple Proxy: tests Proxy2Return and ForwardExp parallel=false -->
+      <contents xsi:type="CPL:Proxy" timeout="15" recurse="no" ordering="sequential">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+
+    <subActions id="saAddr">
+      <!-- contents is AddressSwitch: exercised via AddressSwitch2SelectStat and SwitchedAddress2SelectCase, Otherwise2SelectDefault -->
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+        <addresses is="userA" contains="A" subDomainOf="example.com">
+          <contents xsi:type="CPL:SubCall" ref="saIn"/>
+        </addresses>
+        <addresses is="userB" contains="B" subDomainOf="example.org">
+          <contents xsi:type="CPL:Proxy" timeout="5" recurse="yes" ordering="parallel">
+            <!-- simple Proxy inside SwitchedAddress to exercise Proxy2Return with isParallel=true -->
+          </contents>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </otherwise>
+      </contents>
+    </subActions>
+
+    <!-- Incoming and Outgoing for this CPL -->
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="saIn"/>
+    </incoming>
+
+    <outgoing>
+      <!-- contents is a StringSwitch to exercise StringSwitch2SelectStat -->
+      <contents xsi:type="CPL:StringSwitch" field="callType">
+        <!-- No nested switched strings are needed for rule coverage -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by Proxies and Redirects via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="true"/>
+
+  <!-- Redirect element referenced as contents of Default (complex Proxy) and Otherwise (AddressSwitch) via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

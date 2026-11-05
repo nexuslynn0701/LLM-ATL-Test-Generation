@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuildPipeline"
+    basedir="workspace"
+    description="End-to-end build, package, and cleanup pipeline"
+    default="build-main">
+  <!-- Properties to exercise AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="project.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="workspace/build/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition (not referenced by tasks) -->
+  <taskdef name="custom.cleanup" classname="org.example.ant.CustomCleanupTask"/>
+
+  <!-- Default target with multiple predefined tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Compile and package main module">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="workspace/src/main/java"
+        destdir="workspace/build/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="workspace/dist/fullbuild-main.jar"
+        basedir="workspace/build/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="workspace/config/manifest.mf"/>
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/dist"/>
+    <tasks xsi:type="Ant:Delete"
+        dir="workspace/tmp"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        includes="**/*"
+        includesfile="workspace/config/includes.txt"
+        excludes="**/*.bak"
+        excludesfile="workspace/config/excludes.txt"
+        defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target with additional tasks to widen rule coverage -->
+  <targets xmi:id="build-tests" name="build-tests" description="Compile test sources">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="workspace/src/test/java"
+        destdir="workspace/build/test-classes"
+        debug="true"
+        fork="false"
+        optimize="false"
+        deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="workspace/dist/fullbuild-tests.jar"
+        basedir="workspace/build/test-classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="workspace/config/test-manifest.mf"/>
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/reports"/>
+    <tasks xsi:type="Ant:Delete"
+        dir="workspace/old-reports"
+        verbose="false"
+        quiet="true"
+        failonerror="false"
+        includeEmptyDirs="false"
+        includes="**/*.xml"
+        includesfile="workspace/config/report-includes.txt"
+        excludes="**/archive/**"
+        excludesfile="workspace/config/report-excludes.txt"
+        defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

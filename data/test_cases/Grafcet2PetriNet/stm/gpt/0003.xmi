@@ -1,0 +1,120 @@
+<xmi:XMI xmi:version="2.0"
+         xmlns:xmi="http://www.omg.org/XMI"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:version="2.0"
+                   name="ComplexGrafcetExample"
+                   location="file://complex/grafcet/example">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step"
+              name="InitStep"
+              location="file://complex/grafcet/example#InitStep"
+              isInitial="true"
+              isActive="true"
+              action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step"
+              name="ValidationStep"
+              location="file://complex/grafcet/example#ValidationStep"
+              isInitial="false"
+              isActive="false"
+              action="validateInput"/>
+    <elements xsi:type="Grafcet:Step"
+              name="ProcessingStep"
+              location="file://complex/grafcet/example#ProcessingStep"
+              isInitial="false"
+              isActive="false"
+              action="processData"/>
+    <elements xsi:type="Grafcet:Step"
+              name="FinalStep"
+              location="file://complex/grafcet/example#FinalStep"
+              isInitial="false"
+              isActive="false"
+              action="finalizeAndLog"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition"
+              name="InitToValidation"
+              location="file://complex/grafcet/example#InitToValidation"
+              condition="systemReady"/>
+    <elements xsi:type="Grafcet:Transition"
+              name="ValidationToProcessing"
+              location="file://complex/grafcet/example#ValidationToProcessing"
+              condition="inputValid"/>
+    <elements xsi:type="Grafcet:Transition"
+              name="ProcessingLoop"
+              location="file://complex/grafcet/example#ProcessingLoop"
+              condition="moreDataAvailable"/>
+    <elements xsi:type="Grafcet:Transition"
+              name="ProcessingToFinal"
+              location="file://complex/grafcet/example#ProcessingToFinal"
+              condition="processingComplete"/>
+    <elements xsi:type="Grafcet:Transition"
+              name="ErrorToInit"
+              location="file://complex/grafcet/example#ErrorToInit"
+              condition="errorDetected"/>
+
+    <!-- Connections: Step -> Transition -->
+    <!-- InitStep -> InitToValidation -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 name="c_Init_to_InitToValidation"
+                 location="file://complex/grafcet/example#c_Init_to_InitToValidation"
+                 from="/0/@elements.0"
+                 to="/0/@elements.4"/>
+    <!-- ValidationStep -> ValidationToProcessing -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 name="c_Validation_to_ValidationToProcessing"
+                 location="file://complex/grafcet/example#c_Validation_to_ValidationToProcessing"
+                 from="/0/@elements.1"
+                 to="/0/@elements.5"/>
+    <!-- ProcessingStep -> ProcessingLoop -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 name="c_Processing_to_ProcessingLoop"
+                 location="file://complex/grafcet/example#c_Processing_to_ProcessingLoop"
+                 from="/0/@elements.2"
+                 to="/0/@elements.6"/>
+    <!-- ProcessingStep -> ProcessingToFinal -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 name="c_Processing_to_ProcessingToFinal"
+                 location="file://complex/grafcet/example#c_Processing_to_ProcessingToFinal"
+                 from="/0/@elements.2"
+                 to="/0/@elements.7"/>
+    <!-- FinalStep -> ErrorToInit (simulating error detection from finalization) -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 name="c_Final_to_ErrorToInit"
+                 location="file://complex/grafcet/example#c_Final_to_ErrorToInit"
+                 from="/0/@elements.3"
+                 to="/0/@elements.8"/>
+
+    <!-- Connections: Transition -> Step -->
+    <!-- InitToValidation -> ValidationStep -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 name="c_InitToValidation_to_Validation"
+                 location="file://complex/grafcet/example#c_InitToValidation_to_Validation"
+                 from="/0/@elements.4"
+                 to="/0/@elements.1"/>
+    <!-- ValidationToProcessing -> ProcessingStep -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 name="c_ValidationToProcessing_to_Processing"
+                 location="file://complex/grafcet/example#c_ValidationToProcessing_to_Processing"
+                 from="/0/@elements.5"
+                 to="/0/@elements.2"/>
+    <!-- ProcessingLoop -> ProcessingStep (loop back) -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 name="c_ProcessingLoop_to_Processing"
+                 location="file://complex/grafcet/example#c_ProcessingLoop_to_Processing"
+                 from="/0/@elements.6"
+                 to="/0/@elements.2"/>
+    <!-- ProcessingToFinal -> FinalStep -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 name="c_ProcessingToFinal_to_Final"
+                 location="file://complex/grafcet/example#c_ProcessingToFinal_to_Final"
+                 from="/0/@elements.7"
+                 to="/0/@elements.3"/>
+    <!-- ErrorToInit -> InitStep (error recovery) -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 name="c_ErrorToInit_to_Init"
+                 location="file://complex/grafcet/example#c_ErrorToInit_to_Init"
+                 from="/0/@elements.8"
+                 to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

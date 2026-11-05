@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libRoot"
+    nsURI="http://example.org/libroot"
+    nsPrefix="libroot">
+
+  <!-- Root-level classifiers: -->
+  <!-- 0: Library -->
+  <!-- 1: Book -->
+  <!-- 2: PrintedBook (subclass of Book) -->
+  <!-- 3: EDataType CustomRating -->
+  <!-- 4: EEnum BindingKind -->
+  <!-- 5: EEnumLiteral HARD -->
+  <!-- 6: EEnumLiteral SOFT -->
+  <!-- 7: EEnumLiteral DIGITAL -->
+
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <!-- Library has books (containment), opposite of Book::owner -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="books"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         eType="//@eClassifiers.1"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"/>
+    <!-- Non-containment cross-ref to a single featured book -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="featuredBook"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Book">
+    <!-- Opposite of Library::books -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eType="//@eClassifiers.0"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.0"/>
+    <!-- Simple String title, with default value to trigger AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="Untitled &quot;Book&quot;"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Integer pages, non-ID, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="pages"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="false"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Boolean isPublished, marked as ID to exercise AttEqIsId -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="isPublished"
+                         iD="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Attribute typed by custom datatype (to hit @DataType branch) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rating"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="//@eClassifiers.3"/>
+    <!-- Enum-typed attribute with default literal to exercise enum default handling -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="binding"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="HARD"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="PrintedBook"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.1">
+    <!-- Adds an extra attribute to ensure multiple attributes list -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="weightInGrams"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="false"
+                         unique="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- Custom data type to drive '@DataType' branch in attDataType -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomRating"
+                instanceClassName="int"/>
+
+  <!-- Enumeration with three literals to exercise Enum* rules and lists -->
+  <eClassifiers xsi:type="ecore:EEnum" name="BindingKind">
+    <eLiterals name="HARD"  value="0" literal="HARD"/>
+    <eLiterals name="SOFT"  value="1" literal="SOFT"/>
+    <eLiterals name="DIGITAL" value="2" literal="DIGITAL"/>
+  </eClassifiers>
+
+  <!-- Nested subpackage to exercise superPackage / subPackages and classes-in-subpackage -->
+  <eSubpackages name="media"
+                nsURI="http://example.org/libroot/media"
+                nsPrefix="media">
+    <!-- media package classifiers: -->
+    <!-- 0: MediaItem -->
+    <!-- 1: AudioBook (subclass of Book) -->
+    <!-- 2: EEnum MediaFormat -->
+    <!-- 3: EEnumLiteral CD -->
+    <!-- 4: EEnumLiteral STREAM -->
+    <!-- 5: EEnumLiteral VINYL -->
+
+    <eClassifiers xsi:type="ecore:EClass" name="MediaItem">
+      <!-- Simple name attribute -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="name"
+                           lowerBound="1"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="AudioBook"
+                  eSuperTypes="//@eClassifiers.1">
+      <!-- Reference back to owning MediaItem (no opposite, non-containment) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="source"
+                           lowerBound="0"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           containment="false"
+                           eType="//@eSubpackages.0/@eClassifiers.0"/>
+      <!-- Enum-typed attribute without default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="format"
+                           lowerBound="0"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           eType="//@eSubpackages.0/@eClassifiers.2"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EEnum" name="MediaFormat">
+      <eLiterals name="CD"      value="0" literal="CD"/>
+      <eLiterals name="STREAM"  value="1" literal="STREAM"/>
+      <eLiterals name="VINYL"   value="2" literal="VINYL"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: CPL root with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction sa1 -->
+    <subActions id="sa1">
+      <!-- contents is a simple Proxy p_simple that uses a Location l1 -->
+      <contents xsi:type="CPL:Proxy" recurse="r1" ordering="parallel">
+        <!-- simple proxy: all outcome branches undefined -->
+        <!-- Location l1 as contents of this Location-containing Proxy -->
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:location1@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Incoming inc1 using the same simple Proxy p_simple for its contents -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="r1b" ordering="parallel">
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:location2@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </incoming>
+
+    <!-- Outgoing out1 using a complex Proxy p_complex whose default is a Location l2 -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="r2" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:location3@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: SubCall referencing sa1 (string value, not an object reference) -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[2]: Location l_top used as a standalone top-level element -->
+  <elements xsi:type="CPL:Location" url="sip:toplocation@example.com" clear="yes"/>
+
+  <!-- elements[3]: Redirect using Location from elements[2] via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- elements[4]: AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- One SwitchedAddress with a simple Proxy as contents -->
+    <addresses is="addr1" contains="c1" subDomainOf="sd1">
+      <contents xsi:type="CPL:Proxy" recurse="r3" ordering="parallel">
+        <default contents="//@elements.1"/>
+      </contents>
+    </addresses>
+    <!-- NotPresent branch -->
+    <notPresent/>
+    <!-- Otherwise branch with Default contents (simple Proxy to SubCall) -->
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="r4" ordering="sequential">
+        <default contents="//@elements.1"/>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- elements[5]: StringSwitch (not used by transformation but allowed) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField">
+    <strings is="str1" contains="cont1"/>
+  </elements>
+
+  <!-- elements[6]: LanguageSwitch with NotPresent to trigger NotPresent2ErrorResponse -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- elements[7]: TimeSwitch (unused contents) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="tz1" tzurl="tzurl1">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- elements[8]: PrioritySwitch (unused contents) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="1" greater="2" equal="3"/>
+  </elements>
+
+  <!-- elements[9]: Proxy p_complex2: complex non-simple proxy with all branches, to exercise Busy/NoAnswer/Redirection/Failure/Default -->
+  <elements xsi:type="CPL:Proxy" timeout="20" recurse="r5" ordering="parallel">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </redirection>
+    <failure/>
+    <default contents="//@elements.1"/>
+  </elements>
+
+</CPL:CPLModel>

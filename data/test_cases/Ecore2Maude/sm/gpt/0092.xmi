@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryPkg"
+    nsURI="http://example.org/library"
+    nsPrefix="lib">
+
+  <!-- 0: Primitive-like data type for identifiers -->
+  <eClassifiers xsi:type="ecore:EDataType" name="IdType" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enumeration for item status -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ItemStatus">
+    <eLiterals name="AVAILABLE" value="0" literal="AVAILABLE"/>
+    <eLiterals name="BORROWED" value="1" literal="BORROWED"/>
+    <eLiterals name="LOST" value="2" literal="LOST"/>
+  </eClassifiers>
+
+  <!-- 2: Root container class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="libraryId"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="catalog"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="members"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract base class for all items -->
+  <eClassifiers xsi:type="ecore:EClass" name="LibraryItem" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 4: Concrete book class extending LibraryItem -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="author"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pages"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="currentBorrower"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 5: Member / borrower -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="memberId"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullName"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="borrowedItems"
+        upperBound="-1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 6: Operation-bearing class with parameters and exceptions -->
+  <eClassifiers xsi:type="ecore:EClass" name="LendingService">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library"
+        eType="//@eClassifiers.2"/>
+    <eOperations name="lendItem">
+      <eParameters name="item" eType="//@eClassifiers.3"/>
+      <eParameters name="toMember" eType="//@eClassifiers.5"/>
+      <eExceptions eType="//@eClassifiers.7"/>
+    </eOperations>
+    <eOperations name="returnItem">
+      <eParameters name="item" eType="//@eClassifiers.3"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 7: Exception classifier used as operation exception -->
+  <eClassifiers xsi:type="ecore:EClass" name="LendingException">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="message"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 8: Map entry used as metadata on LibraryItem -->
+  <eClassifiers xsi:type="ecore:EClass" name="MetaEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 9: Specialized item type extending LibraryItem with containment reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Magazine"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="issueNumber"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="meta"
+        upperBound="-1" containment="true"
+        eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+</ecore:EPackage>

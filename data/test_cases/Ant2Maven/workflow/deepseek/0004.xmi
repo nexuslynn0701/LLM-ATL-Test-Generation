@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="CoverageBuild"
+    basedir="."
+    description="Build project with comprehensive coverage"
+    default="main">
+  <properties xsi:type="Ant:PropertyValue" name="build.compiler" value="javac1.8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="target"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <targets xmi:id="main" name="main">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Delete" dir="target/old"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Example API"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" offset="1" unit="hour" locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Copy" file="README.md" todir="dist" overwrite="true" filtering="false" flatten="true" includeEmptyDirs="false"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="target"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+  </targets>
+</Ant:Project>

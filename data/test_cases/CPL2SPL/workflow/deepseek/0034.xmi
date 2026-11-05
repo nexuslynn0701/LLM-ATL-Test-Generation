@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sub1"/>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <default contents="//@elements.2"/>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="sub1">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+      <noAnswer/>
+      <redirection/>
+      <failure/>
+      <default contents="//@elements.3"/>
+    </contents>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="sub1"/>
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <locations xsi:type="CPL:Location" url="sip:forward@example.com" priority="1" clear="yes"/>
+  </elements>
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="sip:alice@example.com"/>
+    <notPresent/>
+    <otherwise contents="//@elements.5"/>
+  </elements>
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <strings is="hello" contains="world"/>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20250101T000000" interval="1" wkst="MO">
+    <times dtstart="20250101T000000" interval="1" wkst="MO"/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5" greater="1"/>
+  </elements>
+</CPL:CPLModel>

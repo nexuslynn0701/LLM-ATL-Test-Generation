@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyPkg"
+    nsURI="http://example.org/companyPkg"
+    nsPrefix="company">
+
+  <!-- 0: Primitive-like data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Email" instanceClassName="java.lang.String" serializable="true"/>
+
+  <!-- 1: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmploymentType">
+    <eLiterals name="FULL_TIME" value="0" literal="FULL_TIME"/>
+    <eLiterals name="PART_TIME" value="1" literal="PART_TIME"/>
+    <eLiterals name="CONTRACTOR" value="2" literal="CONTRACTOR"/>
+  </eClassifiers>
+
+  <!-- 2: Base abstract class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EOperation" xsi:type="ecore:EOperation" name="isAdult" ordered="true" unique="true" lowerBound="0" upperBound="1">
+      <eType xsi:nil="true"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 3: Employee extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="employeeNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="email" eType="//@eClassifiers.0" lowerBound="0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="employmentType" eType="//@eClassifiers.1" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department" eType="//@eClassifiers.4" lowerBound="0" upperBound="1" containment="false" resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager" eType="//@eClassifiers.3" lowerBound="0" upperBound="1" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 4: Department with employees and head (opposites) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees" eType="//@eClassifiers.3" lowerBound="0" upperBound="-1" containment="false" resolveProxies="true" eOpposite="//@eClassifiers.3/@eStructuralFeatures.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="head" eType="//@eClassifiers.3" lowerBound="0" upperBound="1" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 5: Project class with containment and cross refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="projectId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="budget" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ownerDepartment" eType="//@eClassifiers.4" lowerBound="1" upperBound="1" containment="false" resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team" eType="//@eClassifiers.3" lowerBound="0" upperBound="-1" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 6: Office class, container for departments and projects -->
+  <eClassifiers xsi:type="ecore:EClass" name="Office" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="locationCode" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="city" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments" eType="//@eClassifiers.4" lowerBound="0" upperBound="-1" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects" eType="//@eClassifiers.5" lowerBound="0" upperBound="-1" containment="true" resolveProxies="false"/>
+  </eClassifiers>
+
+  <!-- 7: Company as root container -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="registrationId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="legalName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="offices" eType="//@eClassifiers.6" lowerBound="1" upperBound="-1" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="allEmployees" eType="//@eClassifiers.3" lowerBound="0" upperBound="-1" containment="true" resolveProxies="false"/>
+  </eClassifiers>
+
+</ecore:EPackage>

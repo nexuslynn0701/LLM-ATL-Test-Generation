@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="greeting">
+      <contents xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="sequential">
+        <busy/>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </noAnswer>
+        <failure>
+          <contents xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+        </failure>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="greeting"/>
+        </redirection>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <addresses is="alice@example.com"/>
+            <addresses is="bob@example.com">
+              <contents xsi:type="CPL:Location" url="sip:bob@work.com" priority="2" clear="no"/>
+            </addresses>
+            <notPresent>
+              <contents xsi:type="CPL:StringSwitch" field="user-agent">
+                <strings is="CiscoPhone"/>
+                <strings is="Polycom">
+                  <contents xsi:type="CPL:Location" url="sip:polycom@office.com" priority="1" clear="yes"/>
+                </strings>
+                <otherwise>
+                  <contents xsi:type="CPL:TimeSwitch" dtstart="2024-01-01T09:00:00" dtend="2024-01-01T17:00:00" duration="PT8H" interval="1" wkst="MO">
+                    <times matches="en"/>
+                    <otherwise>
+                      <contents xsi:type="CPL:PrioritySwitch">
+                        <priorities less="5" greater="10" equal="7"/>
+                        <otherwise>
+                          <contents xsi:type="CPL:Redirect" permanent="false"/>
+                        </otherwise>
+                      </contents>
+                    </otherwise>
+                  </contents>
+                </otherwise>
+              </contents>
+            </notPresent>
+            <otherwise>
+              <contents xsi:type="CPL:LanguageSwitch">
+                <languages matches="fr"/>
+                <languages matches="de">
+                  <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+                </languages>
+              </contents>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:SubCall" ref="greeting"/>
+    </outgoing>
+  </elements>
+</CPL:CPLModel>

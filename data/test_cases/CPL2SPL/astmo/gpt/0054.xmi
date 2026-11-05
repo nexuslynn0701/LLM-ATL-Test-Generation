@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents: complex Proxy (not simple) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- non-simple proxy: all branches present -->
+        <busy>
+          <!-- Busy contents: SubCall to saMain -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents: simple Proxy (different ordering) -->
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents: Redirect (permanent=false) -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default contents: AddressSwitch -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <!-- SwitchedAddress with string, exercises SwitchedAddress2SelectCase -->
+            <addresses is="user@example.com"/>
+            <!-- notPresent branch with contents a simple Proxy -->
+            <notPresent>
+              <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel"/>
+            </notPresent>
+            <!-- otherwise branch with contents a SubCall to saMain -->
+            <otherwise>
+              <contents xsi:type="CPL:SubCall" ref="saMain"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <!-- Incoming with contents: simple Proxy (no branches) -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+    </incoming>
+    <!-- Outgoing with contents: Redirect (permanent=true) -->
+    <outgoing>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used as a location for proxies and redirects -->
+  <elements xsi:type="CPL:Location" url="sip:example.com" clear="true"/>
+
+</CPL:CPLModel>

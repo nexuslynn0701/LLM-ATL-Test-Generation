@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuildPipeline"
+    basedir="workspace"
+    description="End-to-end build pipeline with compilation, packaging and cleanup"
+    default="buildTarget">
+  <!-- Properties covering all concrete Property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="project.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="workspace/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A standalone TaskDef, not referenced from any task -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with a sequence of different file and compile/archive tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/target/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src/main/java"
+           destdir="workspace/target/classes"
+           debug="on"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/target/fullbuild.jar"
+           basedir="workspace/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="workspace/META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Additional target exercising Delete and a simple Jar without basedir -->
+  <targets xmi:id="cleanupTarget" name="cleanup">
+    <tasks xsi:type="Ant:Delete"
+           file="workspace/target/temporary.dat"
+           dir="workspace/target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           includesfile="workspace/config/delete-includes.txt"
+           excludes="**/*.keep"
+           excludesfile="workspace/config/delete-excludes.txt"
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/target/auxiliary-resources.jar"
+           compress="false"
+           encoding="UTF-8"/>
+  </targets>
+
+  <!-- Target demonstrating a Path with PathElements and FileSet, plus FilterSet/Filter/FiltersFile and Mapper -->
+  <targets xmi:id="resourcesTarget" name="process-resources">
+    <tasks xsi:type="Ant:Copy"
+           file="workspace/resources/application.conf"
+           presservelastmodified="true"
+           tofile="workspace/target/config/application.conf"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="false">
+      <fileset dir="workspace/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/*-test.properties"/>
+        </patternset>
+        <include name="**/*.xml"/>
+        <exclude name="**/secret/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="FullBuildPipeline"/>
+        <filtersfile file="workspace/config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="org.example.build.PathMapper" classpath="workspace/lib/mappers.jar" classpathref="" from="*.conf" to="*.cfg"/>
+    </tasks>
+
+    <!-- Path with nested pathElement and fileset -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src/test/java"
+           destdir="workspace/target/test-classes"
+           debug="off"
+           fork="true"
+           optimize="false"
+           deprecation="false">
+      <classPath refid="">
+        <pathElement path="workspace/lib/test-lib.jar" location="workspace/lib"/>
+        <fileset dir="workspace/lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*-tests.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+      <inExcludes xsi:type="Ant:Includes" name="**/*Test.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/integration/**"/>
+    </tasks>
+
+    <!-- Explicit Path element demonstrating separate Path usage (contained via Project.path) -->
+  </targets>
+
+  <!-- Shared Path for classpaths and resources -->
+  <path id="project.classpath" refid="">
+    <pathElement path="workspace/lib/core-lib.jar" location="workspace/lib"/>
+    <pathElement path="workspace/lib/util-lib.jar" location="workspace/lib"/>
+    <fileset dir="workspace/lib/optional">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/*-sources.jar"/>
+      </patternset>
+    </fileset>
+  </path>
+</Ant:Project>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="lib-utils"
+    basedir="project-root"
+    description="Utility library build"
+    default="build-main">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by tasks, but transformed) -->
+  <taskdef name="extraTask" classname="com.example.ant.ExtraTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"/>
+    <!-- Package JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/lib-utils.jar"
+           basedir="target/classes"/>
+    <!-- Ensure output directory exists -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/lib-utils-dist"/>
+    <!-- Clean temporary files -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"/>
+  </targets>
+
+  <targets xmi:id="build-tests" name="build-tests" description="Test build target">
+    <!-- Compile test sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="target/test-classes"/>
+    <!-- Create test JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/lib-utils-tests.jar"
+           basedir="target/test-classes"/>
+  </targets>
+
+</Ant:Project>

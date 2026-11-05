@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="deploy"
+    basedir="/home/project"
+    description="Complete build process">
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <targets xmi:id="compile" name="compile" description="Compile source code" ifCondition="build.dir">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create JAR archive">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/myapp.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src/main/java" destdir="target/docs" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="MyApp API"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="init" name="init" description="Create build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/docs"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="deploy" name="deploy" description="Full build sequence">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyyMMdd-HHmm" locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Copy" file="src/main/resources/config.xml" todir="target/classes" overwrite="true" filtering="false" flatten="true" includeEmptyDirs="false"/>
+  </targets>
+</Ant:Project>

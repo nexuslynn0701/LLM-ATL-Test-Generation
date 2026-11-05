@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL to trigger CPL2Program, Incoming2Method, Outgoing2Method, and SubAction2Function -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions -->
+    <subActions id="mainSub">
+      <!-- contents -> SubCall (will trigger SubCall2Return) -->
+      <contents xsi:type="CPL:SubCall" ref="helperSub"/>
+    </subActions>
+    <subActions id="helperSub">
+      <!-- contents -> Redirect (will trigger Redirect2Return) -->
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </subActions>
+
+    <!-- Incoming and Outgoing methods, both pointing to the same complex Proxy (index 2) -->
+    <incoming contents="//@elements.2"/>
+    <outgoing contents="//@elements.2"/>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy (index 3) and by Redirect (index 4) via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:simple@example.com" clear="yes" priority="1"/>
+
+  <!-- 2: Complex Proxy to trigger Proxy2Select, Busy/NoAnswer/Redirection/Failure/Default rules -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <!-- busy -> contains SubCall (index 5) to trigger Busy2SelectCase + SubCall2Return -->
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="helperSub"/>
+    </busy>
+    <!-- noAnswer -> contains Location (index 6) so that statements is empty (special-cased types) -->
+    <noAnswer contents="//@elements.6"/>
+    <!-- redirection -> contains simple Proxy (index 3) to test nested Proxy as statement -->
+    <redirection contents="//@elements.3"/>
+    <!-- failure and default without contents (Failure2ErrorResponse, Default2SelectDefault) -->
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- 3: Simple Proxy (isSimple = true) with one Location child to trigger Proxy2Return -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <!-- locations will be {this Location} -->
+    <contents xsi:type="CPL:Location" url="sip:nested@example.org" clear="true" priority="2"/>
+  </elements>
+
+  <!-- 4: Redirect that has a Location child, so Redirect2Return uses that URI -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:Location" url="sip:redirect@example.net" clear="ok" priority="3"/>
+  </elements>
+
+  <!-- 5: Top-level SubCall used from Busy and from SubAction.mainSub -->
+  <elements xsi:type="CPL:SubCall" ref="helperSub"/>
+
+  <!-- 6: Location used as contents of NoAnswer (special-cased, yields no statements) -->
+  <elements xsi:type="CPL:Location" url="sip:noanswer@example.com" clear="clear" priority="4"/>
+
+  <!-- 7: AddressSwitch with SwitchedAddress + NotPresent + Otherwise to trigger AddressSwitch2SelectStat,
+           SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault, and Proxy2Return -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- SwitchedAddress case with contents -> simple Proxy (index 8) -->
+    <addresses is="userA" contains="partA" subDomainOf="domainA">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- location for this simple Proxy -->
+        <contents xsi:type="CPL:Location" url="sip:userA@example.com" clear="1" priority="5"/>
+      </contents>
+    </addresses>
+    <!-- notPresent branch (NotPresent2ErrorResponse) -->
+    <notPresent/>
+    <!-- otherwise branch with contents -> SubCall (index 5) -->
+    <otherwise contents="//@elements.5"/>
+  </elements>
+
+  <!-- 8: Simple Proxy also referenced from SwitchedAddress.contents via direct containment above -->
+  <!-- (no separate top-level needed; index 8 is only for numbering clarity) -->
+
+  <!-- 9: StringSwitch to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <!-- field name becomes variable name in target -->
+    <contents xsi:type="CPL:Location" url="sip:strswitch@example.com" clear="c" priority="6"/>
+  </elements>
+
+  <!-- 10: LanguageSwitch used as contents for Default (statements empty due to special-cased type) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <contents xsi:type="CPL:Location" url="sip:lang@example.com" clear="z" priority="7"/>
+  </elements>
+
+  <!-- 11: TimeSwitch used as contents for Default or Otherwise in previous constructs if needed -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example">
+    <contents xsi:type="CPL:Location" url="sip:time@example.com" clear="t" priority="8"/>
+  </elements>
+
+  <!-- 12: PrioritySwitch to exercise special-cased type in contents conditions -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <contents xsi:type="CPL:Location" url="sip:prio@example.com" clear="p" priority="9"/>
+  </elements>
+
+</CPLModel>

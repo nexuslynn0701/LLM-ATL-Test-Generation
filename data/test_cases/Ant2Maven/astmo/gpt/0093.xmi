@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="demo-ant-project"
+    basedir="project-src"
+    description="Demo Ant project for Ant2Maven transformation tests"
+    default="build-main">
+
+  <!-- Properties: one of each concrete subtype -->
+  <properties xsi:type="Ant:PropertyValue" name="app.name" value="DemoApp"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="config"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by any task) -->
+  <taskdef name="customTask" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/demo-app.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/test-classes"/>
+    <tasks xsi:type="Ant:Copy"
+           file="README.md"
+           todir="target/dist"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           excludes="**/keep/**"
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="org.example.demo.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Demo Application API"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Additional target for tests (no depends) -->
+  <targets xmi:id="run-tests" name="run-tests" description="Run unit tests">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="target/test-classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/reports"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="target/old-reports"
+           verbose="false"
+           quiet="true"
+           failonerror="false"
+           includeEmptyDirs="false"
+           includes="**/*.xml"
+           excludes="**/archive/**"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

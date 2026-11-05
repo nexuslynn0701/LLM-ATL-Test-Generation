@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="lib-src"
+    description="Build and package shared library"
+    default="buildTarget">
+
+  <!-- Ant properties exercising PropertyValue, PropertyLocation, PropertyFile, PropertyEnv -->
+  <properties xsi:type="Ant:PropertyValue" name="lib.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.output" location="lib-build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/library.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition (TaskDef) -->
+  <taskdef name="custom.compress" classname="com.example.build.CustomCompressor"/>
+
+  <!-- Target used as default -->
+  <targets xmi:id="buildTarget" name="buildTarget">
+    <!-- Compile sources (Javac) -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="lib-src/main"
+           destdir="lib-build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+
+    <!-- Create build directory (Mkdir) -->
+    <tasks xsi:type="Ant:Mkdir" dir="lib-build/dist"/>
+
+    <!-- Package into jar (Jar) -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="lib-build/dist/library.jar"
+           basedir="lib-build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="MANIFEST.MF"/>
+
+    <!-- Copy resources with simple fileset and filterset, and a mapper -->
+    <tasks xsi:type="Ant:Copy"
+           todir="lib-build/resources"
+           overwrite="true"
+           includeEmptyDirs="false">
+      <fileset dir="lib-src/resources"/>
+      <filterset starttoken="@[" endtoken="]@">
+        <filter token="LIB_NAME" value="SharedLibrary"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.txt" to="*.properties"/>
+    </tasks>
+
+    <!-- Delete temporary directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="lib-build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target exercising Javadoc and Tstamp -->
+  <targets xmi:id="docTarget" name="docTarget">
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="lib-src/main"
+           destdir="lib-build/javadoc"
+           packagenames="com.example.lib.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Library API Documentation"/>
+    <!-- Timestamp task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.date" pattern="yyyy-MM-dd" offset="0" unit="day" locale="en_US"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

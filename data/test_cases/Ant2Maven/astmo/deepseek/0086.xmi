@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataPipeline"
+    basedir="/opt/data"
+    description="Build and package the data processing pipeline">
+  <targets xmi:id="init" name="init" description="Initialize build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/lib"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile source code">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="false" deprecation="false"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create distribution archive">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/pipeline.jar" basedir="build/classes" compress="true" encoding="UTF-8"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="false" quiet="false" failonerror="true" includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Delete" file="dist/pipeline.jar" verbose="false" quiet="false" failonerror="true" includeEmptyDirs="false"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run unit tests">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes" debug="true" fork="false" optimize="false" deprecation="false"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Generate API documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="build/docs" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Pipeline API"/>
+  </targets>
+  <targets xmi:id="deploy" name="deploy" description="Deploy to staging">
+    <tasks xsi:type="Ant:Copy" file="dist/pipeline.jar" todir="/opt/staging" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="false"/>
+  </targets>
+  <targets xmi:id="all" name="all" description="Full build sequence">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyyMMdd-HHmmss" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.number" value="42"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="/etc/pipeline"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+  <path id="compile.path">
+    <pathElement path="lib/commons.jar" location="/opt/libs/commons.jar"/>
+    <pathElement path="lib/log4j.jar" location="/opt/libs/log4j.jar"/>
+  </path>
+  <path id="test.path">
+    <pathElement path="lib/junit.jar" location="/opt/libs/junit.jar"/>
+  </path>
+  <default="all"/>
+</Ant:Project>

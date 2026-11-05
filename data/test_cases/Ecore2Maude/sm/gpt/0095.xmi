@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://company/example/0095"
+    nsPrefix="cmp">
+
+  <!-- 0: Custom String datatype -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomString"/>
+
+  <!-- 1: Integer identifier datatype -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Identifier"/>
+
+  <!-- 2: Enumeration for employee role -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RoleKind">
+    <eLiterals name="MANAGER" value="0" literal="MANAGER"/>
+    <eLiterals name="DEVELOPER" value="1" literal="DEVELOPER"/>
+    <eLiterals name="TESTER" value="2" literal="TESTER"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract Person superclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1"
+        eType="//@eClassifiers.1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullName" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 4: Concrete Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role" lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects" upperBound="-1"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 5: Department with container and cross references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees" upperBound="-1" containment="true"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="head"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 6: Project with bidirectional-like references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="projectId" lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lead"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team" upperBound="-1"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 7: Utility class not related to Person hierarchy -->
+  <eClassifiers xsi:type="ecore:EClass" name="Location" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="city" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="country" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 8: ManagerOperation on Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="ManagementUtilities" abstract="false" interface="false">
+    <eOperations name="promoteToManager">
+      <eParameters name="target" eType="//@eClassifiers.4"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

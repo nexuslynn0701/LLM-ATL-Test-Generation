@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL script with subActions and incoming/outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="subA">
+      <contents href="//@elements.1"/>
+      <contents href="//@elements.3"/>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="subB">
+      <contents href="//@elements.4"/>
+    </subActions>
+    <outgoing>
+      <contents href="//@elements.2"/>
+      <contents href="//@elements.5"/>
+    </outgoing>
+    <incoming>
+      <contents href="//@elements.6"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location, also used inside SubAction.subA -->
+  <elements xsi:type="CPL:Location" url="sip:alpha@example.com" priority="1" clear="yes">
+    <contents href="//@elements.7"/>
+  </elements>
+
+  <!-- 2: SubCall used from CPL.outgoing -->
+  <elements xsi:type="CPL:SubCall" ref="subA"/>
+
+  <!-- 3: Redirect used from SubAction.subA -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 4: Reject used from SubAction.subB -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy here"/>
+
+  <!-- 5: AddressSwitch used from CPL.outgoing -->
+  <elements xsi:type="CPL:AddressSwitch" field="from" subField="user">
+    <notPresent>
+      <contents href="//@elements.8"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.9"/>
+    </otherwise>
+    <addresses is="sip:bob@example.com" contains="bob" subDomainOf="example.com">
+      <contents href="//@elements.3"/>
+    </addresses>
+    <addresses is="sip:carol@example.org" contains="carol" subDomainOf="example.org">
+      <contents href="//@elements.10"/>
+    </addresses>
+  </elements>
+
+  <!-- 6: Proxy used from CPL.incoming -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+    <busy>
+      <contents href="//@elements.1"/>
+      <contents href="//@elements.4"/>
+    </busy>
+    <noAnswer>
+      <contents href="//@elements.3"/>
+    </noAnswer>
+    <redirection>
+      <contents href="//@elements.2"/>
+      <contents href="//@elements.5"/>
+    </redirection>
+    <failure>
+      <contents href="//@elements.9"/>
+    </failure>
+    <default>
+      <contents href="//@elements.10"/>
+    </default>
+  </elements>
+
+  <!-- 7: StringSwitch referenced from Location.contents -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <notPresent>
+      <contents href="//@elements.4"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.2"/>
+    </otherwise>
+    <strings is="meeting" contains="meet">
+      <contents href="//@elements.6"/>
+    </strings>
+    <strings is="support" contains="help">
+      <contents href="//@elements.1"/>
+    </strings>
+  </elements>
+
+  <!-- 8: LanguageSwitch used from AddressSwitch.notPresent -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <contents href="//@elements.3"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.7"/>
+    </otherwise>
+    <languages matches="en-US">
+      <contents href="//@elements.1"/>
+    </languages>
+    <languages matches="fr-FR">
+      <contents href="//@elements.4"/>
+    </languages>
+  </elements>
+
+  <!-- 9: TimeSwitch used from AddressSwitch.otherwise and Proxy.failure -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <notPresent>
+      <contents href="//@elements.4"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.2"/>
+    </otherwise>
+    <times dtstart="20260101T090000" dtend="20260101T170000" duration="P8H"
+           freq="DAILY" until="20261231T235900" count="10"
+           interval="1" bySecond="0" byMinute="0" byHour="9"
+           byDay="MO,TU,WE,TH,FR" byMonthDay="1" byYearDay="1"
+           byWeekNo="1" byMonth="1" wkst="MO" bySetPos="1">
+      <contents href="//@elements.1"/>
+    </times>
+    <times dtstart="20260102T180000" interval="2" wkst="SU">
+      <contents href="//@elements.3"/>
+    </times>
+  </elements>
+
+  <!-- 10: PrioritySwitch used from Proxy.default and AddressSwitch.addresses -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <contents href="//@elements.6"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.1"/>
+    </otherwise>
+    <priorities less="0.3" greater="0.0" equal="0.1">
+      <contents href="//@elements.2"/>
+    </priorities>
+    <priorities less="0.8" greater="0.5" equal="0.7">
+      <contents href="//@elements.3"/>
+    </priorities>
+  </elements>
+
+</CPL:CPLModel>

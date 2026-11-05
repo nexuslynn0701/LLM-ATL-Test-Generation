@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cpkg">
+
+  <!-- 0: Primitive alias data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="LocalStringAlias" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityLevel">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="HIGH" value="1" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 2: Base entity class with ID attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseEntity" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="createdOn"
+                         lowerBound="0"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 3: User class extending BaseEntity -->
+  <eClassifiers xsi:type="ecore:EClass" name="User" abstract="false" interface="false" eSuperTypes="//@eClassifiers.2">
+    <!-- Structural features -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="username"
+                         lowerBound="1"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="level"
+                         lowerBound="0"
+                         upperBound="1">
+      <eType xsi:type="ecore:EEnum"
+             href="#//@eClassifiers.1"/>
+    </eStructuralFeatures>
+
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="assignedTasks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.4"/>
+
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="primaryProject"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.5"/>
+
+    <!-- Operations -->
+    <eOperations name="computeLoad" ordered="true" unique="true" lowerBound="0" upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eParameters name="factor" ordered="true" unique="true" lowerBound="1" upperBound="1">
+        <eType xsi:type="ecore:EDataType"
+               href="http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+      </eParameters>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 4: Task class extending BaseEntity -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="estimatedHours"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="0">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.3"/>
+
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subTasks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="false"
+                         eType="//@eClassifiers.6"/>
+
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="project"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.5"/>
+
+    <eOperations name="isLarge" ordered="true" unique="true" lowerBound="0" upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      <eParameters name="threshold" ordered="true" unique="true" lowerBound="1" upperBound="1">
+        <eType xsi:type="ecore:EDataType"
+               href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      </eParameters>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 5: Project class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         lowerBound="1"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="#//@eClassifiers.0"/>
+    </eStructuralFeatures>
+
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="tasks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="false"
+                         eType="//@eClassifiers.4"/>
+
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="members"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 6: SubTask class (no inheritance, referenced as containment from Task) -->
+  <eClassifiers xsi:type="ecore:EClass" name="SubTask" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         lowerBound="1"
+                         upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="completed"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+</ecore:EPackage>

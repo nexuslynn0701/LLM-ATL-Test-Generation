@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-root"
+    description="Ant project with multiple targets and properties"
+    default="buildMain">
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="source.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Task definition (user-defined task) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="buildMain" name="buildMain" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/app-main.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/logs"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           defaultexcludes="true"/>
+  </targets>
+
+  <targets xmi:id="docTarget" name="docTarget" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <targets xmi:id="distTarget" name="distTarget" description="Distribution assembly">
+    <tasks xsi:type="Ant:Copy"
+           file="target/app-main.jar"
+           presservelastmodified="true"
+           tofile="dist/app-main.jar"
+           todir="dist"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+  </targets>
+</Ant:Project>

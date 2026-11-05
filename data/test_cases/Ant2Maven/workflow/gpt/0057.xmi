@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullLifecycleBuild"
+    basedir="project-root"
+    description="Build, test, and package the application"
+    default="buildMain">
+  <!-- Properties: Value, Location, File, Env -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition (not referenced by tasks) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with a mix of tasks -->
+  <targets xmi:id="buildMain" name="buildMain" description="Compile, package, and prepare output">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Generate documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="FullLifecycleBuild API"/>
+    <!-- Create jar artifact -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/full-lifecycle-build.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Prepare output directory -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/output"/>
+    <!-- Clean temporary files -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           includesfile=""
+           excludes="**/*.bak"
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target with different tasks -->
+  <targets xmi:id="postBuild" name="postBuild" description="Post-build cleanup and timestamp">
+    <!-- Timestamp task -->
+    <tasks xsi:type="Ant:Tstamp"/>
+    <!-- Simple validation compile (different src/dest) -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="target/test-classes"
+           debug="false"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+  </targets>
+</Ant:Project>

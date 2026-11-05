@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:alice@example.com" contains="example.com"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:TimeSwitch" dtstart="20240101T000000" interval="3600" wkst="MO">
+        <times matches="en"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+            <busy/>
+            <noAnswer>
+              <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+            </noAnswer>
+            <redirection/>
+            <failure/>
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" clear="yes"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <subActions id="sub1">
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities less="5" greater="3"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="sub2"/>
+        </otherwise>
+      </contents>
+    </subActions>
+    <subActions id="sub2">
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="CiscoPhone"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="yes"/>
+        </otherwise>
+      </contents>
+    </subActions>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+  <elements xsi:type="CPL:SubCall" ref="sub1"/>
+  <elements xsi:type="CPL:Location" url="sip:operator@example.com" priority="1" clear="no"/>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="fr"/>
+    <notPresent/>
+    <otherwise>
+      <contents xsi:type="CPL:Busy"/>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

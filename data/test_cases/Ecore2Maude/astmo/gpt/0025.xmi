@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://rootPkg/1.0"
+    nsPrefix="root">
+
+  <!-- Enum with two literals to activate Enum-related rules -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="BLUE" value="1" literal="BLUE"/>
+  </eClassifiers>
+
+  <!-- Simple class without features to establish inheritance targets and package->classes -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseType"/>
+
+  <!-- Class with both attributes and references, and inheritance from BaseType -->
+  <eClassifiers xsi:type="ecore:EClass" name="Node" abstract="true">
+    <!-- Reference to BaseType, non-containment, lowerBound=0, upperBound=-1, with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="targets"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         eType="//@eClassifiers.1"
+                         ordered="true"
+                         unique="true"
+                         eOpposite="//@eClassifiers.3/@eStructuralFeatures.0"/>
+    <!-- Attribute of type EString, with default and as ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="defaultLabel"/>
+  </eClassifiers>
+
+  <!-- Concrete subclass of Node, with a reference to Color enum and a Boolean attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="SpecialNode">
+    <eSuperTypes>//@eClassifiers.2</eSuperTypes>
+    <!-- Opposite of Node.targets -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.2"
+                         ordered="true"
+                         unique="true"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"/>
+    <!-- Attribute typed by Color enum, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="color"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.0"
+                         iD="false"
+                         ordered="true"
+                         unique="true"/>
+    <!-- Attribute typed by EBoolean to exercise Boolean default/type handling (no default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         iD="false"
+                         ordered="true"
+                         unique="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

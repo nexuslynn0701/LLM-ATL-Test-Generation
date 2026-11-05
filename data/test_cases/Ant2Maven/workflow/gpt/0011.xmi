@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullPipelineBuild"
+    basedir="project-root"
+    description="End-to-end build: compile, document, package, and clean."
+    default="buildAll">
+  <!-- Properties of all available subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="compile.debug" value="true"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+  <!-- One custom task definition (not referenced by tasks) -->
+  <taskdef name="customTask" classname="com.example.tools.CustomTask"/>
+  <!-- Default target with a mix of tasks -->
+  <targets xmi:id="buildAll" name="buildAll">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Generate documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Project API"/>
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/artifacts"/>
+    <!-- Package compiled classes -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/artifacts/example-app.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Remove temporary directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+  <!-- Additional target to increase rule coverage (no depends, no tasks) -->
+  <targets xmi:id="prepareResources" name="prepareResources"/>
+</Ant:Project>

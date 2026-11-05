@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    default="build-all"
+    basedir="."
+    description="A comprehensive Ant project for testing ATL transformation">
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" deprecation="true"/>
+  </targets>
+  <targets xmi:id="jar" name="jar">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" manifest="manifest.txt"/>
+  </targets>
+  <targets xmi:id="doc" name="doc">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example.*" author="true" version="true" use="true" windowtitle="My API Docs"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="build"/>
+    <tasks xsi:type="Ant:Delete" dir="dist"/>
+  </targets>
+  <targets xmi:id="build-all" name="build-all">
+    <tasks xsi:type="Ant:Copy" todir="build/resources">
+      <fileset dir="resources"/>
+    </tasks>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/>
+    </tasks>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="app.version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+  <taskdef name="mytask" classname="com.example.MyTask"/>
+  <path id="compile.path">
+    <pathElement path="lib/commons-lang3.jar" location="lib"/>
+    <fileset dir="lib">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+</Ant:Project>

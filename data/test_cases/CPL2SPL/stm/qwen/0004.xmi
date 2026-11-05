@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <subActions id="mainSub">
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+        <addresses is="alice@example.com"/>
+        <addresses contains="bob"/>
+        <addresses subDomainOf="example.net"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential" timeout="30">
+            <busy>
+              <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" clear="true" priority="medium"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Redirect" permanent="yes"/>
+            </noAnswer>
+            <redirection>
+              <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+            </redirection>
+            <failure>
+              <contents xsi:type="CPL:Reject" status="500" reason="Internal Error"/>
+            </failure>
+            <default>
+              <contents xsi:type="CPL:StringSwitch" field="subject">
+                <strings is="Meeting"/>
+                <strings contains="Urgent"/>
+                <otherwise>
+                  <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="false" priority="low"/>
+                </otherwise>
+              </strings>
+            </default>
+          </Proxy>
+        </otherwise>
+      </contents>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:TimeSwitch" tzid="America/New_York" tzurl="http://tz.example.com/ny">
+        <times dtstart="20240101T090000" dtend="20240101T170000" interval="1" wkst="MO"/>
+        <times freq="WEEKLY" byDay="MO,WE,FR" interval="1" wkst="SU" until="20241231T235959"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:PrioritySwitch">
+            <priorities less="5" greater="1"/>
+            <priorities equal="3"/>
+            <otherwise>
+              <contents xsi:type="CPL:LanguageSwitch">
+                <languages matches="en"/>
+                <languages matches="fr"/>
+                <notPresent>
+                  <contents xsi:type="CPL:Reject" status="415" reason="Unsupported Language"/>
+                </notPresent>
+                <otherwise>
+                  <contents xsi:type="CPL:Location" url="sip:multilingual@example.com" clear="true" priority="high"/>
+                </otherwise>
+              </LanguageSwitch>
+            </otherwise>
+          </PrioritySwitch>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="preprocess"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ref="fallbackAction"/>
+  <elements xsi:type="CPL:SubCall" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ref="preprocess"/>
+</CPL:CPLModel>

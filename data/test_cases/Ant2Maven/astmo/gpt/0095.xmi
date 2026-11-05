@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="workspace"
+    description="Complex Ant project for ATL testing"
+    default="buildTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="prop.value" value="12345"/>
+  <properties xsi:type="Ant:PropertyLocation" name="prop.location" location="config/path.cfg"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Task definition (not referenced by any task as required) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Single target that will be the default -->
+  <targets xmi:id="buildTarget" name="buildTarget" description="Main build target">
+    <!-- Compile task -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+    <!-- Documentation task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API"/>
+    <!-- Archive creation -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/example-app.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Directory creation -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/generated-sources"/>
+    <!-- File deletion -->
+    <tasks xsi:type="Ant:Delete"
+           file="target/old-artifact.jar"
+           dir="target/old"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile="includes.txt"
+           excludes="**/*.keep"
+           excludesfile="excludes.txt"
+           defaultexcludes="true"/>
+    <!-- Timestamp management -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+</Ant:Project>

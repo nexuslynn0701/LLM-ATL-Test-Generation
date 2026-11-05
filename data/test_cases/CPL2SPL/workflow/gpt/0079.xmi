@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: CPL root with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- non-simple proxy: all handlers present -->
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </default>
+      </contents>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <!-- simple proxy using Location to trigger Location2URIConstant -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:callee@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: Location (top-level, unused by helpers but allowed) -->
+  <elements xsi:type="CPL:Location" url="sip:top@example.com" clear="no"/>
+
+  <!-- elements[2]: Redirect, independent -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- elements[3]: SubCall referencing sa1 (for SubCall2Return, SubAction2Function) -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[4]: AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1"/>
+    <addresses is="addr2">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <!-- simple proxy with Location to trigger Location2URIConstant lazily -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:alt@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <!-- simple proxy without handlers but still simple -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:other@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- elements[5]: StringSwitch (exercise StringSwitch2SelectStat) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField">
+    <strings is="mode" contains="val"/>
+  </elements>
+
+  <!-- elements[6]: LanguageSwitch with NotPresent (for ErrorResponse/NotPresent2ErrorResponse) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </notPresent>
+  </elements>
+
+  <!-- elements[7]: TimeSwitch (not used by statements, but valid top-level) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="tz1" tzurl="http://tz">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- elements[8]: PrioritySwitch (not used by statements, but valid top-level) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="1" greater="5" equal="3"/>
+  </elements>
+
+</CPL:CPLModel>

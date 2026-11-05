@@ -1,0 +1,71 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet name="ComplexGrafcet0004" location="file:/models/grafcet_complex_0004.gfc">
+    <!-- Steps and Transitions -->
+    <elements xsi:type="Grafcet:Step" name="InitStep" location="1:1-1:20" isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Transition" name="T1" location="2:1-2:20" condition="startPressed"/>
+    <elements xsi:type="Grafcet:Step" name="S1" location="3:1-3:20" isInitial="false" isActive="false" action="loadConfig"/>
+    <elements xsi:type="Grafcet:Step" name="S2" location="4:1-4:20" isInitial="false" isActive="false" action="selfTest"/>
+    <elements xsi:type="Grafcet:Transition" name="T2" location="5:1-5:20" condition="configLoaded"/>
+    <elements xsi:type="Grafcet:Transition" name="T3" location="6:1-6:20" condition="selfTestOK"/>
+    <elements xsi:type="Grafcet:Step" name="ParallelStepA" location="7:1-7:25" isInitial="false" isActive="false" action="prepareChannelA"/>
+    <elements xsi:type="Grafcet:Step" name="ParallelStepB" location="8:1-8:25" isInitial="false" isActive="false" action="prepareChannelB"/>
+    <elements xsi:type="Grafcet:Transition" name="T4" location="9:1-9:20" condition="bothChannelsReady"/>
+    <elements xsi:type="Grafcet:Step" name="MainRunning" location="10:1-10:25" isInitial="false" isActive="false" action="runMainCycle"/>
+    <elements xsi:type="Grafcet:Transition" name="T5" location="11:1-11:20" condition="errorDetected"/>
+    <elements xsi:type="Grafcet:Step" name="ErrorHandler" location="12:1-12:25" isInitial="false" isActive="false" action="handleError"/>
+    <elements xsi:type="Grafcet:Transition" name="T6" location="13:1-13:20" condition="resetRequested"/>
+    <elements xsi:type="Grafcet:Step" name="Shutdown" location="14:1-14:25" isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <!-- Connections (indexing elements in order of appearance above) -->
+    <!-- Index map:
+         0: InitStep (Step)
+         1: T1        (Transition)
+         2: S1        (Step)
+         3: S2        (Step)
+         4: T2        (Transition)
+         5: T3        (Transition)
+         6: ParallelStepA (Step)
+         7: ParallelStepB (Step)
+         8: T4        (Transition)
+         9: MainRunning (Step)
+         10: T5       (Transition)
+         11: ErrorHandler (Step)
+         12: T6       (Transition)
+         13: Shutdown (Step)
+    -->
+
+    <!-- InitStep -> T1 -> S1 -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Init_T1" location="20:1-20:30" from="/0/@elements.0" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T1_S1" location="21:1-21:30" from="/0/@elements.1" to="/0/@elements.2"/>
+
+    <!-- S1 -> T2 -> S2 -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S1_T2" location="22:1-22:30" from="/0/@elements.2" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T2_S2" location="23:1-23:30" from="/0/@elements.4" to="/0/@elements.3"/>
+
+    <!-- S2 branches in parallel to ParallelStepA and ParallelStepB via T3 and T5 -->
+    <!-- S2 -> T3 -> ParallelStepA -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S2_T3" location="24:1-24:30" from="/0/@elements.3" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T3_ParallelA" location="25:1-25:35" from="/0/@elements.5" to="/0/@elements.6"/>
+
+    <!-- S2 -> T5 -> ParallelStepB (T5 reused later for error detection as incoming from MainRunning) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S2_T5" location="26:1-26:30" from="/0/@elements.3" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T5_ParallelB" location="27:1-27:35" from="/0/@elements.10" to="/0/@elements.7"/>
+
+    <!-- Join of ParallelStepA and ParallelStepB into T4 (multiple incoming StepToTransition) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_ParallelA_T4" location="28:1-28:35" from="/0/@elements.6" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_ParallelB_T4" location="29:1-29:35" from="/0/@elements.7" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T4_MainRunning" location="30:1-30:40" from="/0/@elements.8" to="/0/@elements.9"/>
+
+    <!-- MainRunning -> T5 (error) -> ErrorHandler -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Main_T5" location="31:1-31:35" from="/0/@elements.9" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T5_ErrorHandler" location="32:1-32:40" from="/0/@elements.10" to="/0/@elements.11"/>
+
+    <!-- ErrorHandler -> T6 -> Shutdown -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Error_T6" location="33:1-33:35" from="/0/@elements.11" to="/0/@elements.12"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T6_Shutdown" location="34:1-34:40" from="/0/@elements.12" to="/0/@elements.13"/>
+
+    <!-- Loop from Shutdown back to InitStep using T6 as a shared transition (multiple outgoing TransitionToStep) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Shutdown_T6" location="35:1-35:40" from="/0/@elements.13" to="/0/@elements.12"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T6_InitLoop" location="36:1-36:40" from="/0/@elements.12" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

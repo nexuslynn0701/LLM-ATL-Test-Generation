@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one Outgoing and one Location subAction to trigger Location2URIConstant via Proxy -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction whose contents is a Location; id matches SubCall.ref -->
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Location" url="sip:location1@example.com" clear="true"/>
+    </subActions>
+
+    <!-- Outgoing using a simple Proxy; its location will come from the SubAction's Location -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Location1: top-level Location (has url, will also trigger Location2URIConstant when used via Redirect) -->
+  <elements xsi:type="CPL:Location" url="sip:toploc@example.com" clear="yes"/>
+
+  <!-- Location2: another top-level Location to increase coverage of Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:another@example.com" clear="no"/>
+
+  <!-- Redirect that will use Location1 as its first location via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- Simple Proxy that will use Location2 via locations helper -->
+  <elements xsi:type="CPL:Proxy" recurse="r2" ordering="parallel"/>
+
+  <!-- Complex Proxy with all cases, to exercise Proxy2Select and related rules -->
+  <elements xsi:type="CPL:Proxy" recurse="r3" ordering="sequential">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- AddressSwitch with one SwitchedAddress and both NotPresent/Otherwise to exercise switch rules -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- StringSwitch (for completeness; it won't trigger Location2URIConstant but is allowed) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField"/>
+
+  <!-- LanguageSwitch with NotPresent to exercise NotPresent2ErrorResponse -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- TimeSwitch with NotPresent to give another NotPresent instance -->
+  <elements xsi:type="CPL:TimeSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- PrioritySwitch with Failure to exercise Failure2ErrorResponse -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <failure/>
+  </elements>
+
+  <!-- SubCall returning SubAction sa1; its ref must match SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+</CPL:CPLModel>

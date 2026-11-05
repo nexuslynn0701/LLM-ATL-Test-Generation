@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sub1">
+      <contents xsi:type="CPL:Location" url="sip:user@domain.com" priority="1" clear="yes"/>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="from">
+        <addresses is="sip:alice@example.com" contains="sip:"/>
+        <notPresent/>
+        <otherwise/>
+      </addresses>
+      <contents xsi:type="CPL:TimeSwitch" tzid="UTC">
+        <times dtstart="20240101T000000" dtend="20241231T235959" interval="daily" wkst="MO"/>
+        <notPresent/>
+        <otherwise/>
+      </times>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="urgent"/>
+        <notPresent/>
+        <otherwise/>
+      </strings>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+  <elements xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="sequential">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.1"/>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="sub2"/>
+  <elements xsi:type="CPL:Location" url="sip:backup@domain.com" priority="2" clear="no"/>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="fr"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5" greater="3" equal="4"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+</CPL:CPLModel>

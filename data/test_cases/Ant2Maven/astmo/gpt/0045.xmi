@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleAntProject45"
+    basedir="project-root"
+    description="Ant project for ATL Ant2Maven testing - model 0045"
+    default="compileTarget">
+
+  <!-- Properties of all four concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="SampleAntProject45"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="project-root/build"/>
+  <properties xsi:type="Ant:PropertyFile" file="project-root/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- One task definition (not referenced by tasks, per requirements) -->
+  <taskdef name="customTask" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target containing various tasks -->
+  <targets xmi:id="compileTarget" name="compileTarget" description="Compile Java sources">
+    <!-- Javac with simple attributes (no classPath, inExcludes to avoid refs) -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes"/>
+
+    <!-- Javadoc documentation task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="org.example.project45.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="SampleAntProject45 API"/>
+
+    <!-- Jar archive task -->
+    <tasks xsi:type="Ant:Jar" jarfile="target/sample-project45.jar" basedir="target/classes"/>
+
+    <!-- Mkdir file task -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/tmp"/>
+
+    <!-- Copy task with simple attributes (no fileset/filterset/mapper to avoid refs) -->
+    <tasks xsi:type="Ant:Copy"
+           file="README.md"
+           todir="target/dist"
+           overwrite="true"
+           flatten="false"
+           includeEmptyDirs="false"/>
+
+    <!-- Delete task using dir attribute (no includes/excludes to keep it simple) -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"/>
+  </targets>
+
+  <!-- Second target to exercise multiple Goal creation (no depends, per safety rules) -->
+  <targets xmi:id="packageTarget" name="packageTarget" description="Package distribution">
+    <!-- Simple Jar task in another target -->
+    <tasks xsi:type="Ant:Jar" jarfile="target/sample-project45-dist.jar" basedir="target/classes"/>
+    <!-- Another Mkdir to have multiple instances -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+    <!-- Another Delete, this time by file -->
+    <tasks xsi:type="Ant:Delete" file="target/old.log" quiet="true"/>
+  </targets>
+
+</Ant:Project>

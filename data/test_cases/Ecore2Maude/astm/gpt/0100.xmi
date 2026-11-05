@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg0100"
+    nsURI="http://example.org/root0100"
+    nsPrefix="root0100">
+
+  <!-- Subpackage to trigger super/sub-package equations -->
+  <eSubpackages name="subPkg0100"
+                nsURI="http://example.org/sub0100"
+                nsPrefix="sub0100">
+    <!-- Class in subpackage with supertype in root package (cross-package inheritance) -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubEntity">
+      <eSuperTypes href="//@eClassifiers.2"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subFlag"
+                           lowerBound="0"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="subToRoot"
+                           lowerBound="1"
+                           upperBound="-1"
+                           ordered="false"
+                           unique="false"
+                           containment="false"
+                           eType="//@eClassifiers.2"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- 0: Enumeration with three literals to exercise Enum rules and list handling -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW_LITERAL"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="INPROG_LITERAL"/>
+    <eLiterals name="DONE" value="2" literal="DONE_LITERAL"/>
+  </eClassifiers>
+
+  <!-- 1: Simple data type to be used as @DataType in attDataType() -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="CustomCode"
+                instanceClassName="java.lang.String"/>
+
+  <!-- 2: Abstract base class, supertype of several others -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true" interface="false">
+    <!-- ID attribute with String type and default value (to trigger AttEqSpecificDefaultValue String branch) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="true"
+                         defaultValueLiteral="DEF-0100"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute with EInt default to hit non-String/non-enum default branch -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="5"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 3: Concrete class with no superTypes, multiple attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="&quot;Quoted 0100&quot;"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Boolean attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="false"
+                         unique="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Attribute using custom datatype to trigger @DataType branch -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="//@eClassifiers.1"/>
+    <!-- Enum-typed attribute with default value to trigger enum default branch -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="IN_PROGRESS"
+                         eType="//@eClassifiers.0"/>
+    <!-- Containment reference with upperBound * -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subTasks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         eType="//@eClassifiers.4"/>
+    <!-- Non-containment reference with no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="relatedTo"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="false"
+                         unique="false"
+                         containment="false"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 4: Class with supertype BaseElement and opposite references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eSuperTypes href="//@eClassifiers.2"/>
+    <!-- Opposite pair: tasks <-> project -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="tasks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         eType="//@eClassifiers.3"
+                         eOpposite="//@eClassifiers.3/@eStructuralFeatures.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 5: Class implementing interface-like pattern, supertype BaseElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="User" abstract="false" interface="false">
+    <eSuperTypes href="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Reference with explicit lowerBound 1 and upperBound 1, no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="mainProject"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 6: Additional class with multiple superTypes (BaseElement and Task) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Milestone">
+    <eSuperTypes href="//@eClassifiers.2 //@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="deadline"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+  </eClassifiers>
+
+</ecore:EPackage>

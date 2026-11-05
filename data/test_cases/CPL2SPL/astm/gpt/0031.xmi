@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL, drives Program/Service/Dialog, and Incoming/Outgoing methods -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction 1: will be called from SubCall, and its contents is a complex Proxy -->
+    <subActions id="mainAction">
+      <!-- contents points to complex Proxy at elements[5] -->
+      <contents href="//@elements.5"/>
+    </subActions>
+
+    <!-- SubAction 2: contents is a Redirect, to exercise Redirect2Return as a statement -->
+    <subActions id="redirectAction">
+      <!-- contents points to Redirect at elements[7] -->
+      <contents href="//@elements.7"/>
+    </subActions>
+
+    <!-- Incoming and Outgoing reference a TimeSwitch (ignored as statements) -->
+    <incoming>
+      <contents href="//@elements.10"/>
+    </incoming>
+    <outgoing>
+      <contents href="//@elements.10"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy and Redirect (Location2URIConstant + Location.locations) -->
+  <elements xsi:type="CPL:Location" url="sip:alpha@example.com" clear="yes" priority="1">
+    <!-- contents points to simple Proxy at elements[4] -->
+    <contents href="//@elements.4"/>
+  </elements>
+
+  <!-- 2: Location used by complex Proxy (for forward URI in Proxy2Select) -->
+  <elements xsi:type="CPL:Location" url="sip:beta@example.net" clear="no" priority="2">
+    <!-- contents points to complex Proxy at elements[5] -->
+    <contents href="//@elements.5"/>
+  </elements>
+
+  <!-- 3: Simple Proxy (isSimple = true) used directly as a top-level element (statement via Node.helper) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- no busy/noAnswer/redirection/failure/default => isSimple = true -->
+  </elements>
+
+  <!-- 4: Simple Proxy inside Location[1] (Proxy2Return through Location.statement) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- isSimple again: no children -->
+  </elements>
+
+  <!-- 5: Complex Proxy (Proxy2Select, Busy/NoAnswer/Redirection/Failure/Default, plus NotPresent in switch) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <!-- Busy case with SubCall (SubCall2Return) -->
+    <busy>
+      <contents href="//@elements.8"/>
+    </busy>
+    <!-- NoAnswer case with simple Proxy as contents -->
+    <noAnswer>
+      <contents href="//@elements.3"/>
+    </noAnswer>
+    <!-- Redirection case with Redirect as contents -->
+    <redirection>
+      <contents href="//@elements.7"/>
+    </redirection>
+    <!-- Failure case with Reject as contents (Failure2ErrorResponse + Reject used as statement but filtered out) -->
+    <failure>
+      <contents href="//@elements.9"/>
+    </failure>
+    <!-- Default case with Location as contents (filtered out as statement) -->
+    <default>
+      <contents href="//@elements.1"/>
+    </default>
+  </elements>
+
+  <!-- 6: AddressSwitch with SwitchedAddress and NotPresent/Otherwise (AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- SwitchedAddress, with contents = Redirect -->
+    <addresses is="sip:user@example.org" contains="user" subDomainOf="example.org">
+      <contents href="//@elements.7"/>
+    </addresses>
+    <!-- NotPresent branch -->
+    <notPresent>
+      <contents href="//@elements.9"/>
+    </notPresent>
+    <!-- Otherwise branch with SubCall contents -->
+    <otherwise>
+      <contents href="//@elements.8"/>
+    </otherwise>
+  </elements>
+
+  <!-- 7: Redirect used in multiple places (Redirect2Return) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 8: SubCall referring to SubAction "mainAction" (SubCall2Return) -->
+  <elements xsi:type="CPL:SubCall" ref="mainAction"/>
+
+  <!-- 9: Reject used as Failure.contents and in Busy/AddressSwitch branches (no direct rule, but as leaf statement) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 10: TimeSwitch referenced from CPL.incoming/outgoing (ignored statements, but exercises type) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org/utc">
+    <times dtstart="20250101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 11: StringSwitch, to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="eventType">
+    <strings is="update" contains="upd"/>
+  </elements>
+
+  <!-- 12: PrioritySwitch as a top-level element (no direct rule, but used to test statement filtering) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="1.0" greater="0.0" equal="0.5"/>
+  </elements>
+
+</CPL:CPLModel>

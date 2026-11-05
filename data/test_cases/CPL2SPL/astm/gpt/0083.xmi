@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction that will be called by SubCall (R2 + R13) -->
+    <subActions id="saMain">
+      <!-- contents points to SubCall at elements[1] -->
+      <contents href="//@elements.1"/>
+    </subActions>
+    <!-- Incoming method using a simple Proxy via a Location (R3 + R7 + R19) -->
+    <incoming>
+      <!-- contents points to simple Proxy at elements[3] -->
+      <contents href="//@elements.3"/>
+    </incoming>
+    <!-- Outgoing method using a Redirect (R4 + R14 + R19) -->
+    <outgoing>
+      <!-- contents points to Redirect at elements[2] -->
+      <contents href="//@elements.2"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: SubCall referencing SubAction.saMain (R13) -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- 2: Redirect using a Location (R14 + R19) -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- contents: a Location providing URI for Redirect2Return (R14) -->
+    <contents xsi:type="CPL:Location" url="sip:redirect@example.org" clear="no"/>
+  </elements>
+
+  <!-- 3: Simple Proxy with one Location (R7 + R19) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <!-- simple proxy has no busy/noAnswer/redirection/failure/default -->
+    <contents xsi:type="CPL:Location" url="sip:simpleproxy@example.org" clear="yes"/>
+  </elements>
+
+  <!-- 4: Complex Proxy with all branches and nested structures (R8–R12, R5, R6, R7, R14, R19) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <!-- Locations for the proxy (used by Proxy2Select initial forward) -->
+    <contents xsi:type="CPL:Location" url="sip:complexproxy@example.org" clear="yes"/>
+
+    <!-- Busy branch: simple Proxy as contents (R9 with Proxy2Return) -->
+    <busy>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <contents xsi:type="CPL:Location" url="sip:busybranch@example.org" clear="yes"/>
+      </contents>
+    </busy>
+
+    <!-- NoAnswer branch: Redirect as contents (R10 with Redirect2Return) -->
+    <noAnswer>
+      <contents xsi:type="CPL:Redirect" permanent="false">
+        <contents xsi:type="CPL:Location" url="sip:noanswer-redirect@example.org" clear="no"/>
+      </contents>
+    </noAnswer>
+
+    <!-- Redirection branch: Failure as contents (R11 + R5) -->
+    <redirection>
+      <contents xsi:type="CPL:Failure"/>
+    </redirection>
+
+    <!-- Failure branch: Reject as contents (only Failure2ErrorResponse R5) -->
+    <failure>
+      <contents xsi:type="CPL:Reject" status="500" reason="Server failure"/>
+    </failure>
+
+    <!-- Default branch: NotPresent as contents (R12 + R6) -->
+    <default>
+      <contents xsi:type="CPL:NotPresent"/>
+    </default>
+  </elements>
+
+  <!-- 5: AddressSwitch with SwitchedAddress cases, NotPresent and Otherwise (R15, R17, R18, R6, R14, R19) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- SwitchedAddress #1 with simple Proxy inside -->
+    <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com">
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <contents xsi:type="CPL:Location" url="sip:alice-target@example.com" clear="yes"/>
+      </contents>
+    </addresses>
+    <!-- SwitchedAddress #2 with Redirect inside -->
+    <addresses is="sip:bob@example.com" contains="bob" subDomainOf="example.com">
+      <contents xsi:type="CPL:Redirect" permanent="false">
+        <contents xsi:type="CPL:Location" url="sip:bob-target@example.com" clear="yes"/>
+      </contents>
+    </addresses>
+
+    <!-- NotPresent branch with Failure inside (triggers NotPresent2ErrorResponse R6) -->
+    <notPresent>
+      <contents xsi:type="CPL:Failure"/>
+    </notPresent>
+
+    <!-- Otherwise branch with Reject inside (R18) -->
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+    </otherwise>
+  </elements>
+
+  <!-- 6: StringSwitch as a declaration-like node (R16) -->
+  <elements xsi:type="CPL:StringSwitch" field="customHeader">
+    <!-- Using SwitchedString and Location, though ATL only uses the switch name -->
+    <contents xsi:type="CPL:SwitchedString" is="value1" contains="val">
+      <contents xsi:type="CPL:Location" url="sip:stringcase1@example.org" clear="yes"/>
+    </contents>
+  </elements>
+
+</CPL:CPLModel>

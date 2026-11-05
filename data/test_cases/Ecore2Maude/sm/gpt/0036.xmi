@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryMeta"
+    nsURI="http://example.org/libraryMeta"
+    nsPrefix="libmeta">
+
+  <!-- 0: EDataType for an external identifier -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="ExternalID"
+                instanceClassName="java.lang.String"/>
+
+  <!-- 1: EEnum Role -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Role">
+    <eLiterals name="AUTHOR" value="0" literal="AUTHOR"/>
+    <eLiterals name="EDITOR" value="1" literal="EDITOR"/>
+    <eLiterals name="REVIEWER" value="2" literal="REVIEWER"/>
+  </eClassifiers>
+
+  <!-- 2: Map entry type -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="StringToIntEntry"
+                instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="key"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="value"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 3: Root container -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="establishedYear"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Containment of Books -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="books"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.4"/>
+    <!-- Containment of Persons -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="people"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+    <!-- Containment of Sections -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="sections"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 4: Book class with ID attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="published"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rating"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <!-- Non-containment reference to Person -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="mainAuthor"
+                         lowerBound="1"
+                         eType="//@eClassifiers.5"
+                         containment="false"/>
+    <!-- Many-valued refs to Persons -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="coAuthors"
+                         upperBound="-1"
+                         eType="//@eClassifiers.5"
+                         containment="false"/>
+    <!-- Cross-section reference -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="section"
+                         eType="//@eClassifiers.7"
+                         containment="false"/>
+    <!-- Map-style containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="salesByRegion"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 5: Person base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="externalId"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="birthYear"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Derived, non-changeable reference (left empty) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="authoredBooks"
+                         upperBound="-1"
+                         eType="//@eClassifiers.4"
+                         changeable="false"
+                         derived="true"/>
+  </eClassifiers>
+
+  <!-- 6: Employee subclass of Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+                eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="employeeNumber"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="fullTime"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Enum-typed attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="role"
+                         eType="//@eClassifiers.1"/>
+    <!-- Non-containment reference to managed Section -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="manages"
+                         eType="//@eClassifiers.7"
+                         containment="false"/>
+  </eClassifiers>
+
+  <!-- 7: Section class, container of Books -->
+  <eClassifiers xsi:type="ecore:EClass" name="Section">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Containment of Books, with back-ref in Book.section -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="books"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 8: Utility class with operations and parameters -->
+  <eClassifiers xsi:type="ecore:EClass" name="LibraryService" interface="true" abstract="true">
+    <!-- Operation returning Book by id -->
+    <eOperations name="findBookById">
+      <eParameters name="identifier"
+                   eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                   ordered="true"
+                   unique="true"
+                   lowerBound="1"
+                   upperBound="1"/>
+      <eParameters name="searchInSection"
+                   eType="//@eClassifiers.7"
+                   ordered="true"
+                   unique="true"
+                   lowerBound="0"
+                   upperBound="1"/>
+      <eExceptions href="//@eClassifiers.4"/>
+    </eOperations>
+    <!-- Operation returning list of Persons -->
+    <eOperations name="allPeople">
+      <eParameters name="onlyEmployees"
+                   eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                   ordered="true"
+                   unique="true"
+                   lowerBound="0"
+                   upperBound="1"/>
+      <eExceptions href="//@eClassifiers.5"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

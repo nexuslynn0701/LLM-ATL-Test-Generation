@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction used as target of SubCall -->
+    <subActions id="mainAction">
+      <!-- SubAction.contents: complex Proxy (not simple) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- all branches present => not simple proxy -->
+        <busy>
+          <!-- Busy.contents: SubCall -> triggers SubCall2Return via R9 -->
+          <contents xsi:type="CPL:SubCall" ref="mainAction"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- Default with contents Redirect (permanent) -->
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Outgoing with contents = AddressSwitch -->
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <!-- notPresent branch with contents Redirect (temporary) -->
+        <notPresent>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </notPresent>
+        <!-- otherwise branch with contents simple Proxy -->
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+            <!-- simple proxy: all branches undefined, has Location in its locations chain -->
+          </contents>
+        </otherwise>
+        <!-- one SwitchedAddress with contents simple Proxy -->
+        <addresses is="user@example.com">
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+            <!-- simple proxy: all branches undefined, locations from Location element -->
+          </contents>
+        </addresses>
+      </contents>
+    </outgoing>
+
+    <!-- Incoming with contents simple Proxy -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no branches, locations from Location element -->
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- Location used for URIs of simple proxies and Redirects -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" clear="yes">
+    <!-- contents points to the complex Proxy inside SubAction (index 0 CPL element, its subActions[0].contents) -->
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <busy>
+        <contents xsi:type="CPL:SubCall" ref="mainAction"/>
+      </busy>
+      <noAnswer/>
+      <redirection/>
+      <failure/>
+      <default>
+        <contents xsi:type="CPL:Redirect" permanent="true"/>
+      </default>
+    </contents>
+  </elements>
+
+</CPL:CPLModel>

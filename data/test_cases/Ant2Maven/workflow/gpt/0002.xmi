@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AttributeCoverageBuild"
+    basedir="src"
+    default="build"
+    description="">
+  <!-- Properties to exercise AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- TaskDef to exercise AntTaskDef2MavenMavenTaskDef -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target -->
+  <targets xmi:id="build" name="build">
+    <!-- Javac task -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Jar task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/app.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="MANIFEST.MF"/>
+    <!-- Mkdir task -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/logs"/>
+    <!-- Delete task -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target to exercise AntNewTask and AntAttribut rules -->
+  <targets xmi:id="configure" name="configure">
+    <!-- NewTask with Attribut children -->
+    <tasks xsi:type="Ant:NewTask">
+      <attributes name="configFile" value="config/settings.xml"/>
+      <attributes name="profile" value="dev"/>
+      <attributes name="verbose" value="true"/>
+    </tasks>
+    <!-- Tstamp task -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+</Ant:Project>

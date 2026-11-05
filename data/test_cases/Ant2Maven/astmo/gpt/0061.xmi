@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="complex-ant-project"
+    basedir="source"
+    description="Complex Ant project exercising multiple tasks and properties."
+    default="mainTarget">
+  <!-- Path definition (no refid, no nested path, no fileset, no external references) -->
+  <path id="build-path">
+    <pathElement path="lib/util.jar" location="lib/util.jar"/>
+  </path>
+
+  <!-- Properties of all supported kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="build.mode" value="debug"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A standalone TaskDef (not referenced by any task) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target containing several tasks -->
+  <targets xmi:id="mainTarget" name="mainTarget" description="Main build target">
+    <!-- Javac task with only required srcdir -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java"/>
+    <!-- Jar task with required jarfile -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/main.jar"/>
+    <!-- Mkdir task -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/main"/>
+    <!-- Delete task -->
+    <tasks xsi:type="Ant:Delete" dir="build/temp"/>
+  </targets>
+
+  <!-- Additional target to exercise multiple Goal creation -->
+  <targets xmi:id="testTarget" name="testTarget" description="Test execution target">
+    <!-- Another Javac task -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java"/>
+    <!-- Another Jar task -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/test.jar"/>
+    <!-- Another Mkdir task -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/test"/>
+    <!-- Another Delete task -->
+    <tasks xsi:type="Ant:Delete" dir="build/test-temp"/>
+  </targets>
+</Ant:Project>

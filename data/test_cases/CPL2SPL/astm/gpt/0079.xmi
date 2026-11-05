@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <!-- Incoming / Outgoing will reuse other top-level nodes via contents -->
+    <incoming contents="//@elements.1"/>
+    <outgoing contents="//@elements.5"/>
+    <subActions contents="//@elements.2"/>
+  </elements>
+
+  <!-- 1: Simple Proxy under Incoming (will trigger Proxy2Return) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- no busy/noAnswer/redirection/failure/default => isSimple = true -->
+  </elements>
+
+  <!-- 2: SubAction that calls another SubAction via SubCall and then Redirect -->
+  <elements xsi:type="CPL:SubAction" id="sa_main">
+    <!-- contents points to Redirect (index 4) -->
+    <contents href="//@elements.4"/>
+  </elements>
+
+  <!-- 3: SubAction used as target of SubCall -->
+  <elements xsi:type="CPL:SubAction" id="sa_target">
+    <!-- contents points to Reject (index 7) to test 'Reject' as statement -->
+    <contents href="//@elements.7"/>
+  </elements>
+
+  <!-- 4: Redirect (used inside sa_main) -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <!-- contents points to Location (index 6) via Location.locations helper -->
+    <contents href="//@elements.6"/>
+  </elements>
+
+  <!-- 5: Complex Proxy under Outgoing (will trigger Proxy2Select and nested cases) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- For location computation: include a Location in the CPL root (index 6) -->
+    <busy>
+      <!-- Busy.contents points to SubCall (index 8) -->
+      <contents href="//@elements.8"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer.contents points to SubCall (index 9) -->
+      <contents href="//@elements.9"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection.contents points to SubCall (index 10) -->
+      <contents href="//@elements.10"/>
+    </redirection>
+    <failure/>
+    <default>
+      <!-- Default.contents points to SubCall (index 11) -->
+      <contents href="//@elements.11"/>
+    </default>
+  </elements>
+
+  <!-- 6: Location used by Redirect and complex Proxy via locations/Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:example@example.com" clear="true"/>
+
+  <!-- 7: Reject used as contents of sa_target -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 8: SubCall used inside Busy (ref to existing SubAction id) -->
+  <elements xsi:type="CPL:SubCall" ref="sa_target"/>
+
+  <!-- 9: SubCall used inside NoAnswer -->
+  <elements xsi:type="CPL:SubCall" ref="sa_target"/>
+
+  <!-- 10: SubCall used inside Redirection -->
+  <elements xsi:type="CPL:SubCall" ref="sa_target"/>
+
+  <!-- 11: SubCall used inside Default -->
+  <elements xsi:type="CPL:SubCall" ref="sa_target"/>
+
+  <!-- 12: AddressSwitch exercising NotPresent and Otherwise and SwitchedAddress -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- notPresent and otherwise reference separate NodeContainers -->
+    <notPresent>
+      <!-- NotPresent.contents points to Reject (index 7) -->
+      <contents href="//@elements.7"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise.contents points to SubCall (index 8) -->
+      <contents href="//@elements.8"/>
+    </otherwise>
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <!-- SwitchedAddress.contents points to SubCall (index 9) -->
+      <contents href="//@elements.9"/>
+    </addresses>
+  </elements>
+
+  <!-- 13: StringSwitch to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="custom-header">
+    <!-- No specific contents needed for the tested rule -->
+  </elements>
+
+</CPL:CPLModel>

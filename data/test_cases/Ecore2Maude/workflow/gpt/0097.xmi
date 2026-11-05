@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://rootpkgURI"
+    nsPrefix="rootpkgPrefix">
+
+  <!-- Classifiers index map:
+       0: RootClass
+       1: SubClass
+       2: RefTarget
+       3: StatusEnum
+       4: ColorEnum
+       5: SomeDataType
+  -->
+
+  <!-- Root EClass with both attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClass" abstract="false" interface="false">
+    <!-- Attribute with String type, ID, bounds (1..1), default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="nameAttr"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="defaultName"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute with Int type, lowerBound 0, upperBound -1 (unbounded) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="countAttr"
+        lowerBound="0"
+        upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Attribute whose type is a custom EDataType -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="dataAttr"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.5"/>
+    <!-- Attribute whose type is an EEnum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="statusAttr"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.3"/>
+    <!-- Containment reference to RefTarget with upperBound * -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="childrenRef"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- Subclass extending RootClass, with a reference back, and an enum attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="SubClass" abstract="true" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- Non-containment reference to RefTarget with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="targetRef"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.2"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"/>
+    <!-- Attribute with Boolean type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="flagAttr"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Attribute with second enum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="colorAttr"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- RefTarget class, used as reference type and with opposite reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="RefTarget" abstract="false" interface="false">
+    <!-- opposite end of targetRef -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"/>
+    <!-- another reference to RootClass to increase reference variety -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="rootLink"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- First enumeration with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+    <eLiterals name="INACTIVE" value="1" literal="INACTIVE"/>
+  </eClassifiers>
+
+  <!-- Second enumeration with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ColorEnum">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+    <eLiterals name="BLUE" value="2" literal="BLUE"/>
+  </eClassifiers>
+
+  <!-- Custom EDataType used by dataAttr -->
+  <eClassifiers xsi:type="ecore:EDataType" name="SomeDataType"
+      instanceClassName="java.lang.String"/>
+</ecore:EPackage>

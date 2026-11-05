@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="build"
+    basedir="src"
+    description="Main build project">
+  <properties xsi:type="Ant:PropertyValue" name="version" value="1.0"/>
+  <properties xsi:type="Ant:PropertyLocation" name="home" location="/usr/local"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="build"/>
+    <tasks xsi:type="Ant:Delete" dir="dist"/>
+  </targets>
+  <targets xmi:id="build" name="build">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true"/>
+  </targets>
+  <targets xmi:id="doc" name="doc">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="My API"/>
+  </targets>
+  <targets xmi:id="test" name="test">
+    <tasks xsi:type="Ant:Java" classname="org.junit.runner.JUnitCore" jar="lib/junit.jar" fork="true"/>
+  </targets>
+  <targets xmi:id="archive" name="archive">
+    <tasks xsi:type="Ant:Copy" todir="backup"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+  <path id="classpath" refid="compile.path">
+    <pathElement path="/lib/tools.jar" location="/opt/java/lib/tools.jar"/>
+    <fileset dir="/lib">
+      <include name="*.jar"/>
+      <exclude name="test.jar"/>
+    </fileset>
+  </path>
+  <path path="child" id="childPath">
+    <fileset dir="/data">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="*.xml"/>
+        <inexcludes xsi:type="Ant:Excludes" name="*.bak"/>
+      </patternset>
+      <include name="*.config" ifCondition="true" unless="false"/>
+      <exclude name="*.tmp" ifCondition="false"/>
+    </fileset>
+    <pathElement path="/tmp" location="/var/tmp"/>
+  </path>
+  <properties xsi:type="Ant:PropertyValue" name="timestamp" value="now"/>
+  <taskdef name="myTask" classname="com.example.MyTask"/>
+</Ant:Project>

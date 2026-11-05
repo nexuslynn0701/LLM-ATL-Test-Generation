@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryPkg"
+    nsURI="http://example.org/library0097"
+    nsPrefix="lib">
+
+  <!-- 0: Primitive data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ISBN" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enumeration for item kind -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ItemKind">
+    <eLiterals name="BOOK" value="0" literal="BOOK"/>
+    <eLiterals name="MAGAZINE" value="1" literal="MAGAZINE"/>
+    <eLiterals name="DVD" value="2" literal="DVD"/>
+  </eClassifiers>
+
+  <!-- 2: Root class Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- containment of sections -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sections"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+    <!-- containment of all items -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="items"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 3: Section class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Section">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- bidirectional container-reference to Library -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library"
+        lowerBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.2"/>
+    <!-- local items (non-containment, point to same Item instances in Library.items) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="localItems"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 4: Abstract base class for any element that has an identifier -->
+  <eClassifiers xsi:type="ecore:EClass" name="IdentifiedElement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 5: Abstract Item class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Item" abstract="true" eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="year"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 6: Book, a concrete Item -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book" eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="author"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- ISBN uses custom data type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isbn"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 7: Magazine, another Item subtype -->
+  <eClassifiers xsi:type="ecore:EClass" name="Magazine" eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="issue"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 8: DVD, third Item subtype -->
+  <eClassifiers xsi:type="ecore:EClass" name="DVD" eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="regionCode"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 9: Auxiliary map entry class to demonstrate map-like structures -->
+  <eClassifiers xsi:type="ecore:EClass" name="PropertyEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryPkg"
+    nsURI="http://example.org/libraryPkg"
+    nsPrefix="lib">
+
+  <!-- 0: Primitive datatype used by attributes -->
+  <eClassifiers xsi:type="ecore:EDataType" name="StringAlias" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum for item categories -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ItemKind">
+    <eLiterals name="BOOK" value="0" literal="BOOK"/>
+    <eLiterals name="MAGAZINE" value="1" literal="MAGAZINE"/>
+    <eLiterals name="DVD" value="2" literal="DVD"/>
+  </eClassifiers>
+
+  <!-- 2: Root class Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="branches" upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="catalog" containment="true"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 3: Branch -->
+  <eClassifiers xsi:type="ecore:EClass" name="Branch">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="city"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="sections" upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 4: Catalog -->
+  <eClassifiers xsi:type="ecore:EClass" name="Catalog">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="allItems" upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 5: Section, contains shelves -->
+  <eClassifiers xsi:type="ecore:EClass" name="Section">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="shelves" upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 6: Abstract Item -->
+  <eClassifiers xsi:type="ecore:EClass" name="Item" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="kind" lowerBound="1"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 7: Shelf with bidirectional containment to Section -->
+  <eClassifiers xsi:type="ecore:EClass" name="Shelf">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="label" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="items" upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.8"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="section"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 8: Book extends Item -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book"
+      eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="author" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="pages"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 9: Magazine extends Item -->
+  <eClassifiers xsi:type="ecore:EClass" name="Magazine"
+      eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="issueNumber"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 10: DVD extends Item -->
+  <eClassifiers xsi:type="ecore:EClass" name="DVD"
+      eSuperTypes="//@eClassifiers.6">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="durationMinutes"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 11: Staff base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Staff">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="staffId" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 12: Librarian extends Staff -->
+  <eClassifiers xsi:type="ecore:EClass" name="Librarian"
+      eSuperTypes="//@eClassifiers.11">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="level"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 13: Assistant extends Staff -->
+  <eClassifiers xsi:type="ecore:EClass" name="Assistant"
+      eSuperTypes="//@eClassifiers.11">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="partTime"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 14: Operation on Library demonstrating EOperation and EParameter -->
+  <eClassifiers xsi:type="ecore:EClass" name="QueryService">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="targetLibrary"
+        eType="//@eClassifiers.2"/>
+    <eOperations name="findItemsByTitle"
+        ordered="true" unique="true"
+        lowerBound="0" upperBound="-1">
+      <eParameters name="pattern"
+          ordered="true" unique="true"
+          lowerBound="1" upperBound="1"
+          eType="//@eClassifiers.0"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

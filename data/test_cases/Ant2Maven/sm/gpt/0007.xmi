@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="."
+    description="Build, package and clean a simple library project."
+    default="build-main">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/classes"/>
+  <properties xsi:type="Ant:PropertyValue" name="dist.dir" value="dist"/>
+  <properties xsi:type="Ant:PropertyValue" name="jar.name" value="library-core.jar"/>
+
+  <!-- Unused taskdef to exercise TaskDef rule without references -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default build target -->
+  <targets xmi:id="build-main" name="build-main" description="Compile sources into build directory.">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+  </targets>
+
+  <!-- Package target: create jar from compiled classes -->
+  <targets xmi:id="package-jar" name="package-jar" description="Package compiled classes into a jar.">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/library-core.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Documentation target: generate Javadoc -->
+  <targets xmi:id="doc" name="doc" description="Generate API documentation.">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="dist/docs/api"
+           packagenames="com.example.library.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Library API Documentation"/>
+  </targets>
+
+  <!-- Directory preparation target -->
+  <targets xmi:id="prepare" name="prepare" description="Create build and distribution directories if needed.">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="clean" name="clean" description="Remove build output and distribution artifacts.">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           defaultexcludes="false"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="dist"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           defaultexcludes="false"/>
+  </targets>
+
+</Ant:Project>

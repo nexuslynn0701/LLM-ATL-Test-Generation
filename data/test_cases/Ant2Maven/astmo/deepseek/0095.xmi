@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DataPipeline"
+    description="Build pipeline for data processing"
+    basedir="/opt/data"
+    default="package">
+  <targets xmi:id="package" name="package" description="Package the application">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="true" optimize="false" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/data-pipeline.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Delete" dir="build/temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="false" includes="*.tmp" excludes="keep.tmp" defaultexcludes="true"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="false" quiet="true" failonerror="false" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" verbose="false" quiet="true" failonerror="false" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run unit tests">
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-results"/>
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes" debug="true" fork="false" optimize="false" deprecation="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/test-suite.jar" basedir="build/test-classes" compress="false" encoding="ISO-8859-1"/>
+  </targets>
+  <targets xmi:id="deploy" name="deploy" description="Deploy to server">
+    <tasks xsi:type="Ant:Mkdir" dir="/opt/deploy"/>
+    <tasks xsi:type="Ant:Copy" file="dist/data-pipeline.jar" tofile="/opt/deploy/data-pipeline.jar" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Delete" file="dist/data-pipeline.jar" quiet="true" failonerror="false"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="version" value="1.0.0"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.number" value="42"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="/etc/data-pipeline"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customTask" classname="com.example.CustomTask"/>
+</Ant:Project>

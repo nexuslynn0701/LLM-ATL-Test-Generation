@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuilder"
+    basedir="src/main/java"
+    description="Build and package shared library"
+    default="buildTarget">
+
+  <!-- Properties exercising all Ant Property subclasses -->
+  <properties xsi:type="Ant:PropertyValue" name="lib.name" value="shared-lib"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A simple TaskDef (not referenced from any NewTask, per constraints) -->
+  <taskdef name="custom-task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with several different predefined tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile, document and jar">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.lib.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Shared Library API"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/shared-lib.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Additional target to ensure multiple Goal creation -->
+  <targets xmi:id="cleanupTarget" name="cleanup" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Mkdir" dir="target/backup"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/*.keep"
+           defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

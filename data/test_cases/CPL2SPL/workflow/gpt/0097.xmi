@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Outgoing and one Incoming -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <!-- SubAction contents: simple Proxy using Location to trigger Location2URIConstant -->
+      <contents xsi:type="CPL:Proxy" recurse="once" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/... children -->
+      </contents>
+    </subActions>
+    <!-- Outgoing method, contents is a simple Proxy -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="outRec" ordering="parallel">
+        <!-- simple proxy -->
+      </contents>
+    </outgoing>
+    <!-- Incoming method, contents is a simple Proxy -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="inRec" ordering="sequential">
+        <!-- simple proxy -->
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location used as Location.locations for the simple proxies (SubAction and Out/Incoming) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true" priority="1"/>
+
+  <!-- 2: Top-level Location used by Redirect (also triggers Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.com" clear="true" priority="1"/>
+
+  <!-- 3: Redirect using Location 2 via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- No explicit contents; locations will include element 2 -->
+  </elements>
+
+  <!-- 4: AddressSwitch with one SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="sub">
+    <addresses is="addr1" contains="cont1" subDomainOf="dom1">
+      <!-- SwitchedAddress contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <notPresent>
+      <!-- NotPresent contents: Reject -->
+      <contents xsi:type="CPL:Reject" status="404" reason="NotFound"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise contents: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="othRec" ordering="sequential">
+        <!-- simple proxy -->
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- 5: Proxy with Busy/NoAnswer/Redirection/Failure/Default (non-simple Proxy) -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="complexRec" ordering="parallel">
+    <busy>
+      <!-- Busy contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer contents: Reject -->
+      <contents xsi:type="CPL:Reject" status="408" reason="RequestTimeout"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection contents: Redirect (element 3) -->
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </redirection>
+    <failure>
+      <!-- Failure contents: Reject -->
+      <contents xsi:type="CPL:Reject" status="405" reason="MethodNotAllowed"/>
+    </failure>
+    <default>
+      <!-- Default contents: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="defRec" ordering="sequential">
+        <!-- simple proxy -->
+      </contents>
+    </default>
+  </elements>
+
+  <!-- 6: StringSwitch (for additional coverage, no effects on location rules) -->
+  <elements xsi:type="CPL:StringSwitch" field="hdr-field">
+    <!-- No inner strings; just to trigger StringSwitch2SelectStat differently -->
+  </elements>
+
+</CPL:CPLModel>

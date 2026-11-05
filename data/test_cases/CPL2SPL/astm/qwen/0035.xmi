@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="30">
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="User Busy"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="true"/>
+        </default>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:user1@example.com">
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:handler1@example.com" clear="false"/>
+            </default>
+          </contents>
+        </addresses>
+        <addresses contains="example.org">
+          <contents xsi:type="CPL:Reject" status="403" reason="Forbidden Domain"/>
+        </addresses>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="CPL-Client/1.0">
+          <contents xsi:type="CPL:Location" url="sip:special@example.com" clear="true"/>
+        </strings>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction"/>
+  <elements xsi:type="CPL:Location" url="sip:fallback@example.com" clear="true"/>
+  <elements xsi:type="CPL:Reject" status="501" reason="Not Implemented"/>
+</CPL:CPLModel>

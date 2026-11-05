@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cpx">
+
+  <!-- 0: Primitive EDataType -->
+  <eClassifiers xsi:type="ecore:EDataType" name="TextType">
+    <eAnnotations source="http:///org/eclipse/emf/ecore/util/ExtendedMetaData">
+      <details key="baseType" value="http://www.w3.org/2001/XMLSchema#string"/>
+    </eAnnotations>
+  </eClassifiers>
+
+  <!-- 1: Primitive EDataType -->
+  <eClassifiers xsi:type="ecore:EDataType" name="IdentifierType">
+    <eAnnotations source="http:///org/eclipse/emf/ecore/util/ExtendedMetaData">
+      <details key="baseType" value="http://www.w3.org/2001/XMLSchema#int"/>
+    </eAnnotations>
+  </eClassifiers>
+
+  <!-- 2: Enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ARCHIVED" value="1" literal="ARCHIVED"/>
+  </eClassifiers>
+
+  <!-- 3: Another primitive EDataType -->
+  <eClassifiers xsi:type="eccore:EDataType" name="FlagType" instanceClassName="boolean">
+    <eAnnotations source="http:///org/eclipse/emf/ecore/util/ExtendedMetaData">
+      <details key="baseType" value="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </eAnnotations>
+  </eClassifiers>
+
+  <!-- 4: Abstract base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 5: Concrete class extending BaseElement with attributes and a reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Container" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active" lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="items" lowerBound="0" upperBound="-1"
+        containment="true" resolveProxies="true"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 6: Concrete item class extending BaseElement, with an enum attribute and cross-ref -->
+  <eClassifiers xsi:type="ecore:EClass" name="Item" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status" lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="linkedTo" lowerBound="0" upperBound="1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 7: Interface-like class with operations -->
+  <eClassifiers xsi:type="ecore:EClass" name="Auditable" abstract="true" interface="true">
+    <eOperations name="markReviewed">
+      <eParameters name="comment" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 8: Class combining inheritance from BaseElement and Auditable, with operations and params -->
+  <eClassifiers xsi:type="ecore:EClass" name="Review" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.4 //@eClassifiers.7">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="summary" lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="subject" lowerBound="1" upperBound="1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.6"/>
+    <eOperations name="computeScore">
+      <eParameters name="weight" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

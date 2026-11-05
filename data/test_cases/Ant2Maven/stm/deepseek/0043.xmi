@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="CoverageTest"
+    default="clean"
+    basedir="."
+    description="Test model for transformation coverage">
+  <targets xmi:id="clean" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="dist" verbose="true" quiet="false" failonerror="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile source code">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" optimize="false" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*Test.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/*.bak"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create JAR file">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/coverage.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Coverage API"/>
+  </targets>
+  <targets xmi:id="defaultGoal" name="defaultGoal" description="Full build">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyyMMdd-HHmm" locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Copy" file="README.txt" tofile="dist/README.txt" overwrite="false" flatten="true"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="dist"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+</Ant:Project>

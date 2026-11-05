@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="."
+    description="Build and package a small library"
+    default="buildTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target/classes"/>
+  <properties xsi:type="Ant:PropertyValue" name="dist.dir" value="target/dist"/>
+  <properties xsi:type="Ant:PropertyValue" name="jar.name" value="library-1.0.jar"/>
+
+  <!-- Default build target -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources and create distribution">
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" optimize="false" deprecation="true" fork="false"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+    <tasks xsi:type="Ant:Jar" jarfile="target/dist/library-1.0.jar" basedir="target/classes" compress="true"/>
+  </targets>
+
+  <!-- Clean target -->
+  <targets xmi:id="cleanTarget" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+  </targets>
+
+  <!-- Docs target -->
+  <targets xmi:id="docsTarget" name="docs" description="Generate API documentation">
+    <tasks xsi:type="Ant:Mkdir" dir="target/site/apidocs"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.library.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Library API Documentation"/>
+  </targets>
+
+</Ant:Project>

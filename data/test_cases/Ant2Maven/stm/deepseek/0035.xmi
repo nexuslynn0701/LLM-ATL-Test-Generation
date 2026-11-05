@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="build"
+    basedir="."
+    description="Main build project">
+  <targets xmi:id="build" name="build" description="Build target">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Delete" dir="temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Copy" file="README.txt" tofile="dist/README.txt" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="My API"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="DSTAMP" pattern="yyyyMMdd" offset="0" unit="day" locale="en_US"/>
+      <format property="TSTAMP" pattern="HHmm" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean target">
+    <tasks xsi:type="Ant:Delete" dir="classes" verbose="false" quiet="true" failonerror="false"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" verbose="false" quiet="true" failonerror="false"/>
+    <tasks xsi:type="Ant:Delete" dir="docs" verbose="false" quiet="true" failonerror="false"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/usr/local/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+</Ant:Project>

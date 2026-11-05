@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMeta"
+    nsURI="http://example.org/rootMeta"
+    nsPrefix="rm">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="innerMeta"
+      nsURI="http://example.org/innerMeta"
+      nsPrefix="im">
+    <!-- Classifiers inside subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="InnerBase">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="code"
+          iD="true"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="0"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="InnerChild">
+      <!-- Super type from the same subpackage -->
+      <eSuperTypes>//@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="flag"
+          iD="false"
+          lowerBound="0"
+          upperBound="1"
+          ordered="false"
+          unique="true"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      <!-- Non-containment reference to a root class -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="outer"
+          lowerBound="0"
+          upperBound="-1"
+          ordered="true"
+          unique="false"
+          containment="false"
+          eType="//@eClassifiers.0"/>
+    </eClassifiers>
+
+    <!-- Enumeration in subpackage -->
+    <eClassifiers xsi:type="ecore:EEnum" name="InnerKind">
+      <eLiterals name="IK_FIRST" value="0" literal="IK_FIRST"/>
+      <eLiterals name="IK_SECOND" value="1" literal="IK_SECOND"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root package classifiers -->
+  <!-- 0 -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootBase" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="rbName"
+        iD="false"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="RootDefault"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1 -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootMiddle">
+    <!-- multiple super types: root & subpackage -->
+    <eSuperTypes>//@eClassifiers.0 //@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="midCount"
+        iD="false"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="false"
+        defaultValueLiteral="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 2 -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootLeaf">
+    <eSuperTypes>//@eClassifiers.1</eSuperTypes>
+    <!-- Attribute with enum type in root package -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="category"
+        iD="false"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="RL_PRIMARY"
+        eType="//@eClassifiers.3"/>
+    <!-- Reference with opposite & containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="details"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        containment="true"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.0"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 3: Enumeration used by attribute in RootLeaf -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RootLevel">
+    <eLiterals name="RL_PRIMARY" value="0" literal="RL_PRIMARY"/>
+    <eLiterals name="RL_SECONDARY" value="1" literal="RL_SECONDARY"/>
+    <eLiterals name="RL_TERTIARY" value="2" literal="RL_TERTIARY"/>
+  </eClassifiers>
+
+  <!-- 4 -->
+  <eClassifiers xsi:type="ecore:EClass" name="Detail">
+    <!-- opposite reference back to RootLeaf -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        containment="false"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.1"
+        eType="//@eClassifiers.2"/>
+    <!-- attribute without explicit type to trigger @NoType path -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="rawValue"
+        iD="false"
+        lowerBound="0"
+        upperBound="1"
+        ordered="false"
+        unique="false"/>
+  </eClassifiers>
+
+  <!-- 5: DataType not directly used as attribute type to still exercise classifier handling -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="CustomNumber"
+      instanceClassName="java.math.BigDecimal"/>
+
+</ecore:EPackage>

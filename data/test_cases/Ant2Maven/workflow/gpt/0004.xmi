@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project"
+    description="Full build lifecycle: compile, package, and clean"
+    default="build">
+  <!-- Ant properties exercising PropertyValue, PropertyLocation, PropertyFile, PropertyEnv -->
+  <properties xsi:type="Ant:PropertyValue" name="src.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="project/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="project/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition (TaskDef) -->
+  <taskdef name="custom.task" classname="org.example.ant.CustomTask"/>
+
+  <!-- Main build target -->
+  <targets xmi:id="build" name="build" description="Compile sources and assemble jar">
+    <!-- Compile task (Javac) -->
+    <tasks xsi:type="Ant:Javac"
+        srcdir="project/src/main/java"
+        destdir="project/target/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false">
+      <!-- Simple classpath without cross-references -->
+      <classPath refid="">
+        <pathElement path="project/lib/runtime.jar" location="project/lib"/>
+        <fileset dir="project/lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+      <!-- InExcludes directly on Javac -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/generated/**"/>
+    </tasks>
+
+    <!-- Jar packaging task -->
+    <tasks xsi:type="Ant:Jar"
+        jarfile="project/target/complex-build.jar"
+        basedir="project/target/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="project/META-INF/MANIFEST.MF"/>
+
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="project/target"/>
+
+    <!-- Copy resources with FileSet, FilterSet, Mapper -->
+    <tasks xsi:type="Ant:Copy"
+        todir="project/target/resources"
+        overwrite="true"
+        filtering="true"
+        flatten="false"
+        includeEmptyDirs="true">
+      <fileset dir="project/src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.*"/>
+        </patternset>
+        <include name="config/**"/>
+        <exclude name="**/*.tmp"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="app.name" value="ComplexBuildApp"/>
+        <filtersfile file="project/config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.properties" to="*.conf"/>
+    </tasks>
+  </targets>
+
+  <!-- Secondary target: generate documentation -->
+  <targets xmi:id="docs" name="docs" description="Generate Javadoc API documentation">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="project/src/main/java"
+        destdir="project/target/docs/api"
+        packagenames="org.example.**"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="ComplexBuild API"/>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <!-- Tstamp management task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+
+    <!-- Delete task for cleanup -->
+    <tasks xsi:type="Ant:Delete"
+        dir="project/target"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        includes="**/*"
+        includesfile=""
+        excludes="**/.git/**"
+        excludesfile=""
+        defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

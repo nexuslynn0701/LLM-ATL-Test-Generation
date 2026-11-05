@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL script with subActions and incoming/outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="subMain">
+      <contents>//@elements.4</contents>
+      <contents>//@elements.5</contents>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="subAlt">
+      <contents>//@elements.6</contents>
+    </subActions>
+    <outgoing/>
+    <incoming/>
+  </elements>
+
+  <!-- 1: Location node (Node + NodeContainer) -->
+  <elements xsi:type="CPL:Location" url="sip:primary@example.com" priority="1.0" clear="yes">
+    <contents>//@elements.2</contents>
+  </elements>
+
+  <!-- 2: Proxy with all child handlers and contents -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+    <busy>
+      <contents>//@elements.3</contents>
+    </busy>
+    <noAnswer>
+      <contents>//@elements.4</contents>
+    </noAnswer>
+    <redirection>
+      <contents>//@elements.5</contents>
+    </redirection>
+    <failure>
+      <contents>//@elements.7</contents>
+    </failure>
+    <default>
+      <contents>//@elements.8</contents>
+    </default>
+  </elements>
+
+  <!-- 3: Redirect signalling action -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 4: Reject signalling action -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 5: SubCall referring to a SubAction by name (string only) -->
+  <elements xsi:type="CPL:SubCall" ref="subMain"/>
+
+  <!-- 6: AddressSwitch with addresses, notPresent/otherwise and contents -->
+  <elements xsi:type="CPL:AddressSwitch" field="from" subField="user">
+    <addresses is="alice" contains="example.com" subDomainOf="corp.example.com">
+      <contents>//@elements.1</contents>
+    </addresses>
+    <addresses is="bob" contains="example.org">
+      <contents>//@elements.2</contents>
+    </addresses>
+    <notPresent>
+      <contents>//@elements.7</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.8</contents>
+    </otherwise>
+  </elements>
+
+  <!-- 7: StringSwitch with multiple strings and otherwise -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <strings is="support" contains="ticket">
+      <contents>//@elements.1</contents>
+    </strings>
+    <strings is="sales">
+      <contents>//@elements.2</contents>
+    </strings>
+    <notPresent>
+      <contents>//@elements.3</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.4</contents>
+    </otherwise>
+  </elements>
+
+  <!-- 8: LanguageSwitch with SwitchedLanguage and notPresent/otherwise -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en">
+      <contents>//@elements.1</contents>
+    </languages>
+    <languages matches="fr">
+      <contents>//@elements.2</contents>
+    </languages>
+    <notPresent>
+      <contents>//@elements.5</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.4</contents>
+    </otherwise>
+  </elements>
+
+  <!-- 9: TimeSwitch with a detailed SwitchedTime and notPresent/otherwise -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <times dtstart="20260101T080000" dtend="20260101T180000" duration="PT10H"
+           freq="DAILY" until="20261231T235959" count="10" interval="1"
+           bySecond="0" byMinute="0" byHour="8,18" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1,15" byYearDay="100" byWeekNo="20" byMonth="1,6"
+           wkst="MO" bySetPos="1">
+      <contents>//@elements.1</contents>
+    </times>
+    <notPresent>
+      <contents>//@elements.3</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.4</contents>
+    </otherwise>
+  </elements>
+
+  <!-- 10: PrioritySwitch with SwitchedPriority and notPresent/otherwise -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.7" equal="0.5">
+      <contents>//@elements.1</contents>
+    </priorities>
+    <notPresent>
+      <contents>//@elements.2</contents>
+    </notPresent>
+    <otherwise>
+      <contents>//@elements.3</contents>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

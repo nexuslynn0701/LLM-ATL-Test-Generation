@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexExample"
+    nsURI="http://complex/example/1.0"
+    nsPrefix="cex">
+
+  <!-- 0: DomainObject -->
+  <eClassifiers xsi:type="ecore:EClass" name="DomainObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1: IdentifiedElement (ID attribute) -->
+  <eClassifiers xsi:type="ecore:EClass" name="IdentifiedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="uuid"
+        lowerBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 2: Person extends DomainObject & IdentifiedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person"
+      eSuperTypes="//@eClassifiers.0 //@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="address"
+        eType="//@eClassifiers.4"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employer"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 3: Company extends IdentifiedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="primaryAddress"
+        eType="//@eClassifiers.4"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 4: Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="street"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="city"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="zip"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 5: Project extends DomainObject -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team"
+        upperBound="-1"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 6: Task extends DomainObject -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignee"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 7: Status enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 8: Priority enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityKind">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 9: Meeting (uses enum, cross refs) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Meeting">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="subject"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="participants"
+        upperBound="-1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="host"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 10: Milestone extends DomainObject -->
+  <eClassifiers xsi:type="ecore:EClass" name="Milestone"
+      abstract="true"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dueDate"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+  </eClassifiers>
+
+  <!-- 11: ReleaseMilestone extends Milestone -->
+  <eClassifiers xsi:type="ecore:EClass" name="ReleaseMilestone"
+      eSuperTypes="//@eClassifiers.10">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="version"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 12: ReviewMilestone extends Milestone -->
+  <eClassifiers xsi:type="ecore:EClass" name="ReviewMilestone"
+      eSuperTypes="//@eClassifiers.10">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="reviewer"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 13: Utility class with many primitive attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Metrics">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="effort"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="bugs"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="qualityNote"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 14: TaggedElement with EStringToStringMapEntry -->
+  <eClassifiers xsi:type="ecore:EClass" name="TaggedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tags"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.15"/>
+  </eClassifiers>
+
+  <!-- 15: Tag map entry -->
+  <eClassifiers xsi:type="ecore:EClass" name="TagEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 16: Service with operations -->
+  <eClassifiers xsi:type="ecore:EClass" name="Service">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="endpoint"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eOperations name="ping"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eOperations name="findPerson">
+      <eParameters name="id"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eGenericType eClassifier="//@eClassifiers.2"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

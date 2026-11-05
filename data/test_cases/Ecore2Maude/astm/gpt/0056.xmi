@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example/rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to trigger super/subpackage rules -->
+  <eSubpackages name="subPkg"
+                nsURI="http://example/rootPkg/sub"
+                nsPrefix="sub">
+
+    <!-- Class in subpackage, no features -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="SubOnlyClass"/>
+  </eSubpackages>
+
+  <!-- Enumeration with three literals to trigger enum rules and lists -->
+  <eClassifiers xsi:type="eccore:EEnum"
+                name="Color">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+    <eLiterals name="BLUE" value="2" literal="BLUE"/>
+  </eClassifiers>
+
+  <!-- Simple class with only attributes (no refs) -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Person"
+                abstract="false"
+                interface="false">
+    <!-- ID attribute, String-typed, with default value containing quotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="&quot;P&quot;123"
+                         iD="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Boolean attribute, required -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Enum-typed attribute, many-valued -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="favoriteColors"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         iD="false"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- Base class to be extended -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Entity"
+                abstract="true"
+                interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- Derived class extending Entity, with attributes and references (incl. opposite) -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Order"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <!-- Integer attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="number"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="100"
+                         iD="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference to Person, containment, single, with opposite set later -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="customer"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.1"/>
+    <!-- Many-valued reference to OrderLine (will have no opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="lines"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- Class with references including an opposite back to Order.customer -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="OrderLine"
+                abstract="false"
+                interface="false">
+    <!-- Float-typed attribute, many, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="price"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         iD="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <!-- Non-containment ref to Order, with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="order"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.3"
+                         eOpposite="//@eClassifiers.3/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://rootpkg"
+    nsPrefix="root">
+  <!-- 0: Root-level EClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClass" abstract="false" interface="false">
+    <!-- String ID attribute with default value, ordered/unique default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        defaultValueLiteral="defaultId"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Int attribute with bounds and default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="count"
+        lowerBound="0"
+        upperBound="5"
+        defaultValueLiteral="3"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Boolean attribute using EBooleanObject -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="flag"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+    <!-- Reference to ChildClass, containment, upperBound -1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 1: Child EClass with super type RootClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="ChildClass" abstract="false" interface="false" eSuperTypes="//@eClassifiers.0">
+    <!-- String attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="label"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Reference back to RootClass, non-containment, multiplicity 1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="parent"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 2: Enumeration with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 3: Another EEnum used as attribute type, with one literal -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityEnum">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+  </eClassifiers>
+
+  <!-- 4: EDataType used by an attribute (custom data type) -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomDataType" instanceTypeName="java.lang.String"/>
+
+  <!-- 5: EClass that uses enums and custom data type -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false">
+    <!-- Attribute typed with StatusEnum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.2"/>
+    <!-- Attribute typed with PriorityEnum and default literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="LOW"
+        eType="//@eClassifiers.3"/>
+    <!-- Attribute typed with CustomDataType -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="description"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.4"/>
+    <!-- Reference to RootClass with opposite set to ChildClass.parent -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="rootRef"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+  </eClassifiers>
+</ecore:EPackage>

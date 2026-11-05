@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL, with Incoming, Outgoing, and two SubActions -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions used by SubCall and as declarations -->
+    <subActions id="saAlpha"/>
+    <subActions id="saBeta"/>
+
+    <!-- Incoming method body: simple Proxy (triggers Proxy2Return) -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- Simple proxy: no children busy/noAnswer/... -->
+      </contents>
+    </incoming>
+
+    <!-- Outgoing method body: SubCall (triggers SubCall2Return) -->
+    <outgoing>
+      <contents xsi:type="CPL:SubCall" ref="saAlpha"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy (Location2URIConstant & location helper) -->
+  <elements xsi:type="CPL:Location"
+            url="sip:alpha@example.com"
+            clear="true"
+            priority="10">
+    <!-- contents points to simple Proxy at index 2 -->
+    <contents href="//@elements.2"/>
+  </elements>
+
+  <!-- 2: Proxy (simple) to exercise Proxy2Return as standalone statement -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+    <!-- no busy/noAnswer/redirection/failure/default => isSimple = true -->
+  </elements>
+
+  <!-- 3: Complex Proxy to exercise Proxy2Select, Busy/NoAnswer/Redirection/Default -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <!-- Busy branch with SubCall (Busy2SelectCase + SubCall2Return as nested stmt) -->
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="saBeta"/>
+    </busy>
+
+    <!-- NoAnswer branch with Redirect (NoAnswer2SelectCase + Redirect2Return nested) -->
+    <noAnswer>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </noAnswer>
+
+    <!-- Redirection branch with simple Proxy (Redirection2SelectCase + Proxy2Return nested) -->
+    <redirection>
+      <!-- contents refers to simple Proxy at index 2 -->
+      <contents href="//@elements.2"/>
+    </redirection>
+
+    <!-- Failure branch with no contents (Failure2ErrorResponse only when Failure used alone,
+         here we just include it so Proxy2Select has all branches non-undefined) -->
+    <failure/>
+
+    <!-- Default branch with Reject contents (Default2SelectDefault with empty statements) -->
+    <default>
+      <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+    </default>
+  </elements>
+
+  <!-- 4: Redirect with permanent="true" (Redirect2Return, Location helper, Location2URIConstant) -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- Location inside Redirect contributes to locations sequence -->
+    <contents xsi:type="CPL:Location"
+              url="sip:beta@example.org"
+              clear="false"
+              priority="20">
+      <!-- inner Location contents left undefined so it's a pure location holder -->
+    </contents>
+  </elements>
+
+  <!-- 5: AddressSwitch to exercise AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="display-name">
+    <!-- one switched address with SubCall contents -->
+    <addresses is="Alice" contains="none" subDomainOf="example.net">
+      <contents xsi:type="CPL:SubCall" ref="saAlpha"/>
+    </addresses>
+
+    <!-- notPresent branch with no contents (NotPresent2ErrorResponse only when stand-alone, 
+         here it participates in AddressSwitch2SelectStat as select case value) -->
+    <notPresent/>
+
+    <!-- otherwise branch with simple Proxy contents (Otherwise2SelectDefault + Proxy2Return nested) -->
+    <otherwise>
+      <contents href="//@elements.2"/>
+    </otherwise>
+  </elements>
+
+  <!-- 6: StringSwitch to exercise StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <!-- field name becomes a variable name in target -->
+    <contents href="//@elements.4"/>
+    <strings is="ok" contains="yes"/>
+  </elements>
+
+  <!-- 7: LanguageSwitch (appears, but its contents type is filtered out as statements) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <!-- contents is a Reject so various 'statements' helpers will drop it -->
+    <contents xsi:type="CPL:Reject" status="488" reason="Not Acceptable Here"/>
+  </elements>
+
+  <!-- 8: TimeSwitch (appears similarly, used to trigger filtering conditions) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example">
+    <times dtstart="20240101T080000Z"
+           interval="60"
+           wkst="MO"/>
+  </elements>
+
+  <!-- 9: PrioritySwitch (also used only to exercise filtering guards) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.1" greater="0.9" equal="0.5"/>
+  </elements>
+
+</CPL:CPLModel>

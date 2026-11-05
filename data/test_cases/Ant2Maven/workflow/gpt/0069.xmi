@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuildPipeline"
+    basedir="workspace"
+    description="End-to-end build, package and cleanup pipeline"
+    default="build-main">
+  <!-- Properties exercising all property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="workspace/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition (not referenced by tasks) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple predefined tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Compile and package main artifacts">
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src"
+           destdir="workspace/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/dist/main-app.jar"
+           basedir="workspace/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="workspace/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Secondary target performing documentation and cleanup -->
+  <targets xmi:id="doc-and-clean" name="doc-and-clean" description="Generate Javadoc and clean temporary files">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="workspace/src"
+           destdir="workspace/docs/api"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="FullBuildPipeline API"/>
+    <tasks xsi:type="Ant:Delete"
+           file="workspace/temp/old-build.log"
+           dir="workspace/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile="workspace/config/delete-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="workspace/config/delete-excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

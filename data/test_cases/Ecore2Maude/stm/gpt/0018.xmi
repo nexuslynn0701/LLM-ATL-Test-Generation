@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ecore="http://ecore"
+  name="mathSpec"
+  nsURI="http://mathSpec/1.0"
+  nsPrefix="math">
+
+  <!-- 0: Kinds -->
+  <eClassifiers xsi:type="ecore:EClass" name="Kind"
+                eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="sorts"
+                         lowerBound="1"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 1: Type (abstract base for Kind/Sort) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Type"
+                abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 2: Sort -->
+  <eClassifiers xsi:type="ecore:EClass" name="Sort"
+                eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="kind"
+                         lowerBound="1"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subsortRels"
+                         upperBound="-1"
+                         eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="supersortRels"
+                         upperBound="-1"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 3: Operation -->
+  <eClassifiers xsi:type="ecore:EClass" name="Operation">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="coarity"
+                         eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="arity"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="atts"
+                         upperBound="-1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: SubsortRel -->
+  <eClassifiers xsi:type="ecore:EClass" name="SubsortRel">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subsorts"
+                         lowerBound="1"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="supersorts"
+                         lowerBound="1"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 5: Term (abstract) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Term"
+                abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="type"
+                         lowerBound="1"
+                         eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 6: Constant -->
+  <eClassifiers xsi:type="ecore:EClass" name="Constant"
+                eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="op"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 7: RecTerm with nested args -->
+  <eClassifiers xsi:type="ecore:EClass" name="RecTerm"
+                eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="op"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="args"
+                         lowerBound="1"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 8: Variable -->
+  <eClassifiers xsi:type="ecore:EClass" name="Variable"
+                eSuperTypes="//@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 9: Condition (abstract) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Condition"
+                abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="lhs"
+                         lowerBound="1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 10: EquationalCond (abstract) -->
+  <eClassifiers xsi:type="ecore:EClass" name="EquationalCond"
+                abstract="true"
+                eSuperTypes="//@eClassifiers.9"/>
+
+  <!-- 11: RewriteCond -->
+  <eClassifiers xsi:type="ecore:EClass" name="RewriteCond"
+                eSuperTypes="//@eClassifiers.9">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="rhs"
+                         lowerBound="1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 12: MembershipCond -->
+  <eClassifiers xsi:type="ecore:EClass" name="MembershipCond"
+                eSuperTypes="//@eClassifiers.10">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="rhs"
+                         lowerBound="1"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 13: BooleanCond -->
+  <eClassifiers xsi:type="ecore:EClass" name="BooleanCond"
+                eSuperTypes="//@eClassifiers.10"/>
+
+  <!-- 14: MatchingCond -->
+  <eClassifiers xsi:type="ecore:EClass" name="MatchingCond"
+                eSuperTypes="//@eClassifiers.10">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="rhs"
+                         lowerBound="1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 15: EqualCond -->
+  <eClassifiers xsi:type="ecore:EClass" name="EqualCond"
+                eSuperTypes="//@eClassifiers.10">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="rhs"
+                         lowerBound="1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 16: Statement (abstract) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Statement"
+                abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="atts"
+                         upperBound="-1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="conds"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+  <!-- 17: Membership -->
+  <eClassifiers xsi:type="ecore:EClass" name="Membership"
+                eSuperTypes="//@eClassifiers.16">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="term"
+                         lowerBound="1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="sort"
+                         lowerBound="1"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 18: Equation -->
+  <eClassifiers xsi:type="ecore:EClass" name="Equation"
+                eSuperTypes="//@eClassifiers.16">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="lhs"
+                         lowerBound="1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="rhs"
+                         lowerBound="1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 19: Rule -->
+  <eClassifiers xsi:type="ecore:EClass" name="Rule"
+                eSuperTypes="//@eClassifiers.16">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="lhs"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="rhs"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 20: View -->
+  <eClassifiers xsi:type="ecore:EClass" name="View">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 21: ViewMapping (abstract) -->
+  <eClassifiers xsi:type="ecore:EClass" name="ViewMapping"
+                abstract="true"/>
+
+  <!-- 22: RenMapping (abstract) -->
+  <eClassifiers xsi:type="ecore:EClass" name="RenMapping"
+                abstract="true"
+                eSuperTypes="//@eClassifiers.21"/>
+
+  <!-- 23: TermMapping -->
+  <eClassifiers xsi:type="ecore:EClass" name="TermMapping"
+                eSuperTypes="//@eClassifiers.21">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="from"
+                         lowerBound="1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="to"
+                         lowerBound="1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 24: SortMapping -->
+  <eClassifiers xsi:type="ecore:EClass" name="SortMapping"
+                eSuperTypes="//@eClassifiers.22">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="from"
+                         lowerBound="1"
+                         eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="to"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 25: OpTypedMapping -->
+  <eClassifiers xsi:type="ecore:EClass" name="OpTypedMapping"
+                eSuperTypes="//@eClassifiers.22">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="from"
+                         lowerBound="1"
+                         eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="to"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="atts"
+                         upperBound="-1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 26: OpMapping -->
+  <eClassifiers xsi:type="ecore:EClass" name="OpMapping"
+                eSuperTypes="//@eClassifiers.22">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="from"
+                         lowerBound="1"
+                         eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="to"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 27: LabelMapping -->
+  <eClassifiers xsi:type="ecore:EClass" name="LabelMapping"
+                eSuperTypes="//@eClassifiers.22">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="from"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="to"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa_main">
+      <!-- SubAction contents: simple Proxy (will use Proxy2Return) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+    <incoming>
+      <!-- Incoming contents: SubCall to sa_main (SubCall2Return) -->
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing contents: complex Proxy (Proxy2Select) -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy>
+          <!-- Busy contents: SubCall to sa_main -->
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <!-- Default contents: simple Proxy -->
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy in SubAction (index 0) -->
+  <elements xsi:type="CPL:Location" url="sip:subaction@service" clear="yes"/>
+
+  <!-- 2: Location used by simple Proxy inside Default of complex Proxy (index 0 Outgoing) -->
+  <elements xsi:type="CPL:Location" url="sip:default@service" clear="yes"/>
+
+  <!-- 3: SubCall whose ref does NOT match any SubAction id (no SubAction with id=unknown) -->
+  <elements xsi:type="CPL:SubCall" ref="unknown_action"/>
+
+  <!-- 4: AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- SwitchedAddress -> SwitchedAddress2SelectCase -->
+    <addresses is="sip:user1@example.com" contains="user1" subDomainOf="example.com"/>
+    <!-- NotPresent -> NotPresent2ErrorResponse -->
+    <notPresent/>
+    <!-- Otherwise containing Redirect -> Otherwise2SelectDefault + Redirect2Return -->
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </otherwise>
+  </elements>
+
+  <!-- 5: Location for Redirect (in Otherwise of AddressSwitch) -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.com" clear="no"/>
+
+  <!-- 6: Standalone Redirect at top-level (also exercises Redirect2Return, OCL28/15/32) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 7: Standalone simple Proxy at top-level whose location is elements[8] -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- simple: all children undefined -->
+  </elements>
+
+  <!-- 8: Location for top-level simple Proxy (elements[7]) -->
+  <elements xsi:type="CPL:Location" url="sip:topproxy@example.com" clear="yes"/>
+
+  <!-- 9: StringSwitch just to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <!-- field name becomes variable name in target -->
+    <!-- no strings here to keep model simple -->
+  </elements>
+
+</CPL:CPLModel>

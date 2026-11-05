@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    default="build-all"
+    basedir="."
+    description="A sample Ant project for transformation testing">
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target/classes"/>
+  <properties xsi:type="Ant:PropertyValue" name="dist.dir" value="target/dist"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <targets xmi:id="init" name="init" description="Initialize directories">
+    <tasks xsi:type="Ant:Mkdir" dir="${build.dir}"/>
+    <tasks xsi:type="Ant:Mkdir" dir="${dist.dir}"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Javac" srcdir="${src.dir}" destdir="${build.dir}" debug="true" deprecation="true"/>
+  </targets>
+  <targets xmi:id="jar" name="jar" description="Create JAR file">
+    <tasks xsi:type="Ant:Jar" jarfile="${dist.dir}/sample.jar" basedir="${build.dir}" compress="true"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="${build.dir}" quiet="true"/>
+    <tasks xsi:type="Ant:Delete" dir="${dist.dir}" quiet="true"/>
+  </targets>
+  <targets xmi:id="build-all" name="build-all" description="Full build cycle">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="${src.dir}"
+        destdir="${dist.dir}/docs"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Sample API Documentation"/>
+    <tasks xsi:type="Ant:Copy" todir="${dist.dir}/resources" flatten="false" includeEmptyDirs="true">
+      <fileset dir="src/main/resources"/>
+    </tasks>
+  </targets>
+</Ant:Project>

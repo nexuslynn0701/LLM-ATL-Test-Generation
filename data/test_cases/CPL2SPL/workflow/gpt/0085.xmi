@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: CPL root with subAction, outgoing, and incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction -->
+    <subActions id="sa_main">
+      <!-- contents points to AddressSwitch at elements[5] -->
+      <contents xsi:type="CPL:AddressSwitch"
+                field="origin"
+                subField="sf1">
+        <!-- notPresent and otherwise defined inline -->
+        <notPresent/>
+        <otherwise/>
+      </contents>
+    </subActions>
+
+    <!-- One Outgoing whose contents is a complex Proxy at elements[2] -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy"
+                timeout="30"
+                recurse="yes"
+                ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- default contents is a SubCall at elements[4] -->
+        <default contents="//@elements.4"/>
+      </contents>
+    </outgoing>
+
+    <!-- One Incoming whose contents is a simple Proxy at elements[1] -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy"
+                timeout="20"
+                recurse="yes"
+                ordering="sequential">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- elements[1]: Location used by simple Proxy (for Location2URIConstant) -->
+  <elements xsi:type="CPL:Location"
+           url="sip:simple@example.com"
+           priority="1"
+           clear="true"/>
+
+  <!-- elements[2]: Location used by complex Proxy (for Location2URIConstant) -->
+  <elements xsi:type="CPL:Location"
+           url="sip:complex@example.com"
+           priority="1"
+           clear="true"/>
+
+  <!-- elements[3]: Redirect (also uses Location2URIConstant via locations helper) -->
+  <elements xsi:type="CPL:Redirect"
+           permanent="true">
+    <!-- Location belonging to this Redirect -->
+    <contents xsi:type="CPL:Location"
+             url="sip:redirect@example.com"
+             priority="1"
+             clear="true"/>
+  </elements>
+
+  <!-- elements[4]: SubCall referring to existing SubAction id -->
+  <elements xsi:type="CPL:SubCall"
+           ref="sa_main"/>
+
+  <!-- elements[5]: AddressSwitch with SwitchedAddress child (non-empty 'is') -->
+  <elements xsi:type="CPL:AddressSwitch"
+           field="origin"
+           subField="sf2">
+    <!-- notPresent and otherwise with no contents -->
+    <notPresent/>
+    <otherwise/>
+    <!-- SwitchedAddress ensuring rule SwitchedAddress2SelectCase and OCL7 -->
+    <addresses is="user@example.com"
+               contains="cont"
+               subDomainOf="subdom"/>
+  </elements>
+
+</CPL:CPLModel>

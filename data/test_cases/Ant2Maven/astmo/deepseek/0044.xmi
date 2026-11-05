@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Ant="Ant" name="DataProcessing" default="process" basedir="." description="Data processing pipeline">
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.location" location="config/settings.xml"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <targets xmi:id="init" name="init" description="Initialize directories">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/reports"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="false" deprecation="false"/>
+  </targets>
+  <targets xmi:id="process" name="process" description="Process data">
+    <tasks xsi:type="Ant:Copy" todir="build/processed" filtering="true" flatten="false" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="build/temp" verbose="false" quiet="true" failonerror="false" includeEmptyDirs="false"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Package application">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true" encoding="UTF-8"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="build/docs" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Data Processing API"/>
+  </targets>
+  <targets xmi:id="stamp" name="stamp" description="Timestamp build">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" offset="1" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+  </targets>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+</Ant:Project>

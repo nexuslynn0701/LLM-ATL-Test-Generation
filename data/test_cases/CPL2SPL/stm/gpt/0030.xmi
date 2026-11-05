@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL script with multiple subActions and incoming/outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- Incoming branch containing a StringSwitch -->
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="FromUser">
+        <strings is="alice" contains="example.com">
+          <contents xsi:type="CPL:Location" url="sip:alice@home.example.com" clear="yes" priority="1"/>
+        </strings>
+        <strings contains="vip">
+          <contents xsi:type="CPL:SubCall" ref="vipHandler"/>
+        </strings>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="400" reason="Missing From header"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+            <busy>
+              <contents xsi:type="CPL:Location" url="sip:alice@backup.example.com" clear="no" priority="2"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </noAnswer>
+            <redirection>
+              <contents xsi:type="CPL:SubCall" ref="fallbackSequence"/>
+            </redirection>
+            <failure>
+              <contents xsi:type="CPL:Reject" status="500" reason="Internal error"/>
+            </failure>
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:alice@voicemail.example.com" clear="yes" priority="3"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+
+    <!-- Outgoing branch containing an AddressSwitch -->
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="To" subField="host">
+        <addresses is="bob.example.com" contains="bob">
+          <contents xsi:type="CPL:Location" url="sip:bob@office.example.com" clear="yes" priority="1"/>
+        </addresses>
+        <addresses contains="sales" subDomainOf="example.com">
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+            <busy>
+              <contents xsi:type="CPL:Reject" status="486" reason="Sales busy"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Location" url="sip:sales@queue.example.com" clear="no" priority="2"/>
+            </noAnswer>
+            <failure>
+              <contents xsi:type="CPL:Redirect" permanent="false"/>
+            </failure>
+            <default>
+              <contents xsi:type="CPL:SubCall" ref="afterHoursSales"/>
+            </default>
+          </contents>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="No destination"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:dispatcher@example.com" clear="yes" priority="5"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+
+    <!-- SubActions referenced by SubCall.ref strings -->
+    <subActions id="vipHandler">
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities greater="0.7">
+          <contents xsi:type="CPL:Location" url="sip:vip@priority.example.com" clear="yes" priority="0"/>
+        </priorities>
+        <priorities equal="0.5">
+          <contents xsi:type="CPL:SubCall" ref="midPriorityHandler"/>
+        </priorities>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="480" reason="Priority not set"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:vip@standard.example.com" clear="yes" priority="1"/>
+        </otherwise>
+      </contents>
+    </subActions>
+
+    <subActions id="fallbackSequence">
+      <contents xsi:type="CPL:TimeSwitch" tzid="Europe/Berlin" tzurl="http://tz.example.com/eu-berlin">
+        <times dtstart="20240101T080000" dtend="20240101T170000" interval="1" wkst="MO" freq="DAILY">
+          <contents xsi:type="CPL:Location" url="sip:daydesk@example.com" clear="yes" priority="1"/>
+        </times>
+        <times dtstart="20240101T170000" interval="1" wkst="MO" freq="DAILY">
+          <contents xsi:type="CPL:Location" url="sip:eveningdesk@example.com" clear="yes" priority="1"/>
+        </times>
+        <notPresent>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy>
+              <contents xsi:type="CPL:Reject" status="486" reason="All desks busy"/>
+            </busy>
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:operator@example.com" clear="yes" priority="3"/>
+            </default>
+          </contents>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:fallback@example.com" clear="yes" priority="5"/>
+        </otherwise>
+      </contents>
+    </subActions>
+
+    <subActions id="midPriorityHandler">
+      <contents xsi:type="CPL:LanguageSwitch">
+        <languages matches="en">
+          <contents xsi:type="CPL:Location" url="sip:support-en@example.com" clear="yes" priority="1"/>
+        </languages>
+        <languages matches="fr">
+          <contents xsi:type="CPL:Location" url="sip:support-fr@example.com" clear="yes" priority="1"/>
+        </languages>
+        <notPresent>
+          <contents xsi:type="CPL:Location" url="sip:support-generic@example.com" clear="yes" priority="2"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="488" reason="Unsupported language"/>
+        </otherwise>
+      </contents>
+    </subActions>
+  </elements>
+
+  <!-- 1: Standalone SubCall, referred to from proxies via contents -->
+  <elements xsi:type="CPL:SubCall" ref="topLevelSequence"/>
+
+  <!-- 2: Standalone Location used as default target -->
+  <elements xsi:type="CPL:Location" url="sip:mainqueue@example.com" clear="yes" priority="1"/>
+
+  <!-- 3: Standalone Redirect -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 4: Standalone Reject -->
+  <elements xsi:type="CPL:Reject" status="603" reason="Decline"/>
+
+  <!-- 5: Standalone Proxy that composes existing top-level elements via contents -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="30">
+    <busy>
+      <!-- points to element 4 (Reject) -->
+      <contents href="//@elements.4"/>
+    </busy>
+    <noAnswer>
+      <!-- points to element 3 (Redirect) -->
+      <contents href="//@elements.3"/>
+    </noAnswer>
+    <redirection>
+      <!-- points to element 1 (SubCall) -->
+      <contents href="//@elements.1"/>
+    </redirection>
+    <failure>
+      <!-- points to element 2 (Location) -->
+      <contents href="//@elements.2"/>
+    </failure>
+    <default>
+      <!-- points back to element 0 (main CPL) to exercise graph-like structure -->
+      <contents href="//@elements.0"/>
+    </default>
+  </elements>
+
+  <!-- 6: Standalone AddressSwitch with external Location references -->
+  <elements xsi:type="CPL:AddressSwitch" field="ToUser" subField="user">
+    <addresses is="carol">
+      <contents href="//@elements.2"/>
+    </addresses>
+    <addresses contains="ops" subDomainOf="example.org">
+      <contents xsi:type="CPL:Location" url="sip:ops@example.org" clear="yes" priority="0"/>
+    </addresses>
+    <notPresent>
+      <contents href="//@elements.4"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.3"/>
+    </otherwise>
+  </elements>
+
+  <!-- 7: Standalone StringSwitch using external SubCall and Proxy -->
+  <elements xsi:type="CPL:StringSwitch" field="Subject">
+    <strings contains="urgent">
+      <contents href="//@elements.5"/>
+    </strings>
+    <strings contains="callback">
+      <contents href="//@elements.1"/>
+    </strings>
+    <notPresent>
+      <contents href="//@elements.2"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="480" reason="Temporarily unavailable"/>
+    </otherwise>
+  </elements>
+
+  <!-- 8: Standalone LanguageSwitch using external Reject and Location -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="es">
+      <contents xsi:type="CPL:Location" url="sip:support-es@example.com" clear="yes" priority="1"/>
+    </languages>
+    <languages matches="de">
+      <contents href="//@elements.2"/>
+    </languages>
+    <notPresent>
+      <contents href="//@elements.4"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="406" reason="Not acceptable language"/>
+    </otherwise>
+  </elements>
+
+  <!-- 9: Standalone TimeSwitch with multiple SwitchedTime entries -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com/utc">
+    <times dtstart="20240101T000000" dtend="20240101T080000" interval="1" wkst="MO">
+      <contents href="//@elements.2"/>
+    </times>
+    <times dtstart="20240101T080000" dtend="20240101T200000" interval="2" wkst="MO" freq="HOURLY">
+      <contents href="//@elements.5"/>
+    </times>
+    <times dtstart="20240101T200000" interval="1" wkst="MO">
+      <contents href="//@elements.3"/>
+    </times>
+    <notPresent>
+      <contents href="//@elements.4"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:nightwatch@example.com" clear="yes" priority="4"/>
+    </otherwise>
+  </elements>
+
+  <!-- 10: Standalone PrioritySwitch combining external and local nodes -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3">
+      <contents href="//@elements.2"/>
+    </priorities>
+    <priorities greater="0.8">
+      <contents href="//@elements.5"/>
+    </priorities>
+    <priorities equal="0.5">
+      <contents xsi:type="CPL:Location" url="sip:balanced@example.com" clear="yes" priority="2"/>
+    </priorities>
+    <notPresent>
+      <contents href="//@elements.4"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.3"/>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

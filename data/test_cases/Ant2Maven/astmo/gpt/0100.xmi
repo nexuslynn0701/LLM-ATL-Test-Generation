@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleAntProject0100"
+    basedir="project-root"
+    description="Ant project for ATL Ant2Maven testing (model 0100)"
+    default="build">
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  
+  <!-- Task definition (not referenced by tasks, but transformed) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="build" name="build" description="Compile sources and package jar">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/sample-ant-project-0100.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/temp"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile="config/includes.txt"
+           excludes="**/do-not-delete/**"
+           excludesfile="config/excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <targets xmi:id="clean" name="clean" description="Clean build outputs">
+    <tasks xsi:type="Ant:Delete"
+           dir="target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="config/clean-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/clean-excludes.txt"
+           defaultexcludes="false"/>
+  </targets>
+
+  <!-- Path and related pattern structures (all contained, no refs) -->
+  <path id="mainClasspath">
+    <pathElement path="lib/dependency-a.jar" location="lib/dependency-a.jar"/>
+    <pathElement path="lib/dependency-b.jar" location="lib/dependency-b.jar"/>
+    <fileset dir="lib">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar" ifCondition="" unless=""/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/old/*.jar" ifCondition="" unless=""/>
+      </patternset>
+      <include name="**/extra/*.jar" ifCondition="" unless=""/>
+      <exclude name="**/exclude/*.jar" ifCondition="" unless=""/>
+    </fileset>
+  </path>
+
+  <path id="testClasspath">
+    <pathElement path="lib/test-dependency.jar" location="lib/test-dependency.jar"/>
+  </path>
+
+  <!-- ClassPath with FileSet and PathElement -->
+  <path>
+    <fileset dir="extensions">
+      <include name="**/*.jar" ifCondition="" unless=""/>
+      <exclude name="**/beta/*.jar" ifCondition="" unless=""/>
+    </fileset>
+    <pathElement path="extensions/extension-a.jar" location="extensions/extension-a.jar"/>
+  </path>
+
+  <!-- Filters and filter sets -->
+  <properties xsi:type="Ant:PropertyFile" file="config/filters.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="MAVEN_HOME"/>
+
+  <targets xmi:id="resources" name="resources" description="Process resources">
+    <tasks xsi:type="Ant:Copy"
+           todir="target/resources">
+      <fileset dir="src/main/resources">
+        <include name="**/*.*" ifCondition="" unless=""/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="SampleAntProject0100"/>
+        <filtersfile file="config/token-filters.txt"/>
+      </filterset>
+    </tasks>
+  </targets>
+</Ant:Project>

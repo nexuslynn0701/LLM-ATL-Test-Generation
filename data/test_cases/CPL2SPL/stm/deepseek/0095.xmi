@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sub1">
+      <contents xsi:type="CPL:Location" url="sip:user@domain.com" priority="1" clear="yes"/>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="host">
+        <addresses is="192.168.1.100" contains="office" subDomainOf="example.com"/>
+        <addresses is="10.0.0.1" contains="vpn" subDomainOf="internal.net"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:StringSwitch" field="user-agent">
+            <strings is="softphone" contains="linphone"/>
+            <strings is="hardphone" contains="cisco"/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" tzid="America/New_York" tzurl="http://timezone.example.com">
+        <times dtstart="20240101T090000" dtend="20240101T170000" duration="PT8H" freq="daily" until="20241231T235959" count="365" interval="1" wkst="MO" byHour="9,10,11,12,13,14,15,16"/>
+        <times dtstart="20240101T000000" dtend="20240101T080000" duration="PT8H" freq="daily" interval="1" wkst="MO"/>
+        <notPresent>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+            <busy>
+              <contents xsi:type="CPL:Location" url="sip:voicemail@company.com" priority="1" clear="no"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+            </noAnswer>
+            <default contents="//@elements.3"/>
+          </Proxy>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:backup@alternate.com" priority="2" clear="yes"/>
+  <elements xsi:type="CPL:SubCall" ref="sub1"/>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="3" greater="5" equal="4"/>
+    <priorities less="1" equal="2"/>
+    <notPresent>
+      <contents xsi:type="CPL:LanguageSwitch">
+        <languages matches="en"/>
+        <languages matches="fr"/>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+        </otherwise>
+      </contents>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

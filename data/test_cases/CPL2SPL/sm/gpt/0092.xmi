@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with subActions and incoming/outgoing containers -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="saAlpha"/>
+    <subActions xsi:type="CPL:SubAction" id="saBeta"/>
+    <outgoing xsi:type="CPL:Outgoing" contents="//@elements.4"/>
+    <outgoing xsi:type="CPL:Outgoing" contents="//@elements.6"/>
+    <incoming xsi:type="CPL:Incoming" contents="//@elements.3"/>
+  </elements>
+
+  <!-- 1: Location used as a simple endpoint -->
+  <elements xsi:type="CPL:Location" url="sip:alice@example.com" priority="10" clear="yes"/>
+
+  <!-- 2: SubCall referencing a SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="saAlpha"/>
+
+  <!-- 3: Redirect action -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 4: Proxy with only busy and default outcomes -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential" timeout="20">
+    <busy contents="//@elements.1"/>
+    <default contents="//@elements.2"/>
+  </elements>
+
+  <!-- 5: Reject action -->
+  <elements xsi:type="CPL:Reject" status="603" reason="Decline"/>
+
+  <!-- 6: AddressSwitch with multiple addresses and all branches -->
+  <elements xsi:type="CPL:AddressSwitch" field="from" subField="user">
+    <addresses is="bob" contains="corp" subDomainOf="example.com"/>
+    <addresses is="carol" contains="vip" subDomainOf="vip.example.com"/>
+    <notPresent contents="//@elements.5"/>
+    <otherwise contents="//@elements.1"/>
+  </elements>
+
+  <!-- 7: StringSwitch with multiple cases -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <strings is="support" contains="[ticket]"/>
+    <strings is="sales" contains="offer"/>
+    <notPresent contents="//@elements.2"/>
+    <otherwise contents="//@elements.4"/>
+  </elements>
+
+  <!-- 8: LanguageSwitch with several language branches -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="fr"/>
+    <languages matches="de"/>
+    <notPresent contents="//@elements.3"/>
+    <otherwise contents="//@elements.7"/>
+  </elements>
+
+  <!-- 9: TimeSwitch with a SwitchedTime including most attributes -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Berlin" tzurl="http://tz.example.com/berlin">
+    <times dtstart="20240101T080000" dtend="20240101T170000" duration="PT9H" freq="DAILY"
+           until="20241231T235959" count="365" interval="1" bySecond="0"
+           byMinute="0" byHour="8" byDay="MO,TU,WE,TH,FR" byMonthDay="1-31"
+           byYearDay="1-365" byWeekNo="1-52" byMonth="1-12" wkst="MO" bySetPos="1"/>
+    <notPresent contents="//@elements.1"/>
+    <otherwise contents="//@elements.4"/>
+  </elements>
+
+  <!-- 10: PrioritySwitch with SwitchedPriority branches -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.0" equal="0.2"/>
+    <priorities less="0.7" greater="0.3" equal="0.5"/>
+    <notPresent contents="//@elements.5"/>
+    <otherwise contents="//@elements.9"/>
+  </elements>
+
+  <!-- 11: Location that acts as a container for a SubCall -->
+  <elements xsi:type="CPL:Location" url="sip:queue@example.com" priority="5" clear="no">
+    <contents xsi:type="CPL:SubCall" ref="saBeta"/>
+  </elements>
+
+</CPL:CPLModel>

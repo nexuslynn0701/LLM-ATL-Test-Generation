@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with subActions and incoming/outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="subA">
+      <contents>//@elements.4</contents>
+      <contents>//@elements.5</contents>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="subB">
+      <contents>//@elements.6</contents>
+    </subActions>
+    <outgoing>
+      <contents>//@elements.2</contents>
+      <contents>//@elements.3</contents>
+    </outgoing>
+    <incoming>
+      <contents>//@elements.1</contents>
+    </incoming>
+  </elements>
+
+  <!-- 1: Simple SubCall -->
+  <elements xsi:type="CPL:SubCall" ref="handleIncoming"/>
+
+  <!-- 2: Location used from CPL.outgoing -->
+  <elements xsi:type="CPL:Location" url="sip:alice@example.org" priority="10" clear="yes"/>
+
+  <!-- 3: Redirect with minimal attributes -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 4: AddressSwitch with NotPresent/Otherwise and addresses -->
+  <elements xsi:type="CPL:AddressSwitch" field="user" subField="tel">
+    <notPresent/>
+    <otherwise/>
+    <addresses is="bob" contains="001" subDomainOf="example.com">
+      <contents>//@elements.2</contents>
+    </addresses>
+    <addresses is="carol" contains="002" subDomainOf="example.net">
+      <contents>//@elements.3</contents>
+    </addresses>
+  </elements>
+
+  <!-- 5: StringSwitch referencing a Proxy via contents -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <notPresent/>
+    <otherwise/>
+    <strings is="urgent" contains="ASAP">
+      <contents>//@elements.7</contents>
+    </strings>
+    <strings is="info" contains="FYI">
+      <contents>//@elements.8</contents>
+    </strings>
+  </elements>
+
+  <!-- 6: LanguageSwitch with two languages -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+    <otherwise/>
+    <languages matches="en">
+      <contents>//@elements.2</contents>
+    </languages>
+    <languages matches="fr">
+      <contents>//@elements.9</contents>
+    </languages>
+  </elements>
+
+  <!-- 7: Proxy with all sub-containers populated -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="true" ordering="sequential">
+    <busy>
+      <contents>//@elements.3</contents>
+    </busy>
+    <noAnswer>
+      <contents>//@elements.9</contents>
+    </noAnswer>
+    <redirection>
+      <contents>//@elements.10</contents>
+    </redirection>
+    <failure>
+      <contents>//@elements.1</contents>
+    </failure>
+    <default>
+      <contents>//@elements.2</contents>
+    </default>
+  </elements>
+
+  <!-- 8: SubCall referenced from a SwitchedString -->
+  <elements xsi:type="CPL:SubCall" ref="handleInfo"/>
+
+  <!-- 9: Reject used from LanguageSwitch and Proxy -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 10: TimeSwitch exercising multiple SwitchedTime attributes -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org/utc">
+    <notPresent/>
+    <otherwise/>
+    <times dtstart="20250101T000000Z" dtend="20250101T120000Z" duration="PT12H"
+           freq="DAILY" until="20250201T000000Z" count="5" interval="1"
+           bySecond="0" byMinute="0" byHour="8" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1,15" byYearDay="100" byWeekNo="10" byMonth="1,2"
+           wkst="MO" bySetPos="1">
+      <contents>//@elements.2</contents>
+    </times>
+    <times dtstart="20250101T120000Z" interval="2" wkst="SU">
+      <contents>//@elements.11</contents>
+    </times>
+  </elements>
+
+  <!-- 11: PrioritySwitch with two SwitchedPriority entries -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent/>
+    <otherwise/>
+    <priorities less="0.3" greater="0.0" equal="0.1">
+      <contents>//@elements.2</contents>
+    </priorities>
+    <priorities less="1.0" greater="0.7" equal="0.8">
+      <contents>//@elements.9</contents>
+    </priorities>
+  </elements>
+
+</CPL:CPLModel>

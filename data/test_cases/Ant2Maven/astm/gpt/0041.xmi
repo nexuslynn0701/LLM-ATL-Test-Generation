@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Complex Ant project with multiple targets and tasks"
+    default="mainTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="SYSTEM_ENV"/>
+
+  <!-- Task definition (unreferenced by tasks as required) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="mainTarget" name="main" description="Main build target">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/output"/>
+    <!-- Package jar -->
+    <tasks xsi:type="Ant:Jar" jarfile="build/output/app-main.jar" basedir="build/classes"/>
+  </targets>
+
+  <targets xmi:id="testTarget" name="test" description="Run tests">
+    <!-- Compile test sources -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="build/test-classes" debug="true" fork="false" optimize="false" deprecation="true"/>
+    <!-- Delete old test reports -->
+    <tasks xsi:type="Ant:Delete" dir="build/test-reports"/>
+    <!-- Create directory for test reports -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-reports"/>
+  </targets>
+
+  <targets xmi:id="docTarget" name="doc" description="Generate Javadoc">
+    <!-- Timestamp before documentation -->
+    <tasks xsi:type="Ant:Tstamp"/>
+    <!-- Generate API documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+  </targets>
+
+</Ant:Project>

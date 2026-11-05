@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullLifecycleBuild"
+    basedir="project-root"
+    description="End-to-end build: clean, compile, document, package, and setup properties"
+    default="build_all">
+  <!-- Properties to exercise all Ant Property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="project.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="build/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition and attribute to exercise TaskDef and Attribut rules -->
+  <taskdef name="custom.task" classname="com.example.build.CustomTask"/>
+  <taskdef name="db.migration" classname="com.example.tools.DbMigration"/>
+  <targets xmi:id="build_all" name="build_all">
+    <!-- Compile sources (Javac) -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Generate documentation (Javadoc) -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="FullLifecycleBuild API"/>
+    <!-- Create main jar (Jar) -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/full-lifecycle.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Prepare output directory (Mkdir) -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="dist"/>
+    <!-- Clean temporary files (Delete) -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile=""
+           excludes="**/keep/**"
+           excludesfile=""
+           defaultexcludes="true"/>
+    <!-- Timestamp task (Tstamp) -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Additional target to exercise multiple Target→Goal mappings -->
+  <targets xmi:id="package_only" name="package_only">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/package-only.jar"
+           basedir="build/classes"
+           compress="false"
+           encoding="UTF-8"
+           manifest="META-INF/PACKAGE-ONLY.MF"/>
+  </targets>
+</Ant:Project>

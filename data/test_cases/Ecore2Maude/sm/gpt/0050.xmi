@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cp">
+
+  <!-- 0: Primitive-like data type used by attributes -->
+  <eClassifiers xsi:type="ecore:EDataType" name="MyString" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enumeration with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusEnum">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="ARCHIVED" value="2" literal="ARCHIVED"/>
+  </eClassifiers>
+
+  <!-- 2: Root abstract super class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 3: NamedElement extends Element -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: User class with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="User" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="email" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active" lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 5: Project class, contains Tasks and references owner User -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status" lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner" lowerBound="1"
+        eType="//@eClassifiers.4" containment="false" resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tasks" lowerBound="0" upperBound="-1"
+        containment="true" eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 6: Task class, references Project and Users (assignee, reviewers) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority" lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="state" lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project" lowerBound="1"
+        eType="//@eClassifiers.5" containment="false" resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignee" lowerBound="0"
+        eType="//@eClassifiers.4" containment="false" resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="reviewers" lowerBound="0" upperBound="-1"
+        eType="//@eClassifiers.4" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 7: Comment class, contained by Task, references author User -->
+  <eClassifiers xsi:type="ecore:EClass" name="Comment" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="text" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="author" lowerBound="1"
+        eType="//@eClassifiers.4" containment="false" resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="task" lowerBound="1"
+        eType="//@eClassifiers.6" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 8: Attachment class, contained by Task, references binary-like data type -->
+  <eClassifiers xsi:type="ecore:EClass" name="Attachment" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+</ecore:EPackage>

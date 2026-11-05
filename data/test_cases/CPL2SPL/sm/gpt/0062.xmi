@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL container with incoming/outgoing and a subAction -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="mainSub">
+      <contents><![CDATA[//@elements.1]]></contents>
+      <contents><![CDATA[//@elements.2]]></contents>
+    </subActions>
+    <outgoing>
+      <contents><![CDATA[//@elements.3]]></contents>
+      <contents><![CDATA[//@elements.4]]></contents>
+    </outgoing>
+    <incoming>
+      <contents><![CDATA[//@elements.5]]></contents>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location referenced from SubAction and Proxy.Default -->
+  <elements xsi:type="CPL:Location" url="sip:user1@example.com" priority="1" clear="yes">
+    <contents><![CDATA[//@elements.6]]></contents>
+  </elements>
+
+  <!-- 2: Redirect signalling action -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 3: SubCall referenced from Outgoing and PrioritySwitch.Default -->
+  <elements xsi:type="CPL:SubCall" ref="invokeSecondaryLogic"/>
+
+  <!-- 4: Reject signalling action -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 5: AddressSwitch with notPresent/otherwise and a SwitchedAddress -->
+  <elements xsi:type="CPL:AddressSwitch" field="source" subField="user">
+    <notPresent>
+      <contents><![CDATA[//@elements.7]]></contents>
+    </notPresent>
+    <otherwise>
+      <contents><![CDATA[//@elements.3]]></contents>
+      <contents><![CDATA[//@elements.4]]></contents>
+    </otherwise>
+    <addresses is="sip:vip@example.com" contains="vip" subDomainOf="example.com">
+      <contents><![CDATA[//@elements.1]]></contents>
+    </addresses>
+  </elements>
+
+  <!-- 6: StringSwitch with a SwitchedString and otherwise branch -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <notPresent>
+      <contents><![CDATA[//@elements.2]]></contents>
+    </notPresent>
+    <otherwise>
+      <contents><![CDATA[//@elements.5]]></contents>
+    </otherwise>
+    <strings is="urgent" contains="URGENT">
+      <contents><![CDATA[//@elements.4]]></contents>
+    </strings>
+  </elements>
+
+  <!-- 7: LanguageSwitch with SwitchedLanguage and notPresent -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <contents><![CDATA[//@elements.0]]></contents>
+    </notPresent>
+    <otherwise>
+      <contents><![CDATA[//@elements.3]]></contents>
+    </otherwise>
+    <languages matches="en-US">
+      <contents><![CDATA[//@elements.1]]></contents>
+    </languages>
+  </elements>
+
+  <!-- 8: TimeSwitch with one SwitchedTime and full recurrence info -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Berlin" tzurl="http://tz.example.com/berlin">
+    <notPresent>
+      <contents><![CDATA[//@elements.4]]></contents>
+    </notPresent>
+    <otherwise>
+      <contents><![CDATA[//@elements.6]]></contents>
+    </otherwise>
+    <times dtstart="20260101T080000Z" dtend="20260101T170000Z" duration="PT9H"
+           freq="DAILY" until="20261231T235959Z" count="10" interval="1"
+           bySecond="0" byMinute="0" byHour="8" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1,15" byYearDay="100,200" byWeekNo="1,2"
+           byMonth="1,6,12" wkst="MO" bySetPos="1">
+      <contents><![CDATA[//@elements.1]]></contents>
+      <contents><![CDATA[//@elements.2]]></contents>
+    </times>
+  </elements>
+
+  <!-- 9: PrioritySwitch with SwitchedPriority branches -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <contents><![CDATA[//@elements.2]]></contents>
+    </notPresent>
+    <otherwise>
+      <contents><![CDATA[//@elements.1]]></contents>
+    </otherwise>
+    <priorities less="0.3" greater="0.7" equal="0.5">
+      <contents><![CDATA[//@elements.3]]></contents>
+      <contents><![CDATA[//@elements.4]]></contents>
+    </priorities>
+  </elements>
+
+  <!-- 10: Proxy with all outcome branches and nested containers -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+    <busy>
+      <contents><![CDATA[//@elements.1]]></contents>
+      <contents><![CDATA[//@elements.5]]></contents>
+    </busy>
+    <noAnswer>
+      <contents><![CDATA[//@elements.2]]></contents>
+    </noAnswer>
+    <redirection>
+      <contents><![CDATA[//@elements.6]]></contents>
+    </redirection>
+    <failure>
+      <contents><![CDATA[//@elements.7]]></contents>
+    </failure>
+    <default>
+      <contents><![CDATA[//@elements.3]]></contents>
+      <contents><![CDATA[//@elements.9]]></contents>
+    </default>
+  </elements>
+
+</CPL:CPLModel>

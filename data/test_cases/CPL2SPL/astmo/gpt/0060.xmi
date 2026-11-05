@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: root CPL with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="saMain">
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="parallel">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </default>
+      </contents>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="fromUser">
+        <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com">
+          <contents xsi:type="CPL:Proxy" timeout="5" recurse="no" ordering="serial">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default>
+              <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+            </default>
+          </contents>
+        </addresses>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:fallback@example.org" priority="1" clear="yes"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+
+</CPL:CPLModel>

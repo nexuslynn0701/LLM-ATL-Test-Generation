@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="build"
+    basedir="/workspace"
+    description="Main build project">
+  <targets xmi:id="build" name="build" description="Build target">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/myapp.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean target">
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" verbose="false" quiet="true" failonerror="false" includeEmptyDirs="false"/>
+  </targets>
+  <targets xmi:id="init" name="init" description="Initialize target">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Mkdir" dir="docs"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Documentation target">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src/main" destdir="docs/api" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="MyApp API"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Test target">
+    <tasks xsi:type="Ant:Copy" file="src/test/resources/config.xml" tofile="target/test-classes/config.xml" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="false"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target"/>
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyLocation" name="java.home" location="/usr/lib/jvm/java-11"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+</Ant:Project>

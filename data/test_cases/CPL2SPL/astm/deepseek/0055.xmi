@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="authCheck">
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:trusted@example.com">
+          <contents xsi:type="CPL:SubCall" ref="processCall"/>
+        </addresses>
+        <addresses is="sip:blocked@example.com">
+          <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default/>
+          </contents>
+        </otherwise>
+      </contents>
+    </subActions>
+    <subActions id="processCall">
+      <contents xsi:type="CPL:TimeSwitch" dtstart="20250101T000000" dtend="20251231T235959" interval="1" wkst="MO">
+        <times dtstart="20250101T080000" dtend="20250101T180000" interval="1" wkst="MO">
+          <contents xsi:type="CPL:PrioritySwitch">
+            <priorities greater="5">
+              <contents xsi:type="CPL:Location" url="sip:urgent@example.com" priority="1" clear="no"/>
+            </priorities>
+            <priorities less="3" greater="1">
+              <contents xsi:type="CPL:LanguageSwitch">
+                <languages matches="en">
+                  <contents xsi:type="CPL:Location" url="sip:english@example.com" priority="1" clear="no"/>
+                </languages>
+                <languages matches="fr">
+                  <contents xsi:type="CPL:Location" url="sip:french@example.com" priority="1" clear="no"/>
+                </languages>
+                <notPresent>
+                  <contents xsi:type="CPL:Location" url="sip:default@example.com" priority="1" clear="no"/>
+                </notPresent>
+              </contents>
+            </priorities>
+            <notPresent>
+              <contents xsi:type="CPL:Location" url="sip:standard@example.com" priority="1" clear="no"/>
+            </notPresent>
+          </contents>
+        </times>
+        <notPresent>
+          <contents xsi:type="CPL:Location" url="sip:afterhours@example.com" priority="1" clear="no"/>
+        </notPresent>
+      </contents>
+    </subActions>
+    <subActions id="emergency">
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="emergency">
+          <contents xsi:type="CPL:Location" url="sip:911@example.com" priority="1" clear="yes"/>
+        </strings>
+        <notPresent>
+          <contents xsi:type="CPL:SubCall" ref="processCall"/>
+        </notPresent>
+      </contents>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </incoming>
+  </elements>
+</CPL:CPLModel>

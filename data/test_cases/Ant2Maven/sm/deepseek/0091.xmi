@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="build"
+    basedir="/home/project"
+    description="Main build project">
+  <targets xmi:id="init" name="init" description="Initialize build">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/javadoc"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile sources" unless="skip.compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="false" deprecation="false"/>
+  </targets>
+  <targets xmi:id="build" name="build" description="Create JAR archive">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/myapp.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" file="dist/myapp.jar" failonerror="false"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="build/javadoc" packagenames="com.example.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="MyApp API"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run tests" ifCondition="run.tests">
+    <tasks xsi:type="Ant:Copy" file="test/config.xml" tofile="build/test/config.xml" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="false"/>
+  </targets>
+</Ant:Project>

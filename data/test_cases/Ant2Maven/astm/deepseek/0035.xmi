@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    description="A sample Ant project for transformation testing"
+    basedir="/home/user/project"
+    default="test">
+  <targets xmi:id="compile" name="compile"
+      description="Compiles the source code">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes"
+        debug="true" optimize="false" deprecation="true"/>
+  </targets>
+  <targets xmi:id="test" name="test"
+      description="Runs tests after compilation">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes"
+        debug="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-reports"/>
+    <tasks xsi:type="Ant:Delete" dir="build/test-temp"/>
+  </targets>
+  <targets xmi:id="package" name="package"
+      description="Creates distributable archive">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/myapp.jar" basedir="build/classes"
+        compress="true"/>
+  </targets>
+  <targets xmi:id="docs" name="docs"
+      description="Generates documentation">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="build/docs"
+        packagenames="com.example"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="yes"
+        windowtitle="My API Docs"/>
+  </targets>
+  <targets xmi:id="tstampTarget" name="tstamp-target"
+      description="Sets timestamps">
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/usr/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+  <path id="compile.path">
+    <pathElement path="/usr/share/java" location="/usr/share/java"/>
+  </path>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+</Ant:Project>

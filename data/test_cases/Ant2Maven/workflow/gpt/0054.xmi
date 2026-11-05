@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project-root"
+    description="Full build lifecycle with compilation, packaging, and cleanup"
+    default="build-main">
+  <!-- Properties to exercise AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Compile sources and assemble jar">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="target/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false">
+      <!-- Simple classpath without cross references -->
+      <classPath refid="">
+        <pathElement path="lib/runtime.jar" location="lib"/>
+      </classPath>
+    </tasks>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src/main/java"
+        destdir="target/site/apidocs"
+        packagenames="com.example.*"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Example API Documentation"/>
+
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+
+    <!-- Package compiled classes into a jar -->
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/dist/example-app.jar"
+        basedir="target/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Secondary target with file operations -->
+  <targets xmi:id="cleanup" name="cleanup" description="Clean build outputs">
+    <!-- Copy resources into classes directory -->
+    <tasks xsi:type="Ant:Copy"
+        file="src/main/resources/config.yml"
+        presservelastmodified="true"
+        tofile="target/classes/config.yml"
+        todir=""
+        overwrite="true"
+        filtering="false"
+        flatten="false"
+        includeEmptyDirs="false">
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.yml"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/test/**"/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="env" value="dev"/>
+      </filterset>
+      <mapper type="glob" classname="" classpath="" classpathref="" from="*.yml" to="*.yaml"/>
+    </tasks>
+
+    <!-- Delete temporary directory -->
+    <tasks xsi:type="Ant:Delete"
+        file=""
+        dir="target/tmp"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        includes="**/*"
+        includesfile=""
+        excludes=""
+        excludesfile=""
+        defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

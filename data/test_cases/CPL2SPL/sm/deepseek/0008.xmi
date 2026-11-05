@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sub1"/>
+    <subActions id="sub2"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="192.168.1.1" contains="192.168"/>
+        <otherwise>
+          <contents xsi:type="CPL:TimeSwitch" tzid="America/New_York" tzurl="http://example.com/tz">
+            <times dtstart="20250101T000000" dtend="20251231T235959" duration="PT1H" freq="DAILY" until="20251201T000000" count="10" interval="1" wkst="MO"/>
+            <notPresent/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:LanguageSwitch">
+        <languages matches="en"/>
+        <languages matches="fr"/>
+        <otherwise>
+          <contents xsi:type="CPL:StringSwitch" field="subject">
+            <strings is="urgent" contains="meeting"/>
+            <notPresent/>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="sub1"/>
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:Reject" status="603" reason="Declined"/>
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.1"/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5" greater="3" equal="4"/>
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="sub2"/>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

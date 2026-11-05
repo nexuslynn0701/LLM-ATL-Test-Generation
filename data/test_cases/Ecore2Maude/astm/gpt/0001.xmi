@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.org/company"
+    nsPrefix="company">
+
+  <!-- Nested subpackage to trigger super/sub package rules -->
+  <eSubpackages name="hr"
+                nsURI="http://example.org/company/hr"
+                nsPrefix="hr">
+    <!-- Classifiers inside subpackage (indexes local to this eSubpackages) -->
+    <eClassifiers xsi:type="ecore:EClass" name="Employee">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="empId"
+                           lowerBound="1"
+                           iD="true"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="fullName"
+                           lowerBound="1"
+                           defaultValueLiteral="&quot;John &quot; &quot;Doe&quot;"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="active"
+                           lowerBound="0"
+                           defaultValueLiteral="true"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      <!-- Reference without opposite, non-containment, upperBound=-1 -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="projects"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="false"
+                           eType="//@eSubpackages.0/@eClassifiers.1"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="Project">
+      <!-- Super type in same subpackage plus external super type (ecore::EClass) -->
+      <eSuperTypes>//@eSubpackages.0/@eClassifiers.0 ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EClass</eSuperTypes>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="code"
+                           lowerBound="1"
+                           defaultValueLiteral="PRJ-001"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <!-- Reference with opposite, containment=true, upperBound=1 -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="lead"
+                           lowerBound="1"
+                           upperBound="1"
+                           containment="true"
+                           eType="//@eSubpackages.0/@eClassifiers.0"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.3"/>
+    </eClassifiers>
+
+    <!-- Local enum to exercise Enum rules -->
+    <eClassifiers xsi:type="ecore:EEnum" name="EmploymentType">
+      <eLiterals name="FULL_TIME" value="0" literal="FULL_TIME"/>
+      <eLiterals name="PART_TIME" value="1" literal="PART_TIME"/>
+      <eLiterals name="CONTRACTOR" value="2" literal="CONTRACTOR"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Top-level classifiers of the root package -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="deptName"
+                         lowerBound="1"
+                         defaultValueLiteral="Sales"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Reference with opposite, non-containment, upperBound=-1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="employees"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="street"
+                         lowerBound="1"
+                         defaultValueLiteral="&quot;Main&quot; &quot;Street&quot;"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="number"
+                         lowerBound="0"
+                         defaultValueLiteral="10"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Attribute without explicit default and with enum type from subpackage -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="type"
+                         lowerBound="0"
+                         eType="//@eSubpackages.0/@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- Local enum in root package -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Region">
+    <eLiterals name="EUROPE" value="0" literal="EUROPE"/>
+    <eLiterals name="AMERICA" value="1" literal="AMERICA"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyHierarchy"
+    nsURI="http://test/companyHierarchy/0060"
+    nsPrefix="ch">
+
+  <!-- 0: Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="deptName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- cross-refs to Team (4) and Manager (3) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="teams"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="managers"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 1: Organization (root) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Organization">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="orgName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- containment of Departments -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.0"/>
+    <!-- cross reference to primary Location (5) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="hqLocation"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 2: Person (base) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 3: Manager extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Manager" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="level"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- cross ref to team they lead (4) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="leads"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 4: Team -->
+  <eClassifiers xsi:type="ecore:EClass" name="Team">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- cross ref to Manager (3) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="leader"
+        eType="//@eClassifiers.3"/>
+    <!-- cross refs to Worker (6) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="members"
+        upperBound="-1"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 5: Location -->
+  <eClassifiers xsi:type="ecore:EClass" name="Location">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="city"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="country"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 6: Worker extends Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Worker" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- reference back to Team (4) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 7: Project with cross refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="projectId"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- cross ref to Department (0) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ownerDept"
+        eType="//@eClassifiers.0"/>
+    <!-- cross ref to managing Manager (3) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.3"/>
+    <!-- cross refs to Worker participants (6) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="participants"
+        upperBound="-1"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 8: Assignment as link class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Assignment">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="hoursPerWeek"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- cross ref to one Worker (6) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="worker"
+        eType="//@eClassifiers.6"/>
+    <!-- cross ref to one Project (7) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 9: MetaInfo using Ecore primitive data types -->
+  <eClassifiers xsi:type="ecore:EClass" name="MetaInfo">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="rating"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tags"
+        upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 10: Registry is the root container of many elements -->
+  <eClassifiers xsi:type="ecore:EClass" name="Registry">
+    <!-- contain Org, Locations, Projects, Assignments, MetaInfo in one place -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="organization"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="locations"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignments"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.8"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="meta"
+        containment="true"
+        eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+</ecore:EPackage>

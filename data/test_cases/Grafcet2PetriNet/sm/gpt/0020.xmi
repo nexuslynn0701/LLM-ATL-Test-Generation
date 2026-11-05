@@ -1,0 +1,91 @@
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="g1" name="ComplexSequentialParallelGrafcet" location="file://grafcets/complex_seq_parallel.grafcet">
+
+    <!-- Elements: Steps and Transitions -->
+    <!-- Steps -->
+    <elements xmi:id="s1" xsi:type="Grafcet:Step" name="InitStep" location="1:1-1:20"
+              isInitial="true" isActive="true" action="initSystem"/>
+    <elements xmi:id="s2" xsi:type="Grafcet:Step" name="PreCheck" location="2:1-2:25"
+              isInitial="false" isActive="false" action="preCheckSensors"/>
+    <elements xmi:id="s3" xsi:type="Grafcet:Step" name="Branch1StepA" location="3:1-3:30"
+              isInitial="false" isActive="false" action="branch1ActionA"/>
+    <elements xmi:id="s4" xsi:type="Grafcet:Step" name="Branch1StepB" location="4:1-4:30"
+              isInitial="false" isActive="false" action="branch1ActionB"/>
+    <elements xmi:id="s5" xsi:type="Grafcet:Step" name="Branch2StepA" location="5:1-5:30"
+              isInitial="false" isActive="false" action="branch2ActionA"/>
+    <elements xmi:id="s6" xsi:type="Grafcet:Step" name="Branch2StepB" location="6:1-6:30"
+              isInitial="false" isActive="false" action="branch2ActionB"/>
+    <elements xmi:id="s7" xsi:type="Grafcet:Step" name="MergeStep" location="7:1-7:25"
+              isInitial="false" isActive="false" action="mergeBranches"/>
+    <elements xmi:id="s8" xsi:type="Grafcet:Step" name="FinalStep" location="8:1-8:25"
+              isInitial="false" isActive="false" action="shutdown"/>
+
+    <!-- Transitions -->
+    <elements xmi:id="t1" xsi:type="Grafcet:Transition" name="t_InitToPre" location="10:1-10:30"
+              condition="startButtonPressed"/>
+    <elements xmi:id="t2" xsi:type="Grafcet:Transition" name="t_PreToParallel" location="11:1-11:30"
+              condition="preCheckOK"/>
+    <elements xmi:id="t3" xsi:type="Grafcet:Transition" name="t_B1A_to_B1B" location="12:1-12:30"
+              condition="branch1ConditionMet"/>
+    <elements xmi:id="t4" xsi:type="Grafcet:Transition" name="t_B2A_to_B2B" location="13:1-13:30"
+              condition="branch2ConditionMet"/>
+    <elements xmi:id="t5" xsi:type="Grafcet:Transition" name="t_B1B_to_Merge" location="14:1-14:30"
+              condition="branch1Completed"/>
+    <elements xmi:id="t6" xsi:type="Grafcet:Transition" name="t_B2B_to_Merge" location="15:1-15:30"
+              condition="branch2Completed"/>
+    <elements xmi:id="t7" xsi:type="Grafcet:Transition" name="t_Merge_to_Final" location="16:1-16:30"
+              condition="allBranchesDone"/>
+    <elements xmi:id="t8" xsi:type="Grafcet:Transition" name="t_FinalLoopBack" location="17:1-17:30"
+              condition="restartRequested"/>
+
+    <!-- Connections -->
+    <!-- Linear part: InitStep -> t1 -> PreCheck -> t2 -->
+    <connections xmi:id="c1" xsi:type="Grafcet:StepToTransition" name="c_Init_to_t1" location="20:1-20:40"
+                 from="/0/@elements.0" to="/0/@elements.8"/>
+    <connections xmi:id="c2" xsi:type="Grafcet:TransitionToStep" name="c_t1_to_Pre" location="21:1-21:40"
+                 from="/0/@elements.8" to="/0/@elements.1"/>
+    <connections xmi:id="c3" xsi:type="Grafcet:StepToTransition" name="c_Pre_to_t2" location="22:1-22:40"
+                 from="/0/@elements.1" to="/0/@elements.9"/>
+
+    <!-- Parallel branch split: t2 -> Branch1StepA and Branch2StepA -->
+    <connections xmi:id="c4" xsi:type="Grafcet:TransitionToStep" name="c_t2_to_Branch1A" location="23:1-23:45"
+                 from="/0/@elements.9" to="/0/@elements.2"/>
+    <connections xmi:id="c5" xsi:type="Grafcet:TransitionToStep" name="c_t2_to_Branch2A" location="24:1-24:45"
+                 from="/0/@elements.9" to="/0/@elements.4"/>
+
+    <!-- Branch 1: B1A -> t3 -> B1B -> t5 -> Merge -->
+    <connections xmi:id="c6" xsi:type="Grafcet:StepToTransition" name="c_B1A_to_t3" location="25:1-25:45"
+                 from="/0/@elements.2" to="/0/@elements.10"/>
+    <connections xmi:id="c7" xsi:type="Grafcet:TransitionToStep" name="c_t3_to_B1B" location="26:1-26:45"
+                 from="/0/@elements.10" to="/0/@elements.3"/>
+    <connections xmi:id="c8" xsi:type="Grafcet:StepToTransition" name="c_B1B_to_t5" location="27:1-27:45"
+                 from="/0/@elements.3" to="/0/@elements.12"/>
+    <connections xmi:id="c9" xsi:type="Grafcet:TransitionToStep" name="c_t5_to_Merge" location="28:1-28:45"
+                 from="/0/@elements.12" to="/0/@elements.6"/>
+
+    <!-- Branch 2: B2A -> t4 -> B2B -> t6 -> Merge -->
+    <connections xmi:id="c10" xsi:type="Grafcet:StepToTransition" name="c_B2A_to_t4" location="29:1-29:45"
+                 from="/0/@elements.4" to="/0/@elements.11"/>
+    <connections xmi:id="c11" xsi:type="Grafcet:TransitionToStep" name="c_t4_to_B2B" location="30:1-30:45"
+                 from="/0/@elements.11" to="/0/@elements.5"/>
+    <connections xmi:id="c12" xsi:type="Grafcet:StepToTransition" name="c_B2B_to_t6" location="31:1-31:45"
+                 from="/0/@elements.5" to="/0/@elements.13"/>
+    <connections xmi:id="c13" xsi:type="Grafcet:TransitionToStep" name="c_t6_to_Merge" location="32:1-32:45"
+                 from="/0/@elements.13" to="/0/@elements.6"/>
+
+    <!-- Merge -> Final and feedback loop Final -> Init -->
+    <connections xmi:id="c14" xsi:type="Grafcet:StepToTransition" name="c_Merge_to_t7" location="33:1-33:45"
+                 from="/0/@elements.6" to="/0/@elements.14"/>
+    <connections xmi:id="c15" xsi:type="Grafcet:TransitionToStep" name="c_t7_to_Final" location="34:1-34:45"
+                 from="/0/@elements.14" to="/0/@elements.7"/>
+    <connections xmi:id="c16" xsi:type="Grafcet:StepToTransition" name="c_Final_to_t8" location="35:1-35:45"
+                 from="/0/@elements.7" to="/0/@elements.15"/>
+    <connections xmi:id="c17" xsi:type="Grafcet:TransitionToStep" name="c_t8_to_Init" location="36:1-36:45"
+                 from="/0/@elements.15" to="/0/@elements.0"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

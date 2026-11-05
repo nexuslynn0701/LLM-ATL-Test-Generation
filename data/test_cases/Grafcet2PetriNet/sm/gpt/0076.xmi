@@ -1,0 +1,51 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet name="ComplexGrafcet" location="file://complex_grafcet.gcf">
+    <!-- Elements: Steps and Transitions -->
+    <elements xsi:type="Grafcet:Step" name="S_Start" location="file://complex_grafcet.gcf#S_Start" isInitial="true" isActive="true" action="initSystem"/>
+    <elements xsi:type="Grafcet:Step" name="S_CheckA" location="file://complex_grafcet.gcf#S_CheckA" isInitial="false" isActive="false" action="checkSensorA"/>
+    <elements xsi:type="Grafcet:Step" name="S_CheckB" location="file://complex_grafcet.gcf#S_CheckB" isInitial="false" isActive="false" action="checkSensorB"/>
+    <elements xsi:type="Grafcet:Step" name="S_Parallel1" location="file://complex_grafcet.gcf#S_Parallel1" isInitial="false" isActive="false" action="runBranch1"/>
+    <elements xsi:type="Grafcet:Step" name="S_Parallel2" location="file://complex_grafcet.gcf#S_Parallel2" isInitial="false" isActive="false" action="runBranch2"/>
+    <elements xsi:type="Grafcet:Step" name="S_Merge" location="file://complex_grafcet.gcf#S_Merge" isInitial="false" isActive="false" action="mergeBranches"/>
+    <elements xsi:type="Grafcet:Step" name="S_Error" location="file://complex_grafcet.gcf#S_Error" isInitial="false" isActive="false" action="handleError"/>
+    <elements xsi:type="Grafcet:Step" name="S_End" location="file://complex_grafcet.gcf#S_End" isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <elements xsi:type="Grafcet:Transition" name="T_InitToCheck" location="file://complex_grafcet.gcf#T_InitToCheck" condition="systemReady"/>
+    <elements xsi:type="Grafcet:Transition" name="T_CheckToParallel" location="file://complex_grafcet.gcf#T_CheckToParallel" condition="sensorA_OK and sensorB_OK"/>
+    <elements xsi:type="Grafcet:Transition" name="T_CheckToError" location="file://complex_grafcet.gcf#T_CheckToError" condition="not (sensorA_OK and sensorB_OK)"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Parallel1ToMerge" location="file://complex_grafcet.gcf#T_Parallel1ToMerge" condition="branch1Done"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Parallel2ToMerge" location="file://complex_grafcet.gcf#T_Parallel2ToMerge" condition="branch2Done"/>
+    <elements xsi:type="Grafcet:Transition" name="T_ErrorToEnd" location="file://complex_grafcet.gcf#T_ErrorToEnd" condition="errorAcknowledged"/>
+    <elements xsi:type="Grafcet:Transition" name="T_MergeToEnd" location="file://complex_grafcet.gcf#T_MergeToEnd" condition="allBranchesDone"/>
+
+    <!-- Connections: StepToTransition and TransitionToStep -->
+    <!-- From initial step to transition -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S_Start_to_T_InitToCheck" location="file://complex_grafcet.gcf#C1" from="/0/@elements.0" to="/0/@elements.8"/>
+    <!-- From T_InitToCheck to two separate checking steps (branching) -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_InitToCheck_to_S_CheckA" location="file://complex_grafcet.gcf#C2" from="/0/@elements.8" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_InitToCheck_to_S_CheckB" location="file://complex_grafcet.gcf#C3" from="/0/@elements.8" to="/0/@elements.2"/>
+    <!-- From both checking steps to common transition (converging) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S_CheckA_to_T_CheckToParallel" location="file://complex_grafcet.gcf#C4" from="/0/@elements.1" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S_CheckB_to_T_CheckToParallel" location="file://complex_grafcet.gcf#C5" from="/0/@elements.2" to="/0/@elements.9"/>
+    <!-- From common transition to two parallel steps -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_CheckToParallel_to_S_Parallel1" location="file://complex_grafcet.gcf#C6" from="/0/@elements.9" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_CheckToParallel_to_S_Parallel2" location="file://complex_grafcet.gcf#C7" from="/0/@elements.9" to="/0/@elements.4"/>
+    <!-- Error branch from both checking steps to error transition -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S_CheckA_to_T_CheckToError" location="file://complex_grafcet.gcf#C8" from="/0/@elements.1" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S_CheckB_to_T_CheckToError" location="file://complex_grafcet.gcf#C9" from="/0/@elements.2" to="/0/@elements.10"/>
+    <!-- From error transition to error handling step -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_CheckToError_to_S_Error" location="file://complex_grafcet.gcf#C10" from="/0/@elements.10" to="/0/@elements.6"/>
+    <!-- From parallel steps to their respective transitions -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S_Parallel1_to_T_Parallel1ToMerge" location="file://complex_grafcet.gcf#C11" from="/0/@elements.3" to="/0/@elements.11"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S_Parallel2_to_T_Parallel2ToMerge" location="file://complex_grafcet.gcf#C12" from="/0/@elements.4" to="/0/@elements.12"/>
+    <!-- From parallel transitions to merge step -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_Parallel1ToMerge_to_S_Merge" location="file://complex_grafcet.gcf#C13" from="/0/@elements.11" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_Parallel2ToMerge_to_S_Merge" location="file://complex_grafcet.gcf#C14" from="/0/@elements.12" to="/0/@elements.5"/>
+    <!-- From error step to end via its own transition -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S_Error_to_T_ErrorToEnd" location="file://complex_grafcet.gcf#C15" from="/0/@elements.6" to="/0/@elements.13"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_ErrorToEnd_to_S_End" location="file://complex_grafcet.gcf#C16" from="/0/@elements.13" to="/0/@elements.7"/>
+    <!-- From merge step to end via separate transition -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_S_Merge_to_T_MergeToEnd" location="file://complex_grafcet.gcf#C17" from="/0/@elements.5" to="/0/@elements.14"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T_MergeToEnd_to_S_End" location="file://complex_grafcet.gcf#C18" from="/0/@elements.14" to="/0/@elements.7"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

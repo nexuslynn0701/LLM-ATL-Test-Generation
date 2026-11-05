@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net101" name="BranchingAndMerging">
+    <!-- Steps: one initial, multiple non-initial with branching and merging -->
+    <elements xsi:type="Grafcet:Step" location="s101" name="StartUp" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Transition" location="t101" name="BeginCheck" condition="powerOn"/>
+    <elements xsi:type="Grafcet:Step" location="s102" name="CheckSensors" isInitial="false" isActive="false" action="verifySensors"/>
+    <elements xsi:type="Grafcet:Transition" location="t102" name="BranchDecision" condition="sensorStatus"/>
+    <elements xsi:type="Grafcet:Step" location="s103" name="NormalMode" isInitial="false" isActive="false" action="runNormally"/>
+    <elements xsi:type="Grafcet:Step" location="s104" name="SafeMode" isInitial="false" isActive="false" action="runSafely"/>
+    <elements xsi:type="Grafcet:Transition" location="t103" name="MergeToFinalize" condition="modeComplete"/>
+    <elements xsi:type="Grafcet:Step" location="s105" name="Finalize" isInitial="false" isActive="false" action="shutdown"/>
+    <!-- Connections: linear start, then branch to two steps, then merge from both -->
+    <!-- StartUp -> BeginCheck -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c101" name="startupToBeginCheck" from="/0/@elements.0" to="/0/@elements.1"/>
+    <!-- BeginCheck -> CheckSensors -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c102" name="beginCheckToCheckSensors" from="/0/@elements.1" to="/0/@elements.2"/>
+    <!-- CheckSensors -> BranchDecision -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c103" name="checkSensorsToBranchDecision" from="/0/@elements.2" to="/0/@elements.3"/>
+    <!-- BranchDecision -> NormalMode -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c104" name="branchDecisionToNormalMode" from="/0/@elements.3" to="/0/@elements.4"/>
+    <!-- BranchDecision -> SafeMode -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c105" name="branchDecisionToSafeMode" from="/0/@elements.3" to="/0/@elements.5"/>
+    <!-- NormalMode -> MergeToFinalize -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c106" name="normalModeToMerge" from="/0/@elements.4" to="/0/@elements.6"/>
+    <!-- SafeMode -> MergeToFinalize -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c107" name="safeModeToMerge" from="/0/@elements.5" to="/0/@elements.6"/>
+    <!-- MergeToFinalize -> Finalize -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c108" name="mergeToFinalizeStep" from="/0/@elements.6" to="/0/@elements.7"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

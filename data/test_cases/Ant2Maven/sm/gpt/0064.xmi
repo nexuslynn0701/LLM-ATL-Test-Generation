@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiStageBuild"
+    basedir="."
+    description="Project with multiple targets and various predefined tasks"
+    default="t_build">
+
+  <!-- Default target: build -->
+  <targets xmi:id="t_build" name="build" description="Compile sources, create jar and docs">
+    <!-- CompileTask: Javac with minimal attributes -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"/>
+
+    <!-- ArchiveTask: Jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multistage-build.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"/>
+
+    <!-- DocumentationTask: Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.multistage.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="MultiStage Build API"/>
+  </targets>
+
+  <!-- Secondary target: prepare -->
+  <targets xmi:id="t_prepare" name="prepare" description="Prepare build directories">
+    <!-- FileTask: Mkdir -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/docs/api"/>
+
+    <!-- FileTask: Delete -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           excludes="**/keep/**"/>
+  </targets>
+
+  <!-- Tertiary target: cleanup -->
+  <targets xmi:id="t_cleanup" name="cleanup" description="Clean distribution artifacts">
+    <!-- FileTask: Delete using file-based attributes -->
+    <tasks xsi:type="Ant:Delete"
+           file="dist/multistage-build.jar"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           defaultexcludes="yes"/>
+  </targets>
+
+</Ant:Project>

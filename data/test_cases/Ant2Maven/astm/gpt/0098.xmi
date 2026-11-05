@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryManager"
+    basedir="lib-src"
+    description="Build and package the library project."
+    default="buildTarget">
+
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="lib.name" value="LibraryManagerCore"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/library.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="SYSTEM_ENV"/>
+
+  <!-- A standalone taskdef to trigger AntTaskDef2MavenMavenTaskDef -->
+  <taskdef name="custom.checkstyle" classname="com.example.ant.CheckstyleTask"/>
+
+  <!-- Default target with several supported tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources and assemble jar.">
+    <!-- Javac task to trigger AntJavac2MavenMavenJavac -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true">
+    </tasks>
+
+    <!-- Jar task to trigger AntJar2MavenMavenJar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/library-manager.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Copy task with nested structures to trigger Copy, FileSet, PatternSet, Includes, Excludes, FilterSet, Filter, FiltersFile, Mapper rules -->
+    <tasks xsi:type="Ant:Copy"
+           todir="build/distribution"
+           presservelastmodified="true"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties" ifCondition="include.props" unless="skip.props"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/secret/**" ifCondition="exclude.secret" unless="allow.secret"/>
+        </patternset>
+        <include name="**/*.xml" ifCondition="include.xml" unless="skip.xml"/>
+        <exclude name="**/*.tmp" ifCondition="exclude.tmp" unless="allow.tmp"/>
+      </fileset>
+      <filterset starttoken="@[" endtoken="]@">
+        <filter token="projectName" value="LibraryManager"/>
+        <filtersfile file="config/filters.txt"/>
+      </filterset>
+      <mapper type="glob"
+              classname="com.example.ant.SimpleMapper"
+              classpath="lib/tools.jar"
+              classpathref="mapper.classpath"
+              from="*.txt"
+              to="docs/*.txt"/>
+    </tasks>
+
+    <!-- Delete task to trigger AntDelete2MavenMavenDelete -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*~"
+           includesfile="config/delete-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/delete-excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Second target to trigger AntTarget2MavenMavenGoal again -->
+  <targets xmi:id="docTarget" name="docs" description="Generate API documentation.">
+    <!-- Javadoc task to trigger AntJavadoc2MavenMavenJavadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.library.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="LibraryManager API Documentation"/>
+  </targets>
+
+  <!-- Third target to trigger Tstamp and Mkdir rules -->
+  <targets xmi:id="prepareTarget" name="prepare" description="Prepare build environment.">
+    <!-- Tstamp task to trigger AntTstamp2MavenMavenTstamp -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd'T'HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+
+    <!-- Mkdir task to trigger AntMkdir2MavenMavenMkdir -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/logs"/>
+  </targets>
+
+</Ant:Project>

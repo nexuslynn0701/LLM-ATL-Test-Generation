@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- elements[0]: CPL root with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <!-- SubAction contents: complex Proxy using Location, so Location2URIConstant is triggered -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- complex proxy: has Busy, NoAnswer, Redirection, Failure, Default -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- default branch calls a SubCall (elements[4]) -->
+        <default contents="//@elements.4"/>
+      </contents>
+    </subActions>
+    <outgoing>
+      <!-- Outgoing contents: simple Proxy using same Location, triggers Proxy2Return + Location2URIConstant -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <!-- simple proxy: no branches -->
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: Location used by both proxies via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes"/>
+
+  <!-- elements[2]: AddressSwitch that uses SwitchedAddress and Otherwise; notPresent empty -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1"/>
+    <!-- notPresent branch with SubCall contents (elements[4]) -->
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </notPresent>
+    <!-- otherwise branch with simple Proxy contents -->
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <!-- simple proxy, no branches -->
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- elements[3]: Redirect, to exercise Redirect2Return and Location2URIConstant -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- elements[4]: SubCall referencing SubAction id "sa1" -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+</CPL:CPLModel>

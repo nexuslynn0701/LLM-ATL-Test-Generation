@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="university"
+    nsURI="http://example.org/university"
+    nsPrefix="uni">
+
+  <!-- 0: Primitive alias datatype -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CodeType" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enumeration for course level -->
+  <eClassifiers xsi:type="ecore:EEnum" name="CourseLevel">
+    <eLiterals name="BASIC" value="0" literal="BASIC"/>
+    <eLiterals name="INTERMEDIATE" value="1" literal="INTERMEDIATE"/>
+    <eLiterals name="ADVANCED" value="2" literal="ADVANCED"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract Person class with ID attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" iD="true"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 3: Student subclass of Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Student" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="matriculationNumber"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 4: Professor subclass of Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Professor" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="employeeId"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="teaches"
+        lowerBound="0" upperBound="-1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 5: Course class with attributes, containment, and opposite refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="Course" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="credits"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="level"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.1"/>
+    <!-- Containment: modules owned by course -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="modules"
+        lowerBound="0" upperBound="-1"
+        containment="true" resolveProxies="false"
+        eType="//@eClassifiers.6"/>
+    <!-- Bidirectional ref to Department -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        lowerBound="0" upperBound="1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.7"
+        eOpposite="//@eClassifiers.7/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 6: Module class contained in Course -->
+  <eClassifiers xsi:type="ecore:EClass" name="Module" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="order"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference back to Course (non-containment, no opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parentCourse"
+        lowerBound="0" upperBound="1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 7: Department with cross refs and map-like entries -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="deptCode"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="courses"
+        lowerBound="0" upperBound="-1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.5"
+        eOpposite="//@eClassifiers.5/@eStructuralFeatures.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="head"
+        lowerBound="0" upperBound="1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.4"/>
+    <!-- Map-like annotations for department-level metadata -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metadata"
+        lowerBound="0" upperBound="-1"
+        containment="true" resolveProxies="false"
+        eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+  <!-- 8: Map entry class used inside Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="MetaEntry" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

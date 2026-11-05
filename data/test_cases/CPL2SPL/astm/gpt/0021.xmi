@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL, with subAction and both incoming/outgoing pointing to different elements -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="saMain">
+      <!-- SubAction contents: a complex Proxy (exercises Proxy2Select) -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- complex proxy: has all branches -->
+        <busy contents="//@elements.8"/>
+        <noAnswer contents="//@elements.5"/>
+        <redirection contents="//@elements.6"/>
+        <failure contents="//@elements.7"/>
+        <default contents="//@elements.4"/>
+      </contents>
+    </subActions>
+
+    <!-- Incoming: will execute Incoming2Method.
+         Its contents is a SubCall (executes SubCall2Return) referring to saMain -->
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </incoming>
+
+    <!-- Outgoing: will execute Outgoing2Method.
+         Its contents is a simple Proxy (executes Proxy2Return) whose location is a Location below -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: SubAction with contents = Reject (no statements generated) -->
+  <elements xsi:type="CPL:SubAction" id="saReject">
+    <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+  </elements>
+
+  <!-- 2: Location used as the first location for the simple Proxy (element 0.outgoing.contents) -->
+  <elements xsi:type="CPL:Location" url="sip:userA@example.com" priority="1" clear="yes"/>
+
+  <!-- 3: Location used as first location for Redirect and for complex Proxy (via locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:userB@example.org" priority="2" clear="no"/>
+
+  <!-- 4: Redirect whose locations sequence includes element 3 then root locations.
+           Used as Default.contents of complex Proxy.
+           Exercises Redirect2Return and Location2URIConstant -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:redirect@example.net" priority="3" clear="yes"/>
+  </elements>
+
+  <!-- 5: AddressSwitch with SwitchedAddress + NotPresent + Otherwise.
+           Used as NoAnswer.contents of complex Proxy.
+           Exercises AddressSwitch2SelectStat, SwitchedAddress2SelectCase,
+           NotPresent2ErrorResponse, Otherwise2SelectDefault. -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- addresses: one SwitchedAddress containing a simple Proxy -->
+    <addresses is="alice@example.com" contains="ignored" subDomainOf="example.com">
+      <!-- contents: simple proxy (Proxy2Return) using Location 2 -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel"/>
+    </addresses>
+    <!-- notPresent branch -->
+    <notPresent/>
+    <!-- otherwise branch: SubCall to saReject (SubCall2Return) -->
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="saReject"/>
+    </otherwise>
+  </elements>
+
+  <!-- 6: StringSwitch used as Redirection.contents of complex Proxy.
+           Exercises StringSwitch2SelectStat only. -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents xsi:type="CPL:SubCall" ref="saMain"/>
+  </elements>
+
+  <!-- 7: Failure used as Failure branch of complex Proxy.
+           Exercises Failure2ErrorResponse. -->
+  <elements xsi:type="CPL:Failure"/>
+
+  <!-- 8: Busy switch branch used under complex Proxy.
+           Its contents is a SubCall to saReject (SubCall2Return). -->
+  <elements xsi:type="CPL:Busy">
+    <contents xsi:type="CPL:SubCall" ref="saReject"/>
+  </elements>
+
+  <!-- 9: LanguageSwitch as a top-level element, contents = SubCall (no direct rule, but used via helper) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <contents xsi:type="CPL:SubCall" ref="saMain"/>
+  </elements>
+
+  <!-- 10: TimeSwitch as a top-level element (no direct rule, but hits Reject/TimeSwitch filtering branches) -->
+  <elements xsi:type="CPL:TimeSwitch">
+    <times dtstart="20250101T000000Z" dtend="20251231T235959Z" duration="PT3600S"
+           freq="daily" until="20251231T235959Z" count="10" interval="1"
+           bySecond="0" byMinute="0" byHour="0" byDay="MO" byMonthDay="1"
+           byYearDay="1" byWeekNo="1" byMonth="1" wkst="MO" bySetPos="1"/>
+  </elements>
+
+  <!-- 11: PrioritySwitch as a top-level element (no direct rule, but used in filtering) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.7" equal="0.5"/>
+  </elements>
+
+</CPL:CPLModel>

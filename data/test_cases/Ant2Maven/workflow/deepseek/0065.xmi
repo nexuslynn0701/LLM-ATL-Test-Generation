@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DeploymentBuild"
+    basedir="."
+    description="Build and deploy application"
+    default="deploy">
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target"/>
+  <properties xsi:type="Ant:PropertyLocation" name="src.dir" location="src/main/java"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyyMMdd-HHmmss"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="false" deprecation="false"/>
+    <tasks xsi:type="Ant:Java" classname="com.example.Compiler" jar="lib/compiler.jar" fork="true"/>
+  </targets>
+  <targets xmi:id="package" name="package">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="deploy" name="deploy">
+    <tasks xsi:type="Ant:Copy" todir="deploy" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" dir="temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="false" includes="**/*.tmp" excludes="**/*.keep" defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src/main/java" destdir="docs/api" packagenames="com.example.*" defaultexcludes="true" author="true" version="true" use="true" windowtitle="API Documentation"/>
+  </targets>
+</Ant:Project>

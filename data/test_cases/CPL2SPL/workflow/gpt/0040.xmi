@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction whose contents is a Location (will trigger Location2URIConstant) -->
+    <subActions id="sa_main">
+      <contents xsi:type="CPL:Location" url="sip:main@example.com" clear="true">
+        <!-- Location contains a simple Proxy that forwards to this Location -->
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+          <!-- simple Proxy: no busy/noAnswer/redirection/failure/default -->
+        </contents>
+      </contents>
+    </subActions>
+
+    <!-- Incoming whose contents is a Redirect using a Location -->
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="true">
+        <!-- Location to be used by Redirect (also triggers Location2URIConstant) -->
+        <contents xsi:type="CPL:Location" url="sip:redirect@example.com" clear="false"/>
+      </contents>
+    </incoming>
+
+    <!-- Outgoing whose contents is a complex Proxy using Busy/NoAnswer/Redirection/Default
+         and a Location inside Default (triggers many rules incl. Location2URIConstant) -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <!-- complex Proxy: all branches present -->
+        <busy>
+          <!-- Busy with SubCall contents -->
+          <!-- Changed from a nested SubCall node to a reference to the top-level SubCall element -->
+          <contents contents="//@elements.1"/>
+        </busy>
+        <noAnswer/>
+        <redirection>
+          <!-- Redirection with SubCall contents -->
+          <!-- Changed from a nested SubCall node to a reference to the top-level SubCall element -->
+          <contents contents="//@elements.1"/>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default with Location contents -->
+          <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="true"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Top-level SubCall referenced by SubCalls; contents is a simple Proxy with Location -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+  <!-- Index 1 -->
+
+  <!-- Top-level Location used by SubAction's Proxy default branch -->
+  <elements xsi:type="CPL:Location" url="sip:top@example.com" clear="false"/>
+  <!-- Index 2 -->
+
+  <!-- Top-level Redirect (will also use its own Location via contents of Redirect) -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:standalone@example.com" clear="true"/>
+  </elements>
+  <!-- Index 3 -->
+
+  <!-- Top-level AddressSwitch with one SwitchedAddress and Otherwise, plus NotPresent -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1" contains="c1" subDomainOf="sd1">
+      <!-- SwitchedAddress contents is a SubCall -->
+      <!-- Changed from nested SubCall node to reference to top-level SubCall -->
+      <contents contents="//@elements.1"/>
+    </addresses>
+    <notPresent>
+      <!-- NotPresent empty -->
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise contents is a SubCall -->
+      <!-- Changed from nested SubCall node to reference to top-level SubCall -->
+      <contents contents="//@elements.1"/>
+    </otherwise>
+  </elements>
+  <!-- Index 4 -->
+
+  <!-- Top-level StringSwitch to exercise R16 -->
+  <elements xsi:type="CPL:StringSwitch">
+    <strings is="match1" contains="sub">
+      <!-- SwitchedString contents is a SubCall -->
+      <!-- Changed from nested SubCall node to reference to top-level SubCall -->
+      <contents contents="//@elements.1"/>
+    </strings>
+  </elements>
+  <!-- Index 5 -->
+
+  <!-- Top-level LanguageSwitch with NotPresent child (No contents) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en">
+      <!-- SwitchedLanguage contents is a SubCall -->
+      <!-- Changed from nested SubCall node to reference to top-level SubCall -->
+      <contents contents="//@elements.1"/>
+    </languages>
+    <notPresent/>
+  </elements>
+  <!-- Index 6 -->
+
+  <!-- Top-level TimeSwitch with one SwitchedTime (minimal required attrs) -->
+  <elements xsi:type="CPL:TimeSwitch">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO">
+      <!-- SwitchedTime contents is a SubCall -->
+      <!-- Changed from nested SubCall node to reference to top-level SubCall -->
+      <contents contents="//@elements.1"/>
+    </times>
+  </elements>
+  <!-- Index 7 -->
+
+  <!-- Top-level PrioritySwitch with one SwitchedPriority -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="1" greater="5" equal="3">
+      <!-- SwitchedPriority contents is a SubCall -->
+      <!-- Changed from nested SubCall node to reference to top-level SubCall -->
+      <contents contents="//@elements.1"/>
+    </priorities>
+  </elements>
+  <!-- Index 8 -->
+
+</CPL:CPLModel>

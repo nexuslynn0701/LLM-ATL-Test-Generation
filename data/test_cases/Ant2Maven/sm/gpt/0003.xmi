@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntBuild"
+    basedir="."
+    description="Project with multiple targets and various predefined file/archive/doc tasks"
+    default="build-main">
+
+  <!-- Default build target -->
+  <targets xmi:id="build-main" name="build" description="Main build sequence">
+    <!-- mkdir build/classes -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <!-- compile main sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+    <!-- package as jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/main-app.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Separate test compilation target -->
+  <targets xmi:id="compile-tests" name="compile-tests" description="Compile test sources">
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="build/test-classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="false"/>
+  </targets>
+
+  <!-- Documentation generation target -->
+  <targets xmi:id="generate-docs" name="javadoc" description="Generate API documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="clean-target" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="false"/>
+    <tasks xsi:type="Ant:Delete"
+           file="dist/main-app.jar"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="false"
+           includes=""
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

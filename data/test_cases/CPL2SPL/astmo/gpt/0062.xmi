@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one subAction, one incoming, one outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saOne">
+      <!-- contents -> complex proxy (index 5) -->
+      <contents href="//@elements.5"/>
+    </subActions>
+    <incoming>
+      <!-- contents -> Redirect (index 4) -->
+      <contents href="//@elements.4"/>
+    </incoming>
+    <outgoing>
+      <!-- contents -> simple Proxy (index 3) -->
+      <contents href="//@elements.3"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by proxies and redirect -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes" priority="1"/>
+
+  <!-- 2: SubCall referencing saOne -->
+  <elements xsi:type="CPL:SubCall" ref="saOne"/>
+
+  <!-- 3: Simple Proxy (used in Outgoing and as Busy contents) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- locations sequence comes from container chain via Location (index 1) -->
+    <busy>
+      <!-- contents -> SubCall (index 2) to trigger SubCall2Return within Busy -->
+      <contents href="//@elements.2"/>
+    </busy>
+  </elements>
+
+  <!-- 4: Redirect (used as Incoming contents) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 5: Complex Proxy used as SubAction contents -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- Busy with SubCall contents -->
+    <busy>
+      <contents href="//@elements.2"/>
+    </busy>
+    <!-- NoAnswer, Redirection, Failure, Default without contents -->
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- 6: AddressSwitch with one SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- addresses: one SwitchedAddress (index 7) -->
+    <addresses href="//@elements.7"/>
+    <!-- notPresent child -->
+    <notPresent/>
+    <!-- otherwise child -->
+    <otherwise/>
+  </elements>
+
+  <!-- 7: SwitchedAddress used by AddressSwitch -->
+  <elements xsi:type="CPL:SwitchedAddress" is="addr1" contains="x" subDomainOf="y">
+    <!-- contents -> SubCall (index 2) to trigger SubCall2Return inside a case -->
+    <contents href="//@elements.2"/>
+  </elements>
+
+</CPL:CPLModel>

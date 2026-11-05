@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-root"
+    description="Ant project exercising multiple tasks and properties"
+    default="compileTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by tasks as per requirements) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="compileTarget" name="compileTarget" description="Compile Java sources">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+  </targets>
+
+  <targets xmi:id="packageTarget" name="packageTarget" description="Package into JAR">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/complex-project.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <targets xmi:id="cleanupTarget" name="cleanupTarget" description="Clean build outputs">
+    <tasks xsi:type="Ant:Delete"
+           file="target/complex-project.jar"
+           dir="target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="clean-includes.txt"
+           excludes="**/.git/**"
+           excludesfile="clean-excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

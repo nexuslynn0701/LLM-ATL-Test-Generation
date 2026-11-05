@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise subPackages and superPackage -->
+  <eSubpackages name="subPkg"
+                nsURI="http://subPkg"
+                nsPrefix="sub">
+    <!-- Classifiers in subPkg -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClass">
+      <eStructuralFeatures xsi:type="eccore:EAttribute"
+                           name="subName"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers in rootPkg -->
+
+  <!-- Abstract base class with two attributes and two references (one opposite pair) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Base" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         iD="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="flag"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="child"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"
+                         containment="true">
+      <eOpposite href="//@eClassifiers.2/@eStructuralFeatures.1"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="tag"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Concrete class extending Base, with an attribute having default string -->
+  <eClassifiers xsi:type="ecore:EClass" name="Derived">
+    <eSuperTypes href="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         defaultValueLiteral="defaultLabel"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="parent"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.0">
+      <eOpposite href="//@eClassifiers.0/@eStructuralFeatures.2"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- Class with an EEnum-typed attribute and a reference to subpackage class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Tagged">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="kindAttr"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="sub"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- Enumeration with three literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="KindEnum">
+    <eLiterals name="FIRST"  value="0" literal="FIRST"/>
+    <eLiterals name="SECOND" value="1" literal="SECOND"/>
+    <eLiterals name="THIRD"  value="2" literal="THIRD"/>
+  </eClassifiers>
+
+</ecore:EPackage>

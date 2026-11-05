@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project-root"
+    description="Full build with compilation, packaging, and cleanup"
+    default="build-all">
+  <!-- Ant Properties: all four concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition (not referenced by tasks) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Target used as default goal, with several mapped tasks -->
+  <targets xmi:id="build-all" name="build-all" description="Compile, jar and prepare directories">
+    <!-- Compilation task -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+    <!-- Package into jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/dist/complex-build.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Additional target with file manipulation and delete -->
+  <targets xmi:id="clean" name="clean" description="Remove generated output">
+    <!-- Copy some resources before delete to exercise Copy rule -->
+    <tasks xsi:type="Ant:Copy"
+           file="resources/app.properties"
+           presservelastmodified="true"
+           tofile="backup/app.properties.bak"
+           todir="backup"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+    <!-- Delete generated directories -->
+    <tasks xsi:type="Ant:Delete"
+           file="target/dist/complex-build.jar"
+           dir="target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="config/includes.txt"
+           excludes="**/*.bak"
+           excludesfile="config/excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

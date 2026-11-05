@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example.org/rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="subPkg"
+                nsURI="http://example.org/subPkg"
+                nsPrefix="sub">
+    <!-- Class in subpackage, to appear in lists and Package-related equations -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="SubClass">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subAttr"
+                           lowerBound="1"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Enum in root package -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="red" value="0" literal="red"/>
+    <eLiterals name="green" value="1" literal="green"/>
+    <eLiterals name="blue" value="2" literal="blue"/>
+  </eClassifiers>
+
+  <!-- Root classes and features -->
+  <eClassifiers xsi:type="ecore:EClass" name="Base">
+    <!-- ID attribute with default value to trigger AttEqIsId and AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true"
+                         defaultValueLiteral="defId"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- Super type to exercise ClassEqSuperTypes and createSort -->
+    <eSuperTypes>//@eClassifiers.1</eSuperTypes>
+
+    <!-- Attribute with Int type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+
+    <!-- Attribute with Boolean type, multi-valued upperBound = -1 (*) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="0"
+                         upperBound="-1"
+                         iD="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+
+    <!-- Attribute with Enum type Color, with default value to hit enum default handling -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="favoriteColor"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="red"
+                         eType="//@eClassifiers.0"/>
+
+    <!-- Containment reference to Address -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="addresses"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- Opposite reference pair with person -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="person"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.2"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.3"/>
+    <!-- Simple String attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="street"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

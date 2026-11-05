@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="metaRoot"
+    nsURI="http://example/metaroot"
+    nsPrefix="mroot">
+
+  <!-- Subpackage to trigger super/sub package equations -->
+  <eSubpackages name="subPkg"
+      nsURI="http://example/sub"
+      nsPrefix="sub">
+    <!-- Class with no features, to appear in PackEqClasses and Class2Sort -->
+    <eClassifiers xsi:type="ecore:EClass" name="EmptyNode"/>
+  </eSubpackages>
+
+  <!-- 0: EClass AbstractBase -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractBase" abstract="true">
+    <!-- 0-0: attrId (ID, String, default value, lower=1, upper=1, non-ordered, non-unique) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="attrId"
+        lowerBound="1"
+        upperBound="1"
+        ordered="false"
+        unique="false"
+        iD="true"
+        defaultValueLiteral="base-default"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1: EClass Person, super AbstractBase, one ref and one attribute -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Person">
+    <eSuperTypes href="//@eClassifiers.0"/>
+    <!-- 1-0: reference to Address, non-containment, lower=0, upper=-1, ordered=true, unique=true -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="livesAt"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        containment="false"
+        eType="//@eClassifiers.2"/>
+    <!-- 1-1: attribute age, Int, lower=0, upper=1, default omitted -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 2: EClass Address -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Address">
+    <!-- 2-0: containment reference back to Person with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="occupants"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="false"
+        unique="false"
+        containment="true"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"
+        eType="//@eClassifiers.1"/>
+    <!-- 2-1: attribute street, String, with default including quotes to test escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="&quot;Main&quot; Street"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 3: EEnum Color with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <!-- 3-0: literal RED -->
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <!-- 3-1: literal BLUE -->
+    <eLiterals name="BLUE" value="1" literal="BLUE"/>
+  </eClassifiers>
+
+  <!-- 4: EClass ColoredAddress extending Address, with enum-typed attribute and untyped attribute -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="ColoredAddress">
+    <eSuperTypes href="//@eClassifiers.2"/>
+    <!-- 4-0: enum-typed attribute color -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="color"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="RED"
+        eType="//@eClassifiers.3"/>
+    <!-- 4-1: attribute misc with no eType to trigger @NoType -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="misc"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildSystem"
+    default="package"
+    basedir="."
+    description="Comprehensive build script for testing ATL transformation">
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target"/>
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="env"/>
+  <targets xmi:id="init" name="init" description="Initialize directories">
+    <tasks xsi:type="Ant:Mkdir" dir="${build.dir}"/>
+    <tasks xsi:type="Ant:Mkdir" dir="${build.dir}/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="${build.dir}/docs"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile source code" ifCondition="src.present">
+    <tasks xsi:type="Ant:Javac" srcdir="${src.dir}" destdir="${build.dir}/classes" debug="true" fork="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/test/**"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="doc" name="doc" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="${src.dir}"
+        destdir="${build.dir}/docs"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Example API"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Package compiled classes into JAR">
+    <tasks xsi:type="Ant:Jar"
+        jarfile="${build.dir}/app.jar"
+        basedir="${build.dir}/classes"
+        compress="true"
+        manifest="MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="${build.dir}" includeEmptyDirs="true" quiet="true"/>
+  </targets>
+</Ant:Project>

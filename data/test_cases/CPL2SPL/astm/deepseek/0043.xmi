@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="checkCalendar"/>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" dtstart="20250101T000000" interval="1" wkst="MO">
+        <times dtstart="20250101T080000" interval="1" wkst="MO"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <addresses is="sip:bob@example.com"/>
+            <notPresent>
+              <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+                <busy>
+                  <contents xsi:type="CPL:Location" url="sip:alice@voicemail.example.com" clear="yes"/>
+                </busy>
+                <noAnswer>
+                  <contents xsi:type="CPL:Location" url="sip:alice@voicemail.example.com" clear="yes"/>
+                </noAnswer>
+                <redirection>
+                  <contents xsi:type="CPL:SubCall" ref="checkCalendar"/>
+                </redirection>
+                <failure>
+                  <contents xsi:type="CPL:Redirect" permanent="false"/>
+                </failure>
+                <default>
+                  <contents xsi:type="CPL:Location" url="sip:alice@home.example.com" clear="no"/>
+                </default>
+              </contents>
+            </notPresent>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:LanguageSwitch">
+        <languages matches="en"/>
+        <notPresent>
+          <contents xsi:type="CPL:StringSwitch" field="user-agent">
+            <strings is="MySoftPhone"/>
+            <otherwise>
+              <contents xsi:type="CPL:PrioritySwitch">
+                <priorities less="3"/>
+                <otherwise>
+                  <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+                    <default>
+                      <contents xsi:type="CPL:SubCall" ref="checkCalendar"/>
+                    </default>
+                  </contents>
+                </otherwise>
+              </contents>
+            </otherwise>
+          </strings>
+        </notPresent>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="checkCalendar"/>
+  <elements xsi:type="CPL:Location" url="sip:alice@work.example.com" priority="1" clear="no"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="603" reason="Decline"/>
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <busy/>
+    <default contents="//@elements.1"/>
+  </elements>
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses is="sip:carol@example.com" contains="@example.com"/>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="from">
+    <strings is="unknown"/>
+    <otherwise/>
+  </elements>
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20240101T000000" interval="1" wkst="SU"/>
+</CPLModel>

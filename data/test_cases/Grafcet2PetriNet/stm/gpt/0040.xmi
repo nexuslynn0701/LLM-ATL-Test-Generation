@@ -1,0 +1,54 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet name="ComplexGrafcet0040" location="file://complexGrafcet0040.grafcet">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" name="InitStep" location="1,1" isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" name="BranchStepA" location="2,1" isInitial="false" isActive="false" action="branchAAction"/>
+    <elements xsi:type="Grafcet:Step" name="BranchStepB" location="2,2" isInitial="false" isActive="false" action="branchBAction"/>
+    <elements xsi:type="Grafcet:Step" name="MergeStep" location="4,1" isInitial="false" isActive="false" action="mergeAction"/>
+    <elements xsi:type="Grafcet:Step" name="FinalStep" location="5,1" isInitial="false" isActive="false" action="finalizeSystem"/>
+    <elements xsi:type="Grafcet:Step" name="LoopStep1" location="3,1" isInitial="false" isActive="false" action="loopAction1"/>
+    <elements xsi:type="Grafcet:Step" name="LoopStep2" location="3,2" isInitial="false" isActive="false" action="loopAction2"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" name="T_Init_To_Loop" location="1,2" condition="initComplete"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Loop1_To_BranchA" location="2,3" condition="loop1Done"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Loop2_To_BranchB" location="2,4" condition="loop2Done"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Branches_To_Merge" location="3,3" condition="branchesComplete"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Merge_To_Final" location="4,2" condition="mergeComplete"/>
+    <elements xsi:type="Grafcet:Transition" name="T_Loop_Back" location="3,4" condition="repeatLoop"/>
+    <!-- Connections: indices of elements (0-based):
+         0 InitStep
+         1 BranchStepA
+         2 BranchStepB
+         3 MergeStep
+         4 FinalStep
+         5 LoopStep1
+         6 LoopStep2
+         7 T_Init_To_Loop
+         8 T_Loop1_To_BranchA
+         9 T_Loop2_To_BranchB
+        10 T_Branches_To_Merge
+        11 T_Merge_To_Final
+        12 T_Loop_Back
+    -->
+    <!-- InitStep -> T_Init_To_Loop -> LoopStep1 -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Init_to_TInitLoop" location="c1" from="/0/@elements.0" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_TInitLoop_to_Loop1" location="c2" from="/0/@elements.7" to="/0/@elements.5"/>
+    <!-- Loop between LoopStep1 and LoopStep2 via T_Loop_Back -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Loop1_to_TLoopBack" location="c3" from="/0/@elements.5" to="/0/@elements.12"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_TLoopBack_to_Loop2" location="c4" from="/0/@elements.12" to="/0/@elements.6"/>
+    <!-- LoopStep1 -> T_Loop1_To_BranchA -> BranchStepA -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Loop1_to_TLoop1BranchA" location="c5" from="/0/@elements.5" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_TLoop1BranchA_to_BranchA" location="c6" from="/0/@elements.8" to="/0/@elements.1"/>
+    <!-- LoopStep2 -> T_Loop2_To_BranchB -> BranchStepB -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Loop2_to_TLoop2BranchB" location="c7" from="/0/@elements.6" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_TLoop2BranchB_to_BranchB" location="c8" from="/0/@elements.9" to="/0/@elements.2"/>
+    <!-- BranchStepA -> T_Branches_To_Merge, BranchStepB -> T_Branches_To_Merge -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_BranchA_to_TBranchesMerge" location="c9" from="/0/@elements.1" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_BranchB_to_TBranchesMerge" location="c10" from="/0/@elements.2" to="/0/@elements.10"/>
+    <!-- T_Branches_To_Merge -> MergeStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_TBranchesMerge_to_Merge" location="c11" from="/0/@elements.10" to="/0/@elements.3"/>
+    <!-- MergeStep -> T_Merge_To_Final -> FinalStep -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Merge_to_TMergeFinal" location="c12" from="/0/@elements.3" to="/0/@elements.11"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_TMergeFinal_to_Final" location="c13" from="/0/@elements.11" to="/0/@elements.4"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

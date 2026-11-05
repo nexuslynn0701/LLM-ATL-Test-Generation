@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AntMavenSample0033"
+    basedir="."
+    description="Ant project with multiple targets and diverse predefined tasks."
+    default="build-main">
+
+  <!-- Properties to exercise different Property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="test.src.dir" value="src/test/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="build"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="env."/>
+
+  <!-- Task definition (unreferenced by tasks, as required) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: main build -->
+  <targets xmi:id="build-main" name="build-main" description="Compile sources, create output dirs and JARs">
+    <!-- Create main and test build directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-classes"/>
+
+    <!-- Compile main sources with simple settings -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+
+    <!-- Generate Javadoc for main sources -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+
+    <!-- Package compiled classes into a JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/lib/example-0033.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Copy resources with mapping and filtering -->
+    <tasks xsi:type="Ant:Copy"
+           file="src/main/resources/app.properties"
+           tofile="build/resources/app.properties"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="false">
+      <fileset dir="src/main/resources"/>
+      <filterset starttoken="${" endtoken="}">
+        <filter token="app.name" value="SampleApp0033"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.properties" to="*.cfg"/>
+    </tasks>
+  </targets>
+
+  <!-- Secondary target: test compilation and cleanup -->
+  <targets xmi:id="test-and-clean" name="test-and-clean" description="Compile tests and clean temporary files">
+    <!-- Compile test sources with excludes/includes via inExcludes -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="build/test-classes"
+           debug="false"
+           fork="false"
+           optimize="false"
+           deprecation="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*Test.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/integration/**"/>
+    </tasks>
+
+    <!-- Delete old reports and temporary directories -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/.gitignore"
+           defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

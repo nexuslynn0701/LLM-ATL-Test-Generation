@@ -1,0 +1,41 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:id="g1" location="loc:/grafcet/example/0075" name="ProductionLineControl">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" xmi:id="s1" location="loc:/grafcet/example/0075#s1" name="Idle" isInitial="true" isActive="true" action="waitForStartSignal"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s2" location="loc:/grafcet/example/0075#s2" name="LoadMaterial" isInitial="false" isActive="false" action="activateLoader"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s3" location="loc:/grafcet/example/0075#s3" name="ProcessMaterial" isInitial="false" isActive="false" action="startProcessingUnit"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s4" location="loc:/grafcet/example/0075#s4" name="UnloadMaterial" isInitial="false" isActive="false" action="activateUnloader"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="s5" location="loc:/grafcet/example/0075#s5" name="ErrorHandling" isInitial="false" isActive="false" action="raiseAlarmAndStop"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="t1" location="loc:/grafcet/example/0075#t1" name="startPressed" condition="startButtonPressed"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t2" location="loc:/grafcet/example/0075#t2" name="materialLoaded" condition="loaderFinished"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t3" location="loc:/grafcet/example/0075#t3" name="processingDone" condition="processingComplete"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t4" location="loc:/grafcet/example/0075#t4" name="unloadDone" condition="unloaderFinished"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="t5" location="loc:/grafcet/example/0075#t5" name="errorDetected" condition="errorSignalRaised"/>
+
+    <!-- StepToTransition connections (PlaceToTransition in target) -->
+    <!-- Normal forward flow -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c1" location="loc:/grafcet/example/0075#c1" name="Idle_to_startPressed" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c2" location="loc:/grafcet/example/0075#c2" name="Load_to_materialLoaded" from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c3" location="loc:/grafcet/example/0075#c3" name="Process_to_processingDone" from="/0/@elements.2" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c4" location="loc:/grafcet/example/0075#c4" name="Unload_to_unloadDone" from="/0/@elements.3" to="/0/@elements.8"/>
+
+    <!-- Extra alternative connection to show multiple outgoing from a step -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c5" location="loc:/grafcet/example/0075#c5" name="Process_to_errorDetected" from="/0/@elements.2" to="/0/@elements.9"/>
+
+    <!-- TransitionToStep connections (TransitionToPlace in target) -->
+    <!-- Normal forward flow -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c6" location="loc:/grafcet/example/0075#c6" name="startPressed_to_Load" from="/0/@elements.5" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c7" location="loc:/grafcet/example/0075#c7" name="materialLoaded_to_Process" from="/0/@elements.6" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c8" location="loc:/grafcet/example/0075#c8" name="processingDone_to_Unload" from="/0/@elements.7" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c9" location="loc:/grafcet/example/0075#c9" name="unloadDone_to_Idle" from="/0/@elements.8" to="/0/@elements.0"/>
+
+    <!-- Error branch returning to Idle -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c10" location="loc:/grafcet/example/0075#c10" name="errorDetected_to_ErrorHandling" from="/0/@elements.9" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="c11" location="loc:/grafcet/example/0075#c11" name="ErrorHandling_to_startPressed" from="/0/@elements.4" to="/0/@elements.5"/>
+
+    <!-- Extra back-edge transition to show multiple inputs to a step -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="c12" location="loc:/grafcet/example/0075#c12" name="materialLoaded_to_Idle" from="/0/@elements.6" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

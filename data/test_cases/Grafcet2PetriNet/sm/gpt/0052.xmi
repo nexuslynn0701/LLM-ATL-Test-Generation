@@ -1,0 +1,115 @@
+<xmi:XMI xmi:version="2.0"
+         xmlns:xmi="http://www.omg.org/XMI"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcetExample" location="file:///models/grafcet0052.grafcet">
+
+    <!-- Elements: Steps and Transitions -->
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_s1"
+              name="InitStep"
+              location="1:1-1:20"
+              isInitial="true"
+              isActive="true"
+              action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_s2"
+              name="CheckSensors"
+              location="2:1-2:25"
+              isInitial="false"
+              isActive="false"
+              action="readSensors"/>
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_s3"
+              name="ProcessData"
+              location="3:1-3:25"
+              isInitial="false"
+              isActive="false"
+              action="computeResults"/>
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_s4"
+              name="Finalize"
+              location="4:1-4:20"
+              isInitial="false"
+              isActive="false"
+              action="shutdownSystem"/>
+
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_t1"
+              name="InitToCheck"
+              location="5:1-5:25"
+              condition="systemReady"/>
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_t2"
+              name="CheckToProcess"
+              location="6:1-6:30"
+              condition="sensorsOk"/>
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_t3"
+              name="ProcessToFinalize"
+              location="7:1-7:35"
+              condition="processingDone"/>
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_t4"
+              name="LoopBack"
+              location="8:1-8:30"
+              condition="restartRequested"/>
+
+    <!-- Connections: StepToTransition and TransitionToStep -->
+    <!-- Linear chain: s1 -> t1 -> s2 -> t2 -> s3 -> t3 -> s4 -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c1"
+                 name="C_Init_to_T1"
+                 location="9:1-9:35"
+                 from="/0/@elements.0"
+                 to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c2"
+                 name="C_T1_to_S2"
+                 location="10:1-10:35"
+                 from="/0/@elements.4"
+                 to="/0/@elements.1"/>
+
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c3"
+                 name="C_S2_to_T2"
+                 location="11:1-11:35"
+                 from="/0/@elements.1"
+                 to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c4"
+                 name="C_T2_to_S3"
+                 location="12:1-12:35"
+                 from="/0/@elements.5"
+                 to="/0/@elements.2"/>
+
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c5"
+                 name="C_S3_to_T3"
+                 location="13:1-13:35"
+                 from="/0/@elements.2"
+                 to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c6"
+                 name="C_T3_to_S4"
+                 location="14:1-14:35"
+                 from="/0/@elements.6"
+                 to="/0/@elements.3"/>
+
+    <!-- Loop-back branch: from S3 via T4 back to S1 -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c7"
+                 name="C_S3_to_T4"
+                 location="15:1-15:35"
+                 from="/0/@elements.2"
+                 to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c8"
+                 name="C_T4_to_S1"
+                 location="16:1-16:35"
+                 from="/0/@elements.7"
+                 to="/0/@elements.0"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

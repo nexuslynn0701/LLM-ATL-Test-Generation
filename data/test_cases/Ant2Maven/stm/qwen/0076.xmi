@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    default="build"
+    basedir="."
+    description="A sample Ant project for transformation testing">
+  <targets xmi:id="init" name="init" description="Initialize directories">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/test-classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/site"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile source code">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" deprecation="true"/>
+  </targets>
+  <targets xmi:id="test-compile" name="test-compile" description="Compile test code">
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="target/test-classes" debug="true"/>
+  </targets>
+  <targets xmi:id="jar" name="jar" description="Package compiled classes into JAR">
+    <tasks xsi:type="Ant:Jar" jarfile="target/sample-project.jar" basedir="target/classes"/>
+  </targets>
+  <targets xmi:id="javadoc" name="javadoc" description="Generate API documentation">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src/main/java"
+        destdir="target/site/apidocs"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Sample Project API"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="target"/>
+  </targets>
+  <targets xmi:id="build" name="build" description="Full build lifecycle">
+    <tasks xsi:type="Ant:Copy" todir="target/resources">
+      <fileset dir="src/main/resources"/>
+    </tasks>
+    <tasks xsi:type="Ant:Copy" todir="target/test-resources">
+      <fileset dir="src/test/resources"/>
+    </tasks>
+  </targets>
+  <properties>
+    <Ant:PropertyValue name="project.version" value="1.0.0"/>
+    <Ant:PropertyLocation name="lib.dir" location="lib"/>
+    <Ant:PropertyFile file="build.properties"/>
+    <Ant:PropertyEnv environment="env"/>
+  </properties>
+</Ant:Project>

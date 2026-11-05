@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="Ant2MavenSample11"
+    basedir="workspace"
+    description="Ant to Maven transformation test project 0011"
+    default="build">
+  <!-- Properties: one of each kind -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by any NewTask) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="build" name="build" description="Compile sources and create jar">
+    <!-- Compile task -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- Simple classpath without nested references -->
+      <classPath refid="build.classpath"/>
+    </tasks>
+
+    <!-- Jar archive task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/app-0011.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"/>
+  </targets>
+
+  <targets xmi:id="prepare" name="prepare" description="Prepare build directories">
+    <!-- Create build directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+    <!-- Delete old output -->
+    <tasks xsi:type="Ant:Delete" dir="target/old-output" verbose="true"/>
+  </targets>
+
+  <targets xmi:id="cleanup" name="cleanup" description="Clean temporary files">
+    <!-- Simple delete task -->
+    <tasks xsi:type="Ant:Delete" dir="target/tmp" quiet="true" includeEmptyDirs="false"/>
+  </targets>
+</Ant:Project>

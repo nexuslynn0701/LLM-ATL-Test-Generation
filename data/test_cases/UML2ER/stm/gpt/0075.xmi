@@ -1,0 +1,73 @@
+<SimpleUml:Package xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:SimpleUml="http://SimpleUML"
+    name="LibrarySystem">
+
+  <!-- 0: Basic Person-like class -->
+  <ownedElements name="EntityBase"/>
+
+  <!-- 1: LibraryMember extends EntityBase, with primitive and complex refs -->
+  <ownedElements name="LibraryMember" superClasses="//@ownedElements.0">
+    <ownedProperty name="memberId" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="fullName" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="borrowedLoans" complexType="//@ownedElements.5" isContainment="true"/>
+  </ownedElements>
+
+  <!-- 2: Librarian extends LibraryMember and EntityBase (multiple inheritance) -->
+  <ownedElements name="Librarian" superClasses="//@ownedElements.1 //@ownedElements.0">
+    <ownedProperty name="employeeNumber" primitiveType="String" isContainment="false"/>
+  </ownedElements>
+
+  <!-- 3: Book class with both primitive and complex properties -->
+  <ownedElements name="Book">
+    <ownedProperty name="isbn" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="title" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="authors" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="category" complexType="//@ownedElements.4" isContainment="false"/>
+  </ownedElements>
+
+  <!-- 4: Category class, referenced by Book, contains Books (cyclic through refs) -->
+  <ownedElements name="Category">
+    <ownedProperty name="name" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="subCategory" complexType="//@ownedElements.4" isContainment="true"/>
+    <ownedProperty name="books" complexType="//@ownedElements.3" isContainment="true"/>
+  </ownedElements>
+
+  <!-- 5: Loan class, used as containment from LibraryMember -->
+  <ownedElements name="Loan">
+    <ownedProperty name="loanDate" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="dueDate" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="borrower" complexType="//@ownedElements.1" isContainment="false"/>
+    <ownedProperty name="loanedBook" complexType="//@ownedElements.3" isContainment="false"/>
+  </ownedElements>
+
+  <!-- 6: Address class, used as contained and non-contained complex type -->
+  <ownedElements name="Address">
+    <ownedProperty name="street" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="city" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="country" primitiveType="String" isContainment="false"/>
+  </ownedElements>
+
+  <!-- 7: Branch class containing Addresses and referencing Librarian -->
+  <ownedElements name="Branch">
+    <ownedProperty name="branchCode" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="location" complexType="//@ownedElements.6" isContainment="true"/>
+    <ownedProperty name="manager" complexType="//@ownedElements.2" isContainment="false"/>
+  </ownedElements>
+
+  <!-- 8: DigitalResource class without superClass, primitive only -->
+  <ownedElements name="DigitalResource">
+    <ownedProperty name="resourceId" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="url" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="format" primitiveType="String" isContainment="false"/>
+  </ownedElements>
+
+  <!-- 9: Reservation class referencing multiple other classes -->
+  <ownedElements name="Reservation">
+    <ownedProperty name="reservationId" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="reservedBy" complexType="//@ownedElements.1" isContainment="false"/>
+    <ownedProperty name="reservedBook" complexType="//@ownedElements.3" isContainment="false"/>
+    <ownedProperty name="reservedBranch" complexType="//@ownedElements.7" isContainment="false"/>
+  </ownedElements>
+
+</SimpleUml:Package>

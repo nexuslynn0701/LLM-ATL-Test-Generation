@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg58"
+    nsURI="http://example.org/rootPkg58"
+    nsPrefix="rp58">
+
+  <!-- Subpackage to exercise eSuperPackage/eSubpackages and PackEqSupPackage/PackEqSubPackages -->
+  <eSubpackages name="subPkgA"
+                nsURI="http://example.org/subPkgA"
+                nsPrefix="spa">
+    <!-- Class in subpackage with super type in root package (cross-package inheritance) -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubNode">
+      <eSuperTypes href="..//@eClassifiers.0"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subFlag"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Class 0: BaseNode (supertype) -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseNode">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         defaultValueLiteral="unnamedBase"/>
+  </eClassifiers>
+
+  <!-- Class 1: DerivedNode (subclass of BaseNode), has attributes and multiple references -->
+  <eClassifiers xsi:type="ecore:EClass" name="DerivedNode">
+    <!-- Single super type to exercise ClassEqSuperTypes (single element) -->
+    <eSuperTypes href="//@eClassifiers.0"/>
+    <!-- Attribute with String default to trigger AttEqSpecificDefaultValue/string branch -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         defaultValueLiteral="&quot;quoted&quot; label"/>
+    <!-- Attribute with EBooleanObject to test AttEqIsId=false and default handling with non-string type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"
+                         iD="false"
+                         defaultValueLiteral="true"/>
+    <!-- Containment reference with multiplicity * to exercise EqUpperBound '*' and RefEqIsContainment=true -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"
+                         containment="true"/>
+    <!-- Non-containment reference with opposite to exercise RefEqOpposite and maudeMaybeRefSort() -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="parent"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.1"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"
+                         containment="false"/>
+  </eClassifiers>
+
+  <!-- Class 2: Enum user class to get a classifier that is not an EClass in eClassifiers -->
+  <eClassifiers xsi:type="ecore:EClass" name="EnumUser">
+    <!-- Reference to BaseNode to exercise multi-class references list -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="target"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.0"
+                         containment="false"/>
+    <!-- Attribute typed by custom enum MyStatus (defined below) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- Classifier 3: EEnum MyStatus with several literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="MyStatus">
+    <eLiterals name="NEW"
+               value="0"
+               literal="NEW"/>
+    <eLiterals name="IN_PROGRESS"
+               value="1"
+               literal="IN_PROGRESS"/>
+    <eLiterals name="DONE"
+               value="2"
+               literal="DONE"/>
+  </eClassifiers>
+
+  <!-- Classifier 4: Additional enum to have multiple enums -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Priority">
+    <eLiterals name="LOW"
+               value="0"
+               literal="LOW"/>
+    <eLiterals name="MEDIUM"
+               value="1"
+               literal="MEDIUM"/>
+  </eClassifiers>
+
+</ecore:EPackage>

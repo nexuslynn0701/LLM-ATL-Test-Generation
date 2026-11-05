@@ -1,0 +1,321 @@
+# UML2ER / astm / deepseek-flash
+# components=['header', 'source_mm', 'target_mm', 'atl', 'safety_note']
+# safety_note_hash=0211b420
+# ocl_n_constraints=0
+# generated=2026-06-02T02:46:16.005662
+
+You are an expert in Model-Driven Engineering (MDE) and model transformation testing.
+Your task is to generate one valid source model for testing an ATL model transformation.
+
+--------------------------------
+METAMODELS
+--------------------------------
+Two metamodels are provided below in order: SOURCE first, TARGET second.
+
+The SOURCE metamodel defines the structure your output must conform to.
+The TARGET metamodel is provided only to help you understand the target-side
+types and bindings referenced in the ATL transformation.
+
+Do NOT instantiate target metamodel classes.
+Do NOT generate a target model.
+Do NOT use target-only classes, attributes, references, or namespace prefixes
+in the source model.
+
+--- SimpleUml.ecore ---
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="SimpleUml" nsURI="http://SimpleUML" nsPrefix="SimpleUml">
+  <eClassifiers xsi:type="ecore:EClass" name="Class" eSuperTypes="#//NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ownedProperty" upperBound="-1"
+        eType="#//Property" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="superClasses" upperBound="-1"
+        eType="#//Class"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Property" eSuperTypes="#//NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="primitiveType" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="complexType" eType="#//Class"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isContainment" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Package" eSuperTypes="#//NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ownedElements" upperBound="-1"
+        eType="#//Class" containment="true"/>
+  </eClassifiers>
+</ecore:EPackage>
+
+
+--- ER.ecore ---
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="ER" nsURI="http://er" nsPrefix="ER">
+  <eClassifiers xsi:type="ecore:EClass" name="ERModel" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entities" upperBound="-1"
+        eType="#//EntityType" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EntityType" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="features" upperBound="-1"
+        eType="#//Feature" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Feature" abstract="true" eSuperTypes="#//Element"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Attribute" eSuperTypes="#//Feature">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="WeakReference" eSuperTypes="#//Reference"/>
+  <eClassifiers xsi:type="ecore:EClass" name="StrongReference" eSuperTypes="#//Reference"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Reference" abstract="true" eSuperTypes="#//Feature">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//EntityType"/>
+  </eClassifiers>
+</ecore:EPackage>
+
+
+--------------------------------
+MODEL TRANSFORMATION (ATL)
+--------------------------------
+Study this ATL transformation carefully to understand which source structures
+trigger which rules. Use this knowledge to design a source model that exercises
+as many different transformation rules as possible.
+
+module UML2ER;
+create OUT : ER, TM : TMM from IN : SimpleUML;
+
+helper def : trace : TMM!Trace = OclUndefined;
+
+entrypoint rule createTrace()
+{
+	to
+		tr : TMM!Trace( )
+	
+	do {
+		thisModule.trace <- tr;
+	}	
+}
+
+abstract rule NamedElement{ 
+ from s : SimpleUML!NamedElement
+ to   t : ER!Element(
+ 	name <- s.name
+	)
+}
+
+rule Package extends NamedElement{
+  from s: SimpleUML!Package
+  to t: ER!ERModel(
+        entities <- s.ownedElements 
+	),
+	-- trace information
+	tl : TMM!TraceLink(
+		ruleName <- 'Package',
+		targetElements <- Sequence{t}
+	),
+	tl2 : TMM!TraceLink(
+		ruleName <- 'NamedElement',
+		targetElements <- Sequence{t}
+	)
+  do {
+	-- trace information
+	tl.sourceElements <- Sequence{s};
+	tl2.sourceElements <- Sequence{s};
+	thisModule.trace.traceLinks <- tl;
+	thisModule.trace.traceLinks <- tl2;
+  }
+}
+
+rule Class extends NamedElement{
+  from s: SimpleUML!Class
+  to t: ER!EntityType (
+     features <- s.ownedProperty 
+	 ),
+	-- trace information
+	tl : TMM!TraceLink(
+		ruleName <- 'Class',
+		targetElements <- Sequence{t}
+	),
+	tl2 : TMM!TraceLink(
+		ruleName <- 'NamedElement',
+		targetElements <- Sequence{t}
+	)
+  do {
+	-- trace information
+	tl.sourceElements <- Sequence{s};
+	tl2.sourceElements <- Sequence{s};
+	thisModule.trace.traceLinks <- tl;
+	thisModule.trace.traceLinks <- tl2;
+  }
+}
+
+abstract rule Property extends NamedElement{
+  from s: SimpleUML!Property
+  to t: ER!Feature ()
+}
+
+rule Attributes extends Property{
+  from s: SimpleUML!Property (s.complexType.oclIsUndefined())
+  to t: ER!Attribute (
+     type <- if s.primitiveType.oclIsUndefined() then 'NoType' else s.primitiveType endif	
+  ),
+	-- trace information
+	tl : TMM!TraceLink(
+		ruleName <- 'Attributes',
+		targetElements <- Sequence{t}
+	),
+	-- trace information
+	tl2 : TMM!TraceLink(
+		ruleName <- 'Property',
+		targetElements <- Sequence{t}
+	),
+	-- trace information
+	tl3 : TMM!TraceLink(
+		ruleName <- 'NamedElement',
+		targetElements <- Sequence{t}
+	)
+  do {
+	-- trace information
+	tl.sourceElements <- Sequence{s};
+	tl2.sourceElements <- Sequence{s};
+	tl3.sourceElements <- Sequence{s};
+	thisModule.trace.traceLinks <- tl;
+	thisModule.trace.traceLinks <- tl2;
+	thisModule.trace.traceLinks <- tl3;
+  }
+}
+
+abstract rule References extends Property{
+  from s: SimpleUML!Property (not s.complexType.oclIsUndefined())
+  to t: ER!Reference (
+     type <- s.complexType 
+  )
+}
+
+rule WeakReferences extends References{
+  from s: SimpleUML!Property (not s.isContainment)
+  to t: ER!WeakReference(),
+	-- trace information
+	tl : TMM!TraceLink(
+		ruleName <- 'WeakReferences',
+		targetElements <- Sequence{t}
+	),
+	-- trace information
+	tl2 : TMM!TraceLink(
+		ruleName <- 'References',
+		targetElements <- Sequence{t}
+	),
+	-- trace information
+	tl3 : TMM!TraceLink(
+		ruleName <- 'Property',
+		targetElements <- Sequence{t}
+	),
+	-- trace information
+	tl4 : TMM!TraceLink(
+		ruleName <- 'NamedElement',
+		targetElements <- Sequence{t}
+	)
+  do {
+	-- trace information
+	tl.sourceElements <- Sequence{s};
+	tl2.sourceElements <- Sequence{s};
+	tl3.sourceElements <- Sequence{s};
+	tl4.sourceElements <- Sequence{s};
+	thisModule.trace.traceLinks <- tl;
+	thisModule.trace.traceLinks <- tl2;
+	thisModule.trace.traceLinks <- tl3;
+	thisModule.trace.traceLinks <- tl4;
+  }
+}
+
+rule StrongReferences extends References{
+  from s: SimpleUML!Property (s.isContainment)
+  to t: ER!StrongReference(),
+	-- trace information
+	tl : TMM!TraceLink(
+		ruleName <- 'StrongReferences',
+		targetElements <- Sequence{t}
+	),
+	-- trace information
+	tl2 : TMM!TraceLink(
+		ruleName <- 'References',
+		targetElements <- Sequence{t}
+	),
+	-- trace information
+	tl3 : TMM!TraceLink(
+		ruleName <- 'Property',
+		targetElements <- Sequence{t}
+	),
+	-- trace information
+	tl4 : TMM!TraceLink(
+		ruleName <- 'NamedElement',
+		targetElements <- Sequence{t}
+	)
+  do {
+	-- trace information
+	tl.sourceElements <- Sequence{s};
+	tl2.sourceElements <- Sequence{s};
+	tl3.sourceElements <- Sequence{s};
+	tl4.sourceElements <- Sequence{s};
+	thisModule.trace.traceLinks <- tl;
+	thisModule.trace.traceLinks <- tl2;
+	thisModule.trace.traceLinks <- tl3;
+	thisModule.trace.traceLinks <- tl4;
+  }
+}
+
+--------------------------------
+EXAMPLE SOURCE MODELS
+--------------------------------
+Below are example source models that conform to the source metamodel.
+Use them only to understand the correct source-side XMI format and structure.
+Generate a NEW and DIFFERENT source model that covers different ATL rules.
+
+
+
+--------------------------------
+GENERATION REQUIREMENTS
+--------------------------------
+The source model must:
+1. Conform to the source metamodel.
+2. Satisfy all OCL constraints.
+3. Exercise as many different ATL rules as possible.
+4. Be structurally different from the example source models.
+5. Be syntactically valid XMI.
+6. Use ONLY classes, attributes, references, and namespace prefixes defined
+   in the source metamodel.
+7. Never instantiate target metamodel classes.
+8. Express attribute values as XMI attributes, not as XML text content nodes.
+   CORRECT:   <Entry title="My Title" year="2024"/>
+   INCORRECT: <Entry><title>My Title</title></Entry>
+9. Containment references may be represented as nested XMI elements when
+   required by the source metamodel.
+
+--------------------------------
+SOURCE FORMAT NOTES
+--------------------------------
+
+IMPORTANT CONSTRAINTS for SimpleUML source models:
+0. Root element MUST use the SimpleUml namespace prefix:
+   CORRECT:   <SimpleUml:Package xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:SimpleUml="http://SimpleUML" name="...">
+   INCORRECT: <Package xmlns:xmi=...> or <Package name="...">
+1. complexType is a REFERENCE attribute, not a nested element:
+   CORRECT:   <ownedProperty name="author" complexType="//@ownedElements.1"/>
+   INCORRECT: <ownedProperty name="author"><complexType name="Author"/></ownedProperty>
+2. superClasses is a REFERENCE list:
+   CORRECT:   <ownedElements name="Student" superClasses="//@ownedElements.0 //@ownedElements.1"/>
+   INCORRECT: <ownedElements name="Student"><superClasses name="Person"/></ownedElements>
+3. All ownedElements are top-level children of the Package root element.
+4. Use //@ownedElements.N (0-based index) for all cross-references.
+
+--------------------------------
+OUTPUT FORMAT
+--------------------------------
+Return exactly one source model and nothing else:
+
+<source_model>
+[source XMI here]
+</source_model>
+
+Do not include: target_model, expected output, coverage notes,
+explanation, or Markdown fences.

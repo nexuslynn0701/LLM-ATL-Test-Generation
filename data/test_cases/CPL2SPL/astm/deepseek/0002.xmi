@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="helper1"/>
+    <outgoing/>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="destination" subField="user">
+        <addresses is="sip:alice@example.com"/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" timeout="5" recurse="yes" ordering="parallel">
+            <noAnswer>
+              <contents xsi:type="CPL:Redirect" permanent="false"/>
+            </noAnswer>
+            <failure/>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:bob@example.com" priority="0" clear="yes"/>
+  <elements xsi:type="CPL:SubCall" ref="helper1"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <busy>
+      <contents xsi:type="CPL:TimeSwitch" dtstart="20240101T000000" interval="1" wkst="MO"/>
+    </busy>
+    <default contents="//@elements.2"/>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="user-agent">
+    <strings is="iPhone"/>
+    <notPresent/>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <otherwise>
+      <contents xsi:type="CPL:PrioritySwitch">
+        <priorities less="5"/>
+      </contents>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

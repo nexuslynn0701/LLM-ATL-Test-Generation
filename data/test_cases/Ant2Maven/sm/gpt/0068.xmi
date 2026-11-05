@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Project with multiple targets and diverse predefined tasks."
+    default="coreBuild">
+
+  <!-- Core build target: compile sources and prepare jar -->
+  <targets xmi:id="coreBuild" name="coreBuild" description="Compile and package main sources">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/complexbuild-main.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="MANIFEST.MF"/>
+  </targets>
+
+  <!-- Test compilation and documentation target -->
+  <targets xmi:id="testsAndDocs" name="testsAndDocs" description="Compile tests and generate documentation">
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="build/test-classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+  </targets>
+
+  <!-- Cleanup and distribution target -->
+  <targets xmi:id="cleanupAndDist" name="cleanupAndDist" description="Clean old build outputs and prepare distribution">
+    <tasks xsi:type="Ant:Delete"
+           dir="build/old"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           excludes="**/keep/**"
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/complexbuild-dist.jar"
+           basedir="build"
+           compress="true"
+           encoding="UTF-8"/>
+  </targets>
+
+</Ant:Project>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComprehensiveBuild"
+    basedir="workspace"
+    description="Build, package and clean project"
+    default="buildTarget">
+
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="project.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="workspace/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A simple TaskDef to trigger AntTaskDef2MavenMavenTaskDef -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with a variety of tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src"
+           destdir="workspace/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/dist"/>
+    <!-- Package into a jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/dist/comprehensive-build.jar"
+           basedir="workspace/classes"
+           compress="true"/>
+  </targets>
+
+  <!-- Secondary target with additional tasks to broaden coverage -->
+  <targets xmi:id="cleanTarget" name="clean">
+    <!-- Delete compiled classes directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="workspace/classes"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           defaultexcludes="true"/>
+    <!-- Another mkdir to ensure multiple instances -->
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/temp"/>
+  </targets>
+
+</Ant:Project>

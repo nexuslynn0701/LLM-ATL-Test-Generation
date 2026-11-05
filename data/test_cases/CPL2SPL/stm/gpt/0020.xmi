@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with heterogeneous subActions and outgoing/incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions referencing various nodes via contents -->
+    <subActions id="actionA">
+      <contents href="//@elements.3"/>
+      <contents href="//@elements.6"/>
+    </subActions>
+    <subActions id="actionB">
+      <contents href="//@elements.4"/>
+      <contents href="//@elements.5"/>
+    </subActions>
+    <subActions id="actionC">
+      <contents href="//@elements.7"/>
+    </subActions>
+
+    <!-- Outgoing and Incoming containers mixing Locations and Switches -->
+    <outgoing>
+      <contents href="//@elements.1"/>
+      <contents href="//@elements.2"/>
+      <contents href="//@elements.3"/>
+    </outgoing>
+    <incoming>
+      <contents href="//@elements.4"/>
+      <contents href="//@elements.5"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location (Node & NodeContainer) containing a SubCall via contents -->
+  <elements xsi:type="CPL:Location" url="sip:alice@example.com" priority="1" clear="yes">
+    <contents href="//@elements.2"/>
+  </elements>
+
+  <!-- 2: SubCall, referenced as string from several places -->
+  <elements xsi:type="CPL:SubCall" id="subDef1"/>
+
+  <!-- 3: AddressSwitch with multiple SwitchedAddress and NotPresent/Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="From" subField="host">
+    <notPresent>
+      <contents href="//@elements.1"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.7"/>
+    </otherwise>
+    <addresses is="sip:bob@example.net" contains="example.net" subDomainOf="example.net">
+      <contents href="//@elements.2"/>
+    </addresses>
+    <addresses is="sip:carol@example.org">
+      <contents href="//@elements.6"/>
+    </addresses>
+  </elements>
+
+  <!-- 4: StringSwitch using SwitchedString cases -->
+  <elements xsi:type="CPL:StringSwitch" field="Subject">
+    <notPresent>
+      <contents href="//@elements.8"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.1"/>
+    </otherwise>
+    <strings is="urgent" contains="URGENT">
+      <contents href="//@elements.3"/>
+    </strings>
+    <strings is="spam" contains="SPAM">
+      <contents href="//@elements.9"/>
+    </strings>
+  </elements>
+
+  <!-- 5: LanguageSwitch with multiple SwitchedLanguage entries -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <contents href="//@elements.9"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.8"/>
+    </otherwise>
+    <languages matches="en">
+      <contents href="//@elements.6"/>
+    </languages>
+    <languages matches="fr">
+      <contents href="//@elements.7"/>
+    </languages>
+  </elements>
+
+  <!-- 6: TimeSwitch with SwitchedTime recurrence attributes -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example/Paris">
+    <notPresent>
+      <contents href="//@elements.2"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.1"/>
+    </otherwise>
+    <times dtstart="20240101T080000" dtend="20240101T180000"
+           duration="PT1H" freq="DAILY" until="20241231T235959"
+           count="10" interval="1" bySecond="0" byMinute="0"
+           byHour="8,9,10" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1,15" byYearDay="100" byWeekNo="10"
+           byMonth="1,2,3" wkst="MO" bySetPos="1">
+      <contents href="//@elements.3"/>
+    </times>
+    <times dtstart="20240101T000000" interval="2" wkst="SU">
+      <contents href="//@elements.8"/>
+    </times>
+  </elements>
+
+  <!-- 7: PrioritySwitch with several SwitchedPriority entries -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <contents href="//@elements.4"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.5"/>
+    </otherwise>
+    <priorities less="0.3" greater="0.0" equal="0.1">
+      <contents href="//@elements.1"/>
+    </priorities>
+    <priorities less="0.7" greater="0.3" equal="0.5">
+      <contents href="//@elements.9"/>
+    </priorities>
+  </elements>
+
+  <!-- 8: Proxy that uses all outcome branches, each containing different nodes -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+    <busy>
+      <contents href="//@elements.1"/>
+      <contents href="//@elements.3"/>
+    </busy>
+    <noAnswer>
+      <contents href="//@elements.4"/>
+    </noAnswer>
+    <redirection>
+      <contents href="//@elements.5"/>
+      <contents href="//@elements.7"/>
+    </redirection>
+    <failure>
+      <contents href="//@elements.6"/>
+    </failure>
+    <default>
+      <contents href="//@elements.2"/>
+      <contents href="//@elements.9"/>
+    </default>
+  </elements>
+
+  <!-- 9: Reject action -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 10: Redirect action -->
+  <elements xsi:type="CPL:Redirect" permanent="yes"/>
+
+</CPL:CPLModel>

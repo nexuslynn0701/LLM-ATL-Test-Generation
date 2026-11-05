@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project-src"
+    description="Complex Ant project with multiple targets and tasks."
+    default="buildTarget">
+
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="compiler.debug" value="true"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Path with nested PathElement and FileSet to trigger Path-related rules -->
+  <path id="mainPath">
+    <pathElement path="lib/util.jar" location="lib/util.jar"/>
+    <fileset dir="lib">
+      <include name="**/*.jar"/>
+      <exclude name="**/test-*.jar"/>
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/old/*.jar"/>
+      </patternset>
+    </fileset>
+  </path>
+
+  <!-- Task definition and attributes to trigger AntTaskDef and AntAttribut rules -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets (no depends used) -->
+  <targets xmi:id="buildTarget" name="build" description="Main build target">
+    <!-- Management of directories and files -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/jar"/>
+
+    <!-- Compile Java sources with inExcludes and ClassPath -->
+    <tasks xsi:type="Ant:Javac" srcdir="project-src" destdir="build/classes" debug="true" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+      <classPath refid="compile.cp">
+        <pathElement path="build/classes" location="build/classes"/>
+        <fileset dir="lib">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Create jar archive -->
+    <tasks xsi:type="Ant:Jar" jarfile="build/jar/app-main.jar" basedir="build/classes" compress="true"/>
+
+    <!-- Copy resources using FileSet, FilterSet, and Mapper -->
+    <tasks xsi:type="Ant:Copy" todir="build/resources" overwrite="true">
+      <fileset dir="resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/dev/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="version" value="1.0.0"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.properties" to="*.cfg"/>
+    </tasks>
+
+    <!-- Delete temporary directory -->
+    <tasks xsi:type="Ant:Delete" dir="build/tmp" verbose="true"/>
+  </targets>
+
+  <targets xmi:id="docTarget" name="doc" description="Generate Javadoc">
+    <!-- Documentation task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="project-src"
+           destdir="build/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API"/>
+  </targets>
+
+  <targets xmi:id="timestampTarget" name="prepare" description="Prepare build with timestamp">
+    <!-- Tstamp to trigger AntTstamp2MavenMavenTstamp -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+</Ant:Project>

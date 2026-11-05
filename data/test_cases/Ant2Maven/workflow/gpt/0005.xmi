@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuildPipeline"
+    basedir="workspace"
+    description="End-to-end build, package, and cleanup pipeline"
+    default="build-main">
+  <!-- Properties exercising all Ant Property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="project.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="workspace/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition (not referenced by tasks) -->
+  <taskdef name="custom.codegen" classname="org.example.tools.CodeGenTask"/>
+
+  <!-- Default target: main build with multiple pre-defined tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Compile sources, package JAR, and prepare output">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src/main/java"
+           destdir="workspace/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/target/full-build-pipeline.jar"
+           basedir="workspace/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="workspace/META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           id="create-dist-dir"
+           dir="workspace/dist"/>
+    <tasks xsi:type="Ant:Copy"
+           file="workspace/target/full-build-pipeline.jar"
+           presservelastmodified="true"
+           tofile="workspace/dist/full-build-pipeline.jar"
+           todir="workspace/dist"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+  </targets>
+
+  <!-- Secondary target: documentation and cleanup -->
+  <targets xmi:id="docs-and-clean" name="docs-and-clean" description="Generate Javadoc and cleanup temporary files">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="workspace/src/main/java"
+           destdir="workspace/target/apidocs"
+           packagenames="org.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="FullBuildPipeline API"/>
+    <tasks xsi:type="Ant:Delete"
+           file="workspace/target/temp.log"
+           dir="workspace/target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           includesfile="workspace/config/delete-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="workspace/config/delete-excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

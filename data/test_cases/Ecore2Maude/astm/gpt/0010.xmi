@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMeta"
+    nsURI="http://rootMeta/1.0"
+    nsPrefix="root">
+
+  <!-- Subpackage without classifiers (to exercise empty subPackages/classes) -->
+  <eSubpackages name="utilPkg" nsURI="http://rootMeta/util" nsPrefix="util"/>
+
+  <!-- Classifiers of root package -->
+  <!-- 0: Base abstract class -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true" interface="false"/>
+
+  <!-- 1: Concrete class with no supertypes, no features -->
+  <eClassifiers xsi:type="ecore:EClass" name="LeafItem" abstract="false" interface="false"/>
+
+  <!-- 2: Concrete class with two supertypes (BaseElement and LeafItem) -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="CompositeItem"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.0 //@eClassifiers.1">
+    <!-- Reference with opposite to trigger EqType, RefEqOpposite, maudeMaybeRefSort (non-null), containment, bounds, isOrdered/isUnique -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.3/@eStructuralFeatures.0"
+                         eType="//@eClassifiers.2"/>
+    <!-- Attribute with Boolean type, non-ID, String default to trigger AttEqSpecificDefaultValue(String) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         defaultValueLiteral="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 3: Class that is supertyped by CompositeItem (to force createSort on an ecore class) and contains the opposite reference -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Container"
+                abstract="false"
+                interface="false"
+                eSuperTypes="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EClass">
+    <!-- Opposite side of children, no containment, upperBound 1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="parent"
+                         ordered="false"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 4: Enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ARCHIVED" value="1" literal="ARCHIVED"/>
+  </eClassifiers>
+
+  <!-- 5: Class with attributes using String, Int, Enum, including ID and enum default (to trigger many attribute-related rules) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Record" abstract="false" interface="false">
+    <!-- ID attribute, String type, with default -->
+    <eStructuralFeatures xsi:type="eccore:EAttribute"/>
+  </eClassifiers>
+
+</ecore:EPackage>

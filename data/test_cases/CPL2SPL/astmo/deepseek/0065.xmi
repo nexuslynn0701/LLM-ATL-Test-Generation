@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="action1"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <notPresent>
+          <contents xsi:type="CPL:SubCall" ref="action1"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential" timeout="30">
+            <busy>
+              <contents xsi:type="CPL:Location" url="sip:busy@test.com" priority="1" clear="no"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Redirect" permanent="false"/>
+            </noAnswer>
+            <redirection>
+              <contents xsi:type="CPL:Location" url="sip:redirected@test.com" priority="1" clear="no"/>
+            </redirection>
+            <failure>
+              <contents xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+            </failure>
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:default@test.com" priority="1" clear="no"/>
+            </default>
+          </contents>
+        </otherwise>
+        <addresses is="sip:user1@domain.com" contains="test" subDomainOf="domain.com">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default/>
+          </contents>
+        </addresses>
+        <addresses is="sip:user2@domain.com">
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+        </addresses>
+      </contents>
+    </outgoing>
+    <incoming/>
+  </elements>
+</CPLModel>

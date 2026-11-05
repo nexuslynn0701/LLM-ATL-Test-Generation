@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL element with Incoming, Outgoing, and SubActions -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.2"/>
+    <subActions/>
+    <incoming contents="//@elements.3"/>
+    <outgoing contents="//@elements.4"/>
+  </elements>
+
+  <!-- Simple SubAction whose contents is a SubCall (triggers SubAction2Function + SubCall2Return) -->
+  <elements xsi:type="CPL:SubAction" id="sa_simple">
+    <contents xsi:type="CPL:SubCall" ref="sa_complex"/>
+  </elements>
+
+  <!-- Complex SubAction whose contents is a complex Proxy (triggers Proxy2Select etc.) -->
+  <elements xsi:type="CPL:SubAction" id="sa_complex">
+    <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+      <!-- Locations for this Proxy (used by locations helper and Proxy2Select) -->
+      <contents xsi:type="CPL:Location" url="sip:sa_complex@domain.com" clear="yes" priority="5"/>
+      <!-- Complex branches -->
+      <busy contents="//@elements.5"/>
+      <noAnswer contents="//@elements.6"/>
+      <redirection contents="//@elements.7"/>
+      <failure/>
+      <default contents="//@elements.8"/>
+    </contents>
+  </elements>
+
+  <!-- Incoming method contents: a simple Proxy (triggers Incoming2Method + Proxy2Return) -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+    <contents xsi:type="CPL:Location" url="sip:in_location@domain.com" clear="no" priority="1"/>
+  </elements>
+
+  <!-- Outgoing method contents: AddressSwitch (triggers Outgoing2Method + AddressSwitch2SelectStat + SwitchedAddress2SelectCase + NotPresent2ErrorResponse + Otherwise2SelectDefault) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- Address-specific branch 1 with nested simple Proxy -->
+    <addresses>
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <contents xsi:type="CPL:Location" url="sip:addr1@domain.com" clear="yes" priority="2"/>
+      </contents>
+    </addresses>
+    <!-- Address-specific branch 2 with nested Redirect -->
+    <addresses contents="//@elements.9"/>
+    <!-- Not-present branch -->
+    <notPresent/>
+    <!-- Default branch -->
+    <otherwise contents="//@elements.10"/>
+  </elements>
+
+  <!-- Busy branch body for complex Proxy: a Redirect (triggers Busy2SelectCase + Redirect2Return) -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:Location" url="sip:busy_redirect@domain.com" clear="yes" priority="3"/>
+  </elements>
+
+  <!-- NoAnswer branch body for complex Proxy: SubCall (triggers NoAnswer2SelectCase + SubCall2Return) -->
+  <elements xsi:type="CPL:SubCall" ref="sa_simple"/>
+
+  <!-- Redirection branch body for complex Proxy: Reject (triggers Redirection2SelectCase) -->
+  <elements xsi:type="CPL:Reject" status="302" reason="redirect"/>
+
+  <!-- Default branch body for complex Proxy: Failure (triggers Default2SelectDefault + Failure2ErrorResponse) -->
+  <elements xsi:type="CPL:Failure"/>
+
+  <!-- SwitchedAddress used inside AddressSwitch (triggers SwitchedAddress2SelectCase + Redirect2Return via contents) -->
+  <elements xsi:type="CPL:SwitchedAddress" is="user@example.com" contains="dom" subDomainOf="example.com">
+    <contents xsi:type="CPL:Redirect" permanent="false">
+      <contents xsi:type="CPL:Location" url="sip:redir_addr@domain.com" clear="yes" priority="4"/>
+    </contents>
+  </elements>
+
+  <!-- Otherwise branch body of AddressSwitch: simple Proxy (triggers Otherwise2SelectDefault + Proxy2Return) -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <contents xsi:type="CPL:Location" url="sip:otherwise@domain.com" clear="yes" priority="6"/>
+  </elements>
+
+</CPL:CPLModel>

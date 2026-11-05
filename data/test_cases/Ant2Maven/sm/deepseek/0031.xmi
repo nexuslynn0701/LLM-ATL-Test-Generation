@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="build"
+    basedir="."
+    description="Sample build project">
+  <targets xmi:id="build" name="build" description="Main build target">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true" encoding="UTF-8"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete" file="dist/app.jar" verbose="false" quiet="true" failonerror="false"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run tests">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes" debug="true" fork="true" optimize="false" deprecation="true"/>
+    <tasks xsi:type="Ant:Copy" file="test/config.properties" tofile="build/test-classes/config.properties" overwrite="true" filtering="false" flatten="true"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="build/docs" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="My API"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Package distribution">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="false" manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="TODAY" pattern="yyyy-MM-dd" locale="en_US"/>
+      <format property="BUILD_TIME" pattern="HH:mm:ss" offset="0" unit="hour"/>
+    </tasks>
+  </targets>
+</Ant:Project>

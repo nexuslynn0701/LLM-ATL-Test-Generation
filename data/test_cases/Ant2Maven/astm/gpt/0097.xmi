@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComprehensiveBuild"
+    basedir="src/main/java"
+    description="Comprehensive Ant build with compile, docs, archive, and cleanup."
+    default="compileTarget">
+
+  <!-- Properties to trigger property-related rules -->
+  <properties xsi:type="Ant:PropertyValue" name="java.version" value="17"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Task definition to trigger AntTaskDef2MavenMavenTaskDef (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- First target: compile and javadoc tasks -->
+  <targets xmi:id="compileTarget" name="compile" description="Compile source and generate javadocs">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API"/>
+  </targets>
+
+  <!-- Second target: packaging and filesystem management -->
+  <targets xmi:id="packageTarget" name="package" description="Create jar and manage build directories">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/artifacts/example-app.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="build/distributions"/>
+    <tasks xsi:type="Ant:Copy"
+           file="build/artifacts/example-app.jar"
+           presservelastmodified="true"
+           tofile="build/distributions/example-app.jar"
+           todir=""
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Delete"
+           file=""
+           dir="build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

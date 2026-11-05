@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : CPL root with 1 SubAction, 1 Outgoing (complex Proxy), 1 Incoming (simple Proxy) -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents: AddressSwitch -->
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <notPresent>
+          <!-- NotPresent contents: Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </notPresent>
+        <otherwise>
+          <!-- Otherwise contents: SubCall to saAux -->
+          <contents xsi:type="CPL:SubCall" ref="saAux"/>
+        </otherwise>
+        <addresses is="sip:vip@example.com"/>
+        <addresses is="sip:normal@example.com"/>
+      </contents>
+    </subActions>
+
+    <outgoing>
+      <!-- Outgoing contents: complex Proxy (non-simple) with parallel ordering and Location in its locations -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- events branches: Busy with SubCall, NoAnswer with SubCall, Redirection with SubCall,
+             Failure empty, Default with SubCall -->
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="saAux"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="saAux"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="saAux"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </default>
+      </contents>
+    </outgoing>
+
+    <incoming>
+      <!-- Incoming contents: simple Proxy (isSimple = true) with sequential ordering,
+           using same Location as complex Proxy via locations helper -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1] : SubAction referenced by SubCalls (saAux), contents = Reject -->
+  <elements xsi:type="CPL:SubAction" id="saAux">
+    <contents xsi:type="CPL:Reject" status="486" reason="AuxBusy"/>
+  </elements>
+
+  <!-- elements[2] : Location used by both Proxies via locations helper and by Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:server@example.com" clear="yes" priority="1"/>
+
+  <!-- elements[3] : Redirect used as NotPresent.contents (permanent=true) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL root with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- contents: simple Proxy (no busy/noAnswer/redirection/failure/default) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- no event children => isSimple = true -->
+      </contents>
+    </subActions>
+    <incoming>
+      <!-- contents: SubCall (to exercise SubCall2Return) -->
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </incoming>
+    <outgoing>
+      <!-- contents: Redirect (to exercise Redirect2Return) -->
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by complex Proxy and Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:alice@example.com" clear="yes"/>
+
+  <!-- 2: SubAction referenced by SubCall in Incoming -->
+  <elements xsi:type="CPL:SubAction" id="saMain">
+    <!-- contents: Reject (filtered out so no statements created) -->
+    <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+  </elements>
+
+  <!-- 3: Complex Proxy exercising non-simple branch and parallel ordering -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <!-- busy case with SubCall to saMain -->
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </busy>
+    <!-- noAnswer case, no contents -->
+    <noAnswer/>
+    <!-- redirection case with Redirect (permanent=false) -->
+    <redirection>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </redirection>
+    <!-- failure case with Reject (filtered, no statements) -->
+    <failure>
+      <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+    </failure>
+    <!-- default case with SubCall to saMain -->
+    <default>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </default>
+    <!-- associate a Location so Proxy2Select can compute URI -->
+    <contents xsi:type="CPL:Location" url="sip:bob@example.org" clear="no"/>
+  </elements>
+
+  <!-- 4: AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- one switched address with simple Proxy contents -->
+    <addresses>
+      <contents xsi:type="CPL:SwitchedAddress" is="user@example.net">
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="serial"/>
+      </contents>
+    </addresses>
+    <!-- notPresent branch with Reject (filtered) -->
+    <notPresent>
+      <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+    </notPresent>
+    <!-- otherwise branch with SubCall to saMain -->
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.1"/>
+    <incoming contents="//@elements.3"/>
+    <outgoing contents="//@elements.2"/>
+  </elements>
+
+  <!-- 1: SubAction referenced by SubCall.ref="saOne" -->
+  <elements xsi:type="CPL:SubAction" id="saOne">
+    <!-- contents is the complex Proxy at index 5 -->
+    <contents href="//@elements.5"/>
+  </elements>
+
+  <!-- 2: Outgoing wrapper: contents is complex Proxy (5) -->
+  <elements xsi:type="CPL:Outgoing">
+    <contents href="//@elements.5"/>
+  </elements>
+
+  <!-- 3: Incoming wrapper: contents is simple Proxy (6) -->
+  <elements xsi:type="CPL:Incoming">
+    <contents href="//@elements.6"/>
+  </elements>
+
+  <!-- 4: Location used by Proxy 6 and Redirect 10 -->
+  <elements xsi:type="CPL:Location" url="sip:bob@example.com" clear="yes" priority="1"/>
+
+  <!-- 5: Complex Proxy (non-simple: has busy, noAnswer, redirection, failure, default)
+           ordering='parallel' to trigger ForwardExp.isParallel=true -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- busy -> SelectCase with BUSY_HERE, contents is SubCall(7) -->
+    <busy contents="//@elements.7"/>
+    <!-- noAnswer -> SelectCase with REQUEST_TIMEOUT, contents Redirect(10) -->
+    <noAnswer contents="//@elements.10"/>
+    <!-- redirection -> SelectCase with MULTIPLE_CHOICES, contents SubCall(7) -->
+    <redirection contents="//@elements.7"/>
+    <!-- failure just contributes an ErrorResponse; no contents -->
+    <failure/>
+    <!-- default -> SelectDefault with Redirect(10) -->
+    <default contents="//@elements.10"/>
+  </elements>
+
+  <!-- 6: Simple Proxy (no nested handlers => isSimple=true) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- location inside Proxy so locations helper yields this location -->
+    <contents href="//@elements.4"/>
+  </elements>
+
+  <!-- 7: SubCall used inside Busy and Redirection -->
+  <elements xsi:type="CPL:SubCall" ref="saOne"/>
+
+  <!-- 8: AddressSwitch with one SwitchedAddress and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- notPresent with contents Redirect(10) to create RedirectionErrorResponse -->
+    <notPresent contents="//@elements.10"/>
+    <!-- otherwise with contents simple Proxy(6) -->
+    <otherwise contents="//@elements.6"/>
+    <!-- one switched address, contents simple Proxy(6) -->
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com" contents="//@elements.6"/>
+  </elements>
+
+  <!-- 9: StringSwitch just to fire StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents href="//@elements.7"/>
+  </elements>
+
+  <!-- 10: Redirect; used as contents in noAnswer, default, notPresent -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <!-- location for this redirect -->
+    <contents href="//@elements.4"/>
+  </elements>
+
+</CPL:CPLModel>

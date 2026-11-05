@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg0098"
+    nsURI="http://example.org/root0098"
+    nsPrefix="root0098">
+
+  <!-- Subpackage to trigger PackEqSubPackages and nested PackEqSupPackage -->
+  <eSubpackages name="subPkg0098"
+                nsURI="http://example.org/sub0098"
+                nsPrefix="sub0098">
+    <!-- Class inside subpackage to exercise PackEqClasses and EqPackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="NestedClass0098">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="nestedFlag"
+                           iD="false"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Top-level classifiers in root package -->
+
+  <!-- 0: Super class with an ID attribute and a String default to trigger AttEqSpecificDefaultValue -->
+  <eClassifiers xsi:type="ecore:EClass" name="SuperClass0098">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="superId"
+                         iD="true"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="SC-0098"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1: Sub class extending SuperClass0098, with two attributes and two references (one bidirectional, one uni, multi-valued) -->
+  <eClassifiers xsi:type="ecore:EClass" name="MainClass0098"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.0">
+    <!-- Simple String attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Int attribute with default to trigger numeric AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         iD="false"
+                         ordered="false"
+                         unique="false"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="5"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Bidirectional single-valued reference to SecondaryClass0098 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="secondary"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.2"
+                         containment="false"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"/>
+    <!-- Uni-directional multi-valued (upper=-1) containment reference to NestedClass0098 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="nestedItems"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         containment="true"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 2: Secondary class with opposite reference back to MainClass0098 -->
+  <eClassifiers xsi:type="ecore:EClass" name="SecondaryClass0098">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.1"
+                         containment="false"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"/>
+    <!-- Attribute using custom data type (to exercise @DataType branch of attDataType) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="customCode"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 3: Enum with two literals to trigger Enum2Sort, EnumEqDefaultValue, EqLiterals, EnumLitList, EnumLitConstant, EnumLiteral2Operation -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status0098">
+    <eLiterals name="NEW"   value="0" literal="NEW"/>
+    <eLiterals name="DONE"  value="1" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 4: Custom EDataType to exercise attDataType default '@DataType' branch -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="CustomCodeType0098"
+                instanceClassName="java.lang.String"/>
+
+  <!-- 5: Class using the enum as attribute type to exercise enum branch in attDataType and AttEqSpecificDefaultValue for enum -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task0098">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="NEW"
+                         eType="//@eClassifiers.3"/>
+    <!-- BooleanObject attribute to exercise @Bool branch -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+    <!-- Float attribute (DoubleObject) to exercise @Float branch, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="ratio"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDoubleObject"/>
+  </eClassifiers>
+
+</ecore:EPackage>

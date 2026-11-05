@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="TestCoverage"
+    default="validate"
+    basedir="."
+    description="Testing multiple ATL rules">
+  <targets xmi:id="validate" name="validate" description="Run validation tasks">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="bin" debug="true" fork="false" optimize="false" deprecation="true"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="Test API"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/test.jar" basedir="." compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Copy" file="src/config.xml" tofile="dist/config.xml" overwrite="true" filtering="false" flatten="true" includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/output"/>
+    <tasks xsi:type="Ant:Delete" dir="build/temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" includes="*.tmp"/>
+    <tasks xsi:type="Ant:Java" classname="com.example.TestRunner" jar="" fork="true"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="CURRENT_DATE" pattern="yyyy-MM-dd" offset="0" unit="day"/>
+      <format property="BUILD_TIME" pattern="HH:mm:ss"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Remove build artifacts">
+  </targets>
+  <targets xmi:id="deploy" name="deploy" description="Deploy artifacts" unless="skip.deploy" ifCondition="production.release">
+    <tasks xsi:type="Ant:Copy" file="dist/test.jar" todir="/var/www/app" overwrite="false" preservelastmodified="true" includeEmptyDirs="true"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Package application">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build" compress="false"/>
+    <tasks xsi:type="Ant:Copy" file="build/app.properties" tofile="dist/app.properties" filtering="true"/>
+  </targets>
+</Ant:Project>

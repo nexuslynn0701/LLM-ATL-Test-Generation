@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="workflow"
+    nsURI="http://example.org/workflow"
+    nsPrefix="wf">
+
+  <!-- 0: Root workflow class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Workflow"
+                abstract="false" interface="false">
+    <!-- Structural features: containment refs to tasks, transitions, and annotations -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="tasks"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="transitions"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="annotations"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.6"/>
+    <!-- An attribute on the root class -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="version"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <!-- Operations on Workflow -->
+    <eOperations name="getInitialTasks"
+                 ordered="true"
+                 unique="true"
+                 lowerBound="0"
+                 upperBound="-1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+      <!-- Parameter: includeAbstract -->
+      <eParameters name="includeAbstract"
+                   ordered="true"
+                   unique="true"
+                   lowerBound="0"
+                   upperBound="1">
+        <eType xsi:type="ecore:EDataType"
+               href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      </eParameters>
+    </eOperations>
+
+    <eOperations name="findTaskByName"
+                 ordered="true"
+                 unique="true"
+                 lowerBound="0"
+                 upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+      <eParameters name="taskName"
+                   ordered="true"
+                   unique="true"
+                   lowerBound="1"
+                   upperBound="1">
+        <eType xsi:type="ecore:EDataType"
+               href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      </eParameters>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 1: Abstract base task -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractTask"
+                abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="retryCount"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="0"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+
+    <!-- Derived containment / reference lists (non-containment, but here left empty) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="incoming"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="outgoing"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.2"/>
+
+    <!-- Operation on AbstractTask -->
+    <eOperations name="canExecute"
+                 ordered="true"
+                 unique="true"
+                 lowerBound="1"
+                 upperBound="1">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      <eParameters name="previousSucceeded"
+                   ordered="true"
+                   unique="true"
+                   lowerBound="1"
+                   upperBound="1">
+        <eType xsi:type="ecore:EDataType"
+               href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      </eParameters>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 2: Transition class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Transition"
+                abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="source"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="target"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 3: Manual task -->
+  <eClassifiers xsi:type="ecore:EClass" name="ManualTask"
+                abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="assignee"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 4: Automated task -->
+  <eClassifiers xsi:type="ecore:EClass" name="AutomatedTask"
+                abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="serviceEndpoint"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="timeoutSeconds"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="30"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 5: Decision task with enum-based condition -->
+  <eClassifiers xsi:type="ecore:EClass" name="DecisionTask"
+                abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="conditionType"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="#//@eClassifiers.7"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 6: Simple annotation class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Annotation"
+                abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="key"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="value"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 7: Enum used by DecisionTask -->
+  <eClassifiers xsi:type="ecore:EEnum" name="DecisionKind">
+    <eLiterals name="BY_VALUE" value="0" literal="BY_VALUE"/>
+    <eLiterals name="BY_ROLE" value="1" literal="BY_ROLE"/>
+    <eLiterals name="BY_TIMEOUT" value="2" literal="BY_TIMEOUT"/>
+  </eClassifiers>
+
+  <!-- 8: Another concrete task to diversify hierarchy -->
+  <eClassifiers xsi:type="ecore:EClass" name="ScriptTask"
+                abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="scriptLanguage"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="scriptBody"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+</ecore:EPackage>

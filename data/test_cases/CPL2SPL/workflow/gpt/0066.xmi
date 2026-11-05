@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <!-- Root CPL with one subAction, one outgoing, and one incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction with id 'saMain' whose contents is a simple Proxy -->
+    <subActions id="saMain">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple Proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+    <!-- Outgoing whose contents is the same simple Proxy (via locations helper, not by reference) -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple Proxy again -->
+      </contents>
+    </outgoing>
+    <!-- Incoming whose contents is a complex Proxy with branches and a Location -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <!-- complex Proxy: has busy, noAnswer, redirection, failure and default -->
+        <busy>
+          <!-- Busy contents: a SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents: a Redirect (non-permanent) -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents: a Redirect (permanent) -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default contents: an AddressSwitch -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <!-- AddressSwitch: one switched address, notPresent and otherwise -->
+            <addresses is="addr1"/>
+            <notPresent/>
+            <otherwise>
+              <!-- Otherwise contents: a simple Proxy using a Location so Location2URIConstant is triggered -->
+              <contents xsi:type="CPL:Proxy" recurse="once" ordering="parallel">
+                <default>
+                  <contents xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+                </default>
+              </contents>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- Top-level SubCall referring to the SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- Top-level Location used only as a node container contents (not via locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:top@example.com" clear="false"/>
+
+  <!-- Top-level Redirect that will also trigger Location2URIConstant via locations helper if used in proxies -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- Top-level Proxy (simple) whose default contains the top-level Location -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <default contents="//@elements.2"/>
+  </elements>
+
+  <!-- Top-level AddressSwitch whose addresses and otherwise refer to various contents -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses xsi:type="CPL:SwitchedAddress" is="dst1">
+      <!-- SwitchedAddress contents: SubCall so SubCall2Return is triggered inside the switch -->
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </addresses>
+    <notPresent xsi:type="CPL:NotPresent">
+      <!-- NotPresent contents: Redirect (non-permanent) -->
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </notPresent>
+    <otherwise xsi:type="CPL:Otherwise">
+      <!-- Otherwise contents: the simple Proxy defined above via contents reference -->
+      <contents contents="//@elements.4"/>
+    </otherwise>
+  </elements>
+
+  <!-- Top-level StringSwitch to cover StringSwitch2SelectStat; no contents needed -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField"/>
+</CPL:CPLModel>

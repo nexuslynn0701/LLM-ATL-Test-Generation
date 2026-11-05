@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryManager"
+    basedir="lib-src"
+    description="Build and package the library project"
+    default="buildTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="java.version" value="17"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="config/"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Task definition (not referenced by tasks as required) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="initTarget" name="init" description="Initialize build directories">
+    <tasks xsi:type="Ant:Mkdir" target="//@targets.0" dir="build"/>
+    <tasks xsi:type="Ant:Mkdir" target="//@targets.0" dir="dist"/>
+  </targets>
+
+  <targets xmi:id="buildTarget" name="build" description="Compile, document, and package">
+    <!-- Compilation -->
+    <tasks xsi:type="Ant:Javac"
+           target="//@targets.1"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- API documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           target="//@targets.1"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.library.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Library API"/>
+
+    <!-- Packaging -->
+    <tasks xsi:type="Ant:Jar"
+           target="//@targets.1"
+           jarfile="dist/library.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="config/manifest.mf"/>
+
+    <!-- File operations: copy filtered resources -->
+    <tasks xsi:type="Ant:Copy"
+           target="//@targets.1"
+           todir="build/resources"
+           overwrite="true"
+           filtering="true">
+      <fileset dir="resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/secret/**"/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="projectName" value="LibraryManager"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+    </tasks>
+
+    <!-- Cleanup of temporary files -->
+    <tasks xsi:type="Ant:Delete"
+           target="//@targets.1"
+           dir="build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           excludes=""
+           includesfile=""
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Path definition used only as contained data (no external refid/path references) -->
+  <path id="buildPath">
+    <pathElement path="lib/compile" location="lib/compile/library.jar"/>
+    <fileset dir="lib/optional">
+      <include name="**/*.jar"/>
+      <exclude name="**/old/**"/>
+    </fileset>
+  </path>
+
+  <!-- ClassPath definition -->
+  <path>
+    <pathElement path="lib/runtime" location="lib/runtime/dependency.jar"/>
+    <fileset dir="lib/runtime-extra">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- Filter and pattern elements outside tasks to exercise standalone rules -->
+  <filtersfile file="config/global-filters.properties"/>
+  <filter token="globalToken" value="globalValue"/>
+  <patternset>
+    <inexcludes xsi:type="Ant:IncludesFile" name="includes.list" ifCondition="" unless=""/>
+    <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list" ifCondition="" unless=""/>
+  </patternset>
+
+  <!-- Standalone attribute element to exercise Attribut rule -->
+  <properties xsi:type="Ant:PropertyValue" name="build.profile" value="release"/>
+  <taskdef name="customLogger" classname="com.example.ant.LoggerTask"/>
+  <taskdef name="reportGenerator" classname="com.example.ant.ReportTask"/>
+
+  <!-- A standalone Attribut instance (not linked via NewTask) -->
+  <taskdef name="unusedTask" classname="com.example.ant.UnusedTask"/>
+  <properties xsi:type="Ant:PropertyLocation" name="reports.dir" location="reports/"/>
+
+</Ant:Project>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- 0: Root CPL with one outgoing using a simple proxy whose location is element 2 -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1"/>
+    <outgoing>
+      <busy/>
+      <noAnswer/>
+      <redirection/>
+      <failure/>
+      <default/>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Switched address used by AddressSwitch as case -->
+  <elements xsi:type="CPL:SwitchedAddress" is="dest1"/>
+
+  <!-- 2: Location to trigger Location2URIConstant; used by Proxy in element 3 -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+
+  <!-- 3: Complex proxy using the location above; contents for Busy/NoAnswer/Redirection/Default -->
+  <elements xsi:type="CPL:Proxy" recurse="r1" ordering="serial">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </redirection>
+    <failure>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </failure>
+    <default>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </default>
+  </elements>
+
+  <!-- 4: Address switch with notPresent and otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <notPresent/>
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </otherwise>
+    <addresses>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+  </elements>
+
+  <!-- 5: Redirect referencing the same location sequence (via locations helper) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

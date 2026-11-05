@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cp">
+
+  <!-- 0: Enum for status -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="ARCHIVED" value="2" literal="ARCHIVED"/>
+  </eClassifiers>
+
+  <!-- 1: Simple data type wrapper (custom string-like) -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CodeType" instanceClassName="java.lang.String"/>
+
+  <!-- 2: Abstract base element -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        changeable="true" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status" lowerBound="1"
+        eType="//@eClassifiers.0"
+        changeable="true" unique="true" ordered="true"/>
+  </eClassifiers>
+
+  <!-- 3: Named element as subclass of BaseElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        changeable="true" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="//@eClassifiers.1"
+        changeable="true" unique="true" ordered="true"/>
+  </eClassifiers>
+
+  <!-- 4: Project class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0" upperBound="1" changeable="true" unique="true" ordered="true"/>
+    <!-- containment of modules -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="modules" upperBound="-1"
+        eType="//@eClassifiers.5"
+        containment="true" resolveProxies="false" ordered="true" unique="true"/>
+  </eClassifiers>
+
+  <!-- 5: Module class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Module" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <!-- container back-ref to project (non-containment, opposite is not modeled to keep simple) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ownerProject"
+        eType="//@eClassifiers.4"
+        containment="false" resolveProxies="true" ordered="true" unique="true"
+        lowerBound="0" upperBound="1"/>
+    <!-- containment of components -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="components" upperBound="-1"
+        eType="//@eClassifiers.6"
+        containment="true" resolveProxies="false" ordered="true" unique="true"/>
+  </eClassifiers>
+
+  <!-- 6: Component class with self and cross references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Component" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <!-- attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="version"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0" upperBound="1" changeable="true" unique="true" ordered="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        lowerBound="0" upperBound="1" changeable="true" unique="true" ordered="true"/>
+    <!-- reference to another component (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependsOn"
+        eType="//@eClassifiers.6"
+        containment="false" resolveProxies="true" ordered="true" unique="false"
+        upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- 7: Interface type (pure interface EClass) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Taggable" abstract="true" interface="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tag"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0" upperBound="1" changeable="true" unique="true" ordered="true"/>
+  </eClassifiers>
+
+  <!-- 8: Task class, inherits from NamedElement and Taggable (multiple inheritance) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3 //@eClassifiers.7">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="effort"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0" upperBound="1" changeable="true" unique="true" ordered="true"/>
+    <!-- reference to component implementing the task -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="implementedBy"
+        eType="//@eClassifiers.6"
+        containment="false" resolveProxies="true" ordered="true" unique="true"
+        lowerBound="0" upperBound="1"/>
+    <!-- reference to predecessor tasks (self-association, many) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="predecessors"
+        eType="//@eClassifiers.8"
+        containment="false" resolveProxies="true" ordered="true" unique="false"
+        upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- 9: Map entry for project properties -->
+  <eClassifiers xsi:type="ecore:EClass" name="StringToString" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0" upperBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0" upperBound="1"/>
+  </eClassifiers>
+
+</ecore:EPackage>

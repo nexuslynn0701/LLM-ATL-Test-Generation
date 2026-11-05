@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="lib-project"
+    description="Build, package, and clean the library"
+    default="build">
+  <!-- Ant properties covering all subclasses -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition (not referenced by tasks) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="build" name="build" description="Compile and package library">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="target/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/library.jar"
+        basedir="target/classes"
+        compress="true"
+        encoding="UTF-8"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+  </targets>
+
+  <!-- Secondary target exercising delete and an additional compile -->
+  <targets xmi:id="clean" name="clean" description="Remove build outputs">
+    <tasks xsi:type="Ant:Delete"
+        dir="target"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        includes="**/*"
+        defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/test/java"
+        destdir="target/test-classes"
+        debug="false"
+        fork="false"
+        optimize="false"
+        deprecation="false"/>
+  </targets>
+</Ant:Project>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AdvancedBuild"
+    basedir="workspace"
+    description="Build and package the AdvancedBuild project."
+    default="compileTarget">
+
+  <!-- Properties to exercise AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="AdvancedBuild"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A standalone taskdef (no references from tasks) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Target used as default goal -->
+  <targets xmi:id="compileTarget" name="compile" description="Compile main sources">
+    <!-- Javac task with an include pattern -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+    </tasks>
+
+    <!-- Javadoc task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.advanced.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="AdvancedBuild API"/>
+  </targets>
+
+  <!-- A second target (not default) with multiple task types -->
+  <targets xmi:id="packageTarget" name="package" description="Package and manage files">
+    <!-- Create directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="dist/lib"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist/docs"/>
+
+    <!-- Copy task with FileSet, FilterSet, Mapper -->
+    <tasks xsi:type="Ant:Copy" todir="dist/lib" includeEmptyDirs="true">
+      <fileset dir="build/classes">
+        <include xsi:type="Ant:Includes" name="**/*.class"/>
+        <exclude xsi:type="Ant:Excludes" name="**/internal/**"/>
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="includes.list"/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list"/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="AdvancedBuild"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.class" to="*.bin"/>
+    </tasks>
+
+    <!-- Jar task -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/lib/advancedbuild.jar" basedir="build/classes"/>
+
+    <!-- Delete task (e.g., clean temporary output) -->
+    <tasks xsi:type="Ant:Delete" dir="build/temp" includeEmptyDirs="true"/>
+  </targets>
+
+</Ant:Project>

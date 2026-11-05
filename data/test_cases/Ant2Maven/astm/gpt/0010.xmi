@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="src/main/java"
+    default="buildTarget"
+    description="Complex build with multiple targets and tasks.">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="env" value="dev"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="config/"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="SYSTEM_ENV"/>
+
+  <!-- Task definition -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="buildTarget" name="build" description="Compile and package sources.">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+    <!-- Create Jar archive -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/complexbuild.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <targets xmi:id="cleanTarget" name="clean" description="Clean build outputs.">
+    <!-- Remove compiled classes -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/classes"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/.git/**"
+           defaultexcludes="true"/>
+    <!-- Remove jar artifacts -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target"
+           verbose="false"
+           quiet="true"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*.jar"
+           defaultexcludes="true"/>
+  </targets>
+
+  <targets xmi:id="prepareTarget" name="prepare" description="Prepare directories.">
+    <!-- Create main output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+    <!-- Create classes directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+  </targets>
+
+</Ant:Project>

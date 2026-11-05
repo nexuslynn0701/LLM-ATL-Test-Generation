@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.2" id="sa_main"/>
+    <subActions contents="//@elements.3" id="sa_alt"/>
+
+    <incoming contents="//@elements.4"/>
+    <outgoing contents="//@elements.5"/>
+  </elements>
+
+  <!-- elements[1]: Location used as a base for locations computation -->
+  <elements xsi:type="CPL:Location" url="sip:root@example.com" clear="yes" priority="1">
+    <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+      <busy contents="//@elements.6"/>
+      <noAnswer contents="//@elements.7"/>
+      <redirection contents="//@elements.8"/>
+      <failure/>
+      <default contents="//@elements.9"/>
+    </contents>
+  </elements>
+
+  <!-- elements[2]: SubAction with simple Proxy statement -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+    <!-- Simple proxy: no sub-branches -->
+  </elements>
+
+  <!-- elements[3]: SubAction contents: SubCall -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- elements[4]: Incoming contents: AddressSwitch -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses contents="//@elements.1">
+      <!-- SwitchedAddress for first branch -->
+    </addresses>
+    <addresses/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- elements[5]: Outgoing contents: Redirect -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- elements[6]: Busy branch contents: Reject -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- elements[7]: NoAnswer branch contents: TimeSwitch -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com">
+    <times dtstart="20240101T080000Z" dtend="20240101T170000Z" duration="PT1H" freq="DAILY"
+           until="20241231T235959Z" count="10" interval="2" bySecond="0,30"
+           byMinute="0,30" byHour="8,9,10" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1,15" byYearDay="100,200" byWeekNo="10"
+           byMonth="1,6,12" wkst="MO" bySetPos="1,-1"/>
+  </elements>
+
+  <!-- elements[8]: Redirection branch contents: LanguageSwitch -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en-US"/>
+    <languages matches="fr-FR"/>
+  </elements>
+
+  <!-- elements[9]: Default branch contents: PrioritySwitch -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.2" equal="0.5" greater="0.8"/>
+  </elements>
+
+</CPL:CPLModel>

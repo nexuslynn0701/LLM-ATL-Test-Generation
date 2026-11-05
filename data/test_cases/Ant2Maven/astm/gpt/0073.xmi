@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleAntProject73"
+    basedir="project-src"
+    description="Ant project for testing multiple Maven mappings"
+    default="compileTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by any task) -->
+  <taskdef name="customTask" classname="com.acme.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <!-- Default target -->
+  <targets xmi:id="compileTarget" name="compile" description="Compile main sources">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="project-src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+  </targets>
+
+  <!-- Target with documentation and archiving -->
+  <targets xmi:id="docAndJarTarget" name="doc-and-jar" description="Generate Javadoc and package jar">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="project-src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.acme.project.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Sample Project API"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/sample-project.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Target with file management and timestamp -->
+  <targets xmi:id="cleanTarget" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           includesfile=""
+           excludesfile=""
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+</Ant:Project>

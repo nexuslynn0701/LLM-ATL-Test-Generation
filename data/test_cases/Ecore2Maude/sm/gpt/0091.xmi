@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.org/companyModel"
+    nsPrefix="cmp">
+
+  <!-- 0: Primitive data type PersonId -->
+  <eClassifiers xsi:type="ecore:EDataType" name="PersonId"
+                instanceClassName="java.lang.String"
+                serializable="true"/>
+
+  <!-- 1: Enum EmploymentType -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmploymentType">
+    <eLiterals name="FULL_TIME" value="0" literal="FULL_TIME"/>
+    <eLiterals name="PART_TIME" value="1" literal="PART_TIME"/>
+    <eLiterals name="CONTRACTOR" value="2" literal="CONTRACTOR"/>
+  </eClassifiers>
+
+  <!-- 2: Enum DepartmentKind -->
+  <eClassifiers xsi:type="ecore:EEnum" name="DepartmentKind">
+    <eLiterals name="ENGINEERING" value="0" literal="ENGINEERING"/>
+    <eLiterals name="HR" value="1" literal="HR"/>
+    <eLiterals name="SALES" value="2" literal="SALES"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract named element base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+                         lowerBound="1" upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+  </eClassifiers>
+
+  <!-- 4: Department class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+                         lowerBound="1" upperBound="1"
+                         eType="//@eClassifiers.2"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+    <!-- opposite of Employee.department -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+                         lowerBound="0" upperBound="-1"
+                         eType="//@eClassifiers.5"
+                         containment="true" resolveProxies="false"
+                         eOpposite="//@eClassifiers.5/@eStructuralFeatures.1"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+    <!-- self reference to test non-containment refs -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parentDepartment"
+                         lowerBound="0" upperBound="1"
+                         eType="//@eClassifiers.4"
+                         containment="false" resolveProxies="true"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+  </eClassifiers>
+
+  <!-- 5: Employee class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.3">
+    <!-- ID attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+                         lowerBound="1" upperBound="1"
+                         eType="//@eClassifiers.0"
+                         iD="true"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+                         lowerBound="0" upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="employmentType"
+                         lowerBound="1" upperBound="1"
+                         eType="//@eClassifiers.1"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+    <!-- container ref, opposite of Department.employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+                         lowerBound="1" upperBound="1"
+                         eType="//@eClassifiers.4"
+                         containment="false" resolveProxies="false"
+                         eOpposite="//@eClassifiers.4/@eStructuralFeatures.1"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+    <!-- non-containment cross reference to project -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="primaryProject"
+                         lowerBound="0" upperBound="1"
+                         eType="//@eClassifiers.6"
+                         containment="false" resolveProxies="true"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+  </eClassifiers>
+
+  <!-- 6: Project class with containment and map-like entry -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="budget"
+                         lowerBound="0" upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+    <!-- non-containment ref to lead employee -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lead"
+                         lowerBound="0" upperBound="1"
+                         eType="//@eClassifiers.5"
+                         containment="false" resolveProxies="true"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+    <!-- containment of tags as string-to-string entries -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tags"
+                         lowerBound="0" upperBound="-1"
+                         eType="//@eClassifiers.7"
+                         containment="true" resolveProxies="false"
+                         changeable="true" volatile="false" transient="false"
+                         unsettable="false" derived="false"/>
+  </eClassifiers>
+
+  <!-- 7: Map entry for string-to-string (reuse existing meta-class) -->
+  <eClassifiers xsi:type="ecore:EClass" name="ProjectTag"
+                eSuperTypes="//@eClassifiers.8"/>
+
+  <!-- 8: Reuse EStringToStringMapEntry as super of ProjectTag -->
+  <eClassifiers xsi:type="ecore:EClass" name="EStringToStringMapEntry"
+                instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+                         lowerBound="0" upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+                         lowerBound="0" upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

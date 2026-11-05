@@ -1,0 +1,153 @@
+-- Ant2Maven OCL Contract
+-- Transformation-level contract: source-side (Ant) to target-side (Maven) mapping.
+-- Written in the style of Troya et al. 2015 TSE.
+-- Covers: Project → POM, Target → Goal, Properties → AntProperty entries,
+--   Tasks → Plugin/Goal entries, Path → Dependencies, FileSet → Resources.
+
+-- C1 (Rule AntProject2Maven): A MavenProject must be created for each Ant Project,
+-- with groupId and artifactId derived from the Project name.
+context Ant!Project
+inv MavenProjectCreated:
+  MavenProject!Project.allInstances()->exists(mp |
+    mp.artifactId = self.name
+  )
+
+-- C2 (Rule AntProject2Maven): The number of MavenProjects must equal the number of Ant Projects.
+context Ant!Project
+inv MavenProjectCount:
+  MavenProject!Project.allInstances()->size() = Ant!Project.allInstances()->size()
+
+-- C3 (Rule AntProject2Maven): The MavenProject must contain a Build element
+-- whose name matches the Project's basedir.
+context Ant!Project
+inv BuildCreated:
+  self.basedir.oclIsUndefined() or
+  MavenProject!Project.allInstances()->exists(mp |
+    mp.build.name = self.basedir
+  )
+
+-- C4 (Rule AntTarget2MavenMavenGoal): For each Ant Target, a corresponding Maven Goal
+-- must exist with the same name.
+context Ant!Target
+inv MavenGoalCreated:
+  MavenMaven!Goal.allInstances()->exists(g |
+    g.id = self.name
+  )
+
+-- C5 (Rule AntTarget2MavenMavenGoal): The number of Maven Goals must equal
+-- the number of Ant Targets.
+context Ant!Target
+inv GoalTargetCount:
+  MavenMaven!Goal.allInstances()->size() = Ant!Target.allInstances()->size()
+
+-- C6 (Rule AntTarget2MavenMavenGoal): For each Target with dependencies,
+-- the corresponding Goal must reference the dependent Goals.
+context Ant!Target
+inv GoalDependsMapped:
+  self.depends->forAll(d |
+    MavenMaven!Goal.allInstances()->exists(g |
+      g.id = self.name and
+      MavenMaven!Goal.allInstances()->exists(dg |
+        dg.id = d.name and
+        g.dependencies->includes(dg)
+      )
+    )
+  )
+
+-- C7 (Rule AntPropertyValue2MavenMavenAntPropertyValue): Each PropertyValue
+-- must produce a Maven AntPropertyValue with the same name and value.
+context Ant!PropertyValue
+inv AntPropertyCreated:
+  MavenMaven!AntPropertyValue.allInstances()->exists(ap |
+    ap.name = self.name and ap.value = self.value
+  )
+
+-- C8 (Rule AntPropertyLocation2MavenMavenAntPropertyLocation): Each PropertyLocation
+-- must produce a Maven AntPropertyLocation with the same name and location.
+context Ant!PropertyLocation
+inv AntPropertyLocationCreated:
+  MavenMaven!AntPropertyLocation.allInstances()->exists(ap |
+    ap.name = self.name and ap.location = self.location
+  )
+
+-- C9 (Rule AntPropertyFile2MavenMavenAntPropertyFile): Each PropertyFile
+-- must produce a Maven AntPropertyFile referencing the same file path.
+context Ant!PropertyFile
+inv AntPropertyFileCreated:
+  MavenMaven!AntPropertyFile.allInstances()->exists(ap |
+    ap.file = self.file
+  )
+
+-- C10 (Rule AntPropertyEnv2MavenMavenAntPropertyEnv): Each PropertyEnv
+-- must produce a Maven AntPropertyEnv with the same environment key.
+context Ant!PropertyEnv
+inv AntPropertyEnvCreated:
+  MavenMaven!AntPropertyEnv.allInstances()->exists(ap |
+    ap.environment = self.environment
+  )
+
+-- C11 (Rule AntJavac2MavenMavenJavac): Each Javac task must produce
+-- a corresponding Maven Javac plugin configuration.
+context Ant!Javac
+inv JavacMapped:
+  MavenMaven!Javac.allInstances()->exists(j |
+    j.srcdir = self.srcdir and j.destdir = self.destdir
+  )
+
+-- C12 (Rule AntJar2MavenMavenJar): Each Jar task must produce
+-- a corresponding Maven Jar plugin configuration.
+context Ant!Jar
+inv JarMapped:
+  MavenMaven!Jar.allInstances()->exists(j |
+    j.jarfile = self.jarfile and j.basedir = self.basedir
+  )
+
+-- C13 (Rule AntMkdir2MavenMavenMkdir): Each Mkdir task must produce
+-- a corresponding Maven Mkdir plugin entry.
+context Ant!Mkdir
+inv MkdirMapped:
+  MavenMaven!Mkdir.allInstances()->exists(m |
+    m.dir = self.dir
+  )
+
+-- C14 (Rule AntDelete2MavenMavenDelete): Each Delete task must produce
+-- a corresponding Maven Delete plugin entry.
+context Ant!Delete
+inv DeleteMapped:
+  MavenMaven!Delete.allInstances()->exists(d |
+    d.file = self.file
+  )
+
+-- C15 (Rule AntTaskDef2MavenMavenTaskDef): Each TaskDef must produce
+-- a Maven plugin TaskDef entry.
+context Ant!TaskDef
+inv TaskDefMapped:
+  MavenMaven!TaskDef.allInstances()->exists(td |
+    td.name = self.name and td.classname = self.classname
+  )
+
+-- C16 (Rule AntAttribut2MavenMavenAttribut): Each Attribut must produce
+-- a corresponding Maven Attribut with the same name.
+context Ant!Attribut
+inv AttributMapped:
+  MavenMaven!Attribut.allInstances()->exists(a |
+    a.name = self.name
+  )
+
+-- C17 (Rule AntPathElement2MavenMavenPathElement): Each PathElement
+-- must produce a corresponding Maven PathElement.
+context Ant!PathElement
+inv PathElementMapped:
+  MavenMaven!PathElement.allInstances()->exists(pe |
+    pe.location = self.location
+  )
+
+-- C18: All Properties (across subtypes) must be accounted for
+-- in the Maven model's AntProperty entries.
+context Ant!Project
+inv AllPropertiesMapped:
+  Ant!Property.allInstances()->size() =
+  (MavenMaven!AntPropertyValue.allInstances()->size() +
+   MavenMaven!AntPropertyLocation.allInstances()->size() +
+   MavenMaven!AntPropertyFile.allInstances()->size() +
+   MavenMaven!AntPropertyEnv.allInstances()->size())

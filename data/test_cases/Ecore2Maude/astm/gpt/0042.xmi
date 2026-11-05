@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example.org/root"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise superPackage/subPackages and multiple root packages -->
+  <eSubpackages name="subPkg"
+                nsURI="http://example.org/sub"
+                nsPrefix="sub">
+    <!-- Class in subPkg with supertype in rootPkg (cross-package inheritance) -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubClass">
+      <eSuperTypes href="//@eClassifiers.0"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subFlag"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eClassifiers>
+    <!-- Local enum in subPkg, used as attribute type with default -->
+    <eClassifiers xsi:type="ecore:EEnum" name="SubMode">
+      <eLiterals name="Alpha" value="0" literal="Alpha"/>
+      <eLiterals name="Beta" value="1" literal="Beta"/>
+      <eLiterals name="Gamma" value="2" literal="Gamma"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root classifiers -->
+
+  <!-- 0: Base class without supertypes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Base">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         defaultValueLiteral="active"/>
+  </eClassifiers>
+
+  <!-- 1: Derived class with custom EDataType and bidirectional reference to Container -->
+  <eClassifiers xsi:type="ecore:EClass" name="Derived">
+    <eSuperTypes href="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="level"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.2"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"
+                         containment="false"/>
+  </eClassifiers>
+
+  <!-- 2: Container class with containment and opposite reference to Derived -->
+  <eClassifiers xsi:type="ecore:EClass" name="Container">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="elements"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"
+                         containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         ordered="false"
+                         unique="false"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         defaultValueLiteral="5"/>
+  </eClassifiers>
+
+  <!-- 3: Custom numeric datatype to exercise @DataType branch -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="CustomNumber"
+                instanceClassName="java.lang.Long"/>
+
+  <!-- 4: Enum with literals, one used as default value -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StateEnum">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="PROCESSING" value="1" literal="PROCESSING"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 5: Class with multiple attributes using different primitive mappings and an enum-typed attribute with default -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         defaultValueLiteral="Untitled &quot;Task&quot;"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="flag"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"
+                         defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="counter"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         defaultValueLiteral="10"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="ratio"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDoubleObject"
+                         defaultValueLiteral="3.14"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="state"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.4"
+                         defaultValueLiteral="PROCESSING"/>
+  </eClassifiers>
+
+  <!-- 6: Class without references or attributes to force EmptyList in several rules -->
+  <eClassifiers xsi:type="ecore:EClass" name="Isolated"/>
+
+  <!-- 7: Enum declared after its use (to vary positions), not referenced -->
+  <eClassifiers xsi:type="ecore:EEnum" name="UnusedEnum">
+    <eLiterals name="FIRST" value="0" literal="FIRST"/>
+    <eLiterals name="SECOND" value="1" literal="SECOND"/>
+  </eClassifiers>
+
+  <!-- 8: Additional class to be used as reference type without opposite -->
+  <eClassifiers xsi:type="ecore:EClass" name="Aux">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="target"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.6"
+                         containment="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="note"
+                         ordered="false"
+                         unique="false"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

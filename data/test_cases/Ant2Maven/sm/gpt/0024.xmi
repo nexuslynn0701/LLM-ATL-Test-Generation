@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="."
+    description="Build and test a small library"
+    default="buildMain">
+
+  <!-- Properties: value, location, file, env -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="build"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="env."/>
+
+  <!-- Task definition (unused by any NewTask) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: buildMain -->
+  <targets xmi:id="buildMain" name="buildMain" description="Compile and package main code">
+    <tasks xsi:type="Ant:Mkdir">
+      <target href="#buildMain"/>
+      <dir>build/classes</dir>
+    </tasks>
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="true">
+      <target href="#buildMain"/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/library-main.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF">
+      <target href="#buildMain"/>
+    </tasks>
+  </targets>
+
+  <!-- Secondary target: buildTest -->
+  <targets xmi:id="buildTest" name="buildTest" description="Compile and package tests" ifCondition="run.tests">
+    <tasks xsi:type="Ant:Mkdir">
+      <target href="#buildTest"/>
+      <dir>build/test-classes</dir>
+    </tasks>
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="build/test-classes" debug="true" fork="false" optimize="false" deprecation="false">
+      <target href="#buildTest"/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/library-tests.jar" basedir="build/test-classes" compress="false" encoding="UTF-8">
+      <target href="#buildTest"/>
+    </tasks>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="cleanAll" name="cleanAll" description="Remove build and dist artifacts" unless="keep.build">
+    <tasks xsi:type="Ant:Delete">
+      <target href="#cleanAll"/>
+      <dir>build</dir>
+      <verbose>true</verbose>
+      <quiet>false</quiet>
+      <failonerror>true</failonerror>
+      <includeEmptyDirs>true</includeEmptyDirs>
+      <includes>**/*</includes>
+      <defaultexcludes>false</defaultexcludes>
+    </tasks>
+    <tasks xsi:type="Ant:Delete">
+      <target href="#cleanAll"/>
+      <dir>dist</dir>
+      <verbose>true</verbose>
+      <quiet>false</quiet>
+      <failonerror>true</failonerror>
+      <includeEmptyDirs>true</includeEmptyDirs>
+      <includes>**/*.jar</includes>
+      <defaultexcludes>false</defaultexcludes>
+    </tasks>
+  </targets>
+
+</Ant:Project>

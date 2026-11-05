@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingAndMerge">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s010" name="StartUp" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Step" location="s011" name="PathA" isInitial="false" isActive="false" action="executeA"/>
+    <elements xsi:type="Grafcet:Step" location="s012" name="PathB" isInitial="false" isActive="false" action="executeB"/>
+    <elements xsi:type="Grafcet:Step" location="s013" name="Merge" isInitial="false" isActive="false" action="mergePaths"/>
+    <elements xsi:type="Grafcet:Step" location="s014" name="Final" isInitial="false" isActive="false" action="shutdown"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t010" name="StartToBranch" condition="systemReady"/>
+    <elements xsi:type="Grafcet:Transition" location="t011" name="BranchToA" condition="chooseA"/>
+    <elements xsi:type="Grafcet:Transition" location="t012" name="BranchToB" condition="chooseB"/>
+    <elements xsi:type="Grafcet:Transition" location="t013" name="AtoMerge" condition="pathAComplete"/>
+    <elements xsi:type="Grafcet:Transition" location="t014" name="BtoMerge" condition="pathBComplete"/>
+    <elements xsi:type="Grafcet:Transition" location="t015" name="MergeToFinal" condition="allDone"/>
+    <!-- Connections: branching from StartUp to two transitions -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c010" name="startToBranch" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c011" name="branchToPathA" from="/0/@elements.5" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c012" name="branchToPathB" from="/0/@elements.5" to="/0/@elements.2"/>
+    <!-- Connections: separate transitions from StartUp directly to PathA and PathB -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c013" name="startToA" from="/0/@elements.0" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c014" name="toPathA" from="/0/@elements.6" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c015" name="startToB" from="/0/@elements.0" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c016" name="toPathB" from="/0/@elements.7" to="/0/@elements.2"/>
+    <!-- Connections: PathA and PathB converge to Merge via distinct transitions -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c017" name="pathAToMerge" from="/0/@elements.1" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c018" name="AtoMergeStep" from="/0/@elements.8" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c019" name="pathBToMerge" from="/0/@elements.2" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c020" name="BtoMergeStep" from="/0/@elements.9" to="/0/@elements.3"/>
+    <!-- Connections: Merge to Final -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c021" name="mergeToFinal" from="/0/@elements.3" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c022" name="finalStep" from="/0/@elements.10" to="/0/@elements.4"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Ant project exercising multiple predefined tasks"
+    default="buildTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.main" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="src.test" value="src/test/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyValue" name="dist.dir" value="dist"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+
+  <!-- A standalone taskdef (unreferenced as required) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: buildTarget -->
+  <targets xmi:id="buildTarget" name="build" description="Compile, create jar, and prepare distribution">
+    <!-- Create build and dist directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="build"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+
+    <!-- Compile main sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+
+    <!-- Package into a jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/complex-build.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Generate javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="dist/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Complex Build API"/>
+  </targets>
+
+  <!-- Secondary target: cleanTarget -->
+  <targets xmi:id="cleanTarget" name="clean" description="Clean build and dist directories">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           defaultexcludes="false"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="dist"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           defaultexcludes="false"/>
+  </targets>
+
+</Ant:Project>

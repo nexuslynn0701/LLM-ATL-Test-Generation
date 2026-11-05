@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="RootMeta"
+    nsURI="http://root/meta"
+    nsPrefix="root">
+
+  <!-- Subpackage with one class -->
+  <eSubpackages name="SubMeta" nsURI="http://root/meta/sub" nsPrefix="sub">
+    <!-- Class in subpackage -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubNode">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="subFlag"
+          lowerBound="0"
+          upperBound="1"
+          iD="false">
+        <eType xsi:type="ecore:EDataType"
+            href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      </eStructuralFeatures>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers of root package (indices are relative within this package) -->
+
+  <!-- 0: Plain node class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Node"/>
+
+  <!-- 1: Enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ColorKind">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+  </eClassifiers>
+
+  <!-- 2: Container class with attribute and two references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Container">
+    <!-- simple string attribute, not ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="0"
+        upperBound="1"
+        iD="false">
+      <eType xsi:type="ecore:EDataType"
+          href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <!-- reference to Node, non-containment, lower=0, upper=-1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="nodes"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.0"/>
+
+    <!-- containment reference to Node, lower=1, upper=1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="rootNode"
+        lowerBound="1"
+        upperBound="1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 3: Class with several attributes exercising different primitive types and default values -->
+  <eClassifiers xsi:type="ecore:EClass" name="Measurement">
+    <!-- non-ID int attribute with default 0 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="value"
+        lowerBound="1"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="0">
+      <eType xsi:type="ecore:EDataType"
+          href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+
+    <!-- boolean attribute with default true -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="enabled"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="true">
+      <eType xsi:type="ecore:EDataType"
+          href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+
+    <!-- string attribute with quotes in default to exercise escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="label"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="&quot;quoted&quot;">
+      <eType xsi:type="ecore:EDataType"
+          href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <!-- enum-typed attribute (no default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="kind"
+        lowerBound="0"
+        upperBound="1"
+        iD="false">
+      <eType xsi:type="ecore:EEnum"
+          href="#//@eClassifiers.1"/>
+    </eStructuralFeatures>
+
+    <!-- ID attribute, string-typed -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="mid"
+        lowerBound="1"
+        upperBound="1"
+        iD="true">
+      <eType xsi:type="ecore:EDataType"
+          href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 4: Class referencing Measurement and self, with supertype Node -->
+  <eClassifiers xsi:type="ecore:EClass" name="AdvancedNode">
+    <!-- supertype Node -->
+    <eSuperTypes href="#//@eClassifiers.0"/>
+
+    <!-- reference to Measurement, non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="measurement"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+
+    <!-- self reference, non-containment, upper=-1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+</ecore:EPackage>

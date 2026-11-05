@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <subActions id="action1"/>
+    <subActions id="action2"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="user@example.com"/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default contents="//@elements.5"/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings contains="meeting"/>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ref="action1"/>
+  <elements xsi:type="CPL:Location" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" url="sip:user1@domain.com" priority="1" clear="yes"/>
+  <elements xsi:type="CPL:Redirect" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" permanent="true"/>
+  <elements xsi:type="CPL:Reject" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" status="403" reason="Forbidden"/>
+  <elements xsi:type="CPL:Proxy" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" recurse="no" ordering="serial">
+    <default contents="//@elements.3"/>
+  </elements>
+</CPL:CPLModel>

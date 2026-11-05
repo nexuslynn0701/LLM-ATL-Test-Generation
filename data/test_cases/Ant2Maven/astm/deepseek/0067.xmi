@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    description="Main build project"
+    default="build"
+    basedir="/home/project">
+  <targets xmi:id="build" name="build" description="Compile and package">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" failonerror="false"/>
+    <tasks xsi:type="Ant:Delete" dir="dist" failonerror="false"/>
+  </targets>
+  <targets xmi:id="init" name="init" description="Initialize build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="My API"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run tests">
+    <tasks xsi:type="Ant:Java" classname="org.junit.runner.JUnitCore" fork="true"/>
+  </targets>
+  <targets xmi:id="all" name="all" description="Full build cycle">
+    <tasks xsi:type="Ant:Tstamp"/>
+    <tasks xsi:type="Ant:Copy" todir="backup" filtering="false" overwrite="true"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/opt/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <path id="classpath" refid="">
+    <pathElement path="/opt/lib/tools.jar" location="/opt/lib"/>
+    <pathElement path="/opt/lib/commons.jar" location="/opt/lib"/>
+  </path>
+  <taskdef name="customtask" classname="com.example.CustomTask"/>
+</Ant:Project>

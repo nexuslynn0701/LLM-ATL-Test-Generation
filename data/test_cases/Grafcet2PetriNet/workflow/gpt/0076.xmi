@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingMergeCycle">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s010" name="StartUp" isInitial="true" isActive="true" action="init_system"/>
+    <elements xsi:type="Grafcet:Step" location="s011" name="PathA" isInitial="false" isActive="false" action="execute_A"/>
+    <elements xsi:type="Grafcet:Step" location="s012" name="PathB" isInitial="false" isActive="false" action="execute_B"/>
+    <elements xsi:type="Grafcet:Step" location="s013" name="Merged" isInitial="false" isActive="false" action="finalize"/>
+    <elements xsi:type="Grafcet:Step" location="s014" name="Recovery" isInitial="false" isActive="false" action="recover"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t010" name="Branch" condition="modeSelected"/>
+    <elements xsi:type="Grafcet:Transition" location="t011" name="ToA" condition="chooseA"/>
+    <elements xsi:type="Grafcet:Transition" location="t012" name="ToB" condition="chooseB"/>
+    <elements xsi:type="Grafcet:Transition" location="t013" name="Join" condition="pathsComplete"/>
+    <elements xsi:type="Grafcet:Transition" location="t014" name="Error" condition="errorDetected"/>
+    <elements xsi:type="Grafcet:Transition" location="t015" name="Retry" condition="retryRequested"/>
+    <!-- Connections: StepToTransition (PlaceToTransition in target) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c010" name="startupToBranch" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c011" name="branchToToA" from="/0/@elements.0" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c012" name="branchToToB" from="/0/@elements.0" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c013" name="pathAToJoin" from="/0/@elements.1" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c014" name="pathBToJoin" from="/0/@elements.2" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c015" name="mergedToError" from="/0/@elements.3" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c016" name="recoveryToRetry" from="/0/@elements.4" to="/0/@elements.10"/>
+    <!-- Connections: TransitionToStep (TransitionToPlace in target) -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c017" name="branchToPathA" from="/0/@elements.5" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c018" name="branchToPathB" from="/0/@elements.5" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c019" name="toAToPathA" from="/0/@elements.6" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c020" name="toBToPathB" from="/0/@elements.7" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c021" name="joinToMerged" from="/0/@elements.8" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c022" name="errorToRecovery" from="/0/@elements.9" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c023" name="retryToStartUp" from="/0/@elements.10" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

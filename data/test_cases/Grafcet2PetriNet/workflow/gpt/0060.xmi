@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingMergeLoop">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="Start" isInitial="true" isActive="true" action="initSystem"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="BranchA" isInitial="false" isActive="false" action="doA"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="BranchB" isInitial="false" isActive="false" action="doB"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="Join" isInitial="false" isActive="false" action="mergeBranches"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="End" isInitial="false" isActive="false" action="shutdown"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t001" name="Split" condition="readyToSplit"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="AtoJoin" condition="aDone"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="BtoJoin" condition="bDone"/>
+    <elements xsi:type="Grafcet:Transition" location="t004" name="ToEnd" condition="allDone"/>
+    <elements xsi:type="Grafcet:Transition" location="t005" name="LoopBack" condition="resetRequested"/>
+    <!-- Connections: indices of elements:
+         0: Start (Step)
+         1: BranchA (Step)
+         2: BranchB (Step)
+         3: Join (Step)
+         4: End (Step)
+         5: Split (Transition)
+         6: AtoJoin (Transition)
+         7: BtoJoin (Transition)
+         8: ToEnd (Transition)
+         9: LoopBack (Transition)
+    -->
+    <!-- Start -> Split -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="startToSplit" from="/0/@elements.0" to="/0/@elements.5"/>
+    <!-- Split -> BranchA -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c002" name="splitToBranchA" from="/0/@elements.5" to="/0/@elements.1"/>
+    <!-- Split -> BranchB -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c003" name="splitToBranchB" from="/0/@elements.5" to="/0/@elements.2"/>
+    <!-- BranchA -> AtoJoin -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c004" name="branchAToAJoin" from="/0/@elements.1" to="/0/@elements.6"/>
+    <!-- BranchB -> BtoJoin -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c005" name="branchBToBJoin" from="/0/@elements.2" to="/0/@elements.7"/>
+    <!-- AtoJoin -> Join -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c006" name="aJoinToJoinStep" from="/0/@elements.6" to="/0/@elements.3"/>
+    <!-- BtoJoin -> Join -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c007" name="bJoinToJoinStep" from="/0/@elements.7" to="/0/@elements.3"/>
+    <!-- Join -> ToEnd -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c008" name="joinToToEnd" from="/0/@elements.3" to="/0/@elements.8"/>
+    <!-- ToEnd -> End -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c009" name="toEndToEndStep" from="/0/@elements.8" to="/0/@elements.4"/>
+    <!-- End -> LoopBack -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c010" name="endToLoopBack" from="/0/@elements.4" to="/0/@elements.9"/>
+    <!-- LoopBack -> Start (cycle) -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c011" name="loopBackToStart" from="/0/@elements.9" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

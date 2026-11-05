@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="workspace"
+    description="Complex Ant project with various tasks and properties"
+    default="buildTarget">
+
+  <!-- Properties exercising all Ant Property variants -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A simple task definition not referenced by tasks (per constraints) -->
+  <taskdef name="customTask" classname="org.example.ant.CustomTask"/>
+
+  <!-- Simple Path object with no internal references (allowed as containment) -->
+  <path id="main.path">
+    <pathElement path="lib/dependency.jar" location="lib/dependency.jar"/>
+    <fileset dir="lib">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/sources.jar"/>
+      </patternset>
+      <include name="**/*.jar"/>
+      <exclude name="**/old/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- Default target: exercises Javac, Javadoc, Tstamp, Jar, Copy, Delete, FilterSet, Mapper, FileSet -->
+  <targets xmi:id="buildTarget" name="build" description="Main build target">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           deprecation="true"
+           fork="false"
+           optimize="true">
+      <!-- inExcludes pattern elements -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="includeSources"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+      <!-- simple classPath with contained pathElement and fileset -->
+      <classPath refid="compile.classpath">
+        <pathElement path="lib/compile.jar" location="lib/compile.jar"/>
+        <fileset dir="lib">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Generate API documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="org.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+
+    <!-- Timestamp task (no attributes, but has a nested format element) -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyyMMdd-HHmmss" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+
+    <!-- Create jar archive -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/artifacts/complex-build.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Copy resources with FilterSet, FileSet and Mapper -->
+    <tasks xsi:type="Ant:Copy"
+           todir="target/resources"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <!-- FileSet for copy -->
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.*"/>
+        </patternset>
+        <include name="**/*.properties"/>
+        <exclude name="**/secret/**"/>
+      </fileset>
+      <!-- FilterSet with Filter and FiltersFile -->
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexBuild"/>
+        <filtersfile file="filters.properties"/>
+      </filterset>
+      <!-- Mapper for renaming -->
+      <mapper type="glob" from="*.properties" to="conf-*.properties"/>
+    </tasks>
+
+    <!-- Cleanup old build directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/old"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/keep/**"
+           includesfile="includes.txt"
+           excludesfile="excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target without description: exercises Mkdir and another Jar -->
+  <targets xmi:id="packageTarget" name="package">
+    <!-- Create output directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/distribution"/>
+    <!-- Create separate jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/distribution/complex-build-sources.jar"
+           basedir="src/main/java"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/SRC.MF"/>
+  </targets>
+
+</Ant:Project>

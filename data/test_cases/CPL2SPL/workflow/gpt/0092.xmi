@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: Root CPL with subActions, outgoing, incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction sa1 with simple Proxy (uses Location2URIConstant via Location element) -->
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/... children -->
+      </contents>
+    </subActions>
+
+    <!-- SubAction sa2 whose contents is a Redirect (uses Location2URIConstant via Location) -->
+    <subActions id="sa2">
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </subActions>
+
+    <!-- Outgoing with complex Proxy (non-simple) using all error branches, default points to SubCall elements[3] -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="r2" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.3"/>
+      </contents>
+    </outgoing>
+
+    <!-- Incoming with contents a SubCall to sa1 -->
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1]: Location used by Proxy in sa1 (for Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user1@example.com" clear="true">
+    <!-- no nested contents, acts only as location -->
+  </elements>
+
+  <!-- elements[2]: Location used by Redirect in sa2 (for Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user2@example.com" clear="false">
+    <!-- no nested contents -->
+  </elements>
+
+  <!-- elements[3]: SubCall used from complex Proxy default and from Switch contents -->
+  <elements xsi:type="CPL:SubCall" ref="sa2"/>
+
+  <!-- elements[4]: AddressSwitch at top level (uses SwitchedAddress, NotPresent, Otherwise) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- one SwitchedAddress with contents a SubCall -->
+    <addresses is="addr1" contains="cont1" subDomainOf="sub1">
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <!-- notPresent branch with contents a simple Proxy (without locations) -->
+    <notPresent>
+      <contents xsi:type="CPL:Proxy" recurse="simpleNP" ordering="parallel">
+        <!-- simple proxy, no branches -->
+      </contents>
+    </notPresent>
+    <!-- otherwise branch with contents the SubCall stored at elements[3] -->
+    <otherwise contents="//@elements.3"/>
+  </elements>
+
+  <!-- elements[5]: StringSwitch to exercise StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="hdr-field">
+    <!-- not needed: strings; rule only uses 'field' -->
+  </elements>
+
+  <!-- elements[6]: PrioritySwitch as a top-level node, with contents a SubCall (exercising Node.statement) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <contents xsi:type="CPL:SubCall" ref="sa1"/>
+  </elements>
+
+  <!-- elements[7]: TimeSwitch to exist but with no contents -->
+  <elements xsi:type="CPL:TimeSwitch"/>
+
+  <!-- elements[8]: LanguageSwitch with NotPresent child (for NotPresent2ErrorResponse) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- elements[9]: PrioritySwitch with Failure child (for Failure2ErrorResponse) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <contents xsi:type="CPL:Proxy" recurse="pf" ordering="sequential">
+      <failure/>
+    </contents>
+  </elements>
+
+</CPL:CPLModel>

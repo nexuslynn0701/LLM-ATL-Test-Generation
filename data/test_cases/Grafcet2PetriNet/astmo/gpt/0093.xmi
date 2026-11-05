@@ -1,0 +1,73 @@
+<xmi:XMI xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ProductionLine" location="file:///models/productionLine.grafcet">
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="loc_s0" isInitial="true" isActive="true" action="initialize_system"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="LoadStep" location="loc_s1" isInitial="false" isActive="false" action="load_material"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="ProcessStep" location="loc_s2" isInitial="false" isActive="false" action="process_material"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="UnloadStep" location="loc_s3" isInitial="false" isActive="false" action="unload_material"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="T_Init_to_Load" location="loc_t0" condition="system_ready"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="T_Load_to_Process" location="loc_t1" condition="material_loaded"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="T_Process_to_Unload" location="loc_t2" condition="processing_done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" name="T_Loop_Process" location="loc_t3" condition="more_items"/>
+
+    <!-- Linear chain: InitStep -> T_Init_to_Load -> LoadStep -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c0"
+                 name="C_Init_to_T0"
+                 location="loc_c0"
+                 from="/0/@elements.0"
+                 to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c1"
+                 name="C_T0_to_Load"
+                 location="loc_c1"
+                 from="/0/@elements.4"
+                 to="/0/@elements.1"/>
+
+    <!-- LoadStep -> T_Load_to_Process -> ProcessStep -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c2"
+                 name="C_Load_to_T1"
+                 location="loc_c2"
+                 from="/0/@elements.1"
+                 to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c3"
+                 name="C_T1_to_Process"
+                 location="loc_c3"
+                 from="/0/@elements.5"
+                 to="/0/@elements.2"/>
+
+    <!-- ProcessStep -> T_Process_to_Unload -> UnloadStep -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c4"
+                 name="C_Process_to_T2"
+                 location="loc_c4"
+                 from="/0/@elements.2"
+                 to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c5"
+                 name="C_T2_to_Unload"
+                 location="loc_c5"
+                 from="/0/@elements.6"
+                 to="/0/@elements.3"/>
+
+    <!-- Loop back from UnloadStep to ProcessStep via T_Loop_Process -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c6"
+                 name="C_Unload_to_T3"
+                 location="loc_c6"
+                 from="/0/@elements.3"
+                 to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c7"
+                 name="C_T3_to_Process"
+                 location="loc_c7"
+                 from="/0/@elements.7"
+                 to="/0/@elements.2"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

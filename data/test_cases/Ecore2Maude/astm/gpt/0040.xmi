@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="billingRoot"
+    nsURI="http://example.org/billing"
+    nsPrefix="bill">
+
+  <!-- Top-level classifiers: 0..8 -->
+  <!-- 0: Customer -->
+  <eClassifiers xsi:type="ecore:EClass" name="Customer" abstract="false" interface="false">
+    <!-- id Boolean attribute with default, triggers AttEqSpecificDefaultValue(String) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="CUST-000"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <!-- name String attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"/>
+    <!-- vip Boolean attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="vip"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        iD="false"/>
+    <!-- orders containment reference to Order (upperBound -1) with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="orders"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.2"
+        containment="true"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 1: Person (supertype in same package, used by Employee) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="nickname"
+        ordered="false"
+        unique="false"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 2: Order -->
+  <eClassifiers xsi:type="ecore:EClass" name="Order" abstract="false" interface="false">
+    <!-- back-reference to Customer, non-containment, opposite of orders -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="customer"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.0"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.3"/>
+    <!-- lines containment reference to OrderLine, upperBound -1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="lines"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.3"
+        containment="true"
+        resolveProxies="true"/>
+    <!-- status enum reference -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.7"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 3: OrderLine -->
+  <eClassifiers xsi:type="ecore:EClass" name="OrderLine" abstract="false" interface="false">
+    <!-- quantity Int attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="quantity"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="false"/>
+    <!-- description String attribute with quotes in default to exercise escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="description"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="&quot;special&quot; item"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"/>
+    <!-- product non-containment reference without opposite and with upperBound 1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="product"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.4"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 4: Product -->
+  <eClassifiers xsi:type="ecore:EClass" name="Product" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="sku"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <!-- price Double attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="price"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="eccore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        iD="false"/>
+    <!-- category enum attribute with default literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="category"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="STANDARD"
+        eType="//@eClassifiers.8"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 5: Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="zip"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="00000"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 6: Employee extends Person and Customer to exercise multiple superTypes -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Employee"
+      abstract="false"
+      interface="false"
+      eSuperTypes="//@eClassifiers.1 //@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="employeeNumber"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="true"/>
+    <!-- reference to Address, no opposite, upperBound 1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="workAddress"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.5"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 7: Enum OrderStatus -->
+  <eClassifiers xsi:type="ecore:EEnum" name="OrderStatus">
+    <eLiterals name="PENDING" value="0" literal="PENDING"/>
+    <eLiterals name="PAID" value="1" literal="PAID"/>
+    <eLiterals name="SHIPPED" value="2" literal="SHIPPED"/>
+  </eClassifiers>
+
+  <!-- 8: Enum ProductCategory -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ProductCategory">
+    <eLiterals name="STANDARD" value="0" literal="STANDARD"/>
+    <eLiterals name="PREMIUM" value="1" literal="PREMIUM"/>
+  </eClassifiers>
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages and multiple root packages in MetamodelEqPackages -->
+  <eSubpackages name="billingSub" nsURI="http://example.org/billing/sub" nsPrefix="bsub">
+    <!-- Classifiers in subpackage: 0..2 relative to this subpackage -->
+    <!-- 0: Region -->
+    <eClassifiers xsi:type="ecore:EClass" name="Region" abstract="false" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="code"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          iD="true"/>
+    </eClassifiers>
+
+    <!-- 1: Country -->
+    <eClassifiers xsi:type="ecore:EClass" name="Country" abstract="false" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="isoCode"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          iD="true"/>
+      <!-- supertype Region inside same subpackage -->
+      <eSuperTypes>//@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+    </eClassifiers>
+
+    <!-- 2: Enum RegionType -->
+    <eClassifiers xsi:type="ecore:EEnum" name="RegionType">
+      <eLiterals name="URBAN" value="0" literal="URBAN"/>
+      <eLiterals name="RURAL" value="1" literal="RURAL"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Additional top-level EDataType to be ignored by PackEqClasses but available for attDataType fall-through -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData" instanceClassName="java.lang.Object"/>
+</ecore:EPackage>

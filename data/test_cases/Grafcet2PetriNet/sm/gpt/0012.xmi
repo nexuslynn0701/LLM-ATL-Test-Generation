@@ -1,0 +1,60 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet name="ComplexGrafcet" location="file://complex_grafcet.grafcet">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" name="InitStep" location="file://complex_grafcet.grafcet#InitStep" isInitial="true" isActive="true" action="initialize_system"/>
+    <elements xsi:type="Grafcet:Step" name="LoadConfig" location="file://complex_grafcet.grafcet#LoadConfig" isInitial="false" isActive="false" action="load_configuration"/>
+    <elements xsi:type="Grafcet:Step" name="ValidateConfig" location="file://complex_grafcet.grafcet#ValidateConfig" isInitial="false" isActive="false" action="validate_configuration"/>
+    <elements xsi:type="Grafcet:Step" name="RunModeA" location="file://complex_grafcet.grafcet#RunModeA" isInitial="false" isActive="false" action="execute_mode_A"/>
+    <elements xsi:type="Grafcet:Step" name="RunModeB" location="file://complex_grafcet.grafcet#RunModeB" isInitial="false" isActive="false" action="execute_mode_B"/>
+    <elements xsi:type="Grafcet:Step" name="ErrorHandler" location="file://complex_grafcet.grafcet#ErrorHandler" isInitial="false" isActive="false" action="handle_error"/>
+    <elements xsi:type="Grafcet:Step" name="Shutdown" location="file://complex_grafcet.grafcet#Shutdown" isInitial="false" isActive="false" action="shutdown_system"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" name="t_init_to_load" location="file://complex_grafcet.grafcet#t_init_to_load" condition="system_ready"/>
+    <elements xsi:type="Grafcet:Transition" name="t_load_to_validate" location="file://complex_grafcet.grafcet#t_load_to_validate" condition="config_loaded"/>
+    <elements xsi:type="Grafcet:Transition" name="t_validate_to_modes" location="file://complex_grafcet.grafcet#t_validate_to_modes" condition="config_valid"/>
+    <elements xsi:type="Grafcet:Transition" name="t_validate_to_error" location="file://complex_grafcet.grafcet#t_validate_to_error" condition="config_invalid"/>
+    <elements xsi:type="Grafcet:Transition" name="t_modeA_to_shutdown" location="file://complex_grafcet.grafcet#t_modeA_to_shutdown" condition="modeA_complete"/>
+    <elements xsi:type="Grafcet:Transition" name="t_modeB_to_shutdown" location="file://complex_grafcet.grafcet#t_modeB_to_shutdown" condition="modeB_complete"/>
+    <elements xsi:type="Grafcet:Transition" name="t_error_to_shutdown" location="file://complex_grafcet.grafcet#t_error_to_shutdown" condition="error_resolved"/>
+    <elements xsi:type="Grafcet:Transition" name="t_init_loopback" location="file://complex_grafcet.grafcet#t_init_loopback" condition="reinitialize_requested"/>
+
+    <!-- Connections: StepToTransition -->
+    <!-- InitStep -> t_init_to_load -->
+    <connections xsi:type="Grafcet:StepToTransition" name="Init_to_LoadConn" location="file://complex_grafcet.grafcet#Init_to_LoadConn" from="/0/@elements.0" to="/0/@elements.7"/>
+    <!-- LoadConfig -> t_load_to_validate -->
+    <connections xsi:type="Grafcet:StepToTransition" name="Load_to_ValidateConn" location="file://complex_grafcet.grafcet#Load_to_ValidateConn" from="/0/@elements.1" to="/0/@elements.8"/>
+    <!-- ValidateConfig -> t_validate_to_modes -->
+    <connections xsi:type="Grafcet:StepToTransition" name="Validate_to_ModesConn" location="file://complex_grafcet.grafcet#Validate_to_ModesConn" from="/0/@elements.2" to="/0/@elements.9"/>
+    <!-- ValidateConfig -> t_validate_to_error -->
+    <connections xsi:type="Grafcet:StepToTransition" name="Validate_to_ErrorConn" location="file://complex_grafcet.grafcet#Validate_to_ErrorConn" from="/0/@elements.2" to="/0/@elements.10"/>
+    <!-- RunModeA -> t_modeA_to_shutdown -->
+    <connections xsi:type="Grafcet:StepToTransition" name="ModeA_to_ShutdownConn" location="file://complex_grafcet.grafcet#ModeA_to_ShutdownConn" from="/0/@elements.3" to="/0/@elements.11"/>
+    <!-- RunModeB -> t_modeB_to_shutdown -->
+    <connections xsi:type="Grafcet:StepToTransition" name="ModeB_to_ShutdownConn" location="file://complex_grafcet.grafcet#ModeB_to_ShutdownConn" from="/0/@elements.4" to="/0/@elements.12"/>
+    <!-- ErrorHandler -> t_error_to_shutdown -->
+    <connections xsi:type="Grafcet:StepToTransition" name="Error_to_ShutdownConn" location="file://complex_grafcet.grafcet#Error_to_ShutdownConn" from="/0/@elements.5" to="/0/@elements.13"/>
+    <!-- InitStep -> t_init_loopback (self-loop path back to Init via Shutdown) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="Init_to_LoopbackConn" location="file://complex_grafcet.grafcet#Init_to_LoopbackConn" from="/0/@elements.0" to="/0/@elements.14"/>
+
+    <!-- Connections: TransitionToStep -->
+    <!-- t_init_to_load -> LoadConfig -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="tInit_to_LoadStepConn" location="file://complex_grafcet.grafcet#tInit_to_LoadStepConn" from="/0/@elements.7" to="/0/@elements.1"/>
+    <!-- t_load_to_validate -> ValidateConfig -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="tLoad_to_ValidateStepConn" location="file://complex_grafcet.grafcet#tLoad_to_ValidateStepConn" from="/0/@elements.8" to="/0/@elements.2"/>
+    <!-- t_validate_to_modes -> RunModeA -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="tValidate_to_ModeAConn" location="file://complex_grafcet.grafcet#tValidate_to_ModeAConn" from="/0/@elements.9" to="/0/@elements.3"/>
+    <!-- t_validate_to_modes -> RunModeB -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="tValidate_to_ModeBConn" location="file://complex_grafcet.grafcet#tValidate_to_ModeBConn" from="/0/@elements.9" to="/0/@elements.4"/>
+    <!-- t_validate_to_error -> ErrorHandler -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="tValidate_to_ErrorStepConn" location="file://complex_grafcet.grafcet#tValidate_to_ErrorStepConn" from="/0/@elements.10" to="/0/@elements.5"/>
+    <!-- t_modeA_to_shutdown -> Shutdown -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="tModeA_to_ShutdownStepConn" location="file://complex_grafcet.grafcet#tModeA_to_ShutdownStepConn" from="/0/@elements.11" to="/0/@elements.6"/>
+    <!-- t_modeB_to_shutdown -> Shutdown -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="tModeB_to_ShutdownStepConn" location="file://complex_grafcet.grafcet#tModeB_to_ShutdownStepConn" from="/0/@elements.12" to="/0/@elements.6"/>
+    <!-- t_error_to_shutdown -> Shutdown -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="tError_to_ShutdownStepConn" location="file://complex_grafcet.grafcet#tError_to_ShutdownStepConn" from="/0/@elements.13" to="/0/@elements.6"/>
+    <!-- t_init_loopback -> InitStep (loop back from transition to initial step) -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="tLoopback_to_InitStepConn" location="file://complex_grafcet.grafcet#tLoopback_to_InitStepConn" from="/0/@elements.14" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

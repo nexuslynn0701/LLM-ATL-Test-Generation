@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="Ant2MavenSample73"
+    basedir="project-src"
+    description="Ant to Maven transformation test project 73"
+    default="build-main">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="project-src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Task definition (user-defined task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="project-src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- Simple include/exclude patterns for Javac -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- Create jar from compiled classes -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/app-73.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+
+    <!-- Copy resources into distribution directory -->
+    <tasks xsi:type="Ant:Copy"
+           todir="target/dist"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="project-src/main/resources">
+        <include name="**/*.*"/>
+        <exclude name="**/*.tmp"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="app.name" value="Ant2MavenSample73"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+    </tasks>
+
+    <!-- Delete temporary build directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/*.lock"
+           defaultexcludes="true"/>
+  </targets>
+
+  <targets xmi:id="docs" name="docs" description="Generate project documentation">
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="project-src/main/java"
+           destdir="target/docs/api"
+           packagenames="com.example.ant2maven.*"
+           defaultexcludes="true"
+           author="Build Team"
+           version="1.0.73"
+           use="true"
+           windowtitle="Ant2Maven Sample 73 API"/>
+  </targets>
+
+  <targets xmi:id="timestamp" name="timestamp" description="Record build timestamp">
+    <!-- Tstamp task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

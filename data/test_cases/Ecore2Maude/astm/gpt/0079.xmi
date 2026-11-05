@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg79"
+    nsURI="http://example.org/root79"
+    nsPrefix="root79">
+
+  <!-- Subpackage to exercise superPackage/subPackages -->
+  <eSubpackages name="subPkgA"
+                nsURI="http://example.org/root79/subA"
+                nsPrefix="subA">
+    <!-- Class in subpackage with no supertypes, for EmptyList in ClassEqSuperTypes -->
+    <eClassifiers xsi:type="ecore:EClass" name="LeafInSub">
+      <!-- One attribute, exercising Attribute2Operation, EqType (String), bounds, etc. -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="code"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="1"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           iD="false"
+                           defaultValueLiteral="SUBCODE"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers in root package -->
+  <!-- 0: EClass with no super types, both attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="BaseClass">
+    <!-- Attribute with Int type and explicit default to trigger AttEqSpecificDefaultValue (non-String, non-Enum) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="baseId"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         iD="true"
+                         defaultValueLiteral="0"/>
+    <!-- Attribute with EBooleanObject, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"
+                         iD="false"/>
+    <!-- Containment reference to DerivedClass, opposite set from DerivedClass -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"
+                         containment="true"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 1: EClass with one superclass, attributes and references to exercise lists of size>1 and size==1 -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="DerivedClass"
+                abstract="true"
+                interface="false"
+                eSuperTypes="//@eClassifiers.0">
+    <!-- Two attributes to trigger NamedElList in ClassEqAttributes -->
+    <!-- String attribute with quoted default (to exercise escapeQuotes) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label with space"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"
+                         defaultValueLiteral="&quot;quoted value&quot;"/>
+    <!-- Enum-typed attribute with default literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.3"
+                         iD="false"
+                         defaultValueLiteral="NEW"/>
+    <!-- Non-containment reference back to BaseClass with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="parent"
+                         ordered="false"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.0"
+                         containment="false"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+    <!-- Single non-containment reference to LeafInSub (for size==1 path in ClassEqReferences) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="leaf"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 2: EClass with two supertypes to exercise NamedElList in ClassEqSuperTypes -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="MultiDerived"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.0 //@eClassifiers.1">
+    <!-- No attributes, no references (so attributes/references lists empty) -->
+  </eClassifiers>
+
+  <!-- 3: EEnum with 3 literals to exercise Enum2Sort, EnumEqDefaultValue, EqLiterals with EnumLitList, EnumLitConstant -->
+  <eClassifiers xsi:type="ecore:EEnum"
+                name="StatusEnum">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+</ecore:EPackage>

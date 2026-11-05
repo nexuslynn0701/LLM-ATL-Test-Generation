@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="."
+    description="Ant project with multiple targets and tasks for Ant2Maven testing"
+    default="buildTarget">
+
+  <!-- Properties to exercise AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A TaskDef so that AntTaskDef2MavenMavenTaskDef is exercised -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with several tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile and package project">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="true" deprecation="true"/>
+    <tasks xsi:type="Ant:Jar" jarfile="target/app.jar" basedir="target/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Copy" todir="target/dist"/>
+    <tasks xsi:type="Ant:Delete" dir="target/temp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="false"/>
+  </targets>
+
+  <!-- Secondary target with documentation and timestamp tasks -->
+  <targets xmi:id="docTarget" name="doc" description="Generate Javadoc and set timestamp">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+</Ant:Project>

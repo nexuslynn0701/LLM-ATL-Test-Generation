@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject13"
+    basedir="workspace"
+    description="Ant project 13 with multiple targets and properties"
+    default="buildMain">
+
+  <!-- Properties: one of each subtype to trigger property rules -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition to trigger AntTaskDef2MavenMavenTaskDef -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Path with PathElement and FileSet to trigger path-related rules -->
+  <path xsi:type="Ant:Path" id="compile.path">
+    <pathElement path="lib/dependency.jar" location="lib/dependency.jar"/>
+    <fileset dir="lib">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/test-*.jar"/>
+      </patternset>
+      <include name="core/*.jar"/>
+      <exclude name="old/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- Targets -->
+  <!-- Default target: buildMain -->
+  <targets xmi:id="buildMain" name="buildMain" description="Main build target">
+    <!-- Javac task to trigger AntJavac2MavenMavenJavac -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+
+    <!-- Jar task to trigger AntJar2MavenMavenJar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/complex-project-13.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Mkdir task to trigger AntMkdir2MavenMavenMkdir -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/generated-sources"/>
+
+    <!-- Delete task to trigger AntDelete2MavenMavenDelete -->
+    <tasks xsi:type="Ant:Delete"
+           file="target/old-output.tmp"
+           dir="target/obsolete"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           includesfile=""
+           excludes="**/keep/**"
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target: docs -->
+  <targets xmi:id="docs" name="docs" description="Generate documentation">
+    <!-- Javadoc task to trigger AntJavadoc2MavenMavenJavadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntProject13 API"/>
+  </targets>
+
+  <!-- Auxiliary target: housekeeping -->
+  <targets xmi:id="housekeeping" name="housekeeping" description="Housekeeping tasks">
+    <!-- Tstamp task to trigger AntTstamp2MavenMavenTstamp -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd'T'HH:mm:ssZ"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

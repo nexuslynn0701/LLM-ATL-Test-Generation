@@ -1,0 +1,507 @@
+You are an expert in Model-Driven Engineering (MDE) and model transformation testing.
+Your task is to generate one valid source model for testing an ATL model transformation.
+
+--------------------------------
+METAMODELS
+--------------------------------
+Two metamodels are provided below in order: SOURCE first, TARGET second.
+
+The SOURCE metamodel defines the structure your output must conform to.
+The TARGET metamodel is provided only to help you understand the target-side
+types and bindings referenced in the ATL transformation.
+
+Do NOT instantiate target metamodel classes.
+Do NOT generate a target model.
+Do NOT use target-only classes, attributes, references, or namespace prefixes
+in the source model.
+
+--- Grafcet.ecore ---
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore">
+  <ecore:EPackage name="Grafcet" nsURI="Grafcet" nsPrefix="Grafcet">
+    <eClassifiers xsi:type="ecore:EClass" name="LocatedElement" abstract="true">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="location" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true" eSuperTypes="#/0/LocatedElement">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Grafcet" eSuperTypes="#/0/NamedElement">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="elements" ordered="false"
+          upperBound="-1" eType="#/0/Element" containment="true" eOpposite="#/0/Element/grafcet"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="connections" ordered="false"
+          upperBound="-1" eType="#/0/Connection" containment="true" eOpposite="#/0/Connection/grafcet"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" eSuperTypes="#/0/NamedElement">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="grafcet" ordered="false"
+          lowerBound="1" eType="#/0/Grafcet" eOpposite="#/0/Grafcet/elements"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Step" eSuperTypes="#/0/Element">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="isInitial" ordered="false"
+          lowerBound="1" eType="#/1/Boolean"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="isActive" ordered="false"
+          lowerBound="1" eType="#/1/Boolean"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="action" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="incomingConnections"
+          ordered="false" upperBound="-1" eType="#/0/TransitionToStep" eOpposite="#/0/TransitionToStep/to"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="outgoingConnections"
+          ordered="false" upperBound="-1" eType="#/0/StepToTransition" eOpposite="#/0/StepToTransition/from"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Transition" eSuperTypes="#/0/Element">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="condition" ordered="false"
+          lowerBound="1" eType="#/1/String"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="incomingConnections"
+          ordered="false" upperBound="-1" eType="#/0/StepToTransition" eOpposite="#/0/StepToTransition/to"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="outgoingConnections"
+          ordered="false" upperBound="-1" eType="#/0/TransitionToStep" eOpposite="#/0/TransitionToStep/from"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Connection" abstract="true" eSuperTypes="#/0/NamedElement">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="grafcet" ordered="false"
+          lowerBound="1" eType="#/0/Grafcet" eOpposite="#/0/Grafcet/connections"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="StepToTransition" eSuperTypes="#/0/Connection">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="from" ordered="false"
+          lowerBound="1" eType="#/0/Step" eOpposite="#/0/Step/outgoingConnections"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="to" ordered="false" lowerBound="1"
+          eType="#/0/Transition" eOpposite="#/0/Transition/incomingConnections"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="TransitionToStep" eSuperTypes="#/0/Connection">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="from" ordered="false"
+          lowerBound="1" eType="#/0/Transition" eOpposite="#/0/Transition/outgoingConnections"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="to" ordered="false" lowerBound="1"
+          eType="#/0/Step" eOpposite="#/0/Step/incomingConnections"/>
+    </eClassifiers>
+  </ecore:EPackage>
+  <ecore:EPackage name="PrimitiveTypes" nsURI="PrimitiveTypes" nsPrefix="PrimitiveTypes">
+    <eClassifiers xsi:type="ecore:EDataType" name="String" instanceClassName="java.lang.String"/>
+    <eClassifiers xsi:type="ecore:EDataType" name="Boolean" instanceClassName="java.lang.Boolean"/>
+  </ecore:EPackage>
+</xmi:XMI>
+
+
+--- PetriNet.ecore ---
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore">
+  <ecore:EPackage name="PrimitiveTypes" nsURI="PrimitiveTypes" nsPrefix="PrimitiveTypes">
+    <eClassifiers xsi:type="ecore:EDataType" name="String" instanceClassName="java.lang.String"/>
+    <eClassifiers xsi:type="ecore:EDataType" name="Integer" instanceClassName="java.lang.Integer"/>
+  </ecore:EPackage>
+  <ecore:EPackage name="PetriNet" nsURI="PetriNet" nsPrefix="PetriNet">
+    <eClassifiers xsi:type="ecore:EClass" name="LocatedElement" abstract="true">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="location" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true" eSuperTypes="#/1/LocatedElement">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false"
+          lowerBound="1" eType="#/0/String"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PetriNet" eSuperTypes="#/1/NamedElement">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="elements" ordered="false"
+          upperBound="-1" eType="#/1/Element" containment="true" eOpposite="#/1/Element/net"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="arcs" ordered="false"
+          upperBound="-1" eType="#/1/Arc" containment="true" eOpposite="#/1/Arc/net"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" eSuperTypes="#/1/NamedElement">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="net" ordered="false"
+          lowerBound="1" eType="#/1/PetriNet" eOpposite="#/1/PetriNet/elements"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Place" eSuperTypes="#/1/Element">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="incomingArc" ordered="false"
+          upperBound="-1" eType="#/1/TransitionToPlace" eOpposite="#/1/TransitionToPlace/to"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="outgoingArc" ordered="false"
+          upperBound="-1" eType="#/1/PlaceToTransition" eOpposite="#/1/PlaceToTransition/from"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Transition" eSuperTypes="#/1/Element">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="incomingArc" ordered="false"
+          lowerBound="1" upperBound="-1" eType="#/1/PlaceToTransition" eOpposite="#/1/PlaceToTransition/to"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="outgoingArc" ordered="false"
+          lowerBound="1" upperBound="-1" eType="#/1/TransitionToPlace" eOpposite="#/1/TransitionToPlace/from"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Arc" abstract="true" eSuperTypes="#/1/NamedElement">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="weight" ordered="false"
+          lowerBound="1" eType="#/0/Integer"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="net" ordered="false"
+          lowerBound="1" eType="#/1/PetriNet" eOpposite="#/1/PetriNet/arcs"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="PlaceToTransition" eSuperTypes="#/1/Arc">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="from" ordered="false"
+          lowerBound="1" eType="#/1/Place" eOpposite="#/1/Place/outgoingArc"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="to" ordered="false" lowerBound="1"
+          eType="#/1/Transition" eOpposite="#/1/Transition/incomingArc"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="TransitionToPlace" eSuperTypes="#/1/Arc">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="from" ordered="false"
+          lowerBound="1" eType="#/1/Transition" eOpposite="#/1/Transition/outgoingArc"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="to" ordered="false" lowerBound="1"
+          eType="#/1/Place" eOpposite="#/1/Place/incomingArc"/>
+    </eClassifiers>
+  </ecore:EPackage>
+</xmi:XMI>
+
+--------------------------------
+OCL CONSTRAINTS
+--------------------------------
+All generated source models must satisfy the following constraints:
+-- Grafcet2PetriNet OCL Contract
+-- Transformation-level contract: source-side (Grafcet) to target-side (PetriNet) mapping.
+-- Written in the style of Troya et al. 2015 TSE.
+
+-- C1 (Rule PetriNet): For each Grafcet, a PetriNet must be created with the same name and location.
+context Grafcet!Grafcet
+inv PetriNetCreated:
+  PetriNet!PetriNet.allInstances()->exists(p |
+    p.name = self.name and p.location = self.location
+  )
+
+-- C2 (Rule PetriNet): The number of PetriNet instances must equal the number of Grafcet instances.
+context Grafcet!Grafcet
+inv PetriNetCount:
+  PetriNet!PetriNet.allInstances()->size() = Grafcet!Grafcet.allInstances()->size()
+
+-- C3 (Rule Place): For each Step, a Place must be created with the same name and location.
+context Grafcet!Step
+inv PlaceCreated:
+  PetriNet!Place.allInstances()->exists(p |
+    p.name = self.name and p.location = self.location
+  )
+
+-- C4 (Rule Place): The number of Place instances must equal the number of Step instances.
+context Grafcet!Step
+inv PlaceCount:
+  PetriNet!Place.allInstances()->size() = Grafcet!Step.allInstances()->size()
+
+-- C5 (Rule Place): For each Step marked as isInitial=true, the corresponding Place must have initToken=true.
+context Grafcet!Step
+inv InitialStepBecomesInitialPlace:
+  self.isInitial implies
+  PetriNet!Place.allInstances()->exists(p |
+    p.name = self.name and p.initToken = true
+  )
+
+-- C6 (Rule Transition): For each Grafcet Transition, a PetriNet Transition must be created with the same name.
+context Grafcet!Transition
+inv TransitionCreated:
+  PetriNet!Transition.allInstances()->exists(t |
+    t.name = self.name
+  )
+
+-- C7 (Rule Transition): The number of PetriNet Transition instances must equal the number of Grafcet Transition instances.
+context Grafcet!Transition
+inv TransitionCount:
+  PetriNet!Transition.allInstances()->size() = Grafcet!Transition.allInstances()->size()
+
+-- C8 (Rule PlaceToTransition): For each StepToTransition, a PlaceToTransition Arc must connect the corresponding Place and Transition.
+context Grafcet!StepToTransition
+inv ArcCreated:
+  PetriNet!PlaceToTransition.allInstances()->exists(a |
+    a.from.name = self.from.name and
+    a.to.name = self.to.name and
+    a.name = self.name
+  )
+
+-- C9 (Rule TransitionToPlace): For each TransitionToStep, a TransitionToPlace Arc must connect the corresponding Transition and Place.
+context Grafcet!TransitionToStep
+inv ArcCreated:
+  PetriNet!TransitionToPlace.allInstances()->exists(a |
+    a.from.name = self.from.name and
+    a.to.name = self.to.name and
+    a.name = self.name
+  )
+
+-- C10 (Rule PlaceToTransition + Rule TransitionToPlace): The total number of Arcs must equal the total number of Connections.
+context PetriNet!PetriNet
+inv ArcConnectionCount:
+  self.arcs->size() = Grafcet!Grafcet.allInstances()->collect(g | g.connections)->flatten()->size()
+
+--------------------------------
+MODEL TRANSFORMATION (ATL)
+--------------------------------
+Study this ATL transformation carefully to understand which source structures
+trigger which rules. Use this knowledge to design a source model that exercises
+as many different transformation rules as possible.
+
+module Grafcet2PetriNet;
+create OUT : PetriNet, TM : TMM from IN : Grafcet;
+
+helper def : trace : TMM!Trace = OclUndefined;
+
+-------------------------------------------------------------------------------
+-- RULES ----------------------------------------------------------------------
+-------------------------------------------------------------------------------
+entrypoint rule createTrace()
+{
+	to
+		tr : TMM!Trace( )
+
+	do {
+		thisModule.trace <- tr;
+	}
+}
+
+-- The PetriNet rule generates a PetriNet element from the input Grafcet element. 
+-- Name of the generated PetriNet element is copied from the one of the input Grafcet.
+-- Its set of Elements corresponds to Elements generated by Place and Transition rules.
+-- And its set of Arcs corresponds to Connections generated by PlaceToTransition and TransitionToPlace rules.
+rule PetriNet {
+	from
+		g : Grafcet!Grafcet
+	to
+		p : PetriNet!PetriNet
+		(
+			location <- g.location,
+			name <- g.name,
+			elements <- g.elements,
+			arcs <- g.connections
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'PetriNet',
+			targetElements <- Sequence{p}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{g};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+-- The Place rule generates a Place element from the input Step element. 
+-- Name of the generated Place element is copied from the one of the input Step.
+-- Its set of incomingArcs corresponds to incomingConnections generated by TransitionToPlace rule.
+-- And its set of outgoingArc corresponds to outgoingConnections generated by PlaceToTransition rule.
+rule Place {
+	from
+		g : Grafcet!Step
+	to
+		p : PetriNet!Place
+		(
+			location <- g.location,
+			name <- g.name,
+			net <- g.grafcet,
+			incomingArc <- g.incomingConnections,
+			outgoingArc <- g.outgoingConnections
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'Place',
+			targetElements <- Sequence{p}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{g};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+-- The Transition rule generates a Transition element from the input Transition element. 
+-- Name of the generated Transition element is copied from the one of the input Transition.
+-- Its set of incomingArcs corresponds to incomingConnections generated by PlaceToTransition rule.
+-- And its set of outgoingArc corresponds to outgoingConnections generated by TransitionToPlace rule.
+rule Transition {
+	from
+		g : Grafcet!Transition
+	to
+		p : PetriNet!Transition
+		(
+			location <- g.location,
+			name <- g.name,
+			net <- g.grafcet,
+			incomingArc <- g.incomingConnections,
+			outgoingArc <- g.outgoingConnections
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'Transition',
+			targetElements <- Sequence{p}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{g};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+-- The PlaceToTransition rule generates a PlaceToTransition element from the input StepToTransition element. 
+-- Name of the generated PlaceToTransition element is copied from the one of the input StepToTransition.
+-- Its from and to references are also copied from the ones of the input StepToTransition.
+rule PlaceToTransition {
+	from
+		g : Grafcet!StepToTransition
+	to
+		p : PetriNet!PlaceToTransition
+		(
+			location <- g.location,
+			name <- g.name,
+			net <- g.grafcet,
+			"from" <- g."from",
+			"to" <- g."to"
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'PlaceToTransition',
+			targetElements <- Sequence{p}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{g};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+-- The TransitionToPlace rule generates a TransitionToPlace element from the input TransitionToStep element. 
+-- Name of the generated TransitionToPlace element is copied from the one of the input TransitionToStep.
+-- Its from and to references are also copied from the ones of the input TransitionToStep.
+rule TransitionToPlace {
+	from
+		g : Grafcet!TransitionToStep
+	to
+		p : PetriNet!TransitionToPlace
+		(
+			location <- g.location,
+			name <- g.name,
+			net <- g.grafcet,
+			"from" <- g."from",
+			"to" <- g."to"
+		),
+		-- trace information
+		tl : TMM!TraceLink(
+			ruleName <- 'TransitionToPlace',
+			targetElements <- Sequence{p}
+		)
+	do {
+		-- trace information
+		tl.sourceElements <- Sequence{g};
+		thisModule.trace.traceLinks <- tl;
+	}
+}
+
+--------------------------------
+EXAMPLE SOURCE MODELS
+--------------------------------
+Below are example source models that conform to the source metamodel.
+Use them only to understand the correct source-side XMI format and structure.
+Generate a NEW and DIFFERENT source model that covers different ATL rules.
+
+--- Example 1: scenario1_minimal_sequence.xmi ---
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net001" name="MinimalSequence">
+    <elements xsi:type="Grafcet:Step" location="s001" name="Idle" isInitial="true" isActive="true" action="wait"/>
+    <elements xsi:type="Grafcet:Transition" location="t001" name="Start" condition="startPressed"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="Working" isInitial="false" isActive="false" action="process"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="idleToStart" from="/0/@elements.0" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c002" name="startToWorking" from="/0/@elements.1" to="/0/@elements.2"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>
+
+
+--- Example 2: scenario2_longer_sequence.xmi ---
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net002" name="LongerSequence">
+    <elements xsi:type="Grafcet:Step" location="s001" name="Idle" isInitial="true" isActive="true" action="wait"/>
+    <elements xsi:type="Grafcet:Transition" location="t001" name="Start" condition="startPressed"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="Working" isInitial="false" isActive="false" action="process"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="Finish" condition="workComplete"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="Done" isInitial="false" isActive="false" action="stop"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="idleToStart" from="/0/@elements.0" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c002" name="startToWorking" from="/0/@elements.1" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c003" name="workingToFinish" from="/0/@elements.2" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c004" name="finishToDone" from="/0/@elements.3" to="/0/@elements.4"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>
+
+
+--- Example 3: scenario3_retry_cycle.xmi ---
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net003" name="RetryCycle">
+    <elements xsi:type="Grafcet:Step" location="s001" name="Ready" isInitial="true" isActive="true" action="prepare"/>
+    <elements xsi:type="Grafcet:Transition" location="t001" name="Run" condition="enabled"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="Execute" isInitial="false" isActive="false" action="execute"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="Retry" condition="failed"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="readyToRun" from="/0/@elements.0" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c002" name="runToExecute" from="/0/@elements.1" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c003" name="executeToRetry" from="/0/@elements.2" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c004" name="retryToReady" from="/0/@elements.3" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>
+
+--------------------------------
+GENERATION REQUIREMENTS
+--------------------------------
+The source model must:
+1. Conform to the source metamodel.
+2. Satisfy all OCL constraints.
+3. Exercise as many different ATL rules as possible.
+4. Be structurally different from the example source models.
+5. Be syntactically valid XMI.
+6. Use ONLY classes, attributes, references, and namespace prefixes defined
+   in the source metamodel.
+7. Never instantiate target metamodel classes.
+8. Express attribute values as XMI attributes, not as XML text content nodes.
+   CORRECT:   <Entry title="My Title" year="2024"/>
+   INCORRECT: <Entry><title>My Title</title></Entry>
+9. Containment references may be represented as nested XMI elements when
+   required by the source metamodel.
+
+--------------------------------
+SOURCE FORMAT NOTES
+--------------------------------
+Generate only Grafcet source models.
+
+Use an xmi:XMI root containing exactly one Grafcet:Grafcet element.
+
+Declare:
+- xmlns:xmi="http://www.omg.org/XMI"
+- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+- xmlns:Grafcet="Grafcet"
+
+Represent contained nodes under Grafcet:Grafcet as:
+- <elements xsi:type="Grafcet:Step" .../>
+- <elements xsi:type="Grafcet:Transition" .../>
+- <connections xsi:type="Grafcet:StepToTransition" .../>
+- <connections xsi:type="Grafcet:TransitionToStep" .../>
+
+Use positional references for connection endpoints:
+- from="/0/@elements.N"
+- to="/0/@elements.N"
+
+Every StepToTransition must point from a Step to a Transition.
+Every TransitionToStep must point from a Transition to a Step.
+
+Do not explicitly serialize inverse references:
+- grafcet
+- incomingConnections
+- outgoingConnections
+
+Do not instantiate PetriNet target classes.
+Do not generate target models.
+
+--------------------------------
+OUTPUT FORMAT
+--------------------------------
+Return exactly one source model and nothing else:
+
+<source_model>
+[source XMI here]
+</source_model>
+
+Do not include: target_model, expected output, coverage notes,
+explanation, or Markdown fences.

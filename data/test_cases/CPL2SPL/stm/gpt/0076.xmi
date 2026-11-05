@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL with subActions and incoming/outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="sa_main">
+      <!-- Reference to AddressSwitch element at index 4 -->
+      <contents href="//@elements.4"/>
+      <!-- Reference to Location element at index 2 -->
+      <contents href="//@elements.2"/>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="sa_alt">
+      <!-- Reference to TimeSwitch element at index 6 -->
+      <contents href="//@elements.6"/>
+      <!-- Reference to PrioritySwitch element at index 7 -->
+      <contents href="//@elements.7"/>
+    </subActions>
+    <outgoing>
+      <!-- Reference to Proxy element at index 1 -->
+      <contents href="//@elements.1"/>
+      <!-- Reference to Location element at index 2 -->
+      <contents href="//@elements.2"/>
+    </outgoing>
+    <incoming>
+      <!-- Reference to StringSwitch element at index 5 -->
+      <contents href="//@elements.5"/>
+      <!-- Reference to Reject element at index 3 -->
+      <contents href="//@elements.3"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Proxy with all child branches -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential" timeout="20">
+    <busy>
+      <!-- Reference to Location element at index 2 -->
+      <contents href="//@elements.2"/>
+    </busy>
+    <noAnswer>
+      <!-- Reference to SubCall element at index 8 -->
+      <contents href="//@elements.8"/>
+    </noAnswer>
+    <redirection>
+      <!-- Reference to Redirect element at index 9 -->
+      <contents href="//@elements.9"/>
+    </redirection>
+    <failure>
+      <!-- Reference to Reject element at index 3 -->
+      <contents href="//@elements.3"/>
+    </failure>
+    <default>
+      <!-- Reference to AddressSwitch element at index 4 -->
+      <contents href="//@elements.4"/>
+    </default>
+  </elements>
+
+  <!-- 2: Location also acts as a NodeContainer -->
+  <elements xsi:type="CPL:Location" url="sip:alice@example.com" priority="1" clear="no">
+    <!-- Reference to SubCall element at index 8 -->
+    <contents href="//@elements.8"/>
+  </elements>
+
+  <!-- 3: Reject signalling action -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 4: AddressSwitch with notPresent, otherwise and addresses -->
+  <elements xsi:type="CPL:AddressSwitch" field="to" subField="host">
+    <notPresent>
+      <!-- Reference to Location at index 2 -->
+      <contents href="//@elements.2"/>
+    </notPresent>
+    <otherwise>
+      <!-- Reference to Proxy at index 1 -->
+      <contents href="//@elements.1"/>
+    </otherwise>
+    <addresses is="user1@example.org" contains="example.org" subDomainOf="example.org">
+      <!-- Reference to SubCall at index 8 -->
+      <contents href="//@elements.8"/>
+    </addresses>
+    <addresses is="sales@example.org">
+      <!-- Reference to Redirect at index 9 -->
+      <contents href="//@elements.9"/>
+    </addresses>
+  </elements>
+
+  <!-- 5: StringSwitch with notPresent, otherwise and strings -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <notPresent>
+      <!-- Reference to Reject at index 3 -->
+      <contents href="//@elements.3"/>
+    </notPresent>
+    <otherwise>
+      <!-- Reference to Location at index 2 -->
+      <contents href="//@elements.2"/>
+    </otherwise>
+    <strings is="promo" contains="sale">
+      <!-- Reference to Proxy at index 1 -->
+      <contents href="//@elements.1"/>
+    </strings>
+    <strings contains="urgent">
+      <!-- Reference to PrioritySwitch at index 7 -->
+      <contents href="//@elements.7"/>
+    </strings>
+  </elements>
+
+  <!-- 6: TimeSwitch exercising many SwitchedTime attributes -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.org/paris">
+    <notPresent>
+      <!-- Reference to Location at index 2 -->
+      <contents href="//@elements.2"/>
+    </notPresent>
+    <otherwise>
+      <!-- Reference to Reject at index 3 -->
+      <contents href="//@elements.3"/>
+    </otherwise>
+    <times dtstart="20260101T090000" dtend="20260101T170000" duration="8h"
+           freq="DAILY" until="20261231T170000" count="10" interval="1"
+           bySecond="0" byMinute="0" byHour="9" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1" byYearDay="1" byWeekNo="1" byMonth="1" wkst="MO"
+           bySetPos="1">
+      <!-- Reference to Proxy at index 1 -->
+      <contents href="//@elements.1"/>
+    </times>
+    <times dtstart="20260101T000000" interval="2" wkst="SU">
+      <!-- Reference to AddressSwitch at index 4 -->
+      <contents href="//@elements.4"/>
+    </times>
+  </elements>
+
+  <!-- 7: PrioritySwitch with SwitchedPriority entries -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <!-- Reference to Proxy at index 1 -->
+      <contents href="//@elements.1"/>
+    </notPresent>
+    <otherwise>
+      <!-- Reference to Location at index 2 -->
+      <contents href="//@elements.2"/>
+    </otherwise>
+    <priorities less="0.3">
+      <!-- Reference to Reject at index 3 -->
+      <contents href="//@elements.3"/>
+    </priorities>
+    <priorities greater="0.7" equal="0.7">
+      <!-- Reference to Redirect at index 9 -->
+      <contents href="//@elements.9"/>
+    </priorities>
+  </elements>
+
+  <!-- 8: SubCall referencing a sub-action by name (string) -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- 9: Redirect signalling action -->
+  <elements xsi:type="CPL:Redirect" permanent="yes"/>
+
+  <!-- 10: LanguageSwitch with multiple languages -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <!-- Reference to SubCall at index 8 -->
+      <contents href="//@elements.8"/>
+    </notPresent>
+    <otherwise>
+      <!-- Reference to Proxy at index 1 -->
+      <contents href="//@elements.1"/>
+    </otherwise>
+    <languages matches="en">
+      <!-- Reference to Location at index 2 -->
+      <contents href="//@elements.2"/>
+    </languages>
+    <languages matches="fr">
+      <!-- Reference to Reject at index 3 -->
+      <contents href="//@elements.3"/>
+    </languages>
+  </elements>
+
+</CPL:CPLModel>

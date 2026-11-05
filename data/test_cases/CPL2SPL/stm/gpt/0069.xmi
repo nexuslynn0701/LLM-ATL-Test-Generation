@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL script with Incoming/Outgoing and multiple SubActions -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="subMain">
+      <contents xsi:type="CPL:Location" url="sip:main@domain.com" clear="yes" priority="1"/>
+      <!-- reference to Location at elements[3] -->
+      <contents xsi:type="CPL:SubCall"/>
+    </subActions>
+    <subActions id="subBackup">
+      <!-- reference to AddressSwitch at elements[6] -->
+      <contents xsi:type="CPL:SubCall"/>
+    </subActions>
+    <incoming>
+      <!-- reference to StringSwitch at elements[7] -->
+      <contents xsi:type="CPL:SubCall"/>
+    </incoming>
+    <outgoing>
+      <!-- reference to Proxy at elements[4] -->
+      <contents xsi:type="CPL:SubCall"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Simple SubCall (string ref) -->
+  <elements xsi:type="CPL:SubCall" ref="subMain"/>
+
+  <!-- 2: Reject with full attributes -->
+  <elements xsi:type="CPL:Reject" status="603" reason="Decline"/>
+
+  <!-- 3: Location used from root CPL and from switches -->
+  <elements xsi:type="CPL:Location" url="sip:user1@domain.com" clear="no" priority="5"/>
+
+  <!-- 4: Proxy with all branches and cross-links to existing elements -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential" timeout="30">
+    <busy>
+      <!-- busy branch points to Location at elements[5] -->
+      <contents xsi:type="CPL:Node" xmi:id="busy_dummy"/>
+    </busy>
+    <noAnswer>
+      <!-- noAnswer points to Reject at elements[2] -->
+      <contents xsi:type="CPL:Node" xmi:id="noanswer_dummy"/>
+    </noAnswer>
+    <redirection>
+      <!-- redirection points to AddressSwitch at elements[6] -->
+      <contents xsi:type="CPL:Node" xmi:id="redirection_dummy"/>
+    </redirection>
+    <failure>
+      <!-- failure points to PrioritySwitch at elements[10] -->
+      <contents xsi:type="CPL:Node" xmi:id="failure_dummy"/>
+    </failure>
+    <default>
+      <!-- default points back to SubCall at elements[1] -->
+      <contents xsi:type="CPL:Node" xmi:id="default_dummy"/>
+    </default>
+  </elements>
+
+  <!-- 5: Another Location to be used by Proxy.busy etc. -->
+  <elements xsi:type="CPL:Location" url="sip:backup@domain.com" clear="yes" priority="10"/>
+
+  <!-- 6: AddressSwitch with NotPresent/Otherwise and two SwitchedAddress cases -->
+  <elements xsi:type="CPL:AddressSwitch" field="FROM" subField="user">
+    <notPresent>
+      <!-- fall back to Reject at elements[2] -->
+      <contents xsi:type="CPL:Node" xmi:id="addr_notpresent_dummy"/>
+    </notPresent>
+    <otherwise>
+      <!-- otherwise leads to Proxy at elements[4] -->
+      <contents xsi:type="CPL:Node" xmi:id="addr_otherwise_dummy"/>
+    </otherwise>
+    <addresses is="alice" contains="sales" subDomainOf="dept.domain.com">
+      <!-- address case to Location at elements[3] -->
+      <contents xsi:type="CPL:Node" xmi:id="addr_case1_dummy"/>
+    </addresses>
+    <addresses is="bob" contains="support" subDomainOf="dept.domain.com">
+      <!-- address case to Location at elements[5] -->
+      <contents xsi:type="CPL:Node" xmi:id="addr_case2_dummy"/>
+    </addresses>
+  </elements>
+
+  <!-- 7: StringSwitch on some header/field -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <notPresent>
+      <!-- no subject -> Reject at elements[2] -->
+      <contents xsi:type="CPL:Node" xmi:id="str_notpresent_dummy"/>
+    </notPresent>
+    <otherwise>
+      <!-- otherwise -> Location at elements[3] -->
+      <contents xsi:type="CPL:Node" xmi:id="str_otherwise_dummy"/>
+    </otherwise>
+    <strings is="urgent" contains="projectX">
+      <!-- string case -> Proxy at elements[4] -->
+      <contents xsi:type="CPL:Node" xmi:id="str_case1_dummy"/>
+    </strings>
+    <strings is="info" contains="newsletter">
+      <!-- string case -> AddressSwitch at elements[6] -->
+      <contents xsi:type="CPL:Node" xmi:id="str_case2_dummy"/>
+    </strings>
+  </elements>
+
+  <!-- 8: LanguageSwitch with multiple languages -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <!-- if no language -> Location at elements[3] -->
+      <contents xsi:type="CPL:Node" xmi:id="lang_notpresent_dummy"/>
+    </notPresent>
+    <otherwise>
+      <!-- otherwise -> Reject at elements[2] -->
+      <contents xsi:type="CPL:Node" xmi:id="lang_otherwise_dummy"/>
+    </otherwise>
+    <languages matches="en">
+      <!-- english -> Proxy at elements[4] -->
+      <contents xsi:type="CPL:Node" xmi:id="lang_en_dummy"/>
+    </languages>
+    <languages matches="fr">
+      <!-- french -> AddressSwitch at elements[6] -->
+      <contents xsi:type="CPL:Node" xmi:id="lang_fr_dummy"/>
+    </languages>
+  </elements>
+
+  <!-- 9: TimeSwitch with a detailed SwitchedTime rule -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <notPresent>
+      <!-- if time info missing -> Location at elements[5] -->
+      <contents xsi:type="CPL:Node" xmi:id="time_notpresent_dummy"/>
+    </notPresent>
+    <otherwise>
+      <!-- otherwise -> Proxy at elements[4] -->
+      <contents xsi:type="CPL:Node" xmi:id="time_otherwise_dummy"/>
+    </otherwise>
+    <times dtstart="20260101T080000" dtend="20260101T180000" duration="PT10H"
+           freq="DAILY" until="20261231T235959" count="10" interval="1"
+           bySecond="0" byMinute="0" byHour="8" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1-31" byYearDay="1-365" byWeekNo="1-52"
+           byMonth="1-12" wkst="MO" bySetPos="1">
+      <!-- business hours -> Location at elements[3] -->
+      <contents xsi:type="CPL:Node" xmi:id="time_case1_dummy"/>
+    </times>
+  </elements>
+
+  <!-- 10: PrioritySwitch with SwitchedPriority cases -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <!-- no priority -> Reject at elements[2] -->
+      <contents xsi:type="CPL:Node" xmi:id="prio_notpresent_dummy"/>
+    </notPresent>
+    <otherwise>
+      <!-- otherwise -> Location at elements[5] -->
+      <contents xsi:type="CPL:Node" xmi:id="prio_otherwise_dummy"/>
+    </otherwise>
+    <priorities less="0.3" greater="0.0" equal="">
+      <!-- low priority -> AddressSwitch at elements[6] -->
+      <contents xsi:type="CPL:Node" xmi:id="prio_low_dummy"/>
+    </priorities>
+    <priorities less="0.8" greater="0.3" equal="0.5">
+      <!-- medium/high priority -> Proxy at elements[4] -->
+      <contents xsi:type="CPL:Node" xmi:id="prio_mid_dummy"/>
+    </priorities>
+  </elements>
+
+  <!-- 11: Redirect signalling action -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

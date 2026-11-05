@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    xmi:id="proj0063"
+    name="AntMavenDemo63"
+    basedir="demo-src"
+    description="Ant to Maven transformation demo project 63"
+    default="buildTarget">
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="demo-src"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="demo-build"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/demo.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by tasks, to respect safety rules) -->
+  <taskdef name="customTask" classname="com.example.tools.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="buildTarget" name="build" description="Compile and package the project">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="demo-src"
+           destdir="demo-build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- ClassPath with PathElement and FileSet to exercise path-related rules -->
+      <classPath refid="cp-demo">
+        <pathElement path="lib/demo.jar" location="lib/demo.jar"/>
+        <fileset dir="lib">
+          <include name="**/*.jar"/>
+          <exclude name="**/test-*.jar"/>
+          <patternset>
+            <inexcludes xsi:type="Ant:IncludesFile" name="includes.list" ifCondition="" unless=""/>
+            <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list" ifCondition="" unless=""/>
+          </patternset>
+        </fileset>
+      </classPath>
+      <!-- InExcludes directly on Javac -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="" unless="deprecated"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="" unless=""/>
+    </tasks>
+
+    <!-- Create build directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="demo-build"/>
+
+    <!-- Package classes into a Jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="demo-build/AntMavenDemo63.jar"
+           basedir="demo-build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Copy resources with filters and mapper -->
+    <tasks xsi:type="Ant:Copy"
+           todir="demo-build/resources"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/secret/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="AntMavenDemo63"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="" classpath="" classpathref="" from="*.tpl" to="*.txt"/>
+    </tasks>
+
+    <!-- Delete temporary directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="demo-build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           includesfile="delete-includes.list"
+           excludes="**/keep/**"
+           excludesfile="delete-excludes.list"
+           defaultexcludes="true"/>
+  </targets>
+
+  <targets xmi:id="docTarget" name="docs" description="Generate project documentation">
+    <!-- Javadoc generation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="demo-src"
+           destdir="demo-build/docs"
+           packagenames="com.example.demo.*"
+           defaultexcludes="true"
+           author="Demo Author"
+           version="1.0.63"
+           use="true"
+           windowtitle="AntMavenDemo63 API Documentation"/>
+    <!-- Tstamp task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Standalone Path to exercise AntPath2MavenMavenPath & PathElement/FileSet rules -->
+  <path id="demoPath" refid="">
+    <pathElement path="demo-build/classes" location="demo-build/classes"/>
+    <fileset dir="demo-build">
+      <include name="**/*.jar"/>
+      <exclude name="**/*.tmp"/>
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar" ifCondition="" unless="old"/>
+      </patternset>
+    </fileset>
+  </path>
+
+  <!-- Standalone ClassPath to exercise AntClassPath2MavenMavenClassPath -->
+  <path xsi:type="Ant:ClassPath" refid="runtime.cp">
+    <pathElement path="lib/runtime.jar" location="lib/runtime.jar"/>
+    <fileset dir="lib/runtime">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+</Ant:Project>

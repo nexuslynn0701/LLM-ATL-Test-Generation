@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="library-src"
+    description="Build and package the library"
+    default="buildMain">
+  <properties xsi:type="Ant:PropertyValue" name="lib.name" value="mylib"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="build"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+  <targets xmi:id="prepare" name="prepare" description="Create build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/jar"/>
+  </targets>
+  <targets xmi:id="compileMain" name="compileMain" description="Compile main sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+  </targets>
+  <targets xmi:id="jarMain" name="jarMain" description="Create main JAR">
+    <tasks xsi:type="Ant:Jar" jarfile="build/jar/mylib.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="doc" name="doc" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.library.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="MyLib API"/>
+  </targets>
+  <targets xmi:id="timestamp" name="timestamp" description="Add build timestamp">
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build output">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" defaultexcludes="yes"/>
+  </targets>
+  <targets xmi:id="buildMain" name="buildMain" description="Full build including docs and jar">
+    <tasks xsi:type="Ant:Copy" todir="dist" overwrite="true" filtering="false" flatten="false" includeEmptyDirs="true"/>
+  </targets>
+</Ant:Project>

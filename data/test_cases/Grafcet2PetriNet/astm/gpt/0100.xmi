@@ -1,0 +1,83 @@
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" location="0:0-0:0" name="ComplexGrafcet0100">
+    <!-- Elements: 4 Steps and 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" location="1:0-1:10" name="InitStep" isInitial="true" isActive="true" action="startSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" location="2:0-2:10" name="IntermediateStepA" isInitial="false" isActive="false" action="checkConditionA"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" location="3:0-3:10" name="IntermediateStepB" isInitial="false" isActive="false" action="checkConditionB"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s4" location="4:0-4:10" name="FinalStep" isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" location="5:0-5:10" name="ToAorB" condition="x &gt; 0"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" location="6:0-6:10" name="LoopBack" condition="retry == true"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" location="7:0-7:10" name="ToFinal" condition="allOK"/>
+
+    <!-- Connections: StepToTransition -->
+    <!-- InitStep -> ToAorB -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c_st1"
+                 location="10:0-10:15"
+                 name="Init_to_AorB"
+                 from="/0/@elements.0"
+                 to="/0/@elements.4"/>
+
+    <!-- IntermediateStepA -> ToFinal -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c_st2"
+                 location="11:0-11:15"
+                 name="A_to_Final"
+                 from="/0/@elements.1"
+                 to="/0/@elements.6"/>
+
+    <!-- IntermediateStepB -> ToFinal -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c_st3"
+                 location="12:0-12:15"
+                 name="B_to_Final"
+                 from="/0/@elements.2"
+                 to="/0/@elements.6"/>
+
+    <!-- FinalStep -> LoopBack (to create a cycle) -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c_st4"
+                 location="13:0-13:15"
+                 name="Final_to_Loop"
+                 from="/0/@elements.3"
+                 to="/0/@elements.5"/>
+
+    <!-- Connections: TransitionToStep -->
+    <!-- ToAorB -> IntermediateStepA -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c_ts1"
+                 location="20:0-20:15"
+                 name="AorB_to_A"
+                 from="/0/@elements.4"
+                 to="/0/@elements.1"/>
+
+    <!-- ToAorB -> IntermediateStepB -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c_ts2"
+                 location="21:0-21:15"
+                 name="AorB_to_B"
+                 from="/0/@elements.4"
+                 to="/0/@elements.2"/>
+
+    <!-- LoopBack -> InitStep (closing the loop) -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c_ts3"
+                 location="22:0-22:15"
+                 name="Loop_to_Init"
+                 from="/0/@elements.5"
+                 to="/0/@elements.0"/>
+
+    <!-- ToFinal -> FinalStep -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c_ts4"
+                 location="23:0-23:15"
+                 name="FinalTransition_to_FinalStep"
+                 from="/0/@elements.6"
+                 to="/0/@elements.3"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

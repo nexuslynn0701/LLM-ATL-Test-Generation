@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ecore="http://ecore"
+  name="companyModel"
+  nsURI="http://example.org/companyModel"
+  nsPrefix="cmp">
+
+  <!-- 0: Enum for department kinds -->
+  <eClassifiers xsi:type="ecore:EEnum" name="DepartmentKind">
+    <eLiterals name="DEV" value="0" literal="DEV"/>
+    <eLiterals name="HR" value="1" literal="HR"/>
+    <eLiterals name="FINANCE" value="2" literal="FINANCE"/>
+  </eClassifiers>
+
+  <!-- 1: Simple data type for an external ID string -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ExternalID" instanceClassName="java.lang.String"/>
+
+  <!-- 2: Base abstract person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 3: Employee extending Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager" eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department" eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 4: Contractor extending Person, using custom ExternalID datatype -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contractor" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="externalCode" eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 5: Department with enum attribute and containment of employees -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind" eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees" upperBound="-1"
+                         eType="//@eClassifiers.3" containment="true"/>
+  </eClassifiers>
+
+  <!-- 6: Project with references to employees and contractors -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="identifier" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="budget" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lead" eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="contributors" upperBound="-1"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 7: Interface-like role; marked interface=true and abstract=true -->
+  <eClassifiers xsi:type="ecore:EClass" name="Auditable" abstract="true" interface="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="createdBy" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="createdOn" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+  </eClassifiers>
+
+  <!-- 8: FinanceDepartment specializing Department and implementing Auditable -->
+  <eClassifiers xsi:type="ecore:EClass" name="FinanceDepartment" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.5 //@eClassifiers.7">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="regionalCode" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 9: Operation with parameters and exceptions on Project -->
+  <eClassifiers xsi:type="ecore:EClass" name="ReportingService" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="defaultProject" eType="//@eClassifiers.6" containment="true"/>
+    <eOperations name="generateReport" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eParameters name="project" eType="//@eClassifiers.6"/>
+      <eParameters name="includeFinancials" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      <eExceptions href="//@eClassifiers.10"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 10: Custom data type used as an exception classifier in the operation above -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ReportException" instanceClassName="java.lang.Exception"/>
+
+</ecore:EPackage>

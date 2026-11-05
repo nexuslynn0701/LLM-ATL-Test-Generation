@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleAntProject47"
+    basedir="src/main/java"
+    description="Ant project with multiple targets and varied tasks."
+    default="buildTarget">
+
+  <!-- Properties exercising PropertyValue, PropertyLocation, PropertyFile, PropertyEnv -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="SampleAntProject47"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/project.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="SYSTEM_ENV"/>
+
+  <!-- A standalone task definition (not referenced by tasks, per constraints) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with several different tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile, jar, and clean up build artifacts">
+    <!-- Compile task with includes/excludes and classpath structure -->
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="compile.sources" unless="skip.compile"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="exclude.internal" unless=""/>
+      <classPath refid="compile.classpath">
+        <pathElement path="lib/dependency.jar" location="lib/dependency.jar"/>
+        <fileset dir="lib/optional">
+          <include name="**/*.jar"/>
+          <exclude name="**/old/**"/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Javadoc documentation task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src"
+           destdir="build/docs/api"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="SampleAntProject47 API"/>
+
+    <!-- Create target JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/jars/sample-ant-project47.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Timestamp management task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyyMMdd-HHmmss" offset="+0" unit="second" locale="en_US"/>
+    </tasks>
+
+    <!-- File operations: mkdir, copy with filters and mapper, then delete -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/distribution"/>
+
+    <tasks xsi:type="Ant:Copy"
+           todir="build/distribution"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="build/jars">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        </patternset>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="projectName" value="SampleAntProject47"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.jar" to="dist-*.jar" classname="org.example.Mapper" classpath="lib/mapper.jar" classpathref="mapper.path"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="config/delete-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/delete-excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target to exercise additional Target-to-Goal rule -->
+  <targets xmi:id="testTarget" name="test" description="Run tests with compiled classes">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes" debug="false" fork="false" optimize="false" deprecation="false"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-results"/>
+    <tasks xsi:type="Ant:Jar" jarfile="build/jars/sample-ant-project47-tests.jar" basedir="build/test-classes"/>
+    <tasks xsi:type="Ant:Delete" dir="build/obsolete" verbose="false" quiet="true" failonerror="false" includeEmptyDirs="false"/>
+  </targets>
+
+</Ant:Project>

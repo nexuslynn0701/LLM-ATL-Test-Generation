@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example/rootPkg"
+    nsPrefix="root">
+  <!-- Root package classifiers -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseEntity">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="baseId"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="true"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NamedEntity" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="unnamed"/>
+  </eClassifiers>
+  <!-- Subpackage containing most model elements -->
+  <eSubpackages name="modelPkg" nsURI="http://example/modelPkg" nsPrefix="model">
+    <!-- Classifiers inside modelPkg -->
+    <!-- EClass 0 in modelPkg: Person -->
+    <eClassifiers xsi:type="ecore:EClass" name="Person"
+        eSuperTypes="//@eClassifiers.1">
+      <!-- Attribute of type String with default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="fullName"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="John &quot;Doe&quot;"/>
+      <!-- Attribute of type EBoolean (no default) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="active"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"/>
+      <!-- Attribute typed by custom enum in this package -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="status"
+          eType="//@eSubpackages.0/@eClassifiers.4"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="INACTIVE"/>
+      <!-- Self-reference, non containment, many, ordered=false, unique=false -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="friends"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          lowerBound="0"
+          upperBound="-1"
+          ordered="false"
+          unique="false"
+          containment="false"
+          resolveProxies="true"/>
+      <!-- Cross-package containment reference to Department -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="department"
+          eType="//@eClassifiers.2"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          containment="true"
+          resolveProxies="true"/>
+    </eClassifiers>
+    <!-- EClass 1 in modelPkg: Employee extends Person and BaseEntity -->
+    <eClassifiers xsi:type="ecore:EClass" name="Employee"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.0 //@eClassifiers.0">
+      <!-- Attribute of type EInt with default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="age"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="30"/>
+      <!-- Attribute of type EDouble (via name 'Double') -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="salary"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="1234.5"/>
+      <!-- Non-containment reference to Project with opposite 'team' -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="projects"
+          eType="//@eSubpackages.0/@eClassifiers.2"
+          lowerBound="0"
+          upperBound="-1"
+          ordered="true"
+          unique="true"
+          containment="false"
+          resolveProxies="true"
+          eOpposite="//@eSubpackages.0/@eClassifiers.2/@eStructuralFeatures.0"/>
+    </eClassifiers>
+    <!-- EClass 2 in modelPkg: Project -->
+    <eClassifiers xsi:type="ecore:EClass" name="Project">
+      <!-- Opposite side of Employee.projects -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="team"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          lowerBound="1"
+          upperBound="-1"
+          ordered="true"
+          unique="true"
+          containment="false"
+          resolveProxies="true"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.2"/>
+      <!-- Containment reference to Task, many, unordered -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="tasks"
+          eType="//@eSubpackages.0/@eClassifiers.3"
+          lowerBound="0"
+          upperBound="-1"
+          ordered="false"
+          unique="true"
+          containment="true"
+          resolveProxies="true"/>
+    </eClassifiers>
+    <!-- EClass 3 in modelPkg: Task -->
+    <eClassifiers xsi:type="ecore:EClass" name="Task">
+      <!-- Attribute of type EString without default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="title"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"/>
+      <!-- Attribute of type custom enum (Priority) with default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="priority"
+          eType="//@eSubpackages.0/@eClassifiers.5"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          defaultValueLiteral="MEDIUM"/>
+    </eClassifiers>
+    <!-- EEnum 4 in modelPkg: Status -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Status">
+      <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+      <eLiterals name="INACTIVE" value="1" literal="INACTIVE"/>
+    </eClassifiers>
+    <!-- EEnum 5 in modelPkg: Priority -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Priority">
+      <eLiterals name="LOW" value="0" literal="LOW"/>
+      <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+      <eLiterals name="HIGH" value="2" literal="HIGH"/>
+    </eClassifiers>
+  </eSubpackages>
+  <!-- Cross-package class in rootPkg that is target of containment from Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="D01"/>
+  </eClassifiers>
+</ecore:EPackage>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiPhaseBuild"
+    basedir="."
+    description="Ant project with separated build and package targets."
+    default="buildTarget">
+
+  <!-- Simple property definitions to exercise different property subclasses -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="env."/>
+
+  <!-- A standalone TaskDef (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: build compilation output -->
+  <targets xmi:id="buildTarget" name="build" description="Compile project source code">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="on"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+  </targets>
+
+  <!-- Secondary target: create distribution archive and clean temporary directory -->
+  <targets xmi:id="packageTarget" name="package" description="Package compiled classes into a jar">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multiphase-build.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           excludes="**/*.keep"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

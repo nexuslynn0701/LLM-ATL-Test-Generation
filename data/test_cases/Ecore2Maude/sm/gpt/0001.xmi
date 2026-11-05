@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryPkg"
+    nsURI="http://example.org/library"
+    nsPrefix="lib">
+
+  <!-- 0: EDataType for ISBN -->
+  <eClassifiers xsi:type="ecore:EDataType" name="ISBN" instanceClassName="java.lang.String"/>
+
+  <!-- 1: EEnum for BookCategory -->
+  <eClassifiers xsi:type="eccore:EEnum" name="BookCategory">
+    <eLiterals name="SCIENCE" value="0" literal="SCIENCE"/>
+    <eLiterals name="ART" value="1" literal="ART"/>
+    <eLiterals name="HISTORY" value="2" literal="HISTORY"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract base class Publication -->
+  <eClassifiers xsi:type="ecore:EClass" name="Publication" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="year"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pubId" iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 3: Class Book extends Publication -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pages"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="category"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isbn"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 4: Class Magazine extends Publication -->
+  <eClassifiers xsi:type="ecore:EClass" name="Magazine" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="issueNumber" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="monthly"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 5: Class Author -->
+  <eClassifiers xsi:type="ecore:EClass" name="Author" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="birthYear"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 6: Class Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="libraryName" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- containment of publications (Book and Magazine) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="publications" upperBound="-1"
+        containment="true" resolveProxies="true"
+        eType="//@eClassifiers.2"/>
+    <!-- containment of authors -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="authors" upperBound="-1"
+        containment="true" resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 7: Association: Book - Author (many-to-many, non-containment) -->
+  <eClassifiers xsi:type="ecore:EClass" name="BookAuthorLink" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="book" lowerBound="1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="author" lowerBound="1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 8: Operation-bearing class with parameters and exceptions -->
+  <eClassifiers xsi:type="ecore:EClass" name="SearchService" abstract="false" interface="false">
+    <eOperations name="findPublicationsByTitle">
+      <eParameters name="pattern" lowerBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eParameters name="maxResults"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eExceptions href="//@eClassifiers.2"/>
+      <eType xsi:type="ecore:EClassifier" href="//@eClassifiers.2"/>
+    </eOperations>
+  </eClassifiers>
+
+</ecore:EPackage>

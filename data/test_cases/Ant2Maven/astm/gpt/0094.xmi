@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject94"
+    basedir="src/main/java"
+    description="A sample Ant project for Ant2Maven transformation tests."
+    default="build-target">
+
+  <!-- Properties triggering AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="project.build.dir" value="target/build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition (AntTaskDef2MavenMavenTaskDef) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with several different tasks -->
+  <targets xmi:id="build-target" name="build" description="Compile, document, and package">
+    <!-- Compile task (AntJavac2MavenMavenJavac) -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true">
+      <!-- InExcludes via FileSet/PatternSet/Includes/Excludes -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- Documentation task (AntJavadoc2MavenMavenJavadoc) -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="SampleProject94 API"/>
+
+    <!-- Jar task (AntJar2MavenMavenJar) -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/sampleproject94.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- File management tasks: Mkdir, Copy, Delete -->
+    <tasks xsi:type="Ant:Mkdir" dir="target/tmp"/>
+    <tasks xsi:type="Ant:Copy"
+           todir="target/distribution"
+           overwrite="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <!-- FileSet with PatternSet and includes/excludes (FileSet, PatternSet, Includes, Excludes rules) -->
+      <fileset dir="target/classes">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.class"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/test/**"/>
+        </patternset>
+        <include name="**/*.class"/>
+        <exclude name="**/internal/**"/>
+      </fileset>
+
+      <!-- FilterSet with Filter and FiltersFile (FilterSet, Filter, FiltersFile rules) -->
+      <filterset starttoken="@@" endtoken="@@">
+        <filter token="BUILD_DIR" value="target/build"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+
+      <!-- Mapper (Mapper rule) -->
+      <mapper type="glob" from="*.class" to="*.bin"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/keep/**"
+           defaultexcludes="true"/>
+
+    <!-- Tstamp task (AntTstamp2MavenMavenTstamp) with nested FormatTstamp -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd HH:mm:ss"
+              offset="0"
+              unit="hour"
+              locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Secondary target to exercise additional tasks and Path/ClassPath -->
+  <targets xmi:id="test-target" name="test" description="Run tests">
+    <!-- Java execution task (AntJava2MavenMavenJava) -->
+    <tasks xsi:type="Ant:Java"
+           classname="com.example.MainTestRunner"
+           jar="target/tests.jar"
+           fork="true">
+      <!-- ClassPath (ClassPath, PathElement, FileSet, Includes, Excludes rules) -->
+      <classPath refid="test.classpath">
+        <pathElement path="lib/junit.jar" location="lib/junit-4.13.2.jar"/>
+        <pathElement path="lib/hamcrest.jar" location="lib/hamcrest-core-1.3.jar"/>
+        <fileset dir="lib/extra">
+          <include name="**/*.jar"/>
+          <exclude name="old/**"/>
+        </fileset>
+      </classPath>
+    </tasks>
+  </targets>
+
+  <!-- Standalone Path (AntPath2MavenMavenPath) with nested PathElement and FileSet -->
+  <path id="main.path">
+    <pathElement path="lib/runtime.jar" location="lib/runtime-1.0.jar"/>
+    <fileset dir="lib/optional">
+      <include name="**/*.jar"/>
+      <exclude name="**/sources/**"/>
+    </fileset>
+  </path>
+
+</Ant:Project>

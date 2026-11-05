@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Empty main CPL -->
+  <elements xsi:type="CPL:CPL"/>
+
+  <!-- 1: SubAction with id and a Location in its contents -->
+  <elements xsi:type="CPL:SubAction" id="subA">
+    <contents xsi:type="CPL:Location" url="sip:suba@example.com" clear="no"
+      contents="//@elements.4"/>
+  </elements>
+
+  <!-- 2: AddressSwitch with NotPresent / Otherwise and two SwitchedAddress cases -->
+  <elements xsi:type="CPL:AddressSwitch" field="from" subField="user">
+    <notPresent>
+      <contents xsi:type="CPL:Reject" status="404" reason="No address"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="yes"/>
+    </otherwise>
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <contents xsi:type="CPL:SubCall" ref="subA"/>
+    </addresses>
+    <addresses is="bob@example.org" contains="bob" subDomainOf="example.org">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="serial" timeout="15">
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy here"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Location" url="sip:voicemail@example.org"
+                    priority="1" clear="yes"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure>
+          <contents xsi:type="CPL:Reject" status="500" reason="Server failure"/>
+        </failure>
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:fallback@example.org"
+                    priority="2" clear="no"/>
+        </default>
+      </contents>
+    </addresses>
+  </elements>
+
+  <!-- 3: StringSwitch with strings and nested Reject / Redirect -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <notPresent>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="480" reason="Temporarily unavailable"/>
+    </otherwise>
+    <strings is="urgent" contains="URGENT">
+      <contents xsi:type="CPL:Location" url="sip:urgent@example.com" clear="yes"/>
+    </strings>
+    <strings is="info" contains="INFO">
+      <contents xsi:type="CPL:SubCall" ref="infoHandler"/>
+    </strings>
+  </elements>
+
+  <!-- 4: Location that forwards to AddressSwitch (2) via contents -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com"
+            priority="1" clear="yes"
+            contents="//@elements.2"/>
+
+  <!-- 5: LanguageSwitch with two language branches -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <contents xsi:type="CPL:Location" url="sip:lang-unknown@example.com" clear="no"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="defaultLangFlow"/>
+    </otherwise>
+    <languages matches="en">
+      <contents xsi:type="CPL:Location" url="sip:english@example.com" clear="yes"/>
+    </languages>
+    <languages matches="fr">
+      <contents xsi:type="CPL:Location" url="sip:french@example.com" clear="yes"/>
+    </languages>
+  </elements>
+
+  <!-- 6: TimeSwitch with SwitchedTime cases -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <notPresent>
+      <contents xsi:type="CPL:Reject" status="400" reason="No time info"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:anytime@example.com" clear="no"/>
+    </otherwise>
+    <times dtstart="20240101T080000" dtend="20240101T180000" duration="PT10H"
+           freq="DAILY" until="20241231T235959" count="365" interval="1"
+           bySecond="0" byMinute="0" byHour="8,9,10,11,14,15,16"
+           byDay="MO,TU,WE,TH,FR" byMonthDay="" byYearDay=""
+           byWeekNo="" byMonth="1-12" wkst="MO" bySetPos="">
+      <contents xsi:type="CPL:Location" url="sip:workhours@example.com" clear="yes"/>
+    </times>
+    <times dtstart="20240101T000000" dtend="20240101T075959" duration="PT7H59M"
+           freq="DAILY" until="" count="" interval="1"
+           bySecond="" byMinute="" byHour="0-7"
+           byDay="MO,TU,WE,TH,FR,SA,SU" byMonthDay="" byYearDay=""
+           byWeekNo="" byMonth="" wkst="MO" bySetPos="">
+      <contents xsi:type="CPL:Location" url="sip:nightline@example.com" clear="no"/>
+    </times>
+  </elements>
+
+  <!-- 7: PrioritySwitch with different priority cases -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <contents xsi:type="CPL:Location" url="sip:nopriority@example.com" clear="yes"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+    </otherwise>
+    <priorities less="0.3" greater="" equal="">
+      <contents xsi:type="CPL:Location" url="sip:lowprio@example.com" clear="no"/>
+    </priorities>
+    <priorities less="" greater="0.7" equal="">
+      <contents xsi:type="CPL:Location" url="sip:highprio@example.com" clear="yes"/>
+    </priorities>
+    <priorities less="" greater="" equal="0.5">
+      <contents xsi:type="CPL:SubCall" ref="mediumPriorityFlow"/>
+    </priorities>
+  </elements>
+
+  <!-- 8: Proxy with all result branches, referencing other top-level elements via contents -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel" timeout="20">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="busyHandler"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:Location" url="sip:noanswer@example.com" clear="yes"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </redirection>
+    <failure>
+      <contents xsi:type="CPL:Reject" status="500" reason="Failure in proxy"/>
+    </failure>
+    <default>
+      <contents xsi:type="CPL:Location" url="sip:proxy-default@example.com"
+                priority="5" clear="no"/>
+    </default>
+  </elements>
+
+  <!-- 9: Redirect as top-level Element -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 10: Reject as top-level Element -->
+  <elements xsi:type="CPL:Reject" status="603" reason="Decline final"/>
+
+  <!-- 11: SubCall referencing a non-subAction id (plain string, allowed) -->
+  <elements xsi:type="CPL:SubCall" ref="externalFlow"/>
+</CPL:CPLModel>

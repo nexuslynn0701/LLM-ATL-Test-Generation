@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Build with compile, docs, packaging, and cleaning."
+    default="build-main">
+
+  <targets xmi:id="build-main" name="build-main" description="Compile sources and create main jar.">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/main-app.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <targets xmi:id="build-test" name="build-test" description="Compile test sources.">
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="build/test-classes"
+           debug="false"
+           fork="false"
+           optimize="false"
+           deprecation="false"/>
+  </targets>
+
+  <targets xmi:id="generate-docs" name="generate-docs" description="Generate Java documentation.">
+    <tasks xsi:type="Ant:Mkdir" dir="build/docs"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+  </targets>
+
+  <targets xmi:id="package-all" name="package-all" description="Package all artifacts into distribution jars.">
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/main-with-resources.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MAIN.MF"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/tests.jar"
+           basedir="build/test-classes"
+           compress="false"
+           encoding="UTF-8"
+           manifest="META-INF/TESTS.MF"/>
+  </targets>
+
+  <targets xmi:id="clean-build" name="clean-build" description="Remove build and distribution directories.">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="dist"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

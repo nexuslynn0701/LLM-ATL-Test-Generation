@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example.org/rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage with classes to trigger subpackage & superPackage handling -->
+  <eSubpackages name="subPkg"
+      nsURI="http://example.org/rootPkg/sub"
+      nsPrefix="sub">
+    <!-- Class with super type and multiple references/attributes -->
+    <eClassifiers xsi:type="ecore:EClass" name="BaseClass">
+      <eStructuralFeatures xsi:type="eccore:EAttribute"
+          name="baseId"
+          lowerBound="1"
+          iD="true"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="baseFlag"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+          defaultValueLiteral="true"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="DerivedClass"
+        abstract="true"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <!-- Attribute with String default to exercise AttEqSpecificDefaultValue string branch -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="title"
+          lowerBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          defaultValueLiteral="Untitled &quot;Work&quot;"/>
+      <!-- Attribute with Int type, no default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="priority"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          lowerBound="0"
+          upperBound="1"/>
+      <!-- Containment reference, no opposite, triggers null maybeRefSort and containment=true -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="items"
+          lowerBound="0"
+          upperBound="-1"
+          containment="true"
+          eType="//@eSubpackages.0/@eClassifiers.2"/>
+    </eClassifiers>
+
+    <!-- Target class for references -->
+    <eClassifiers xsi:type="ecore:EClass" name="Item">
+      <!-- Reference with opposite and many upper bound to exercise EqUpperBound '*' and RefEqOpposite non-null -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="owner"
+          lowerBound="1"
+          upperBound="1"
+          containment="false"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.2"/>
+      <!-- Attribute with BooleanObject / Integer / Double type names via custom EDataTypes in root -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="flagNamedBoolean"
+          eType="//@eClassifiers.2"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="countNamedInteger"
+          eType="//@eClassifiers.3"
+          defaultValueLiteral="5"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="ratioNamedDouble"
+          eType="//@eClassifiers.4"
+          defaultValueLiteral="3.14"/>
+    </eClassifiers>
+
+    <!-- Enum inside subpackage -->
+    <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+      <eLiterals name="NEW" value="0" literal="NEW"/>
+      <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+      <eLiterals name="DONE" value="2" literal="DONE"/>
+    </eClassifiers>
+
+    <!-- Class with enum-typed attribute with default literal to exercise enum branch in attDataType and AttEqSpecificDefaultValue -->
+    <eClassifiers xsi:type="ecore:EClass" name="Task">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="status"
+          lowerBound="1"
+          eType="//@eSubpackages.0/@eClassifiers.3"
+          defaultValueLiteral="IN_PROGRESS"/>
+      <!-- Reference to enum-containing class to give another reference -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="related"
+          eType="//@eSubpackages.0/@eClassifiers.4"
+          containment="false"
+          lowerBound="0"
+          upperBound="-1"/>
+    </eClassifiers>
+
+  </eSubpackages>
+
+  <!-- Root-level classifier: a concrete class without super types, no features -->
+  <eClassifiers xsi:type="ecore:EClass" name="LonelyRootClass"/>
+
+  <!-- Root-level enum to exercise multiple enums and literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RootLevelEnum">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+  </eClassifiers>
+
+  <!-- Custom data types with specific names to hit attDataType name-based branches -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Boolean"
+      instanceClassName="java.lang.Boolean"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="Integer"
+      instanceClassName="java.lang.Integer"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="Double"
+      instanceClassName="java.lang.Double"/>
+
+</ecore:EPackage>

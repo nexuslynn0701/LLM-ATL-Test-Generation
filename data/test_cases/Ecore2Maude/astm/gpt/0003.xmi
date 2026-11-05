@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg3"
+    nsURI="http://example.org/rootPkg3"
+    nsPrefix="root3">
+
+  <!-- Subpackage to exercise eSuperPackage/eSubpackages and PackEqSupPackage/PackEqSubPackages -->
+  <eSubpackages name="subPkgA" nsURI="http://example.org/subPkgA" nsPrefix="subA">
+    <!-- Classifiers inside subPkgA are indexed within this package only -->
+    <eClassifiers xsi:type="ecore:EClass" name="Person">
+      <!-- abstract, with one supertype coming from the same package -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="pid"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          iD="true" lowerBound="1" upperBound="1" ordered="true" unique="true"
+          defaultValueLiteral="0"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          iD="false" lowerBound="1" upperBound="1" ordered="true" unique="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="address"
+          eType="//@eSubpackages.0/@eClassifiers.2"
+          containment="true" lowerBound="0" upperBound="1" ordered="true" unique="true"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="Employee">
+      <eSuperTypes>//@eSubpackages.0/@eClassifiers.0</eSuperTypes>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="salary"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+          iD="false" lowerBound="0" upperBound="1" ordered="true" unique="true"
+          defaultValueLiteral="1000.5"/>
+      <!-- Reference with opposite to exercise RefEqOpposite and maudeMaybeRefSort -->
+      <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.1"
+          containment="false" lowerBound="0" upperBound="1" ordered="true" unique="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="subordinates"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.0"
+          containment="false" lowerBound="0" upperBound="-1" ordered="true" unique="true"/>
+      <!-- Attribute with enum-typed default value -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+          eType="//@eClassifiers.0"
+          iD="false" lowerBound="0" upperBound="1" ordered="true" unique="true"
+          defaultValueLiteral="ACTIVE"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="Address">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="street"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          iD="false" lowerBound="1" upperBound="1" ordered="true" unique="true"
+          defaultValueLiteral="&quot;Main&quot; Street"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="number"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          iD="false" lowerBound="0" upperBound="1" ordered="true" unique="true"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root-level classifiers for multiple top EPackages and enum-related rules -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmploymentStatus">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+    <eLiterals name="INACTIVE" value="1" literal="INACTIVE"/>
+    <eLiterals name="ON_LEAVE" value="2" literal="ON_LEAVE"/>
+  </eClassifiers>
+
+  <!-- A simple class in the root package with no superTypes to exercise EmptyList paths -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true" lowerBound="1" upperBound="1" ordered="true" unique="true"
+        defaultValueLiteral="D-001"/>
+  </eClassifiers>
+
+</ecore:EPackage>

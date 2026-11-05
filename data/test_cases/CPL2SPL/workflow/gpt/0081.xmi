@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: CPL root with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL"/>
+
+  <!-- elements[1]: SubAction referenced by SubCall via plain string ref -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[2]: Location used by both Proxies to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+
+  <!-- elements[3]: complex Proxy (non-simple): all child branches present -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.2"/>
+  </elements>
+
+  <!-- elements[4]: simple Proxy: no nested branches -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="serial"/>
+
+</CPL:CPLModel>

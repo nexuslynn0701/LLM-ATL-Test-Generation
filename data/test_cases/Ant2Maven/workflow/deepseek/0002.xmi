@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="DocumentationBuild"
+    basedir="."
+    description=""
+    default="docs">
+  <targets xmi:id="docs" name="docs">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="docs/api"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Example API"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/>
+    </tasks>
+    <tasks xsi:type="Ant:Java"
+        classname="com.example.Main"
+        jar="lib/example.jar"
+        fork="true">
+      <classPath refid="compile.classpath">
+        <pathElement path="lib/core.jar" location="lib"/>
+      </classPath>
+    </tasks>
+    <tasks xsi:type="Ant:Copy"
+        file="README.txt"
+        todir="dist"
+        overwrite="true">
+      <fileset dir="src">
+        <include name="**/*.java"/>
+        <exclude name="**/*Test.java"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0"/>
+        <filtersfile file="filters.properties"/>
+      </filterset>
+    </tasks>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="build"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+  </targets>
+  <path id="compile.classpath">
+    <pathElement path="lib/core.jar" location="lib"/>
+    <fileset dir="lib">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/*-sources.jar"/>
+      </patternset>
+    </fileset>
+  </path>
+  <properties xsi:type="Ant:PropertyValue" name="encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="custom" classname="com.example.CustomTask"/>
+</Ant:Project>

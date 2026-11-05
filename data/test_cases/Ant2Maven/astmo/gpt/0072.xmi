@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AntMavenCoverageProj"
+    basedir="project-src"
+    description="Ant to Maven transformation coverage project"
+    default="buildTarget">
+
+  <!-- Properties of all four concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="compiler.level" value="1.8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="project-src/build"/>
+  <properties xsi:type="Ant:PropertyFile" file="project-src/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A standalone TaskDef (no references from tasks, as required) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple tasks of different kinds -->
+  <targets xmi:id="buildTarget" name="build" description="Main build target">
+    <!-- Javac task -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="project-src/src"
+           destdir="project-src/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Javadoc task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="project-src/src"
+           destdir="project-src/target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API"/>
+    <!-- Jar task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="project-src/target/example-app.jar"
+           basedir="project-src/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="project-src/META-INF/MANIFEST.MF"/>
+    <!-- Mkdir task -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="project-src/target/temp"/>
+    <!-- Copy task with FileSet and FilterSet, using PatternSet and In/Excludes -->
+    <tasks xsi:type="Ant:Copy"
+           todir="project-src/target/distribution"
+           overwrite="true"
+           includeEmptyDirs="false">
+      <fileset dir="project-src/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/test/**"/>
+        </patternset>
+        <include name="**/*.xml"/>
+        <exclude name="**/*.tmp"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="AntMavenCoverageProj"/>
+        <filtersfile file="project-src/config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.txt" to="*.cfg"/>
+    </tasks>
+    <!-- Delete task -->
+    <tasks xsi:type="Ant:Delete"
+           dir="project-src/target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/*.keep"
+           defaultexcludes="false"/>
+  </targets>
+
+  <!-- Secondary target with different tasks -->
+  <targets xmi:id="cleanTarget" name="clean" description="Clean build outputs">
+    <!-- Tstamp task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+    <!-- Another Mkdir to exercise multiple instances -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="project-src/target/logs"/>
+    <!-- Another Delete with file attribute set -->
+    <tasks xsi:type="Ant:Delete"
+           file="project-src/old.log"
+           quiet="true"
+           verbose="false"
+           failonerror="false"/>
+  </targets>
+
+  <!-- Path with PathElement and FileSet (all contained, no external refs) -->
+  <path id="compile.classpath">
+    <pathElement path="lib/runtime" location="project-src/lib/runtime"/>
+    <pathElement path="lib/test" location="project-src/lib/test"/>
+    <fileset dir="project-src/lib/extra">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- ClassPath with PathElement and FileSet -->
+  <path>
+    <fileset dir="project-src/lib/tools">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+      </patternset>
+    </fileset>
+    <pathElement path="lib/tools" location="project-src/lib/tools"/>
+  </path>
+
+</Ant:Project>

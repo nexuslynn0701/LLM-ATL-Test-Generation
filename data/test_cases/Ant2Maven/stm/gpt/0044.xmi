@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Ant project with multiple targets and varied predefined tasks"
+    default="buildTarget">
+
+  <!-- Default build target -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources, create jar and clean build directory">
+    <!-- Create build and dist directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes">
+      <target href="#buildTarget"/>
+    </tasks>
+    <tasks xsi:type="Ant:Mkdir" dir="dist">
+      <target href="#buildTarget"/>
+    </tasks>
+
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="true">
+      <target href="#buildTarget"/>
+    </tasks>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.**"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API">
+      <target href="#buildTarget"/>
+    </tasks>
+
+    <!-- Package classes into JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/complexbuild.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF">
+      <target href="#buildTarget"/>
+    </tasks>
+
+    <!-- Remove temporary build directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           defaultexcludes="true">
+      <target href="#buildTarget"/>
+    </tasks>
+  </targets>
+
+  <!-- Separate documentation target -->
+  <targets xmi:id="docTarget" name="doc" description="Generate standalone Javadoc">
+    <tasks xsi:type="Ant:Mkdir" dir="build/docsOnly">
+      <target href="#docTarget"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docsOnly"
+           packagenames="com.example.docs.**"
+           defaultexcludes="false"
+           author="false"
+           version="false"
+           use="false"
+           windowtitle="Docs Only">
+      <target href="#docTarget"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

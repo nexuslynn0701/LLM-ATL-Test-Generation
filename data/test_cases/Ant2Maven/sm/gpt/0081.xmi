@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuildProject"
+    basedir="."
+    description="Project with multiple targets and various predefined file and archive tasks"
+    default="buildTarget">
+
+  <!-- Default build target -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources and package into a jar">
+    <!-- Create build directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes">
+      <target xmi:idref="buildTarget"/>
+    </tasks>
+
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false">
+      <target xmi:idref="buildTarget"/>
+    </tasks>
+
+    <!-- Package compiled classes -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="META-INF/MANIFEST.MF">
+      <target xmi:idref="buildTarget"/>
+    </tasks>
+  </targets>
+
+  <!-- Secondary target for cleaning build artifacts -->
+  <targets xmi:id="cleanTarget" name="clean" description="Remove build and distribution directories">
+    <!-- Delete build directory -->
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" defaultexcludes="true">
+      <target xmi:idref="cleanTarget"/>
+    </tasks>
+
+    <!-- Delete distribution directory -->
+    <tasks xsi:type="Ant:Delete" dir="dist" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" defaultexcludes="true">
+      <target xmi:idref="cleanTarget"/>
+    </tasks>
+  </targets>
+
+  <!-- Target for documentation generation -->
+  <targets xmi:id="docTarget" name="doc" description="Generate API documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src"
+           destdir="dist/docs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API">
+      <target xmi:idref="docTarget"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

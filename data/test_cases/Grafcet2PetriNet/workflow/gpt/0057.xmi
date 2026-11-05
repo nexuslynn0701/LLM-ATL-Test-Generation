@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net100" name="BranchAndMerge">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s100" name="StartUp" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Step" location="s101" name="LoadConfig" isInitial="false" isActive="false" action="load"/>
+    <elements xsi:type="Grafcet:Step" location="s102" name="ValidateConfig" isInitial="false" isActive="false" action="validate"/>
+    <elements xsi:type="Grafcet:Step" location="s103" name="RunMainTask" isInitial="false" isActive="false" action="run"/>
+    <elements xsi:type="Grafcet:Step" location="s104" name="ErrorHandler" isInitial="false" isActive="false" action="handleError"/>
+    <elements xsi:type="Grafcet:Step" location="s105" name="Shutdown" isInitial="false" isActive="false" action="shutdown"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t100" name="ConfigLoaded" condition="configLoaded"/>
+    <elements xsi:type="Grafcet:Transition" location="t101" name="ConfigValid" condition="configValid"/>
+    <elements xsi:type="Grafcet:Transition" location="t102" name="ConfigInvalid" condition="configInvalid"/>
+    <elements xsi:type="Grafcet:Transition" location="t103" name="TaskCompleted" condition="taskCompleted"/>
+    <elements xsi:type="Grafcet:Transition" location="t104" name="RecoveryDone" condition="recoveryDone"/>
+    <!-- Connections: StepToTransition -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c100" name="startToLoad" from="/0/@elements.0" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c101" name="loadToValidate" from="/0/@elements.1" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c102" name="validateToRun" from="/0/@elements.2" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c103" name="validateToError" from="/0/@elements.2" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c104" name="runToShutdown" from="/0/@elements.3" to="/0/@elements.10"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c105" name="errorToRun" from="/0/@elements.4" to="/0/@elements.11"/>
+    <!-- Connections: TransitionToStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c106" name="configLoadedToValidate" from="/0/@elements.6" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c107" name="configValidToRun" from="/0/@elements.7" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c108" name="configInvalidToError" from="/0/@elements.8" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c109" name="taskCompletedToShutdown" from="/0/@elements.9" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c110" name="recoveryDoneToRun" from="/0/@elements.10" to="/0/@elements.3"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

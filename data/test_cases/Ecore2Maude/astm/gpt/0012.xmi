@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMeta"
+    nsURI="http://example.org/rootMeta"
+    nsPrefix="root">
+
+  <!-- Subpackage to trigger super/sub package rules and multi-root handling -->
+  <eSubpackages name="subPkgA" nsURI="http://example.org/rootMeta/subA" nsPrefix="subA">
+    <!-- Class with no features and no supertypes -->
+    <eClassifiers xsi:type="ecore:EClass" name="EmptyClass"/>
+    <!-- Enumeration with multiple literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="ColorEnum">
+      <eLiterals name="RED" value="0" literal="RED"/>
+      <eLiterals name="GREEN" value="1" literal="GREEN"/>
+      <eLiterals name="BLUE" value="2" literal="BLUE"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root-level classifiers -->
+
+  <!-- 0: Abstract base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseEntity" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="true"
+        defaultValueLiteral="0"/>
+  </eClassifiers>
+
+  <!-- 1: Class extending BaseEntity, with attributes of different primitive kinds and default values -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="&quot;Unknown Person&quot;"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="30"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="rating"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        defaultValueLiteral="3.14"/>
+  </eClassifiers>
+
+  <!-- 2: Class with single reference (to trigger NamedElConstant in references) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="deptCode"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="manager"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.1"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- 3: Class with multiple attributes and references (including containment and opposite) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <!-- Multiple attributes to trigger NamedElList for attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="legalName"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="&quot;ACME Corp&quot;"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="foundedYear"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Enum-typed attribute to exercise enum handling in attDataType and AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="themeColor"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eSubpackages.0/@eClassifiers.1"
+        defaultValueLiteral="GREEN"/>
+
+    <!-- References: one containment, one non-containment, with opposites -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="departments"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.2"
+        containment="true"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="false"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.4"/>
+  </eClassifiers>
+
+  <!-- 4: Class with both attributes and references (to trigger both lists) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="budget"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.3"
+        containment="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="lead"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.1"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- 5: Enumeration with single literal to trigger single-literal branch -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityLevel">
+    <eLiterals name="HIGH" value="0" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 6: Class with EEnum attributes and multi-supertype to exercise superTypes list -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false"
+      eSuperTypes="//@eClassifiers.1 //@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.5"
+        defaultValueLiteral="HIGH"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="assignedTo"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.1"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- 7: Class to act as reference target in Department (opposite side) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- Complete opposite references declared earlier -->
+  <!-- Add remaining structural features into already declared classes via nested elements -->
+
+  <!-- Extend Department with bidirectional company reference and address -->
+  <eClassifiers xsi:type="ecore:EClass" name="DepartmentExtension">
+    <!-- This dummy class is only here to keep indices of existing classifiers stable.
+         Its features are unused but valid. -->
+  </eClassifiers>
+
+  <!-- Now, define the missing opposite references inside the original classes via additional nested elements -->
+
+  <!-- Reopen Department (index 2) to add contained features -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecree:EAttribute" name="dummy"/>
+  </eClassifiers>
+
+</ecore:EPackage>

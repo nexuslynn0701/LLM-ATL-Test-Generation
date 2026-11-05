@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <!-- elements[0]: one CPL root with subActions, incoming and outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction sa1 -> Function with body from SubCall sc1 -->
+    <subActions id="sa1">
+      <contents xsi:type="CPL:SubCall" ref="sa2"/>
+    </subActions>
+    <!-- SubAction sa2 -> empty body -->
+    <subActions id="sa2"/>
+    <!-- Outgoing o1 with simple Proxy p1 using Location loc1 -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </outgoing>
+    <!-- Incoming i1 with complex Proxy p2 using Location loc2 -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.0/@subActions.0"/>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- elements[1]: Location loc1 used by simple Proxy in outgoing -->
+  <elements xsi:type="CPL:Location" url="sip:loc1@example.com" clear="true" priority="1">
+    <!-- make this Location non-root so locations helper returns it -->
+    <contents xsi:type="CPL:SubCall" ref="sa1"/>
+  </elements>
+
+  <!-- elements[2]: Location loc2 used by Redirect and complex Proxy -->
+  <elements xsi:type="CPL:Location" url="sip:loc2@example.com" clear="true" priority="1">
+    <contents xsi:type="CPL:SubCall" ref="sa2"/>
+  </elements>
+
+  <!-- elements[3]: Redirect r1 (non-permanent) using loc2 -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- elements[4]: AddressSwitch with one SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1" contains="c1" subDomainOf="sd1">
+      <!-- contents of SwitchedAddress: SubCall to sa1 -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <notPresent>
+      <!-- contents of NotPresent: SubCall to sa2 -->
+      <contents xsi:type="CPL:SubCall" ref="sa2"/>
+    </notPresent>
+    <otherwise>
+      <!-- contents of Otherwise: simple Proxy using Location loc1 -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- elements[5]: StringSwitch (no contents used as statements) -->
+  <elements xsi:type="CPL:StringSwitch" field="hdrField">
+    <strings is="val1" contains="sub1"/>
+  </elements>
+
+  <!-- elements[6]: LanguageSwitch with NotPresent (no statements) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- elements[7]: TimeSwitch with minimal required attributes (no statements) -->
+  <elements xsi:type="CPL:TimeSwitch" dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+
+  <!-- elements[8]: PrioritySwitch (no statements) -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+
+  <!-- elements[9]: Proxy p3 (non-simple, parallel) with all branches, using Location loc1 -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy>
+      <!-- Busy contents: SubCall to sa1 -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer contents: SubCall to sa2 -->
+      <contents xsi:type="CPL:SubCall" ref="sa2"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection contents: SubCall to sa1 -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </redirection>
+    <failure>
+      <!-- Failure contents: SubCall to sa2 -->
+      <contents xsi:type="CPL:SubCall" ref="sa2"/>
+    </failure>
+    <default contents="//@elements.1"/>
+  </elements>
+
+  <!-- elements[10]: SubCall sc1 referencing sa1 (from SubAction sa1 body) -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[11]: Reject (no statements) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy"/>
+</CPL:CPLModel>

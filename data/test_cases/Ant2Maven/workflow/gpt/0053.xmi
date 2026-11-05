@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project-root"
+    description="Build, document, package and clean the project"
+    default="buildTarget">
+
+  <!-- Properties to exercise all Ant Property mapping rules -->
+  <properties xsi:type="Ant:PropertyValue" name="project.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.output" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition to exercise AntTaskDef2MavenMavenTaskDef and Attribut mapping -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with a mix of tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <!-- Generate documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Project API"/>
+    <!-- Create directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/dist"/>
+    <!-- Package jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/dist/example-app.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Copy resources with filtering, mapper, and nested patterns -->
+    <tasks xsi:type="Ant:Copy"
+           todir="build/resources"
+           overwrite="true"
+           filtering="true"
+           includeEmptyDirs="false">
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/test/**"/>
+        </patternset>
+        <include name="**/*.xml"/>
+        <exclude name="**/old/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexBuild"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob"
+              classname="com.example.util.PathMapper"
+              classpath="lib/mappers.jar"
+              classpathref="mapper.classpath"
+              from="*.template"
+              to="*.conf"/>
+    </tasks>
+    <!-- Delete temporary files -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/*.keep"
+           includesfile="config/include-list.txt"
+           excludesfile="config/exclude-list.txt"
+           defaultexcludes="true"/>
+    <!-- Timestamp task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd'T'HH:mm:ss"
+              offset="+0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+    <!-- Custom user-defined task with attributes -->
+    <tasks xsi:type="Ant:NewTask">
+      <attributes name="level" value="DEBUG"/>
+      <attributes name="mode" value="full"/>
+    </tasks>
+  </targets>
+
+  <!-- Additional target without being default, still transformed to a Goal -->
+  <targets xmi:id="cleanTarget" name="clean">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           defaultexcludes="false"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/tmp"/>
+  </targets>
+
+</Ant:Project>

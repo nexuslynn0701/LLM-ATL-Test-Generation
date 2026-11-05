@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="login"/>
+    <subActions id="checkStatus"/>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="login"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="no"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure>
+          <contents xsi:type="CPL:SubCall" ref="checkStatus"/>
+        </failure>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <addresses is="sip:alice@example.com">
+              <contents xsi:type="CPL:Location" url="sip:bob@example.com" priority="1" clear="no"/>
+            </addresses>
+            <otherwise>
+              <contents xsi:type="CPL:Reject" status="600" reason="Global Error"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </outgoing>
+    <incoming/>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:default@example.com" priority="1" clear="no"/>
+  <elements xsi:type="CPL:SubCall" ref="login"/>
+  <elements xsi:type="CPL:SubCall" ref="checkStatus"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses is="sip:*@example.com">
+      <contents xsi:type="CPL:StringSwitch" field="user">
+        <strings is="admin"/>
+      </contents>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:Location" url="sip:operator@example.com" priority="1" clear="no"/>
+    </notPresent>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="language">
+    <languages matches="en"/>
+    <otherwise>
+      <contents xsi:type="CPL:Limit"/>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

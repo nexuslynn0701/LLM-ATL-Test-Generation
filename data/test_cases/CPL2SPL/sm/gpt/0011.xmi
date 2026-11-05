@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL script with mixed subActions, incoming, outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- Incoming branch with a Location and nested switches -->
+    <incoming contents="//@elements.3 //@elements.6"/>
+    <!-- Outgoing branch with Proxy and Redirect -->
+    <outgoing contents="//@elements.4 //@elements.2"/>
+    <!-- A subAction used by SubCall -->
+    <subActions id="welcomeFlow" contents="//@elements.8 //@elements.9"/>
+    <!-- Another subAction, intentionally unused by SubCall -->
+    <subActions id="backupFlow" contents="//@elements.10"/>
+  </elements>
+
+  <!-- 1: Simple Location used only from a NotPresent arm -->
+  <elements xsi:type="CPL:Location" url="sip:office@example.com" priority="1" clear="no"/>
+
+  <!-- 2: Redirect referenced from outgoing branch -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 3: SubCall referenced from incoming branch and from Default of Proxy -->
+  <elements xsi:type="CPL:SubCall" ref="welcomeFlow"/>
+
+  <!-- 4: Proxy with all outcome branches populated -->
+  <elements xsi:type="CPL:Proxy" timeout="60" recurse="yes" ordering="sequential">
+    <busy contents="//@elements.7"/>          <!-- go to PrioritySwitch -->
+    <noAnswer contents="//@elements.5"/>      <!-- go to TimeSwitch -->
+    <redirection contents="//@elements.1"/>   <!-- go directly to Location (top-level) -->
+    <failure contents="//@elements.11"/>      <!-- go to Reject -->
+    <default contents="//@elements.3"/>       <!-- go to SubCall -->
+  </elements>
+
+  <!-- 5: TimeSwitch used from Proxy.noAnswer -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <!-- Matched time -->
+    <times dtstart="20250101T090000" dtend="20250101T170000" duration="P1D"
+           freq="DAILY" until="20251231T000000" count="10" interval="1"
+           bySecond="0" byMinute="0" byHour="9" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1" byYearDay="100" byWeekNo="2" byMonth="1" wkst="MO"
+           bySetPos="1" contents="//@elements.1"/>
+    <!-- Another time rule forwarding to AddressSwitch -->
+    <times dtstart="20250101T170000" interval="2" wkst="SU" contents="//@elements.6"/>
+    <!-- NotPresent branch -->
+    <notPresent contents="//@elements.10"/>
+    <!-- Otherwise branch -->
+    <otherwise contents="//@elements.11"/>
+  </elements>
+
+  <!-- 6: AddressSwitch reached from CPL.incoming, TimeSwitch, and PrioritySwitch -->
+  <elements xsi:type="CPL:AddressSwitch" field="from" subField="user">
+    <addresses is="bob" contains="corp" subDomainOf="example.com" contents="//@elements.2"/>
+    <addresses is="alice" contains="sales" subDomainOf="example.org" contents="//@elements.7"/>
+    <notPresent contents="//@elements.1"/>
+    <otherwise contents="//@elements.3"/>
+  </elements>
+
+  <!-- 7: PrioritySwitch reached from Proxy.busy and AddressSwitch -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.8" equal="0.5" contents="//@elements.9"/>
+    <priorities less="0.1" greater="0.2" equal="0.15" contents="//@elements.1"/>
+    <notPresent contents="//@elements.10"/>
+    <otherwise contents="//@elements.2"/>
+  </elements>
+
+  <!-- 8: Location used inside subAction "welcomeFlow" -->
+  <elements xsi:type="CPL:Location" url="sip:welcome@example.com" priority="5" clear="yes"/>
+
+  <!-- 9: StringSwitch used inside subAction "welcomeFlow" -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <strings is="promo" contains="discount" contents="//@elements.8"/>
+    <strings is="info" contains="newsletter" contents="//@elements.1"/>
+    <notPresent contents="//@elements.10"/>
+    <otherwise contents="//@elements.11"/>
+  </elements>
+
+  <!-- 10: LanguageSwitch used from several NotPresent branches -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en" contents="//@elements.1"/>
+    <languages matches="fr" contents="//@elements.2"/>
+    <notPresent contents="//@elements.11"/>
+    <otherwise contents="//@elements.8"/>
+  </elements>
+
+  <!-- 11: Reject used as error/fallback in multiple places -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+</CPL:CPLModel>

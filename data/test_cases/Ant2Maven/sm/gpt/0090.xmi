@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiPhaseBuild"
+    basedir="."
+    description="Build, test, and package a Java project using several Ant tasks."
+    default="build-main">
+
+  <!-- Main build target -->
+  <targets xmi:id="build-main" name="build-main" description="Compile, document, and package main sources">
+    <!-- Create build output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <!-- Compile main sources with simple include/exclude patterns and a local classpath -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" optimize="false" fork="false" deprecation="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+      <classPath refid="local.compile.path"/>
+    </tasks>
+    <!-- Generate Javadoc for main sources -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.project.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="MultiPhaseBuild API"/>
+    <!-- Create the main application JAR -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multiphase-main.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"/>
+  </targets>
+
+  <!-- Test compilation and packaging target -->
+  <targets xmi:id="build-test" name="build-test" description="Compile and package test sources">
+    <!-- Create test classes directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-classes"/>
+    <!-- Compile test sources -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="build/test-classes" debug="true" optimize="false" fork="false" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*Test.java"/>
+    </tasks>
+    <!-- Package tests into a separate jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multiphase-tests.jar"
+           basedir="build/test-classes"
+           compress="true"/>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="clean-all" name="clean-all" description="Clean all generated artifacts">
+    <!-- Delete compiled classes directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/classes"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"
+           defaultexcludes="true"/>
+    <!-- Delete test classes directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/test-classes"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"/>
+    <!-- Delete distribution directory and jars -->
+    <tasks xsi:type="Ant:Delete"
+           dir="dist"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"/>
+  </targets>
+
+</Ant:Project>

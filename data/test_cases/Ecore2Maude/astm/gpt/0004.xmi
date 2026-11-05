@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="RootPkg"
+    nsURI="http://rootpkg"
+    nsPrefix="root">
+
+  <!-- Subpackage with two concrete classes and one enum -->
+  <eSubpackages name="subA" nsURI="http://rootpkg/subA" nsPrefix="subA">
+    <!-- 0: Abstract base class -->
+    <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true" interface="false">
+      <!-- attributes container -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="code"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          defaultValueLiteral="BASE"
+          iD="true"/>
+    </eClassifiers>
+
+    <!-- 1: Concrete subclass with references and attributes -->
+    <eClassifiers xsi:type="ecore:EClass" name="Node" abstract="false" interface="false"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <!-- attribute using EInt with default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="weight"
+          ordered="false"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          defaultValueLiteral="10"
+          iD="false"/>
+      <!-- attribute using EBoolean without default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="active"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+          iD="false"/>
+      <!-- reference to Container (containment, many, no opposite) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="parent"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="//@eSubpackages.0/@eClassifiers.2"
+          containment="false"
+          resolveProxies="true"/>
+      <!-- self reference with opposite, non-containment, multi-valued -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="neighbors"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="-1"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          containment="false"
+          resolveProxies="true"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.3"/>
+      <!-- opposite end of neighbors -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="neighborsOpp"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="-1"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          containment="false"
+          resolveProxies="true"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.2"/>
+      <!-- reference to enum-typed attribute via EEnumLiteral equation rules -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="kind"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          eType="//@eSubpackages.0/@eClassifiers.3"
+          defaultValueLiteral="PRIMARY"
+          iD="false"/>
+    </eClassifiers>
+
+    <!-- 2: Container class with containment reference and attribute with escaped quotes -->
+    <eClassifiers xsi:type="ecore:EClass" name="Container" abstract="false" interface="false"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <!-- containment many reference to Node -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="elements"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="-1"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          containment="true"
+          resolveProxies="true"/>
+      <!-- String attribute with embedded quotes in default to trigger escapeQuotes -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="label"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          defaultValueLiteral="He said &quot;hello&quot;."
+          iD="false"/>
+    </eClassifiers>
+
+    <!-- 3: Enumeration with three literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="NodeKind">
+      <eLiterals name="PRIMARY" value="0" literal="PRIMARY"/>
+      <eLiterals name="SECONDARY" value="1" literal="SECONDARY"/>
+      <eLiterals name="TERTIARY" value="2" literal="TERTIARY"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Top-level classifiers in root package -->
+
+  <!-- 0: Independent abstract class in root, no supertypes -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+  </eClassifiers>
+
+  <!-- 1: Concrete class extending RootElement and referencing subpackage classes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- reference to Container (cross-package) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="rootContainer"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eSubpackages.0/@eClassifiers.2"
+        containment="false"
+        resolveProxies="true"/>
+    <!-- multi-valued reference to Node -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="allNodes"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eSubpackages.0/@eClassifiers.1"
+        containment="false"
+        resolveProxies="true"/>
+    <!-- attribute with Double-like type (using EDouble) to exercise Float branch -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="progress"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        defaultValueLiteral="0.5"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 2: DataType to exercise classifier handling without being a class -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData" instanceClassName="java.lang.String" serializable="true"/>
+
+</ecore:EPackage>

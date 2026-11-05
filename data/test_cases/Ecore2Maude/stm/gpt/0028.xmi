@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyPkg"
+    nsURI="http://example/companyPkg/2"
+    nsPrefix="company">
+
+  <!-- 0: EDataType StringID -->
+  <eClassifiers xsi:type="ecore:EDataType" name="StringID"/>
+
+  <!-- 1: EDataType PriorityLevel -->
+  <eClassifiers xsi:type="ecore:EDataType" name="PriorityLevel"/>
+
+  <!-- 2: EEnum ProjectStatus -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ProjectStatus">
+    <eLiterals name="PLANNED" value="0" literal="PLANNED"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="COMPLETED" value="2" literal="COMPLETED"/>
+  </eClassifiers>
+
+  <!-- 3: EClass IdentifiedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="IdentifiedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 4: EClass NamedElement extends IdentifiedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 5: EClass Department extends NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        lowerBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees"
+        upperBound="-1"
+        eType="//@eClassifiers.6"
+        containment="true"
+        eOpposite="//@eClassifiers.6/@eStructuralFeatures.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects"
+        upperBound="-1"
+        eType="//@eClassifiers.7"
+        containment="true"
+        eOpposite="//@eClassifiers.7/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <!-- 6: EClass Employee extends NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="hiredOn"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.5"
+        eOpposite="//@eClassifiers.5/@eStructuralFeatures.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tasks"
+        upperBound="-1"
+        eType="//@eClassifiers.8"
+        containment="true"
+        eOpposite="//@eClassifiers.8/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 7: EClass Project extends NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="budget"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lead"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.5"
+        eOpposite="//@eClassifiers.5/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <!-- 8: EClass Task extends NamedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project"
+        eType="//@eClassifiers.7"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignee"
+        eType="//@eClassifiers.6"
+        eOpposite="//@eClassifiers.6/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 9: EClass Review extends Task -->
+  <eClassifiers xsi:type="ecore:EClass" name="Review"
+      eSuperTypes="//@eClassifiers.8">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="approved"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 10: EClass Meeting extends Task -->
+  <eClassifiers xsi:type="ecore:EClass" name="Meeting"
+      eSuperTypes="//@eClassifiers.8">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="durationMinutes"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 11: EClass Assignment extends IdentifiedElement -->
+  <eClassifiers xsi:type="ecore:EClass" name="Assignment"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="task"
+        lowerBound="1"
+        eType="//@eClassifiers.8"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employee"
+        lowerBound="1"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+</ecore:EPackage>

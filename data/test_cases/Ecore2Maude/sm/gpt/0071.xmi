@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="workflow"
+    nsURI="http://example.org/workflow"
+    nsPrefix="wf">
+
+  <!-- 0: Primitive alias String -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="WFString"
+                instanceClassName="java.lang.String"/>
+                
+  <!-- 1: Primitive alias Integer -->
+  <eClassifiers xsi:type="eccore:EDataType"
+                name="WFInt"
+                instanceClassName="int"/>
+
+  <!-- 2: Enum for task state -->
+  <eClassifiers xsi:type="ecore:EEnum" name="TaskStatus">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="RUNNING" value="1" literal="RUNNING"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+    <eLiterals name="FAILED" value="3" literal="FAILED"/>
+  </eClassifiers>
+
+  <!-- 3: Root Workflow class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Workflow">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="version"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Containment of states and tasks -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="states"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="tasks"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 4: Abstract base State -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractState" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="initial"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 5: Concrete Task -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="estimatedTime"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         eType="//@eClassifiers.2"/>
+    <!-- reference to owning workflow state (non containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="currentState"
+                         eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 6: Concrete NormalState -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="NormalState"
+                eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="canRetry"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- outgoing transitions -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="outgoing"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 7: Transition -->
+  <eClassifiers xsi:type="ecore:EClass" name="Transition">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="source"
+                         eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="target"
+                         eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 8: FinalState -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="FinalState"
+                eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="success"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 9: Utility Map Entry -->
+  <eClassifiers xsi:type="ecore:EClass" name="PropertyEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="key"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="value"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 10: Another EPackage as subpackage, to exercise eSubpackages/eSuperPackage -->
+  <eSubpackages name="extensions"
+                nsURI="http://example.org/workflow/extensions"
+                nsPrefix="wfext">
+    <!-- 0 in subpackage: Extension point -->
+    <eClassifiers xsi:type="ecore:EClass" name="ExtensionPoint">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="name"
+                           lowerBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <!-- link back to Workflow classifier in super package -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="ownerWorkflowType"
+                           eType="//@eClassifiers.3"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

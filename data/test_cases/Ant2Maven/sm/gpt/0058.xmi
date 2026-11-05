@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiStageBuild"
+    basedir="."
+    description="Project with separate compile and package targets"
+    default="pkgTarget">
+
+  <targets xmi:id="compileTarget" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="MultiStageBuild API"/>
+  </targets>
+
+  <targets xmi:id="pkgTarget" name="package" description="Create distribution artifacts">
+    <tasks xsi:type="Ant:Mkdir"
+           dir="dist"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/multistagebuild.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Copy"
+           file="README.md"
+           tofile="dist/README.md"
+           presservelastmodified="true"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           includesfile="config/delete-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/delete-excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

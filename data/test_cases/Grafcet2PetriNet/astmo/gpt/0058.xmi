@@ -1,0 +1,83 @@
+<xmi:XMI xmi:version="2.0"
+         xmlns:xmi="http://www.omg.org/XMI"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="/0" name="ComplexGrafcet0058" location="file://grafcets/complex_0058.gcf">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" xmi:id="/0/@elements.0"
+              name="InitStepA" location="file://grafcets/complex_0058.gcf#InitA"
+              isInitial="true" isActive="true" action="initialize system A"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="/0/@elements.1"
+              name="InitStepB" location="file://grafcets/complex_0058.gcf#InitB"
+              isInitial="true" isActive="false" action="initialize system B"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="/0/@elements.2"
+              name="ProcessingStep1" location="file://grafcets/complex_0058.gcf#Proc1"
+              isInitial="false" isActive="false" action="process batch 1"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="/0/@elements.3"
+              name="ProcessingStep2" location="file://grafcets/complex_0058.gcf#Proc2"
+              isInitial="false" isActive="false" action="process batch 2"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="/0/@elements.4"
+              name="FinalStep" location="file://grafcets/complex_0058.gcf#Final"
+              isInitial="false" isActive="false" action="shutdown sequence"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" xmi:id="/0/@elements.5"
+              name="T_InitToProc1" location="file://grafcets/complex_0058.gcf#T1"
+              condition="A and B initialized"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="/0/@elements.6"
+              name="T_Proc1ToProc2" location="file://grafcets/complex_0058.gcf#T2"
+              condition="batch 1 complete"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="/0/@elements.7"
+              name="T_Proc2ToFinal" location="file://grafcets/complex_0058.gcf#T3"
+              condition="batch 2 complete"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="/0/@elements.8"
+              name="T_ReworkToProc1" location="file://grafcets/complex_0058.gcf#T4"
+              condition="rework required"/>
+
+    <!-- Connections: StepToTransition (PlaceToTransition in target) -->
+    <!-- From both initial steps to first processing transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="/0/@connections.0"
+                 name="C_InitA_to_T1" location="file://grafcets/complex_0058.gcf#C0"
+                 from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="/0/@connections.1"
+                 name="C_InitB_to_T1" location="file://grafcets/complex_0058.gcf#C1"
+                 from="/0/@elements.1" to="/0/@elements.5"/>
+
+    <!-- From first processing step to second processing transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="/0/@connections.2"
+                 name="C_Proc1_to_T2" location="file://grafcets/complex_0058.gcf#C2"
+                 from="/0/@elements.2" to="/0/@elements.6"/>
+
+    <!-- From second processing step to final transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="/0/@connections.3"
+                 name="C_Proc2_to_T3" location="file://grafcets/complex_0058.gcf#C3"
+                 from="/0/@elements.3" to="/0/@elements.7"/>
+
+    <!-- From final step back to rework transition (creates a loop) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="/0/@connections.4"
+                 name="C_Final_to_T4" location="file://grafcets/complex_0058.gcf#C4"
+                 from="/0/@elements.4" to="/0/@elements.8"/>
+
+    <!-- Connections: TransitionToStep (TransitionToPlace in target) -->
+    <!-- From init-to-proc transition to first processing step -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="/0/@connections.5"
+                 name="C_T1_to_Proc1" location="file://grafcets/complex_0058.gcf#C5"
+                 from="/0/@elements.5" to="/0/@elements.2"/>
+
+    <!-- From proc1-to-proc2 transition to second processing step -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="/0/@connections.6"
+                 name="C_T2_to_Proc2" location="file://grafcets/complex_0058.gcf#C6"
+                 from="/0/@elements.6" to="/0/@elements.3"/>
+
+    <!-- From proc2-to-final transition to final step -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="/0/@connections.7"
+                 name="C_T3_to_Final" location="file://grafcets/complex_0058.gcf#C7"
+                 from="/0/@elements.7" to="/0/@elements.4"/>
+
+    <!-- From rework transition back to first processing step (closing the loop) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="/0/@connections.8"
+                 name="C_T4_to_Proc1" location="file://grafcets/complex_0058.gcf#C8"
+                 from="/0/@elements.8" to="/0/@elements.2"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

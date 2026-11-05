@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- elements[0]: Root CPL with one subAction, one outgoing, one incoming -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <!-- SubAction contents: simple Proxy (will use Location via locations helper) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no error handlers, no default -->
+      </contents>
+    </subActions>
+    <!-- Outgoing method, contents is a complex Proxy -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- complex proxy: all branches present -->
+        <busy>
+          <!-- Busy contents: SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </outgoing>
+    <!-- Incoming method, contents is a Redirect using Location (Location2URIConstant) -->
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="true">
+        <!-- No direct contents; will use locations helper from Location below -->
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- elements[1]: Location used by simple Proxy in SubAction (Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:simpleproxy@example.com" clear="yes"/>
+
+  <!-- elements[2]: Location used by Redirect (Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.com" clear="yes"/>
+
+  <!-- elements[3]: AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="alice@example.com" contains="example.com" subDomainOf="example.com">
+      <!-- SwitchedAddress contents: SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- elements[4]: SubCall (ref is plain string) -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[5]: Redirect (top-level) using Location2URIConstant via locations -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- elements[6]: Proxy (top-level) simple, using Location2URIConstant via locations -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+
+  <!-- elements[7]: StringSwitch (top-level, no locations) -->
+  <elements xsi:type="CPL:StringSwitch" field="hdrField"/>
+
+  <!-- elements[8]: LanguageSwitch (top-level, demonstrates NotPresent) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- elements[9]: TimeSwitch (top-level, unused by statements but valid) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC"/>
+</CPL:CPLModel>

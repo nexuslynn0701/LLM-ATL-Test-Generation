@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with subActions, outgoing, incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- subActions -->
+    <subActions id="sa1">
+      <!-- SubAction sa1 contents: simple Proxy (will use Location via locations helper) -->
+      <!-- contents points to simple Proxy at elements[1] -->
+      <contents xsi:nil="true"/>
+    </subActions>
+    <subActions id="sa2">
+      <!-- SubAction sa2 contents: complex Proxy to exercise Proxy2Select -->
+      <!-- contents points to complex Proxy at elements[2] -->
+      <contents xsi:nil="true"/>
+    </subActions>
+
+    <!-- outgoing and incoming refer to the same proxies via contents -->
+    <outgoing>
+      <!-- Outgoing contents: simple Proxy at elements[1] -->
+      <contents xsi:nil="true"/>
+    </outgoing>
+    <incoming>
+      <!-- Incoming contents: complex Proxy at elements[2] -->
+      <contents xsi:nil="true"/>
+    </incoming>
+  </elements>
+
+  <!-- Location used by both proxies (for Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true"/>
+
+  <!-- Simple Proxy (isSimple = true: no busy/noAnswer/redirection/failure/default) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- This Proxy has no child error/default blocks, so isSimple = true -->
+    <!-- Its location is taken from its container locations sequence:
+         the Location above will be included via helper logic -->
+  </elements>
+
+  <!-- Complex Proxy (isSimple = false: has busy/noAnswer/redirection/failure/default) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <!-- default contents: SubCall at elements[4] -->
+    <default contents="//@elements.4"/>
+  </elements>
+
+  <!-- SubCall that matches SubAction sa1 via ref="sa1" -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- Redirect (uses Location through locations helper for Location2URIConstant) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="fromUser">
+    <addresses is="addr1" contains="contains1" subDomainOf="sd1"/>
+    <addresses is="addr2" contains="contains2" subDomainOf="sd2"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+</CPL:CPLModel>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa_main">
+      <!-- SubAction contents: complex Proxy (non-simple) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- default points to an AddressSwitch top-level element -->
+        <default contents="//@elements.1"/>
+      </contents>
+    </subActions>
+    <!-- Incoming with simple Proxy contents -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <!-- simple proxy: no handlers -->
+      </contents>
+    </incoming>
+    <!-- Outgoing with Redirect contents -->
+    <outgoing>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </outgoing>
+  </elements>
+
+  <!-- AddressSwitch used from Proxy.default -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- notPresent and otherwise created + one SwitchedAddress case -->
+    <notPresent/>
+    <otherwise/>
+    <addresses is="case-1" contains="foo" subDomainOf="bar">
+      <!-- SwitchedAddress contents: SubCall (by string ref) -->
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </addresses>
+  </elements>
+
+  <!-- Location used by simple Proxy via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+
+  <!-- Redirect referenced as contents of Outgoing and also using locations -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

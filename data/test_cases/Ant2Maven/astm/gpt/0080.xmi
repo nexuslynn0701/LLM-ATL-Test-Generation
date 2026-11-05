@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntBuild"
+    basedir="src/main/java"
+    description="Ant build with compilation, docs, packaging and cleanup."
+    default="buildTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Task definition (unused by any NewTask as required) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="cleanTarget" name="clean" description="Remove build directory and temporary files.">
+    <tasks xsi:type="Ant:Delete" dir="target"/>
+  </targets>
+
+  <targets xmi:id="compileTarget" name="compile" description="Compile Java sources.">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+  </targets>
+
+  <targets xmi:id="docsTarget" name="docs" description="Generate Javadoc.">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+  </targets>
+
+  <targets xmi:id="packageTarget" name="package" description="Create application jar.">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/example-app.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <targets xmi:id="prepareTarget" name="prepare" description="Prepare build directories.">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+  </targets>
+
+  <targets xmi:id="resourcesTarget" name="resources" description="Copy resource files.">
+    <tasks xsi:type="Ant:Copy"
+           file="src/main/resources/app.properties"
+           todir="target/classes"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="true"/>
+  </targets>
+
+  <targets xmi:id="buildTarget" name="build" description="Main build target.">
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+</Ant:Project>

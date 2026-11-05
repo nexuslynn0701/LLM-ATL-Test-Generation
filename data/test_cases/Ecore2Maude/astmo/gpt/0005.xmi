@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="blog"
+    nsURI="http://example.org/blog"
+    nsPrefix="blog">
+
+  <!-- Classifiers order is important for index-based references -->
+  <!-- 0: Post -->
+  <eClassifiers xsi:type="ecore:EClass" name="Post">
+    <!-- id attribute on Post -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="postId"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="true"/>
+    <!-- title attribute (String, with default value to trigger AttEqSpecificDefaultValue) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="Untitled"/>
+    <!-- status attribute (enum BlogStatus) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         eType="//@eClassifiers.2"
+                         lowerBound="1"
+                         upperBound="1"/>
+    <!-- comments reference (containment many, unbounded) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="comments"
+                         eType="//@eClassifiers.1"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"/>
+    <!-- mainComment reference (non-containment, single, opposite of Comment.post) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="mainComment"
+                         eType="//@eClassifiers.1"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 1: Comment (supertype of SpecialComment) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Comment">
+    <!-- back reference to containing Post, non-containment, opposite of Post.mainComment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="post"
+                         eType="//@eClassifiers.0"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.4"/>
+    <!-- message attribute (String, with quotes in default to exercise escapeQuotes) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="message"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="&quot;No comment&quot;"/>
+    <!-- likes attribute (Int, many, unbounded upperBound) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="likes"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="0"
+                         upperBound="-1"/>
+    <!-- priority attribute (Int, single, explicit bounds) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         lowerBound="0"
+                         upperBound="1"/>
+  </eClassifiers>
+
+  <!-- 2: BlogStatus enum -->
+  <eClassifiers xsi:type="ecore:EEnum" name="BlogStatus">
+    <eLiterals name="DRAFT" value="0" literal="DRAFT"/>
+    <eLiterals name="PUBLISHED" value="1" literal="PUBLISHED"/>
+    <eLiterals name="ARCHIVED" value="2" literal="ARCHIVED"/>
+  </eClassifiers>
+
+  <!-- 3: SpecialComment subclass of Comment -->
+  <eClassifiers xsi:type="ecore:EClass" name="SpecialComment">
+    <eSuperTypes href="//@eClassifiers.1"/>
+    <!-- tag attribute (String, many, derived name-based datatype mapping) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="tag"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="0"
+                         upperBound="-1"/>
+  </eClassifiers>
+
+</ecore:EPackage>

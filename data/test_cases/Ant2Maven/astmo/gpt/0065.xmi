@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-root"
+    description="Ant project with multiple targets and tasks for Ant2Maven testing"
+    default="build">
+  <!-- Properties of all four concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- One TaskDef, not referenced by any NewTask -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: build -->
+  <targets xmi:id="build" name="build" description="Compile sources and package jar">
+    <!-- Compile task with srcdir and destdir -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes"/>
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+    <!-- Create jar from compiled classes -->
+    <tasks xsi:type="Ant:Jar" jarfile="target/complex-ant-project.jar" basedir="target/classes"/>
+  </targets>
+
+  <!-- Secondary target: clean -->
+  <targets xmi:id="clean" name="clean" description="Remove build artifacts">
+    <!-- Delete the target directory -->
+    <tasks xsi:type="Ant:Delete" dir="target"/>
+  </targets>
+
+  <!-- Additional target: prepare -->
+  <targets xmi:id="prepare" name="prepare" description="Prepare build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="target/tmp"/>
+  </targets>
+</Ant:Project>

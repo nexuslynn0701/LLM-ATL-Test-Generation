@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="authCheck"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+        <addresses is="alice"/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:LanguageSwitch">
+        <languages matches="en">
+          <contents xsi:type="CPL:SubCall" ref="authCheck"/>
+        </languages>
+        <otherwise/>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="authCheck">
+    <contents xsi:type="CPL:PrioritySwitch">
+      <priorities less="5"/>
+      <otherwise/>
+    </contents>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" priority="1" clear="yes">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+      <default>
+        <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+      </default>
+    </contents>
+  </elements>
+</CPL:CPLModel>

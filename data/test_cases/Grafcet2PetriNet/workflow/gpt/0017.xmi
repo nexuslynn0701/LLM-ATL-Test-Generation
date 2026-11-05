@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingAndJoin">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="StartUp" isInitial="true" isActive="true" action="init"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="LoadConfig" isInitial="false" isActive="false" action="load"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="CheckSensors" isInitial="false" isActive="false" action="check"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="RunSystem" isInitial="false" isActive="false" action="run"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="Shutdown" isInitial="false" isActive="false" action="stop"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t001" name="configReady" condition="configLoaded"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="sensorsReady" condition="sensorsOk"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="allReady" condition="configAndSensorsOk"/>
+    <elements xsi:type="Grafcet:Transition" location="t004" name="stopCommand" condition="stopRequested"/>
+
+    <!-- Connections: branching and join with multiple arcs per transition -->
+    <!-- StartUp -> configReady -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="startToConfig" from="/0/@elements.0" to="/0/@elements.5"/>
+    <!-- StartUp -> sensorsReady (branch) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c002" name="startToSensors" from="/0/@elements.0" to="/0/@elements.6"/>
+
+    <!-- configReady -> LoadConfig -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c003" name="configToLoad" from="/0/@elements.5" to="/0/@elements.1"/>
+    <!-- sensorsReady -> CheckSensors -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c004" name="sensorsToCheck" from="/0/@elements.6" to="/0/@elements.2"/>
+
+    <!-- LoadConfig -> allReady -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c005" name="loadToAllReady" from="/0/@elements.1" to="/0/@elements.7"/>
+    <!-- CheckSensors -> allReady (join with multiple incoming) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c006" name="checkToAllReady" from="/0/@elements.2" to="/0/@elements.7"/>
+
+    <!-- allReady -> RunSystem -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c007" name="allReadyToRun" from="/0/@elements.7" to="/0/@elements.3"/>
+
+    <!-- RunSystem -> stopCommand -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c008" name="runToStopCmd" from="/0/@elements.3" to="/0/@elements.8"/>
+
+    <!-- stopCommand -> Shutdown -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c009" name="stopCmdToShutdown" from="/0/@elements.8" to="/0/@elements.4"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

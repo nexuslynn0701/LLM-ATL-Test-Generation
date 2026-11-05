@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleBuild"
+    default="dist"
+    basedir="."
+    description="Sample build project">
+  <targets xmi:id="init" name="init" description="Initialization target">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="DSTAMP" pattern="yyyyMMdd" locale="en_US"/>
+      <format property="TSTAMP" pattern="HH:mm" offset="0" unit="hour"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile source code" depends="init">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" optimize="false" deprecation="true"/>
+  </targets>
+  <targets xmi:id="dist" name="dist" description="Generate distribution" depends="compile">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Copy" file="README.txt" todir="dist" overwrite="true"/>
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" failonerror="false"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/opt/libs"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+</Ant:Project>

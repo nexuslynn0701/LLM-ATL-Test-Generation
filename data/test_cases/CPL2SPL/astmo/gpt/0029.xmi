@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : main CPL with subAction, incoming and outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- contents -> simple Proxy (triggers Proxy2Return as statement) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+    <incoming>
+      <!-- contents -> SubCall (uses ref="saMain") -->
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </incoming>
+    <outgoing>
+      <!-- contents -> Redirect (permanent true, has a Location) -->
+      <contents xsi:type="CPL:Redirect" permanent="true">
+        <contents xsi:type="CPL:Location" url="sip:permanent@example.com" clear="yes" priority="10"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1] : SubCall used inside the proxy/default chain -->
+  <elements xsi:type="CPL:SubCall" ref="saAux"/>
+
+  <!-- elements[2] : Location used by a proxy and by Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:loc02@example.com" clear="no" priority="5"/>
+
+  <!-- elements[3] : Reject used as a leaf (never produces statements) -->
+  <elements xsi:type="CPL:Reject" status="603" reason="Decline"/>
+
+  <!-- elements[4] : Redirect (non‑permanent) with Location -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:temp@example.com" clear="yes" priority="3"/>
+  </elements>
+
+  <!-- elements[5] : complex Proxy to trigger Proxy2Select and related rules -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+    <!-- busy with contents = SubCall (elements[1]) -->
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="saAux"/>
+    </busy>
+    <!-- noAnswer with contents = Reject (elements[3]) -->
+    <noAnswer>
+      <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+    </noAnswer>
+    <!-- redirection with contents = Redirect (elements[4]) -->
+    <redirection>
+      <contents xsi:type="CPL:Redirect" permanent="false">
+        <contents xsi:type="CPL:Location" url="sip:redir@example.com" clear="yes" priority="2"/>
+      </contents>
+    </redirection>
+    <!-- failure with no contents -->
+    <failure/>
+    <!-- default with contents = SubCall (elements[1]) -->
+    <default>
+      <contents xsi:type="CPL:SubCall" ref="saAux"/>
+    </default>
+    <!-- use Location[2] as a location for the proxy -->
+    <contents xsi:type="CPL:Location" url="sip:proxy-target@example.com" clear="yes" priority="1"/>
+  </elements>
+
+  <!-- elements[6] : AddressSwitch with SwitchedAddress, NotPresent, Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- SwitchedAddress with contents = Redirect (elements[4]) -->
+    <addresses is="sip:userA@example.com" contains="userA" subDomainOf="example.com">
+      <contents xsi:type="CPL:Redirect" permanent="true">
+        <contents xsi:type="CPL:Location" url="sip:addrA@example.com" clear="yes" priority="4"/>
+      </contents>
+    </addresses>
+    <!-- NotPresent with contents = SubCall (elements[1]) -->
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="saAux"/>
+    </notPresent>
+    <!-- Otherwise with contents = Proxy[5] as statement via NodeContainer.contents -->
+    <otherwise>
+      <!-- proxy used as a statement -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple inner proxy with location[2] -->
+        <contents xsi:type="CPL:Location" url="sip:inner@example.com" clear="yes" priority="7"/>
+      </contents>
+    </otherwise>
+  </elements>
+
+  <!-- elements[7] : StringSwitch, only to hit rule StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents xsi:type="CPL:Node"/>
+  </elements>
+
+  <!-- elements[8] : LanguageSwitch as a leaf node contained in a Location -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <contents xsi:type="CPL:Node"/>
+  </elements>
+
+  <!-- elements[9] : TimeSwitch as a leaf node contained in a Location -->
+  <elements xsi:type="CPL:TimeSwitch">
+    <contents xsi:type="CPL:Node"/>
+  </elements>
+
+  <!-- elements[10] : PrioritySwitch as a leaf node contained in a Location -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <contents xsi:type="CPL:Node"/>
+  </elements>
+
+  <!-- elements[11] : SubAction referenced by SubCall "saAux" -->
+  <elements xsi:type="CPL:SubAction" id="saAux">
+    <!-- contents -> Redirect (to exercise SubAction2Function with non‑empty, non‑Proxy) -->
+    <contents xsi:type="CPL:Redirect" permanent="false">
+      <contents xsi:type="CPL:Location" url="sip:aux@example.com" clear="yes" priority="6"/>
+    </contents>
+  </elements>
+
+</CPL:CPLModel>

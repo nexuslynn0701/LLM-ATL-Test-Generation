@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="mainPkg"
+    nsURI="http://example/main"
+    nsPrefix="main">
+
+  <!-- Subpackage to exercise superPackage/subPackages and multiple root packages logic -->
+  <eSubpackages name="subPkg"
+      nsURI="http://example/sub"
+      nsPrefix="sub">
+    <!-- Class in subpackage, with supertype referring to a class in the parent package -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubEntity">
+      <eSuperTypes href="//@eClassifiers.2"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="subCode"
+          lowerBound="1"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          iD="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- 0: Enum with two literals, used as attribute type and default -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 1: Simple data type to be treated as generic @DataType -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomNumber"
+      instanceClassName="java.lang.Long"/>
+
+  <!-- 2: Abstract superclass in main package -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseItem" abstract="true" interface="false">
+    <!-- String attribute with default, non-ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="Untitled"
+        iD="false"/>
+    <!-- Int attribute with default, marked as ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="itemId"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="100"
+        iD="true"/>
+  </eClassifiers>
+
+  <!-- 3: Concrete subclass with attributes of many different primitive kinds and custom datatype -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false">
+    <eSuperTypes href="//@eClassifiers.2"/>
+
+    <!-- Boolean attribute (EBoolean), lower=0, upper=1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="activeFlag"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        iD="false"/>
+
+    <!-- Boolean attribute (EBooleanObject), default true -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="archived"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"
+        defaultValueLiteral="true"
+        iD="false"/>
+
+    <!-- Integer attribute (EInt), upperBound = -1 (unbounded list) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="retryCount"
+        lowerBound="0"
+        upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="false"/>
+
+    <!-- Float attribute (EDouble) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="progress"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        iD="false"/>
+
+    <!-- Attribute typed by enum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.0"
+        defaultValueLiteral="NEW"
+        iD="false"/>
+
+    <!-- Attribute typed by custom EDataType (will map to @DataType) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="customValue"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.1"
+        iD="false"/>
+
+    <!-- Containment reference many to Note, with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="notes"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.4"
+        containment="true"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.0"/>
+
+    <!-- Non-containment, 0..1, opposite in Note -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="mainNote"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.4"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 4: Another concrete class with bidirectional references to Task -->
+  <eClassifiers xsi:type="ecore:EClass" name="Note" abstract="false" interface="false">
+    <!-- Container reference back to Task.notes -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.3"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.5"/>
+
+    <!-- Reference 0..1 back to Task.mainNote -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="referencedBy"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.3"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.6"/>
+
+    <!-- Simple string attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="text"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 5: Class without supertype, to test empty superTypes, no refs, one attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Standalone" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="S-0001"
+        iD="false"/>
+  </eClassifiers>
+
+  <!-- 6: Class with no attributes, only references, including a non-containment with no opposite -->
+  <eClassifiers xsi:type="ecore:EClass" name="Link" abstract="false" interface="false">
+    <!-- Non-containment, 0..*, no opposite (tests null maybeRefSort) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="targets"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.3"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

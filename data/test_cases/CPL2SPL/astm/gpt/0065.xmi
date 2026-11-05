@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL, with Incoming and Outgoing to trigger R1, R3, R4 -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.2" id="saMain"/>
+    <outgoing/>
+    <incoming/>
+  </elements>
+
+  <!-- 1: Location used by Proxy and Redirect (R7, R8, R14, R19, locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" priority="1" clear="yes"/>
+
+  <!-- 2: SubAction whose contents is a complex Proxy (R2 + R8, R9–R12, R5) -->
+  <elements xsi:type="CPL:Proxy" timeout="25" recurse="no" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure contents="//@elements.3"/>
+    <default contents="//@elements.4"/>
+  </elements>
+
+  <!-- 3: SubCall inside Failure branch (R13) -->
+  <elements xsi:type="CPL:SubCall" ref="saOther"/>
+
+  <!-- 4: Redirect inside Default branch (R14) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 5: SubAction whose contents is a simple Proxy (R2 + R7, R6) -->
+  <elements xsi:type="CPL:SubAction" id="saOther" contents="//@elements.6"/>
+
+  <!-- 6: Simple Proxy with NotPresent child and associated Location (R7, R6, R19) -->
+  <elements xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="sequential">
+    <notPresent/>
+  </elements>
+
+  <!-- 7: Location that is a nested Location contents (tests Location.statement and locations chain) -->
+  <elements xsi:type="CPL:Location" url="sip:other@example.org" priority="2" clear="no">
+    <contents>//@elements.1</contents>
+  </elements>
+
+  <!-- 8: AddressSwitch with SwitchedAddress cases, NotPresent and Otherwise (R15, R17, R18, R6, R7) -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination" subField="user">
+    <notPresent/>
+    <otherwise contents="//@elements.9"/>
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com" contents="//@elements.10"/>
+    <addresses is="bob@example.org" contains="bob" subDomainOf="example.org" contents="//@elements.11"/>
+  </elements>
+
+  <!-- 9: Simple Proxy used as contents of Otherwise (R7 via Otherwise2SelectDefault) -->
+  <elements xsi:type="CPL:Proxy" timeout="5" recurse="yes" ordering="parallel"/>
+
+  <!-- 10: Busy used as contents of SwitchedAddress (R9) -->
+  <elements xsi:type="CPL:Busy"/>
+
+  <!-- 11: NoAnswer used as contents of another SwitchedAddress (R10) -->
+  <elements xsi:type="CPL:NoAnswer"/>
+
+  <!-- 12: StringSwitch to exercise R16 -->
+  <elements xsi:type="CPL:StringSwitch">
+    <contents>//@elements.1</contents>
+    <contents>//@elements.7</contents>
+  </elements>
+
+</CPL:CPLModel>

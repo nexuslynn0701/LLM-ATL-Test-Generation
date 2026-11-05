@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <!-- one SubAction -->
+    <subActions xsi:type="CPL:SubAction" id="sa_main">
+      <!-- contents points to complex Proxy at elements[2] -->
+      <contents href="//@elements.2"/>
+    </subActions>
+    <!-- one Outgoing using the same complex Proxy -->
+    <outgoing xsi:type="CPL:Outgoing">
+      <contents href="//@elements.2"/>
+    </outgoing>
+    <!-- one Incoming using the Redirect at elements[4] -->
+    <incoming xsi:type="CPL:Incoming">
+      <contents href="//@elements.4"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location used by both Proxy and Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes"/>
+
+  <!-- 2: Complex Proxy (not simple, parallel ordering) -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <busy>
+      <!-- Busy contains SubCall at elements[3] -->
+      <contents href="//@elements.3"/>
+    </busy>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <!-- Default contains AddressSwitch at elements[5] -->
+    <default>
+      <contents href="//@elements.5"/>
+    </default>
+  </elements>
+
+  <!-- 3: SubCall referencing SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- 4: Redirect (temporary) using same Location -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 5: AddressSwitch on origin, with one SwitchedAddress and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses xsi:type="CPL:SwitchedAddress" is="sip:alt@example.com"/>
+    <notPresent/>
+    <!-- Otherwise contains a simple Proxy at elements[6] -->
+    <otherwise>
+      <contents href="//@elements.6"/>
+    </otherwise>
+  </elements>
+
+  <!-- 6: Simple Proxy (sequential ordering) -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="sequential"/>
+
+</CPL:CPLModel>

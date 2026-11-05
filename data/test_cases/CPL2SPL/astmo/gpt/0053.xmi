@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] : root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- subActions[0] -->
+    <subActions id="sa_main">
+      <!-- contents -> Proxy (simple) at elements[3] -->
+      <contents href="#//@elements.3"/>
+    </subActions>
+    <!-- outgoing[0] -->
+    <outgoing>
+      <!-- contents -> AddressSwitch at elements[4] -->
+      <contents href="#//@elements.4"/>
+    </outgoing>
+    <!-- incoming[0] -->
+    <incoming>
+      <!-- contents -> Redirect at elements[2] -->
+      <contents href="#//@elements.2"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1] : Location used by Redirect and Proxy -->
+  <elements xsi:type="CPL:Location" url="sip:callee@example.com" clear="yes"/>
+
+  <!-- elements[2] : Redirect (permanent) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- elements[3] : Proxy SIMPLE (no children) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="serial"/>
+
+  <!-- elements[4] : AddressSwitch with one SwitchedAddress, one NotPresent, one Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- one switched address -->
+    <addresses is="sip:user1@example.com"/>
+    <!-- notPresent branch (empty contents) -->
+    <notPresent/>
+    <!-- otherwise branch containing a SubCall at elements[5] -->
+    <otherwise>
+      <contents href="#//@elements.5"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[5] : SubCall referring to SubAction id "sa_main" -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+</CPL:CPLModel>

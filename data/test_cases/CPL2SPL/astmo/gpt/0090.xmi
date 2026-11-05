@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: root CPL with one SubAction, one Incoming, one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa1">
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="yes" ordering="parallel">
+        <!-- non-simple Proxy: all handlers present -->
+        <busy>
+          <!-- Busy contents is a SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents is a SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents is a Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure>
+          <!-- Failure contents is a Reject -->
+          <contents xsi:type="CPL:Reject" status="500" reason="ServerFailure"/>
+        </failure>
+        <default>
+          <!-- Default contents is an AddressSwitch -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+            <addresses is="userA" contains="partA" subDomainOf="domA">
+              <!-- SwitchedAddress contents is a simple Proxy -->
+              <contents xsi:type="CPL:Proxy" timeout="10" recurse="no" ordering="sequential"/>
+            </addresses>
+            <notPresent/>
+            <otherwise>
+              <!-- Otherwise contents is a Redirect -->
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <incoming/>
+    <outgoing/>
+  </elements>
+
+</CPL:CPLModel>

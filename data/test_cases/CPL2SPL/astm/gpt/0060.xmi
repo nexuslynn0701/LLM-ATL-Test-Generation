@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL, with one SubAction, Incoming and Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="actionMain">
+      <!-- SubAction contents: complex Proxy (triggers Proxy2Select via contents.statement) -->
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="no" ordering="parallel">
+        <!-- complex: all branches present -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- default branch executes a Redirect (contents -> Redirect2Return) -->
+        <default contents="//@elements.4"/>
+      </contents>
+    </subActions>
+    <incoming>
+      <!-- Incoming contents: simple Proxy (Proxy2Return) -->
+      <contents xsi:type="CPL:Proxy" timeout="15" recurse="yes" ordering="sequential">
+        <!-- simple proxy: no branches -->
+      </contents>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing contents: SubCall (SubCall2Return) -->
+      <contents xsi:type="CPL:SubCall" ref="actionMain"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used as first location for simple Proxy in Incoming (for Proxy2Return) -->
+  <elements xsi:type="CPL:Location" url="sip:userA@example.com" priority="1" clear="yes"/>
+
+  <!-- 2: Location used as first location for complex Proxy in SubAction (Proxy2Select) -->
+  <elements xsi:type="CPL:Location" url="sip:userB@example.net" priority="2" clear="yes"/>
+
+  <!-- 3: SwitchedAddress with contents SubCall (SubCall2Return inside AddressSwitch case) -->
+  <elements xsi:type="CPL:SwitchedAddress" is="sip:vip@example.com">
+    <contents xsi:type="CPL:SubCall" ref="actionMain"/>
+  </elements>
+
+  <!-- 4: Redirect referenced from SubAction.default (Redirect2Return) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 5: AddressSwitch (AddressSwitch2SelectStat) using SwitchedAddress and NotPresent -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses href="//@elements.3"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 6: StringSwitch (StringSwitch2SelectStat), contents is Reject (no nested statements) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerValue">
+    <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+  </elements>
+
+  <!-- 7: LanguageSwitch as top-level, contents is Proxy (treated as statement) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="parallel">
+      <!-- simple proxy here (no branches), used only as nested statement -->
+    </contents>
+  </elements>
+
+  <!-- 8: TimeSwitch as top-level, with one SwitchedTime (no nested statements) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com/utc">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- 9: PrioritySwitch as top-level (no nested statements) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" greater="0.7" equal="0.5"/>
+  </elements>
+
+</CPL:CPLModel>

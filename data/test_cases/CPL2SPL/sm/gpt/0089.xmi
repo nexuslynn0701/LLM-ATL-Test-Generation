@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL script with routing sections -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction with two nodes, including a SubCall and an AddressSwitch -->
+    <subActions xsi:type="CPL:SubAction" id="subRouteMain">
+      <!-- Node 0.7: SubCall inside SubAction -->
+      <contents xsi:type="CPL:SubCall" ref="followupScript"/>
+      <!-- Node 0.8: AddressSwitch inside SubAction -->
+      <contents xsi:type="CPL:AddressSwitch" field="from" subField="user">
+        <notPresent/>
+        <otherwise>
+          <!-- Otherwise branch points to a Location defined as element 4 -->
+          <contents contents="//@elements.4"/>
+        </otherwise>
+        <addresses is="userA@example.com" contains="example.com" subDomainOf="example.org">
+          <!-- SwitchedAddress branch to Proxy defined as element 5 -->
+          <contents contents="//@elements.5"/>
+        </addresses>
+        <addresses is="userB@example.net" contains="example.net" subDomainOf="example.net">
+          <!-- SwitchedAddress branch to LanguageSwitch defined as element 7 -->
+          <contents contents="//@elements.7"/>
+        </addresses>
+      </contents>
+    </subActions>
+
+    <!-- Outgoing and Incoming with nested switches -->
+    <outgoing>
+      <!-- Node 0.1: Location in outgoing -->
+      <contents xsi:type="CPL:Location" url="sip:outgoing@example.com" priority="1" clear="yes">
+        <!-- Location contents refer to Redirect (element 2) -->
+        <contents contents="//@elements.2"/>
+      </contents>
+      <!-- Node 0.2: LanguageSwitch in outgoing -->
+      <contents xsi:type="CPL:LanguageSwitch">
+        <notPresent>
+          <!-- NotPresent branch to Reject (element 3) -->
+          <contents contents="//@elements.3"/>
+        </notPresent>
+        <otherwise>
+          <!-- Otherwise branch to TimeSwitch (element 8) -->
+          <contents contents="//@elements.8"/>
+        </otherwise>
+        <languages matches="en">
+          <!-- English calls go to Location (element 4) -->
+          <contents contents="//@elements.4"/>
+        </languages>
+        <languages matches="fr">
+          <!-- French calls go to PrioritySwitch (element 9) -->
+          <contents contents="//@elements.9"/>
+        </languages>
+      </contents>
+    </outgoing>
+
+    <incoming>
+      <!-- Node 0.3: StringSwitch in incoming -->
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <notPresent>
+          <!-- NotPresent branch to Proxy (element 5) -->
+          <contents contents="//@elements.5"/>
+        </notPresent>
+        <otherwise>
+          <!-- Otherwise branch to Reject (element 3) -->
+          <contents contents="//@elements.3"/>
+        </otherwise>
+        <strings is="urgent" contains="URGENT">
+          <!-- Urgent subject goes to Location (element 6) -->
+          <contents contents="//@elements.6"/>
+        </strings>
+        <strings is="info" contains="INFO">
+          <!-- Info subject goes to SubCall (element 1) -->
+          <contents contents="//@elements.1"/>
+        </strings>
+      </contents>
+
+      <!-- Node 0.4: PrioritySwitch in incoming -->
+      <contents xsi:type="CPL:PrioritySwitch">
+        <notPresent>
+          <!-- No priority: go to Redirect (element 2) -->
+          <contents contents="//@elements.2"/>
+        </notPresent>
+        <otherwise>
+          <!-- Otherwise: go to Location (element 4) -->
+          <contents contents="//@elements.4"/>
+        </otherwise>
+        <priorities less="0.3" greater="">
+          <!-- Low priority: go to Location (element 6) -->
+          <contents contents="//@elements.6"/>
+        </priorities>
+        <priorities greater="0.7" equal="1.0">
+          <!-- High priority: go to Proxy (element 5) -->
+          <contents contents="//@elements.5"/>
+        </priorities>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- 1: Standalone SubCall -->
+  <elements xsi:type="CPL:SubCall" ref="subRouteMain"/>
+
+  <!-- 2: Redirect signalling action -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 3: Reject signalling action -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 4: Primary Location -->
+  <elements xsi:type="CPL:Location" url="sip:primary@example.com" priority="0.8" clear="yes">
+    <!-- Location content: forward to Proxy (element 5) -->
+    <contents contents="//@elements.5"/>
+  </elements>
+
+  <!-- 5: Proxy with all response branches -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+    <busy>
+      <!-- Busy branch: go to Location (element 6) -->
+      <contents contents="//@elements.6"/>
+    </busy>
+    <noAnswer>
+      <!-- NoAnswer branch: go to Redirect (element 2) -->
+      <contents contents="//@elements.2"/>
+    </noAnswer>
+    <redirection>
+      <!-- Redirection branch: go to TimeSwitch (element 8) -->
+      <contents contents="//@elements.8"/>
+    </redirection>
+    <failure>
+      <!-- Failure branch: go to Reject (element 3) -->
+      <contents contents="//@elements.3"/>
+    </failure>
+    <default>
+      <!-- Default branch: go back to main CPL element (element 0) -->
+      <contents contents="//@elements.0"/>
+    </default>
+  </elements>
+
+  <!-- 6: Secondary Location -->
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" priority="0.5" clear="no">
+    <!-- Forward from backup to Redirect (element 2) -->
+    <contents contents="//@elements.2"/>
+  </elements>
+
+  <!-- 7: AddressSwitch at top level -->
+  <elements xsi:type="CPL:AddressSwitch" field="to" subField="host">
+    <notPresent>
+      <!-- No 'to' address: send to Reject (element 3) -->
+      <contents contents="//@elements.3"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise: go to Location (element 4) -->
+      <contents contents="//@elements.4"/>
+    </otherwise>
+    <addresses is="vip@example.com" contains="vip" subDomainOf="example.com">
+      <!-- VIP address goes directly to Proxy (element 5) -->
+      <contents contents="//@elements.5"/>
+    </addresses>
+  </elements>
+
+  <!-- 8: TimeSwitch with one SwitchedTime -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.org/paris">
+    <notPresent>
+      <!-- If no time info: go to Location (element 6) -->
+      <contents contents="//@elements.6"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise: go to PrioritySwitch (element 9) -->
+      <contents contents="//@elements.9"/>
+    </otherwise>
+    <times dtstart="20260101T090000" dtend="20260101T170000" duration="PT8H"
+           freq="DAILY" until="20261231T235959" count="10" interval="1"
+           bySecond="0" byMinute="0" byHour="9,10,11,12,13,14,15,16"
+           byDay="MO,TU,WE,TH,FR" byMonthDay="" byYearDay="" byWeekNo=""
+           byMonth="1,2,3,4,5,6,7,8,9,10,11,12" wkst="MO" bySetPos="">
+      <!-- Working hours: go to Location (element 4) -->
+      <contents contents="//@elements.4"/>
+    </times>
+  </elements>
+
+  <!-- 9: PrioritySwitch at top level with multiple SwitchedPriority -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <!-- No priority: go to Proxy (element 5) -->
+      <contents contents="//@elements.5"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise: go to Location (element 6) -->
+      <contents contents="//@elements.6"/>
+    </otherwise>
+    <priorities less="0.2" greater="" equal="">
+      <!-- Very low priority: reject -->
+      <contents contents="//@elements.3"/>
+    </priorities>
+    <priorities less="" greater="0.9" equal="">
+      <!-- Very high priority: primary Location -->
+      <contents contents="//@elements.4"/>
+    </priorities>
+    <priorities less="" greater="" equal="0.5">
+      <!-- Mid priority: backup Location -->
+      <contents contents="//@elements.6"/>
+    </priorities>
+  </elements>
+
+</CPL:CPLModel>

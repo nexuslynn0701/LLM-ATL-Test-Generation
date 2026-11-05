@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example/rootPkg"
+    nsPrefix="root">
+  <!-- EClass 0: Superclass with no features -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseEntity"/>
+
+  <!-- EClass 1: Subclass of BaseEntity, with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- Attribute 0: String-typed, with default and ID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="John &quot;Doe&quot;"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute 1: Int-typed, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference 2: to Address, containment, no opposite, upperBound = -1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="addresses"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.2"/>
+    <!-- Reference 3: bidirectional non-containment to Company (opposite set later) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employer"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.3"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- EClass 2: Address, no supertypes, referenced and contained -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- Attribute 0: String street, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- EClass 3: Company, subclass of BaseEntity, opposite reference to Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+    <!-- Reference 0: opposite of Person.employer, non-containment, many -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <!-- EEnum 4: Color, with three literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+    <eLiterals name="BLUE" value="2" literal="BLUE"/>
+  </eClassifiers>
+
+  <!-- EEnum 5: Size, with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Size">
+    <eLiterals name="SMALL" value="0" literal="SMALL"/>
+    <eLiterals name="LARGE" value="1" literal="LARGE"/>
+  </eClassifiers>
+
+  <!-- EClass 6: Product, with enum-typed attribute having default literal -->
+  <eClassifiers xsi:type="ecore:EClass" name="Product">
+    <!-- Attribute 0: Color enum, default GREEN -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="color"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="GREEN"
+        eType="//@eClassifiers.4"/>
+    <!-- Attribute 1: Size enum, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="size"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- EDataType 7: Custom data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData" instanceTypeName="java.lang.String"/>
+
+  <!-- EClass 8: Order, with attribute typed by CustomData (falls back to @DataType) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Order">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="ORD-001"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+</ecore:EPackage>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ecore="http://ecore"
+  name="MainPkg"
+  nsURI="http://example/mainpkg"
+  nsPrefix="main">
+
+  <!-- Subpackage with its own classifiers -->
+  <eSubpackages name="SubPkg"
+                nsURI="http://example/subpkg"
+                nsPrefix="sub">
+    <!-- 0: Class in subpackage, super of AbstractBase -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubBase">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subCode"
+                           lowerBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                           defaultValueLiteral="7"
+                           ordered="false"
+                           unique="true"
+                           iD="false"/>
+    </eClassifiers>
+
+    <!-- 1: Enum in subpackage -->
+    <eClassifiers xsi:type="ecore:EEnum" name="SubStatus">
+      <eLiterals name="Queued" value="0" literal="QueuedLiteral"/>
+      <eLiterals name="Running" value="1" literal="RunningLiteral"/>
+      <eLiterals name="Finished" value="2" literal="FinishedLiteral"/>
+    </eClassifiers>
+
+    <!-- 2: Class in subpackage with reference to MainPkg.Root and attribute using SubStatus -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubTask">
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="root"
+                           lowerBound="0"
+                           upperBound="-1"
+                           eType="//@eClassifiers.0"
+                           containment="false"
+                           ordered="false"
+                           unique="false"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="status"
+                           lowerBound="1"
+                           eType="//@eSubpackages.0/@eClassifiers.1"
+                           defaultValueLiteral="Running"
+                           ordered="true"
+                           unique="true"
+                           iD="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers of MainPkg -->
+
+  <!-- 0: Root class with attributes & references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Root">
+    <!-- String attribute with default -->
+    <eStructuralFeatures xsi:type="eccore:EAttribute"
+                         name="title"
+                         lowerBound="0"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         defaultValueLiteral="Untitled &quot;Root&quot;"
+                         ordered="true"
+                         unique="true"
+                         iD="false"/>
+    <!-- Boolean attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         defaultValueLiteral="true"
+                         ordered="true"
+                         unique="true"
+                         iD="false"/>
+    <!-- Attribute that is ID and uses Integer -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rootId"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         ordered="true"
+                         unique="true"
+                         iD="true"/>
+    <!-- Enum-typed attribute with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         lowerBound="0"
+                         eType="//@eClassifiers.4"
+                         defaultValueLiteral="Medium"
+                         ordered="true"
+                         unique="true"
+                         iD="false"/>
+  </eClassifiers>
+
+  <!-- 1: Abstract base class extending SubPkg.SubBase -->
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractBase" abstract="true" interface="false"
+                eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+    <!-- Reference with opposite, multiplicity *, containment false -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"
+                         containment="false"
+                         eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"
+                         ordered="true"
+                         unique="true"/>
+  </eClassifiers>
+
+  <!-- 2: Concrete class extending AbstractBase with attributes & refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="ConcreteItem" abstract="false" interface="false"
+                eSuperTypes="//@eClassifiers.1">
+    <!-- Opposite reference to AbstractBase.children, containment true, mult 1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="parent"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.1"
+                         containment="true"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"
+                         ordered="false"
+                         unique="true"/>
+    <!-- Reference to Root without opposite, mult 0..1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="rootRef"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.0"
+                         containment="false"
+                         ordered="true"
+                         unique="false"/>
+    <!-- Attribute using EDouble with no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="weight"
+                         lowerBound="0"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+                         ordered="true"
+                         unique="false"
+                         iD="false"/>
+  </eClassifiers>
+
+  <!-- 3: Extra class with no supertypes and single ref, used to trigger EmptyList in superTypes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Lonely">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="toTask"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eSubpackages.0/@eClassifiers.2"
+                         containment="false"
+                         ordered="true"
+                         unique="true"/>
+  </eClassifiers>
+
+  <!-- 4: Enum in main package -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityLevel">
+    <eLiterals name="Low" value="0" literal="LOW_LITERAL"/>
+    <eLiterals name="Medium" value="1" literal="MEDIUM_LITERAL"/>
+    <eLiterals name="High" value="2" literal="HIGH_LITERAL"/>
+  </eClassifiers>
+
+  <!-- 5: DataType with custom name to exercise generic '@DataType' branch -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="CustomNumber"
+                instanceClassName="java.lang.Number"/>
+
+</ecore:EPackage>

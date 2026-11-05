@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="metaRoot"
+    nsURI="http://example/metaroot"
+    nsPrefix="mroot">
+
+  <!-- Subpackage to trigger superPackage/subPackages logic -->
+  <eSubpackages name="subPkg"
+                nsURI="http://example/sub"
+                nsPrefix="sub">
+    <!-- 0: EClass in subpackage, used as target type of a reference -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="ExternalTarget">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="extCode"
+                           lowerBound="0"
+                           upperBound="1"
+                           defaultValueLiteral="X"
+                           iD="false"
+                           ordered="true"
+                           unique="true">
+        <eType xsi:type="ecore:EDataType"
+               href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      </eStructuralFeatures>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- 0: EClass with multiple attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Person"
+                abstract="false"
+                interface="false">
+    <!-- String attribute with explicit type and default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="John &quot;Doe&quot;"
+                         iD="true"
+                         ordered="true"
+                         unique="true">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+
+    <!-- Int attribute with explicit type and default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="30"
+                         iD="false"
+                         ordered="true"
+                         unique="true">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+
+    <!-- Boolean attribute with explicit type and default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="true"
+                         iD="false"
+                         ordered="true"
+                         unique="true">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+
+    <!-- Enum-typed attribute, defaultValueLiteral is enum literal name -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="NEW"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         eAttributeType="//@eClassifiers.4"/>
+    <!-- One-valued containment reference with opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="address"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="true"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"
+                         eType="//@eClassifiers.1"/>
+    <!-- Multi-valued non-containment reference with upperBound -1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="friends"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.0"/>
+    <!-- Reference to a class in a subpackage (external type) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="externalTarget"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 1: EClass with reference opposite to Person.address and a super type -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Address"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.2">
+    <!-- Opposite end of bidirectional reference, container -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.0/@eStructuralFeatures.4"
+                         eType="//@eClassifiers.0"/>
+    <!-- Simple attribute without explicit type (NoType case) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="street"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"/>
+    <!-- Attribute with unbounded upperBound -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="tags"
+                         lowerBound="0"
+                         upperBound="-1"
+                         iD="false"
+                         ordered="false"
+                         unique="false">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 2: Abstract EClass used as super type -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="LocatedElement"
+                abstract="true"
+                interface="false">
+    <!-- Attribute with Float-like type resolved to @Float -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="xCoord"
+                         lowerBound="0"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true">
+      <eType xsi:type="ecore:EDataType"
+             href="http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 3: EEnum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum"
+                name="Color">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+  </eClassifiers>
+
+  <!-- 4: EEnum used by Person.status -->
+  <eClassifiers xsi:type="ecore:EEnum"
+                name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+  </eClassifiers>
+
+</ecore:EPackage>

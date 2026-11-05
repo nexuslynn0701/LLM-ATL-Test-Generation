@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://rootpkg"
+    nsPrefix="root">
+  <!-- Subpackage to exercise superPackage/subPackages -->
+  <eSubpackages name="subpkg"
+                nsURI="http://rootpkg/sub"
+                nsPrefix="sub">
+    <!-- Classifiers inside subpackage -->
+    <!-- 0: ClassA -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="ClassA"
+                  abstract="false"
+                  interface="false">
+      <!-- Attribute id (String, iD=true, lowerBound=0, upperBound=1) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="id"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="true"
+                           defaultValueLiteral="defaultId"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <!-- Attribute flag (BooleanObject, lowerBound=0, upperBound=-1) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="flag"
+                           lowerBound="0"
+                           upperBound="-1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+      <!-- Reference to ClassB, non-containment, multiplicity 0..* -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="toB"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="false"
+                           eType="//@eSubpackages.0/@eClassifiers.1"/>
+    </eClassifiers>
+
+    <!-- 1: ClassB extends ClassA -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="ClassB"
+                  abstract="true"
+                  interface="false"
+                  eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <!-- Reference to ClassA, opposite of ClassA.toB, containment=true -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="toA"
+                           lowerBound="1"
+                           upperBound="1"
+                           containment="true"
+                           eType="//@eSubpackages.0/@eClassifiers.0"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.2"/>
+      <!-- Attribute count (EInt, lowerBound=1, upperBound=5) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="count"
+                           lowerBound="1"
+                           upperBound="5"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eClassifiers>
+
+    <!-- 2: Enum Status with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum"
+                  name="Status">
+      <eLiterals name="ON" value="0" literal="ON"/>
+      <eLiterals name="OFF" value="1" literal="OFF"/>
+    </eClassifiers>
+
+    <!-- 3: ClassC with enum attribute and string attribute with default -->
+    <eClassifiers xsi:type="ecore:EClass"
+                  name="ClassC"
+                  abstract="false"
+                  interface="false">
+      <!-- Attribute mode (enum Status, lowerBound=1, upperBound=1) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="mode"
+                           lowerBound="1"
+                           upperBound="1"
+                           eType="//@eSubpackages.0/@eClassifiers.2"/>
+      <!-- Attribute nameAttr (EString, default value literal) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="nameAttr"
+                           lowerBound="0"
+                           upperBound="1"
+                           defaultValueLiteral="anon"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers directly in root package -->
+  <!-- 0: RootClass with reference and attribute -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="RootClass"
+                abstract="false"
+                interface="false">
+    <!-- Reference to subpkg.ClassC, non-containment, lower=1 upper=1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="rootToC"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eSubpackages.0/@eClassifiers.3"/>
+    <!-- Attribute rootName (EString, no default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rootName"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 1: Data type PlainString to exercise EDataType presence -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="PlainString"
+                instanceTypeName="java.lang.String"/>
+</ecore:EPackage>

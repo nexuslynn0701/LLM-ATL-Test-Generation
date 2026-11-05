@@ -1,0 +1,36 @@
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexScenarioGrafcet" location="test/location/0023">
+    <!-- Elements: 4 Steps, 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="loc_s0" isInitial="true" isActive="true" action="initialize_system"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="ParallelBranch1" location="loc_s1" isInitial="false" isActive="false" action="branch_one_action"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="ParallelBranch2" location="loc_s2" isInitial="false" isActive="false" action="branch_two_action"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="MergeStep" location="loc_s3" isInitial="false" isActive="false" action="merge_action"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="SplitTransition" location="loc_t0" condition="sensorA &gt; 0"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="LeftBranchTransition" location="loc_t1" condition="timer &gt; 5"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="MergeTransition" location="loc_t2" condition="branch1_done and branch2_done"/>
+    <!-- Connections: create a non-trivial graph with fan-out and fan-in -->
+    <!-- From initial step to split transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="Init_to_Split" location="loc_c0"
+                 from="/0/@elements.0" to="/0/@elements.4"/>
+    <!-- Split transition to two parallel steps -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c1" name="Split_to_Branch1" location="loc_c1"
+                 from="/0/@elements.4" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c2" name="Split_to_Branch2" location="loc_c2"
+                 from="/0/@elements.4" to="/0/@elements.2"/>
+    <!-- Left branch step to its own transition (self-contained mini path) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c3" name="Branch1_to_LeftTransition" location="loc_c3"
+                 from="/0/@elements.1" to="/0/@elements.5"/>
+    <!-- Left branch transition joins into MergeStep directly (bypass merge transition) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c4" name="LeftTransition_to_MergeStep" location="loc_c4"
+                 from="/0/@elements.5" to="/0/@elements.3"/>
+    <!-- Second branch step goes to merge transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c5" name="Branch2_to_MergeTransition" location="loc_c5"
+                 from="/0/@elements.2" to="/0/@elements.6"/>
+    <!-- Merge transition also leads to the same MergeStep, creating a fan-in -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c6" name="MergeTransition_to_MergeStep" location="loc_c6"
+                 from="/0/@elements.6" to="/0/@elements.3"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

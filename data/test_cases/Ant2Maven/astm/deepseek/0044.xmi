@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    description="A sample project for testing"
+    default="build"
+    basedir="src">
+  <targets xmi:id="build" name="build">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="classes" debug="true" fork="false" optimize="true" deprecation="false"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="API"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+    <tasks xsi:type="Ant:Mkdir" dir="output"/>
+    <tasks xsi:type="Ant:Copy" todir="output" filtering="false" flatten="true">
+      <fileset dir="resources">
+        <include name="*.txt"/>
+        <exclude name="test.txt"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+    </tasks>
+    <tasks xsi:type="Ant:Delete" dir="temp" verbose="true" quiet="false" failonerror="true"/>
+  </targets>
+  <properties xsi:type="Ant:PropertyValue" name="app.version" value="2.0.0"/>
+  <properties xsi:type="Ant:PropertyLocation" name="home.dir" location="/usr/local/app"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+  <taskdef name="myTask" classname="com.example.MyTask"/>
+  <path id="classpath">
+    <pathElement path="lib" location="/opt/lib"/>
+    <fileset dir="lib">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+  <classPath refid="classpath">
+    <pathElement path="ext" location="ext"/>
+    <fileset dir="ext">
+      <include name="*.zip"/>
+    </fileset>
+  </classPath>
+</Ant:Project>

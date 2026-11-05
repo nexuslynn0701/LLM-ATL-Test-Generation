@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sub1">
+      <contents xsi:type="CPL:SubCall" ref="sub2"/>
+    </subActions>
+    <subActions id="sub2">
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="user@example.com">
+          <contents xsi:type="CPL:Location" url="sip:backup@example.com" priority="1" clear="yes"/>
+        </addresses>
+        <addresses is="admin@example.com">
+          <contents xsi:type="CPL:Location" url="sip:admin@example.com" priority="1" clear="yes"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="yes"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="urgent">
+          <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="sequential">
+            <busy>
+              <contents xsi:type="CPL:Location" url="sip:busy@example.com" priority="1" clear="yes"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+                <failure>
+                  <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+                </failure>
+              </contents>
+            </noAnswer>
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:default@example.com" priority="1" clear="yes"/>
+            </default>
+          </contents>
+        </strings>
+        <strings is="normal">
+          <contents xsi:type="CPL:Location" url="sip:normal@example.com" priority="1" clear="yes"/>
+        </strings>
+        <notPresent>
+          <contents xsi:type="CPL:Location" url="sip:unknown@example.com" priority="1" clear="yes"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+</CPL:CPLModel>

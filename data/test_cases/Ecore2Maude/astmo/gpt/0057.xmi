@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMeta"
+    nsURI="http://rootMeta/1.0"
+    nsPrefix="rm">
+
+  <!-- Subpackage to trigger superPackage/subPackages logic -->
+  <eSubpackages name="subMeta" nsURI="http://subMeta/1.0" nsPrefix="sm">
+    <!-- Class in subpackage to be supertype of a root class (will be sorted via createSort) -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubBase">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="subFlag"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Class 0: Person, with attribute and containment reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- Attribute 0: triggers Attribute2Operation, EqType, EqLowerBound, EqUpperBound, EqContainingClass,
+         AttEqIsId, EqIsOrdered, EqIsUnique, AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="42"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Attribute 1: String-typed, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Reference 2: containment to Address, multiplicity 0..* -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="addresses"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- Class 1: Address, supertype from subpackage, bidirectional non-containment ref -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address"
+      eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+    <!-- Attribute 0: city, String with quoted default to exercise escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="city"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        defaultValueLiteral="Unknown &quot;City&quot;"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Reference 1: opposite of Person.addresses, non-containment, 1..1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        containment="false"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- Enum 2: Color with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+  </eClassifiers>
+
+  <!-- Enum 3: Status with one literal -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="ACTIVE" value="0" literal="ACTIVE"/>
+  </eClassifiers>
+
+</ecore:EPackage>

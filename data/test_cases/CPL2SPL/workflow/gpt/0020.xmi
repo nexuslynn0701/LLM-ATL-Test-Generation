@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: CPL root with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sub1">
+      <contents xsi:type="CPL:Proxy" recurse="r1" ordering="parallel">
+        <!-- simple proxy (no handlers) whose location is the top-level Location element[1] -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.2"/>
+      </contents>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="r2" ordering="serial">
+        <!-- non-simple proxy with all handlers; its location is elements[1] as well -->
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="sub1"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="sub1"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="sub1"/>
+        </redirection>
+        <failure>
+          <contents xsi:type="CPL:SubCall" ref="sub1"/>
+        </failure>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sub1"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: SubCall used by other SubCall.ref attributes -->
+  <elements xsi:type="CPL:SubCall" ref="sub1"/>
+
+  <!-- elements[2]: Location used by proxies (via contents path) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes"/>
+
+  <!-- elements[3]: AddressSwitch with one SwitchedAddress and Otherwise (using SubCall) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1" contains="c1" subDomainOf="sd1">
+      <contents xsi:type="CPL:SubCall" ref="sub1"/>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sub1"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="sub1"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[4]: Redirect whose location is elements[2] (via CPL locations helper) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingMerge">
+    <!-- Elements: 4 Steps (2 initial), 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="InitA" isInitial="true" isActive="true" action="startA"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="InitB" isInitial="true" isActive="false" action="startB"/>
+    <elements xsi:type="Grafcet:Transition" location="t001" name="Fork" condition="bothReady"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="Branch1" isInitial="false" isActive="false" action="doBranch1"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="Branch2" isInitial="false" isActive="false" action="doBranch2"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="Join" condition="branchesDone"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="End" isInitial="false" isActive="false" action="finish"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="Reset" condition="resetSignal"/>
+
+    <!-- Connections: branching, merging, and a small loop -->
+    <!-- Parallel starts into a common transition -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="initAToFork" from="/0/@elements.0" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c002" name="initBToFork" from="/0/@elements.1" to="/0/@elements.2"/>
+
+    <!-- Fork to two branches -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c003" name="forkToBranch1" from="/0/@elements.2" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c004" name="forkToBranch2" from="/0/@elements.2" to="/0/@elements.4"/>
+
+    <!-- Each branch to the join transition -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c005" name="branch1ToJoin" from="/0/@elements.3" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c006" name="branch2ToJoin" from="/0/@elements.4" to="/0/@elements.5"/>
+
+    <!-- Join to final step -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c007" name="joinToEnd" from="/0/@elements.5" to="/0/@elements.6"/>
+
+    <!-- Small loop from End back to InitB via Reset -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c008" name="endToReset" from="/0/@elements.6" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c009" name="resetToInitB" from="/0/@elements.7" to="/0/@elements.1"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

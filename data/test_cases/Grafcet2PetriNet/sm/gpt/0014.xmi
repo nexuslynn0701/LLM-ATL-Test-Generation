@@ -1,0 +1,43 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:id="_G0" name="ComplexGrafcet" location="file://complex_grafcet.gcf">
+    <!-- Elements: 6 Steps + 4 Transitions in non-trivial topology -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_S0" name="InitStep" location="file://complex_grafcet.gcf#S0" isInitial="true" isActive="true" action="InitializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S1" name="ParallelStepA" location="file://complex_grafcet.gcf#S1" isInitial="false" isActive="false" action="ComputeBranchA"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S2" name="ParallelStepB" location="file://complex_grafcet.gcf#S2" isInitial="false" isActive="false" action="ComputeBranchB"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S3" name="JoinStep" location="file://complex_grafcet.gcf#S3" isInitial="false" isActive="false" action="JoinBranches"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S4" name="LoopBody" location="file://complex_grafcet.gcf#S4" isInitial="false" isActive="false" action="ExecuteLoopBody"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S5" name="FinalStep" location="file://complex_grafcet.gcf#S5" isInitial="false" isActive="false" action="ShutdownSystem"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T0" name="T_Init_to_Parallel" location="file://complex_grafcet.gcf#T0" condition="startPressed"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T1" name="T_Parallel_to_Join" location="file://complex_grafcet.gcf#T1" condition="A_done and B_done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T2" name="T_Join_to_Loop" location="file://complex_grafcet.gcf#T2" condition="joinCompleted"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T3" name="T_Loop_to_FinalOrBack" location="file://complex_grafcet.gcf#T3" condition="loopFinished or retry"/>
+
+    <!-- Connections: complex fan-out / fan-in + loop and alternative path -->
+    <!-- InitStep -> T0 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C0" name="C_Init_to_T0" location="file://complex_grafcet.gcf#C0" from="/0/@elements.0" to="/0/@elements.6"/>
+    <!-- T0 -> ParallelStepA -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C1" name="C_T0_to_A" location="file://complex_grafcet.gcf#C1" from="/0/@elements.6" to="/0/@elements.1"/>
+    <!-- T0 -> ParallelStepB -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C2" name="C_T0_to_B" location="file://complex_grafcet.gcf#C2" from="/0/@elements.6" to="/0/@elements.2"/>
+
+    <!-- ParallelStepA -> T1 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C3" name="C_A_to_T1" location="file://complex_grafcet.gcf#C3" from="/0/@elements.1" to="/0/@elements.7"/>
+    <!-- ParallelStepB -> T1 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C4" name="C_B_to_T1" location="file://complex_grafcet.gcf#C4" from="/0/@elements.2" to="/0/@elements.7"/>
+    <!-- T1 -> JoinStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C5" name="C_T1_to_Join" location="file://complex_grafcet.gcf#C5" from="/0/@elements.7" to="/0/@elements.3"/>
+
+    <!-- JoinStep -> T2 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C6" name="C_Join_to_T2" location="file://complex_grafcet.gcf#C6" from="/0/@elements.3" to="/0/@elements.8"/>
+    <!-- T2 -> LoopBody -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C7" name="C_T2_to_LoopBody" location="file://complex_grafcet.gcf#C7" from="/0/@elements.8" to="/0/@elements.4"/>
+
+    <!-- LoopBody -> T3 (loop exit / back) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C8" name="C_LoopBody_to_T3" location="file://complex_grafcet.gcf#C8" from="/0/@elements.4" to="/0/@elements.9"/>
+    <!-- T3 -> FinalStep (exit branch) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C9" name="C_T3_to_Final" location="file://complex_grafcet.gcf#C9" from="/0/@elements.9" to="/0/@elements.5"/>
+    <!-- T3 -> LoopBody (back edge for retry) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C10" name="C_T3_to_LoopBody" location="file://complex_grafcet.gcf#C10" from="/0/@elements.9" to="/0/@elements.4"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

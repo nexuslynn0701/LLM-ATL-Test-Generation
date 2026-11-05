@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryRoot"
+    nsURI="http://example.org/libraryRoot"
+    nsPrefix="libroot">
+
+  <!-- Root package classifiers: 0..7 -->
+  <!-- 0: Library (EClass) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="libId"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1" upperBound="1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books"
+        eType="//@eSubpackages.0/@eClassifiers.0"
+        containment="true" upperBound="-1"/>
+    <eStructuralFeatures xsi:type="eccore:EReference" name="members"
+        eType="//@eSubpackages.0/@eClassifiers.1"
+        containment="true" upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- 1: Address (EClass, will reference EInt) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="street"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="zipCode"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0" upperBound="1"/>
+  </eClassifiers>
+
+  <!-- 2: Publication (superclass of Book and Member) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Publication">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 3: MembershipKind (EEnum with 2 literals) -->
+  <eClassifiers xsi:type="ecore:EEnum" name="MembershipKind">
+    <eLiterals name="Regular" value="0" literal="Regular"/>
+    <eLiterals name="Premium" value="1" literal="Premium"/>
+  </eClassifiers>
+
+  <!-- 4: Genre (EEnum with 3 literals) -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Genre">
+    <eLiterals name="Fiction" value="0" literal="Fiction"/>
+    <eLiterals name="NonFiction" value="1" literal="NonFiction"/>
+    <eLiterals name="SciFi" value="2" literal="SciFi"/>
+  </eClassifiers>
+
+  <!-- 5: SimpleData (EDataType just to have a non-primitive datatype) -->
+  <eClassifiers xsi:type="ecore:EDataType" name="SimpleData"/>
+
+  <!-- 6: BaseEntity (abstract superclass) -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseEntity" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="uuid"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1" iD="false"/>
+  </eClassifiers>
+
+  <!-- 7: Tag (EClass referenced from Book) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Tag">
+    <eStructuralFeatures xsi:type="eccore:EAttribute" name="label"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- Subpackage 0: library (child of root) -->
+  <eSubpackages name="library" nsURI="http://example.org/library" nsPrefix="lib">
+    <!-- 0: Book (EClass) -->
+    <eClassifiers xsi:type="ecore:EClass" name="Book"
+        eSuperTypes="//@eClassifiers.2 //@eClassifiers.6">
+      <!-- title inherited from Publication; add ISBN and genre -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="isbn"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1" iD="false" defaultValueLiteral="000-DEFAULT"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="genre"
+          eType="//@eClassifiers.4"
+          lowerBound="1" upperBound="1"/>
+      <!-- reference to Tag, many, not containment -->
+      <eStructuralFeatures xsi:type="ecore:EReference" name="tags"
+          eType="//@eClassifiers.7"
+          containment="false" upperBound="-1"/>
+    </eClassifiers>
+
+    <!-- 1: Member (EClass) -->
+    <eClassifiers xsi:type="ecore:EClass" name="Member"
+        eSuperTypes="//@eClassifiers.6">
+      <eStructuralFeatures xsi:type="eccore:EAttribute" name="name"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1"/>
+      <!-- attribute typed by EEnum MembershipKind -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+          eType="//@eClassifiers.3"
+          lowerBound="1" upperBound="1"/>
+      <!-- attribute typed by custom EDataType -->
+      <eStructuralFeatures xsi:type="eccore:EAttribute" name="metaData"
+          eType="//@eClassifiers.5"
+          lowerBound="0" upperBound="1"/>
+      <!-- containment reference to Address, lowerBound 0, upperBound 1 -->
+      <eStructuralFeatures xsi:type="ecore:EReference" name="address"
+          eType="//@eClassifiers.1"
+          containment="true" lowerBound="0" upperBound="1"/>
+    </eClassifiers>
+
+    <!-- 2: Loan (EClass) referencing Book and Member, with opposite references -->
+    <eClassifiers xsi:type="ecore:EClass" name="Loan">
+      <!-- ref to Book with opposite in Book -->
+      <eStructuralFeatures xsi:type="ecore:EReference" name="loanedBook"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.2"
+          containment="false" lowerBound="1" upperBound="1"/>
+      <!-- ref to Member with opposite in Member -->
+      <eStructuralFeatures xsi:type="ecore:EReference" name="borrower"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.4"
+          containment="false" lowerBound="1" upperBound="1"/>
+      <!-- attribute with upperBound = -1 to trigger '*' encoding -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="notes"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="0" upperBound="-1"/>
+    </eClassifiers>
+
+    <!-- 3: Staff (EClass) extending Member and Publication to give multiple supertypes -->
+    <eClassifiers xsi:type="ecore:EClass" name="Staff"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.1 //@eClassifiers.2">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1"/>
+    </eClassifiers>
+
+    <!-- Complete opposites in Book and Member pointing back to Loan -->
+    <!-- Add after class definitions to ensure indices: -->
+    <!-- In Book: loanBack opposite of Loan::loanedBook -->
+    <eClassifiers xsi:type="ecore:EClass" name="BookWithLoan"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <eStructuralFeatures xsi:type="eccore:EReference" name="loanBack"
+          eType="//@eSubpackages.0/@eClassifiers.2"
+          eOpposite="//@eSubpackages.0/@eClassifiers.2/@eStructuralFeatures.0"
+          containment="false" lowerBound="0" upperBound="1"/>
+    </eClassifiers>
+
+    <!-- In Member: activeLoan opposite of Loan::borrower -->
+    <eClassifiers xsi:type="ecore:EClass" name="MemberWithLoan"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.1">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="activeLoan"
+          eType="//@eSubpackages.0/@eClassifiers.2"
+          eOpposite="//@eSubpackages.0/@eClassifiers.2/@eStructuralFeatures.1"
+          containment="false" lowerBound="0" upperBound="1"/>
+    </eClassifiers>
+
+  </eSubpackages>
+</ecore:EPackage>

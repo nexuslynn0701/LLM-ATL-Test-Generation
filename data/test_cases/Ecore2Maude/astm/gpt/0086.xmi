@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootMM"
+    nsURI="http://example.org/rootMM"
+    nsPrefix="root">
+
+  <!-- eClassifiers.0 : enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Priority">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- eClassifiers.1 : class with no super types, one ref, one attr (ID, default string) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tasks"
+        lowerBound="0" upperBound="-1"
+        eType="//@eClassifiers.2"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        iD="true"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="PRJ-001"/>
+  </eClassifiers>
+
+  <!-- eClassifiers.2 : class with super type, references (one opposite, one non-opposite), attrs using several primitive and enum types -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task"
+      eSuperTypes="//@eClassifiers.3">
+    <!-- reference with opposite, non-containment, multiplicity * -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"
+        containment="false"/>
+    <!-- single multiplicity reference, no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+        lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.4"
+        containment="false"/>
+    <!-- different attribute data types -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="Initial &quot;Task&quot;"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="completed"
+        lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="estimatedHours"
+        lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="8"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.0"
+        defaultValueLiteral="MEDIUM"/>
+  </eClassifiers>
+
+  <!-- eClassifiers.3 : abstract super class of Task -->
+  <eClassifiers xsi:type="ecore:EClass" name="WorkItem" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="identifier"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- eClassifiers.4 : class used as reference target, with attribute using Double -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="efficiency"
+        lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        defaultValueLiteral="0.75"/>
+  </eClassifiers>
+
+  <!-- One subpackage to exercise eSubpackages / superPackage and package-level lists -->
+  <eSubpackages name="subMM"
+      nsURI="http://example.org/rootMM/sub"
+      nsPrefix="sub">
+    <!-- subpackage classifiers -->
+    <eClassifiers xsi:type="ecore:EClass" name="Milestone">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+          lowerBound="1" upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="Status">
+      <eLiterals name="PLANNED" value="0" literal="PLANNED"/>
+      <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+      <eLiterals name="DONE" value="2" literal="DONE"/>
+    </eClassifiers>
+  </eSubpackages>
+
+</ecore:EPackage>

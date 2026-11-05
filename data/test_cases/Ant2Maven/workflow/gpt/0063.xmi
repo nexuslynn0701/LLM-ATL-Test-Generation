@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="lib-src"
+    description="Build and package shared library"
+    default="build-main">
+  <!-- Properties exercising all Ant Property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition (not referenced by tasks) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: main build pipeline -->
+  <targets xmi:id="build-main" name="build-main">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Create main jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/library-main.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"/>
+    <!-- Ensure output directory exists -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/dist"/>
+    <!-- Clean temporary files -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target: test compilation and packaging -->
+  <targets xmi:id="build-test" name="build-test">
+    <!-- Compile test sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="target/test-classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+    <!-- Package test jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/library-tests.jar"
+           basedir="target/test-classes"
+           compress="true"
+           encoding="UTF-8"/>
+    <!-- Create test reports directory -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/test-reports"/>
+    <!-- Delete old test reports -->
+    <tasks xsi:type="Ant:Delete"
+           dir="target/test-reports-old"
+           verbose="false"
+           quiet="true"
+           failonerror="false"
+           includeEmptyDirs="true"
+           excludes="**/keep/**"
+           defaultexcludes="false"/>
+  </targets>
+</Ant:Project>

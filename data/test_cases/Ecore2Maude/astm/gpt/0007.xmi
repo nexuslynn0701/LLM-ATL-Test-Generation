@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.com/company"
+    nsPrefix="company">
+
+  <!-- Root package classifiers -->
+  <!-- 0: Department -->
+  <!-- 1: Person -->
+  <!-- 2: Role (enum) -->
+  <!-- 3: Project -->
+  <!-- 4: Priority (enum) -->
+  <!-- 5: SubDepartment -->
+
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <!-- Attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="deptId"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        defaultValueLiteral="1"
+        ordered="true"
+        unique="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="deptName"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="Headquarters"
+        ordered="true"
+        unique="true"/>
+    <!-- References -->
+    <!-- employees : containment many, ordered/unique false -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        ordered="false"
+        unique="false"/>
+    <!-- projects : non-containment many, ordered false, unique true -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="projects"
+        eType="//@eClassifiers.3"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        ordered="false"
+        unique="true"/>
+    <!-- parentDepartment : optional container ref with opposite in SubDepartment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="parentDepartment"
+        eType="//@eClassifiers.5"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eOpposite="//@eClassifiers.5/@eStructuralFeatures.0"
+        ordered="true"
+        unique="true"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- Attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="John &quot;Johnny&quot; Doe"
+        ordered="true"
+        unique="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="30"
+        ordered="true"
+        unique="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="true"
+        ordered="true"
+        unique="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="role"
+        eType="//@eClassifiers.2"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="MANAGER"
+        ordered="true"
+        unique="true"/>
+    <!-- References -->
+    <!-- manager : non-containment single ref, ordered/unique default -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="manager"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        ordered="true"
+        unique="true"/>
+    <!-- department : container reference with opposite employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="department"
+        eType="//@eClassifiers.0"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"
+        ordered="true"
+        unique="true"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EEnum" name="Role">
+    <eLiterals name="ENGINEER" value="0" literal="ENGINEER"/>
+    <eLiterals name="MANAGER" value="1" literal="MANAGER"/>
+    <eLiterals name="INTERN" value="2" literal="INTERN"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <!-- Project is a subclass of Department to exercise eSuperTypes and createSort -->
+    <eSuperTypes href="//@eClassifiers.0"/>
+    <!-- Attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        defaultValueLiteral="PRJ-001"
+        ordered="true"
+        unique="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        eType="//@eClassifiers.4"
+        lowerBound="0"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="HIGH"
+        ordered="true"
+        unique="true"/>
+    <!-- References -->
+    <!-- owner : non-containment ref to Person, opposite ownedProjects -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        eType="//@eClassifiers.1"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.5"
+        ordered="true"
+        unique="true"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EEnum" name="Priority">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+    <eLiterals name="CRITICAL" value="3" literal="CRITICAL"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="SubDepartment">
+    <!-- SubDepartment has no super types, but acts as parent of Departments -->
+    <!-- Attributes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="subDeptName"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        upperBound="1"
+        iD="false"
+        defaultValueLiteral="SubUnit"
+        ordered="true"
+        unique="true"/>
+    <!-- References -->
+    <!-- children : containment many, opposite parentDepartment in Department -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        eType="//@eClassifiers.0"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.4"
+        ordered="true"
+        unique="true"/>
+  </eClassifiers>
+
+  <!-- Additional structural features on Person to reference Project (opposite owner) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" eSuperTypes="">
+    <!-- ownedProjects reference defined here just to have a valid indexable path -->
+    <!-- NOTE: This duplicate EClass element is only to host the opposite feature index.
+         In an actual EMF model you'd merge these, but for index-based pathing we keep it empty. -->
+    <eStructuralFeatures xsi:type="eccore:EReference" name="ownedProjectsDummy"/>
+  </eClassifiers>
+
+  <!-- Owned projects reference actually declared on original Person classifier (index 1) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" eSuperTypes="">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="ownedProjects"
+        eType="//@eClassifiers.3"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        ordered="true"
+        unique="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

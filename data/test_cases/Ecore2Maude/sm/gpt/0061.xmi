@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.com/companyModel"
+    nsPrefix="cmp">
+
+  <!-- 0: Primitive-like data type for Identifier -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Identifier"/>
+
+  <!-- 1: Primitive-like data type for Code -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Code"/>
+
+  <!-- 2: Enum for EmploymentType -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmploymentType">
+    <eLiterals name="FULL_TIME" value="0" literal="FULL_TIME"/>
+    <eLiterals name="PART_TIME" value="1" literal="PART_TIME"/>
+    <eLiterals name="CONTRACTOR" value="2" literal="CONTRACTOR"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract super class Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        eType="//@eClassifiers.0"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: Class Employee extending Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="employeeNumber"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="employmentType"
+        lowerBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="manager"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.4"
+        containment="false"
+        resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="projects"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.5"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 5: Class Project -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="lead"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.4"
+        containment="false"
+        resolveProxies="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="teamMembers"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.4"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 6: Abstract interface-like Role -->
+  <eClassifiers xsi:type="ecore:EClass" name="Role" abstract="true" interface="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="roleName"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 7: Manager class implementing Role (no formal interface link in Ecore core meta, just as separate EClass) -->
+  <eClassifiers xsi:type="ecore:EClass" name="ManagerRole" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="level"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+</ecore:EPackage>

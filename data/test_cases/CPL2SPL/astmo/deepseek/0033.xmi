@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" outgoing="//@elements.1" incoming="//@elements.2" subActions="//@elements.3">
+    <outgoing contents="//@elements.4"/>
+    <incoming contents="//@elements.5"/>
+  </elements>
+  <elements xsi:type="CPL:Outgoing">
+    <contents xsi:type="CPL:AddressSwitch" field="origin">
+      <addresses is="john@example.com">
+        <contents xsi:type="CPL:SubCall" ref="forwardToVoicemail"/>
+      </addresses>
+      <otherwise>
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+          <busy>
+            <contents xsi:type="CPL:Redirect" permanent="false"/>
+          </busy>
+          <noAnswer>
+            <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+          </noAnswer>
+          <default>
+            <contents xsi:type="CPL:Location" url="sip:assistant@example.com" priority="1" clear="yes"/>
+          </default>
+        </contents>
+      </otherwise>
+    </contents>
+  </elements>
+  <elements xsi:type="CPL:Incoming">
+    <contents xsi:type="CPL:TimeSwitch" dtstart="20240101T090000" interval="P1D" wkst="MO">
+      <times dtstart="20240101T090000" dtend="20240101T170000" interval="P1D" wkst="MO"/>
+      <otherwise>
+        <contents xsi:type="CPL:SubCall" ref="defaultRouting"/>
+      </otherwise>
+    </contents>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="forwardToVoicemail">
+    <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="yes"/>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="defaultRouting">
+    <contents xsi:type="CPL:Redirect" permanent="true"/>
+  </elements>
+  <elements xsi:type="CPL:SubAction" id="locationSub">
+    <contents xsi:type="CPL:Location" url="sip:home@example.com" priority="1" clear="yes"/>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:proxy@example.com" priority="1" clear="no"/>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+</CPL:CPLModel>

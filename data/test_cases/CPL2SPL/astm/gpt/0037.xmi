@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL (will trigger CPL2Program) -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.3" id="sa1"/>
+    <subActions contents="//@elements.4" id="sa2"/>
+    <incoming contents="//@elements.5"/>
+    <outgoing contents="//@elements.6"/>
+  </elements>
+
+  <!-- 1: Location used by simple Proxy and Redirect (for location-based helpers and Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:rootloc@example.com" clear="true" priority="5"/>
+
+  <!-- 2: Location used only in complex Proxy (different URL) -->
+  <elements xsi:type="CPL:Location" url="sip:complexloc@example.org" clear="false" priority="1"/>
+
+  <!-- 3: SubCall target for sa1 and method/subaction rule coverage -->
+  <elements xsi:type="CPL:SubAction" id="callTarget1">
+    <!-- contents is a Reject to exercise exclusion branches in statement computations -->
+  </elements>
+
+  <!-- 4: SubAction whose body is a SubCall; exercises SubAction2Function and SubCall2Return -->
+  <elements xsi:type="CPL:SubAction" id="sa1">
+    <contents xsi:type="CPL:SubCall" ref="callTarget1"/>
+  </elements>
+
+  <!-- 5: Incoming with a simple Proxy (isSimple=true) -->
+  <elements xsi:type="CPL:Incoming">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+    </contents>
+  </elements>
+
+  <!-- 6: Outgoing with a complex Proxy (isSimple=false) -->
+  <elements xsi:type="CPL:Outgoing">
+    <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+      <busy/>
+      <noAnswer/>
+      <redirection/>
+      <failure/>
+      <default/>
+    </contents>
+  </elements>
+
+  <!-- 7: A top-level simple Proxy whose locations pull from Location #1 -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <default contents="//@elements.1"/>
+  </elements>
+
+  <!-- 8: Top-level Redirect using Location #1 -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 9: AddressSwitch with one SwitchedAddress and NotPresent/Otherwise branches -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com"/>
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- 10: StringSwitch for StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="User-Agent">
+    <strings is="softphone" contains="soft" contents="//@elements.7"/>
+  </elements>
+
+  <!-- 11: LanguageSwitch to exercise exclusion paths in statement helpers -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en-US"/>
+  </elements>
+
+  <!-- 12: TimeSwitch for various time attributes -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com">
+    <times dtstart="20240101T000000Z" dtend="20241231T235959Z" duration="3600"
+           freq="DAILY" until="20241231T235959Z" count="10" interval="1"
+           bySecond="0" byMinute="0" byHour="9" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1" byYearDay="100" byWeekNo="15" byMonth="1"
+           wkst="MO" bySetPos="1"/>
+  </elements>
+
+  <!-- 13: PrioritySwitch, also used to hit exclusion in helpers -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.2" equal="0.5" greater="0.8"/>
+  </elements>
+
+  <!-- 14: Standalone Reject to exercise Reject handling in contents exclusions -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+</CPL:CPLModel>

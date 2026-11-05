@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntBuild"
+    basedir="."
+    description="Comprehensive Ant build for multiple stages."
+    default="build-target">
+
+  <!-- Ant properties to trigger property rules -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition to trigger TaskDef rule -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with several different tasks -->
+  <targets xmi:id="build-target" name="build" description="Compile, test, and package the project">
+    <!-- Compile Java sources with includes/excludes and classpath -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" fork="false" optimize="true" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+      <classPath refid="main.classpath">
+        <pathElement path="lib/dependency1.jar" location="lib/dependency1.jar"/>
+        <fileset dir="lib">
+          <include name="**/*.jar"/>
+          <exclude name="**/old/**"/>
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/extra/*.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntBuild API"/>
+
+    <!-- Package classes into a JAR -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/complex-ant-build.jar" basedir="build/classes" compress="true" encoding="UTF-8" manifest="MANIFEST.MF"/>
+
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/output"/>
+
+    <!-- Copy built artifacts with filters and mapper -->
+    <tasks xsi:type="Ant:Copy" todir="build/output" overwrite="true" includeEmptyDirs="false">
+      <fileset dir="build/classes">
+        <include name="**/*.class"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexAntBuild"/>
+        <filtersfile file="filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="org.example.Mapper" classpath="lib/mapper.jar" from="*.class" to="*.bin"/>
+    </tasks>
+
+    <!-- Delete temporary directory -->
+    <tasks xsi:type="Ant:Delete" dir="build/tmp" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true"/>
+
+    <!-- Timestamp task -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Secondary target to become another Maven goal (no depends used) -->
+  <targets xmi:id="clean-target" name="clean" description="Clean all build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="false" includeEmptyDirs="true" defaultexcludes="yes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build"/>
+  </targets>
+
+  <!-- Path defined at project level to trigger Path and FileSet/PathElement rules -->
+  <path id="main.path">
+    <pathElement path="lib/core.jar" location="lib/core.jar"/>
+    <fileset dir="lib/extra">
+      <include name="**/*.jar"/>
+      <exclude name="**/sources/**"/>
+      <patternset>
+        <inexcludes xsi:type="Ant:ExcludesFile" name="excluded.files" ifCondition="" unless=""/>
+      </patternset>
+    </fileset>
+    <path>
+      <pathElement path="lib/nested.jar" location="lib/nested.jar"/>
+    </path>
+  </path>
+
+</Ant:Project>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="metaRoot"
+    nsURI="http://metaRoot/1.0"
+    nsPrefix="mroot">
+
+  <!-- Subpackage to exercise super/subpackage relations -->
+  <eSubpackages name="subOne"
+      nsURI="http://metaRoot/subOne"
+      nsPrefix="s1">
+    <!-- Classifiers in subOne -->
+    <!-- 0: Abstract base class with no structural features -->
+    <eClassifiers xsi:type="ecore:EClass" name="BaseEntity" abstract="true" interface="false"/>
+    <!-- 1: Concrete subclass in same package, with one attribute and one containment reference -->
+    <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="false" interface="false"
+        eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="identifier"
+          iD="true"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          defaultValueLiteral="P-001"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="age"
+          iD="false"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="addresses"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="-1"
+          eType="//@eSubpackages.0/@eClassifiers.2"
+          containment="true"
+          resolveProxies="true"/>
+    </eClassifiers>
+    <!-- 2: Address class to be referenced/contained -->
+    <eClassifiers xsi:type="ecore:EClass" name="Address" abstract="false" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="street"
+          iD="false"
+          ordered="true"
+          unique="true"
+          lowerBound="1"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="number"
+          iD="false"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          defaultValueLiteral="10"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+          name="owner"
+          ordered="true"
+          unique="true"
+          lowerBound="0"
+          upperBound="1"
+          eType="//@eSubpackages.0/@eClassifiers.1"
+          containment="false"
+          resolveProxies="true"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers directly in root package -->
+  <!-- 0: Class with no supertypes and a single reference with opposite -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="true"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 1: Class in root, subclassing subpackage BaseEntity and ecore.EObject (through its EClass) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+      eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+    <!-- Cross-package reference to Person -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="personInfo"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eSubpackages.0/@eClassifiers.1"
+        containment="false"
+        resolveProxies="true"/>
+    <!-- Attribute with Float-like type to hit @Float branch -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="salary"
+        iD="false"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <!-- Reference opposite of Company.employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employer"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.0"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 2: Enumeration with several literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Rank">
+    <eLiterals name="junior" value="0" literal="junior"/>
+    <eLiterals name="mid" value="1" literal="mid"/>
+    <eLiterals name="senior" value="2" literal="senior"/>
+  </eClassifiers>
+
+  <!-- 3: Class with attributes using different primitive and enum datatypes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Job" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        iD="false"
+        ordered="true"
+        unique="true"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="default &quot;job&quot;"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="level"
+        iD="false"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="3"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="fullTime"
+        iD="false"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <!-- Enum-typed attribute to test enumeration datatype mapping -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="rank"
+        iD="false"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.2"
+        defaultValueLiteral="junior"/>
+    <!-- Reference list to Employee to exercise multi-valued reference with * upperBound -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="assignedEmployees"
+        ordered="true"
+        unique="true"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

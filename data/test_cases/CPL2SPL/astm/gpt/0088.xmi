@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL element exercising Incoming/Outgoing/SubAction and switches -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions referenced by SubCalls and used as declarations -->
+    <subActions id="saMain" contents="//@elements.1"/>
+    <subActions id="saBusyChain" contents="//@elements.4"/>
+    <subActions id="saRedirectOnly" contents="//@elements.6"/>
+
+    <!-- Incoming and Outgoing mapped to methods -->
+    <incoming contents="//@elements.2"/>
+    <outgoing contents="//@elements.5"/>
+  </elements>
+
+  <!-- Redirect using permanent=false, with location as location provider -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- Proxy (simple) for Incoming to exercise Proxy2Return and Location2URIConstant
+       Locations come from the referenced Location's locations helper chain -->
+  <elements xsi:type="CPL:Location" url="sip:incoming@example.com" priority="1" clear="yes"/>
+
+  <!-- Complex Proxy for saBusyChain: has Busy/NoAnswer/Redirection/Failure/Default -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- Complex, because it has non-null handlers -->
+    <busy contents="//@elements.7"/>
+    <noAnswer contents="//@elements.1"/>
+    <redirection contents="//@elements.6"/>
+    <failure/>
+    <default contents="//@elements.8"/>
+  </elements>
+
+  <!-- StringSwitch to exercise StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" />
+
+  <!-- Redirect used inside redirection handler and in saRedirectOnly (permanent=true) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- Busy with contents = SubCall, to trigger Busy2SelectCase + SubCall2Return -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- Default with contents = AddressSwitch, to trigger Default2SelectDefault + AddressSwitch2SelectStat -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- NotPresent and Otherwise inside the AddressSwitch -->
+    <notPresent/>
+    <otherwise contents="//@elements.9"/>
+  </elements>
+
+  <!-- SwitchedAddress with contents = Reject, to trigger SwitchedAddress2SelectCase and a Reject leaf that produces no further statements -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- Location used only for redirect contact URI and switch locations propagation -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.net" priority="2" clear="no"/>
+
+  <!-- PrioritySwitch as a top-level element (no direct rule, but used to test 'ignored' switches in contents conditions) -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+
+</CPL:CPLModel>

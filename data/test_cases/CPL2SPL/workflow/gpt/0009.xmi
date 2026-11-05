@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements.0 : main CPL root with subActions, outgoing, incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction 'saMain' containing a simple Proxy (uses Location) -->
+    <subActions id="saMain">
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+
+    <!-- One Outgoing whose contents is the same simple Proxy -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- simple proxy -->
+      </contents>
+    </outgoing>
+
+    <!-- One Incoming whose contents is a complex Proxy -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="serial">
+        <!-- complex proxy: has all five branches -->
+        <busy>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </default>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- elements.1 : SubCall with string ref (top-level allowed) -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- elements.2 : Location used by proxies and redirect (for Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes" priority="1"/>
+
+  <!-- elements.3 : Redirect that uses Location as its location ancestor -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- Put redirect inside the Location so that locations helper yields this Location -->
+    <refImmediateComposite xsi:nil="true"/>
+  </elements>
+
+</CPL:CPLModel>

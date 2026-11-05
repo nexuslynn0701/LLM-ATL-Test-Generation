@@ -1,0 +1,94 @@
+<xmi:XMI xmi:version="2.0"
+         xmlns:xmi="http://www.omg.org/XMI"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:Grafcet="Grafcet">
+
+  <!-- Single root Grafcet instance at index 0 -->
+  <Grafcet:Grafcet xmi:id="_grafcet1" name="ManufacturingCell" location="plant:line1">
+    <!-- Elements: three Steps and two Transitions -->
+
+    <!-- Step 0: initial and active -->
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_step0"
+              name="LoadParts"
+              location="plant:line1:stationA"
+              isInitial="true"
+              isActive="true"
+              action="load_parts"/>
+
+    <!-- Step 1: non-initial, inactive -->
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_step1"
+              name="Assemble"
+              location="plant:line1:stationB"
+              isInitial="false"
+              isActive="false"
+              action="assemble_components"/>
+
+    <!-- Step 2: non-initial, active -->
+    <elements xsi:type="Grafcet:Step"
+              xmi:id="_step2"
+              name="Unload"
+              location="plant:line1:stationC"
+              isInitial="false"
+              isActive="true"
+              action="unload_products"/>
+
+    <!-- Transition 3 -->
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_trans0"
+              name="t_LoadToAssemble"
+              location="plant:line1:transition01"
+              condition="parts_loaded"/>
+
+    <!-- Transition 4 -->
+    <elements xsi:type="Grafcet:Transition"
+              xmi:id="_trans1"
+              name="t_AssembleToUnload"
+              location="plant:line1:transition02"
+              condition="assembly_done"/>
+
+    <!-- Connections: three StepToTransition and two TransitionToStep -->
+
+    <!-- Connection 0: LoadParts -> t_LoadToAssemble -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c_st0"
+                 name="c_Load_to_t1"
+                 location="plant:line1:conn01"
+                 from="/0/@elements.0"
+                 to="/0/@elements.3"/>
+
+    <!-- Connection 1: t_LoadToAssemble -> Assemble -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c_ts0"
+                 name="c_t1_to_Assemble"
+                 location="plant:line1:conn02"
+                 from="/0/@elements.3"
+                 to="/0/@elements.1"/>
+
+    <!-- Connection 2: Assemble -> t_AssembleToUnload -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c_st1"
+                 name="c_Assemble_to_t2"
+                 location="plant:line1:conn03"
+                 from="/0/@elements.1"
+                 to="/0/@elements.4"/>
+
+    <!-- Connection 3: t_AssembleToUnload -> Unload -->
+    <connections xsi:type="Grafcet:TransitionToStep"
+                 xmi:id="_c_ts1"
+                 name="c_t2_to_Unload"
+                 location="plant:line1:conn04"
+                 from="/0/@elements.4"
+                 to="/0/@elements.2"/>
+
+    <!-- Connection 4: extra branch LoadParts -> t_AssembleToUnload -->
+    <connections xsi:type="Grafcet:StepToTransition"
+                 xmi:id="_c_st2"
+                 name="c_Load_to_t2"
+                 location="plant:line1:conn05"
+                 from="/0/@elements.0"
+                 to="/0/@elements.4"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

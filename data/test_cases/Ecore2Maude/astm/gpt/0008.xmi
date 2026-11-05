@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.com/companyModel"
+    nsPrefix="cm">
+
+  <!-- Subpackage to trigger superPackage/subPackages and multiple root packages handling -->
+  <eSubpackages name="hrSub"
+      nsURI="http://example.com/companyModel/hrSub"
+      nsPrefix="hr">
+    <!-- Class only in subpackage, to exercise PackEqClasses on non-root -->
+    <eClassifiers xsi:type="ecore:EClass" name="HRPolicy">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+          lowerBound="1" upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          iD="false" ordered="true" unique="true"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+          lowerBound="0" upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+          iD="false" ordered="false" unique="true"
+          defaultValueLiteral="true"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Root-level classifiers -->
+  <!-- 0: Department (abstract, super of Team) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="true" interface="false">
+    <!-- Attribute to create Attribute2Operation, EqType (String), EqLower/Upper, EqContainingClass, AttEqIsId(false), EqIsOrdered/Unique -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="deptName"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false" ordered="true" unique="true"/>
+  </eClassifiers>
+
+  <!-- 1: Team extends Department, has attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Team" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- ID attribute with default string value to trigger AttEqIsId(true) and AttEqSpecificDefaultValue(String) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="teamId"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true" ordered="true" unique="true"
+        defaultValueLiteral="T-DEFAULT&quot;ID"/>
+    <!-- Non-ID integer attribute with default value to exercise Int path in helpers -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="false" ordered="false" unique="true"
+        defaultValueLiteral="5"/>
+    <!-- Reference without opposite, non-containment, upperBound = -1 to trigger EqUpperBound(*) and maudeMaybeRefSort(OclVoid) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="members"
+        lowerBound="0" upperBound="-1"
+        eType="//@eClassifiers.2"
+        containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 2: Employee with attributes and a bidirectional reference to Project -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false">
+    <!-- Non-ID String attribute with default, to exercise String default and escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false" ordered="true" unique="true"
+        defaultValueLiteral="&quot;Unnamed&quot; Employee"/>
+    <!-- Boolean attribute, no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullTime"
+        lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        iD="false" ordered="false" unique="true"/>
+    <!-- Reference with opposite and containment=true to trigger RefEqOpposite (non-null) and RefEqIsContainment(true) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignedProject"
+        lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.3"
+        containment="true" resolveProxies="true"
+        eOpposite="//@eClassifiers.3/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 3: Project with opposite reference to Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <!-- Reference opposite of Employee.assignedProject, containment=false -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lead"
+        lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.2"
+        containment="false" resolveProxies="true"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 4: Role enumeration with two literals, used as attribute type and default -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Role">
+    <eLiterals name="DEVELOPER" value="0" literal="DEVELOPER"/>
+    <eLiterals name="MANAGER" value="1" literal="MANAGER"/>
+  </eClassifiers>
+
+  <!-- 5: Contract enumeration with single literal (to exercise single-literal path in EqLiterals) -->
+  <eClassifiers xsi:type="ecore:EEnum" name="ContractType">
+    <eLiterals name="PERMANENT" value="0" literal="PERMANENT"/>
+  </eClassifiers>
+
+  <!-- 6: Contractor class that uses both enums in attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contractor" abstract="false" interface="false">
+    <!-- Enum attribute with default to trigger enum default mapping in AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.4"
+        iD="false" ordered="true" unique="true"
+        defaultValueLiteral="DEVELOPER"/>
+    <!-- Enum attribute without default, referencing ContractType -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="contract"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.5"
+        iD="false" ordered="true" unique="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

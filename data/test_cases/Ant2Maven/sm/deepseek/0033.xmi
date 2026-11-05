@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    default="deploy"
+    basedir="/home/project"
+    description="Main build project">
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build"/>
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/usr/local/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <targets xmi:id="clean" name="clean" description="Remove build directory">
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" failonerror="false"/>
+  </targets>
+  <targets xmi:id="compile" name="compile" description="Compile source code" unless="skip.compile">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" optimize="false" deprecation="true"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create JAR file" ifCondition="build.success">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/myapp.jar" basedir="build/classes" compress="true" encoding="UTF-8"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run tests">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes" debug="true"/>
+    <tasks xsi:type="Ant:Copy" file="test/config.xml" todir="build/test-classes" overwrite="true"/>
+  </targets>
+  <targets xmi:id="deploy" name="deploy" description="Deploy application">
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Copy" file="dist/myapp.jar" todir="/opt/app" overwrite="false"/>
+    <tasks xsi:type="Ant:Delete" file="/tmp/temp.jar" quiet="true"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Generate documentation">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.app.*" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="MyApp API"/>
+  </targets>
+  <targets xmi:id="archive" name="archive" description="Archive old builds">
+    <tasks xsi:type="Ant:Jar" jarfile="backup/archive.jar" basedir="dist" compress="false"/>
+  </targets>
+</Ant:Project>

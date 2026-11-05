@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg87"
+    nsURI="http://root/pkg87"
+    nsPrefix="rp87">
+
+  <!-- Subpackage to trigger super/sub package equations -->
+  <eSubpackages name="childPkg1" nsURI="http://root/pkg87/child1" nsPrefix="cp1">
+    <!-- Class with:
+         - no supertypes
+         - one EReference with opposite and multiplicity * and containment=true
+         - one EAttribute (String, default value, iD=true)
+         Triggers many rules including AttEqSpecificDefaultValue, AttEqIsId, RefEqOpposite, EqUpperBound(*), etc. -->
+    <eClassifiers xsi:type="ecore:EClass" name="NodeA">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="code"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="1"
+                           upperBound="1"
+                           defaultValueLiteral="ABC&quot;123"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           iD="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="links"
+                           ordered="true"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="-1"
+                           eType="//@eSubpackages.0/@eClassifiers.1"
+                           containment="true"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.0"/>
+    </eClassifiers>
+
+    <!-- Class used as target of opposite reference above.
+         Has:
+         - one superclass (from root package)
+         - one EAttribute (Int, no default, iD=false)
+         - reference back as opposite (non-containment) -->
+    <eClassifiers xsi:type="ecore:EClass" name="NodeB"
+                  eSuperTypes="//@eClassifiers.0">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="weight"
+                           ordered="false"
+                           unique="false"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                           iD="false"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="owner"
+                           ordered="false"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="//@eSubpackages.0/@eClassifiers.0"
+                           containment="false"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.1"/>
+    </eClassifiers>
+
+  </eSubpackages>
+
+  <!-- Root-level classifiers -->
+
+  <!-- Base class for inheritance chain -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement">
+    <!-- Reference with no opposite, multiplicity 0..1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="primaryRef"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.1"
+                         containment="false"/>
+  </eClassifiers>
+
+  <!-- Derived class extending BaseElement and demonstrating
+       - an attribute with Float datatype (no default)
+       - a reference with upperBound=3 (finite >1) and no opposite -->
+  <eClassifiers xsi:type="ecore:EClass" name="DerivedElement"
+                eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="ratio"
+                         ordered="false"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"
+                         iD="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="related"
+                         ordered="false"
+                         unique="false"
+                         lowerBound="1"
+                         upperBound="3"
+                         eType="//@eClassifiers.0"
+                         containment="false"/>
+  </eClassifiers>
+
+  <!-- Enumeration with three literals, used as attribute type and for enum rules -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- Class with:
+       - String attribute without default
+       - Boolean attribute with default "true"
+       - Enum-typed attribute with default literal
+       to exercise various AttEqSpecificDefaultValue branches -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                         iD="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="IN_PROGRESS"
+                         eType="//@eClassifiers.2"
+                         iD="false"/>
+  </eClassifiers>
+
+</ecore:EPackage>

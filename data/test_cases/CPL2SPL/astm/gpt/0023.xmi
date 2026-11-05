@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.4" id="subA"/>
+    <subActions contents="//@elements.7" id="subB"/>
+    <incoming contents="//@elements.10"/>
+    <outgoing contents="//@elements.11"/>
+  </elements>
+
+  <!-- 1: Simple Location (used by simple Proxy) -->
+  <elements xsi:type="CPL:Location" url="sip:simple@example.com" clear="true"/>
+
+  <!-- 2: Complex Proxy for AddressSwitch.case -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <busy contents="//@elements.3"/>
+    <noAnswer contents="//@elements.12"/>
+  </elements>
+
+  <!-- 3: Redirect inside Busy (uses Locations from SubAction B) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 4: SubAction A: simple Proxy as contents -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="serial">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- 5: Location under SubAction B, used by Redirect/Proxy via locations -->
+  <elements xsi:type="CPL:Location" url="sip:subB@example.org" priority="5" clear="false"/>
+
+  <!-- 6: AddressSwitch as contents of SubAction B -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses contents="//@elements.2"/>
+    <addresses contents="//@elements.9"/>
+    <notPresent/>
+    <otherwise contents="//@elements.13"/>
+  </elements>
+
+  <!-- 7: SubAction B: AddressSwitch as contents -->
+  <elements xsi:type="CPL:SubAction" contents="//@elements.6" id="subB"/>
+
+  <!-- 8: SwitchedAddress with Proxy contents (complex again) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <failure/>
+  </elements>
+
+  <!-- 9: SwitchedAddress instance -->
+  <elements xsi:type="CPL:SwitchedAddress" contents="//@elements.8" is="alice@example.com"/>
+
+  <!-- 10: Location used by Incoming method as its top statement (filtered out) -->
+  <elements xsi:type="CPL:Location" url="sip:incoming@example.net" clear="true"/>
+
+  <!-- 11: SubCall used by Outgoing method as statement -->
+  <elements xsi:type="CPL:SubCall" ref="subA"/>
+
+  <!-- 12: Reject used as contents of NoAnswer in complex Proxy -->
+  <elements xsi:type="CPL:Reject" status="480" reason="No Answer"/>
+
+  <!-- 13: Redirect used as contents of Otherwise in AddressSwitch -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

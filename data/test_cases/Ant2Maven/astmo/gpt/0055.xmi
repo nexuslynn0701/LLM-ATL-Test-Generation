@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AntMavenDemoProject"
+    basedir="project-base"
+    description="Ant to Maven transformation demo"
+    default="build-target">
+
+  <!-- Path definition (will be copied to MavenMaven Path) -->
+  <path id="main-path">
+    <pathElement path="lib/somelib.jar" location="lib/somelib.jar"/>
+  </path>
+
+  <!-- Properties of all four subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- One TaskDef (user-defined task) -->
+  <taskdef name="customTask" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target with several predefined tasks -->
+  <targets xmi:id="build-target" name="build-target" description="Main build target">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+    </tasks>
+
+    <!-- Create output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+    
+    <!-- Package classes into a jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/demo-project.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    
+    <!-- Clean temporary directory -->
+    <tasks xsi:type="Ant:Delete" dir="target/tmp"/>
+  </targets>
+
+  <!-- Additional target to increase rule coverage -->
+  <targets xmi:id="docs-target" name="docs-target" description="Generate documentation">
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="org.example.demo"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Demo Project API Documentation"/>
+    
+    <!-- Timestamp task (management properties) -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd'T'HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+  </targets>
+</Ant:Project>

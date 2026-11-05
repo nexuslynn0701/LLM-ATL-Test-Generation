@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryExtended"
+    nsURI="http://example.org/libraryExtended"
+    nsPrefix="libext">
+
+  <!-- 0: Primitive wrapper datatype -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="Rating"
+      instanceClassName="java.lang.Integer"/>
+
+  <!-- 1: Enum for book format -->
+  <eClassifiers xsi:type="ecore:EEnum" name="BookFormat">
+    <eLiterals name="HARDCOVER" value="0" literal="HARDCOVER"/>
+    <eLiterals name="PAPERBACK" value="1" literal="PAPERBACK"/>
+    <eLiterals name="EBOOK" value="2" literal="EBOOK"/>
+  </eClassifiers>
+
+  <!-- 2: Enum for language -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Language">
+    <eLiterals name="EN" value="0" literal="EN"/>
+    <eLiterals name="FR" value="1" literal="FR"/>
+    <eLiterals name="DE" value="2" literal="DE"/>
+  </eClassifiers>
+
+  <!-- 3: Base named element with an ID attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="IdentifiedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="label"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: Person, abstract -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="firstName"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="lastName"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 5: Author, concrete subclass of Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Author"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="pseudonym"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 6: Librarian, another Person subtype -->
+  <eClassifiers xsi:type="ecore:EClass" name="Librarian"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="employeeNumber"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 7: Library class with containments -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="address"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="books"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.8"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="members"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.11"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="librarians"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.6"/>
+  </eClassifiers>
+
+  <!-- 8: Book class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="isbn"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="format"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="language"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="pages"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="authors"
+        upperBound="-1"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 9: Specialization of Book -->
+  <eClassifiers xsi:type="ecore:EClass" name="ReferenceBook"
+      eSuperTypes="//@eClassifiers.8">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="topic"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 10: Loan with opposite reference to Member -->
+  <eClassifiers xsi:type="ecore:EClass" name="Loan">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="startDate"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="dueDate"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="book"
+        lowerBound="1"
+        eType="//@eClassifiers.8"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="member"
+        lowerBound="1"
+        eType="//@eClassifiers.11"
+        eOpposite="//@eClassifiers.11/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 11: Member with containment of Loan and bidirectional ref -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="loans"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.10"
+        eOpposite="//@eClassifiers.10/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <!-- 12: Review referencing Book and Member and using Rating EDataType -->
+  <eClassifiers xsi:type="ecore:EClass" name="Review">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="score"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="comment"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="book"
+        lowerBound="1"
+        eType="//@eClassifiers.8"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="reviewer"
+        lowerBound="1"
+        eType="//@eClassifiers.11"/>
+  </eClassifiers>
+
+  <!-- 13: Map-entry style metadata, to exercise EStringToStringMapEntry-like structure -->
+  <eClassifiers xsi:type="ecore:EClass" name="MetaEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="key"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

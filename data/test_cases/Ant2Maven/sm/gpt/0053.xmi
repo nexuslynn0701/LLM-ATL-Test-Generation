@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MixedBuild"
+    basedir="."
+    description="Project with separate compile, doc and package targets"
+    default="compileTarget">
+
+  <!-- Default compilation target -->
+  <targets xmi:id="compileTarget" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes"/>
+  </targets>
+
+  <!-- Documentation generation target -->
+  <targets xmi:id="docsTarget" name="javadoc" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Mkdir" dir="build/docs"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example API Documentation"/>
+  </targets>
+
+  <!-- Packaging and cleanup target -->
+  <targets xmi:id="packageTarget" name="package" description="Create jar and clean temp files">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/example-1.0.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           excludes="**/keep/**"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

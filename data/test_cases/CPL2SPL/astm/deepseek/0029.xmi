@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="action1">
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="alice@example.com">
+          <contents xsi:type="CPL:SubCall" ref="action1"/>
+        </addresses>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="10">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:operator@domain.com" priority="1" clear="yes"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="urgent">
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+        </strings>
+        <notPresent>
+          <contents xsi:type="CPL:LanguageSwitch">
+            <languages matches="en"/>
+            <notPresent/>
+            <otherwise>
+              <contents xsi:type="CPL:PrioritySwitch">
+                <priorities less="3"/>
+                <notPresent/>
+                <otherwise/>
+              </contents>
+            </otherwise>
+          </contents>
+        </notPresent>
+        <otherwise/>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:backup@domain.com" priority="2" clear="no"/>
+  <elements xsi:type="CPL:SubCall" ref="action1"/>
+  <elements xsi:type="CPL:Reject" status="480" reason="TemporarilyUnavailable"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <busy>
+      <contents xsi:type="CPL:Location" url="sip:voicemail@domain.com" priority="1" clear="yes"/>
+    </busy>
+    <default>
+      <contents xsi:type="CPL:TimeSwitch" dtstart="20210101T000000" dtend="20211231T235959" duration="PT1H" interval="1" wkst="MO"/>
+    </default>
+  </elements>
+</CPL:CPLModel>

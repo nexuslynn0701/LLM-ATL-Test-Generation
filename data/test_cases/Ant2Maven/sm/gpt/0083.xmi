@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="multi-stage-build"
+    basedir="."
+    description="Project with separate compile and package targets"
+    default="build-target">
+
+  <targets xmi:id="compile-target" name="compile" description="Compile Java sources">
+    <tasks xsi:type="Ant:Mkdir" dir="out/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="out/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+  </targets>
+
+  <targets xmi:id="build-target" name="build" description="Package compiled classes into a jar">
+    <tasks xsi:type="Ant:Jar"
+           jarfile="out/artifacts/app-main.jar"
+           basedir="out/classes"
+           compress="true"
+           encoding="UTF-8"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="out/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*.tmp"
+           excludes="**/keep/**"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

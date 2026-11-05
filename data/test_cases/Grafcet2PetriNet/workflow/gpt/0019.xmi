@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingAndMerging">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="StartUp" isInitial="true" isActive="true" action="initSystem"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="LoadConfig" isInitial="false" isActive="false" action="loadCfg"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="SafeMode" isInitial="false" isActive="false" action="enterSafe"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="RunMode" isInitial="false" isActive="false" action="enterRun"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="Shutdown" isInitial="false" isActive="false" action="shutdownAll"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t001" name="cfgLoaded" condition="configOk"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="errorDetected" condition="fault"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="normalStart" condition="noFault"/>
+    <elements xsi:type="Grafcet:Transition" location="t004" name="recover" condition="recovered"/>
+    <elements xsi:type="Grafcet:Transition" location="t005" name="stopCommand" condition="stopRequest"/>
+    <!-- Connections: sequence, branching, merging, and cycle -->
+    <!-- StartUp -> cfgLoaded -> LoadConfig -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="startToCfgLoaded" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c002" name="cfgLoadedToLoadConfig" from="/0/@elements.5" to="/0/@elements.1"/>
+    <!-- LoadConfig branches to SafeMode and RunMode -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c003" name="loadConfigToError" from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c004" name="errorToSafeMode" from="/0/@elements.6" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c005" name="loadConfigToNormalStart" from="/0/@elements.1" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c006" name="normalStartToRunMode" from="/0/@elements.7" to="/0/@elements.3"/>
+    <!-- SafeMode can recover to RunMode -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c007" name="safeModeToRecover" from="/0/@elements.2" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c008" name="recoverToRunMode" from="/0/@elements.8" to="/0/@elements.3"/>
+    <!-- RunMode and SafeMode both can go to Shutdown (merging from two branches) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c009" name="runModeToStop" from="/0/@elements.3" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c010" name="safeModeToStop" from="/0/@elements.2" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c011" name="stopToShutdown" from="/0/@elements.9" to="/0/@elements.4"/>
+    <!-- Shutdown cycles back to StartUp -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c012" name="shutdownToStartup" from="/0/@elements.4" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c013" name="startupCycleToStart" from="/0/@elements.7" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

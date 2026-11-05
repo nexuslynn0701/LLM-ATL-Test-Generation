@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- Root CPL with one SubAction, one Outgoing, one Incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction whose contents is a simple Proxy using a Location (to trigger Location2URIConstant) -->
+    <subActions id="sa_main">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- Simple proxy: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+    <!-- Outgoing whose contents is the same simple Proxy -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="serial">
+        <!-- Also simple; shares same structure (location will be taken from CPL locations) -->
+      </contents>
+    </outgoing>
+    <!-- Incoming whose contents is a Reject so its statements are empty -->
+    <incoming>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+    </incoming>
+  </elements>
+
+  <!-- Location that will contribute to locations sequence for Proxies via containment -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true" priority="1">
+    <!-- No nested contents; this Location itself will be used by Location2URIConstant -->
+  </elements>
+
+  <!-- AddressSwitch using SwitchedAddress, NotPresent, Otherwise, each with contents a SubCall -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="fromUser">
+    <!-- SwitchedAddress with a SubCall contents -->
+    <addresses is="addr1" contains="x" subDomainOf="y">
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </addresses>
+    <!-- NotPresent with a SubCall contents -->
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </notPresent>
+    <!-- Otherwise with a SubCall contents -->
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </otherwise>
+  </elements>
+
+  <!-- Top-level SubCall whose ref matches the SubAction id -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- Redirect that will also use Location2URIConstant via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- StringSwitch with a simple SwitchedString contents (won't create statements) -->
+  <elements xsi:type="CPL:StringSwitch">
+    <strings is="fieldValue" contains="sub">
+      <!-- contents is Location so statements will be empty -->
+      <contents xsi:type="CPL:Location" url="sip:other@example.com" clear="false" priority="2"/>
+    </strings>
+  </elements>
+
+  <!-- LanguageSwitch with NotPresent only (so locations and error responses are exercised) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </notPresent>
+  </elements>
+
+  <!-- TimeSwitch with minimal required attributes to exercise rule guards (no statements) -->
+  <elements xsi:type="CPL:TimeSwitch">
+    <times dtstart="20240101T000000" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- PrioritySwitch with SwitchedPriority contents (no statements) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="low" greater="high" equal="mid"/>
+  </elements>
+</CPL:CPLModel>

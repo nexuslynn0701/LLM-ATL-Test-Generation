@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: Root CPL with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="sa_main">
+      <!-- SubAction contents: a simple Proxy that uses a Location, to trigger Location2URIConstant via Proxy2Return -->
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="parallel">
+        <!-- Simple proxy: no busy/noAnswer/redirection/failure/default children -->
+      </contents>
+    </subActions>
+    <!-- Root CPL outgoing, whose contents is a Location (non-statement, statement helper delegates to its contents) -->
+    <outgoing>
+      <contents xsi:type="CPL:Location" url="sip:callee@example.com" clear="yes">
+        <!-- Location contents: a Redirect that uses the same Location as its location, triggering Location2URIConstant via Redirect2Return -->
+        <contents xsi:type="CPL:Redirect" permanent="true"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: Location used as top-level (allowed) and as a location for a Proxy via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:proxy@example.net" priority="1" clear="yes"/>
+
+  <!-- elements[2]: Redirect (independent, exercises Redirect2Return without a location) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+</CPL:CPLModel>

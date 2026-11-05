@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyPkg"
+    nsURI="http://example.com/company"
+    nsPrefix="company">
+
+  <!-- 0: EDataType for String-based identifier -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="IdentifierType"
+                instanceClassName="java.lang.String"/>
+
+  <!-- 1: EEnum for EmployeeLevel -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmployeeLevel">
+    <eLiterals name="JUNIOR" value="0" literal="JUNIOR"/>
+    <eLiterals name="MID" value="1" literal="MID"/>
+    <eLiterals name="SENIOR" value="2" literal="SENIOR"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract base class Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         eType="//@eClassifiers.0"
+                         iD="true"
+                         lowerBound="1"
+                         upperBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"/>
+  </eClassifiers>
+
+  <!-- 3: Interface Payable -->
+  <eClassifiers xsi:type="ecore:EClass" name="Payable" abstract="false" interface="true">
+    <eOperations name="computePay" lowerBound="0" upperBound="1">
+      <eParameters name="hours"
+                   eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eType xsi:nil="true"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 4: Concrete Employee class -->
+  <eClassifiers xsi:type="ecore:EClass"
+                name="Employee"
+                abstract="false"
+                interface="false"
+                eSuperTypes="//@eClassifiers.2 //@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="employeeNumber"
+                         eType="//@eClassifiers.0"
+                         lowerBound="1"
+                         upperBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="level"
+                         eType="//@eClassifiers.1"
+                         lowerBound="1"
+                         upperBound="1"/>
+  </eClassifiers>
+
+  <!-- 5: Department class with containment -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="deptCode"
+                         eType="//@eClassifiers.0"
+                         lowerBound="1"
+                         upperBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="employees"
+                         eType="//@eClassifiers.4"
+                         containment="true"
+                         lowerBound="0"
+                         upperBound="-1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="head"
+                         eType="//@eClassifiers.4"
+                         containment="false"
+                         lowerBound="0"
+                         upperBound="1"/>
+  </eClassifiers>
+
+</ecore:EPackage>

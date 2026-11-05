@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.1"/>
+    <subActions contents="//@elements.2"/>
+    <subActions contents="//@elements.3"/>
+    <subActions contents="//@elements.4"/>
+    <!-- Incoming method body: simple Proxy -->
+    <incoming contents="//@elements.5"/>
+    <!-- Outgoing method body: complex Proxy with Busy/NoAnswer/Redirection/Failure/Default -->
+    <outgoing contents="//@elements.6"/>
+  </elements>
+
+  <!-- 1: SubAction subA -> contents is simple Proxy (same element as incoming) -->
+  <elements xsi:type="CPL:SubAction" id="subA" contents="//@elements.5"/>
+
+  <!-- 2: SubAction subB -> contents is SubCall to "subA" -->
+  <elements xsi:type="CPL:SubAction" id="subB" contents="//@elements.7"/>
+
+  <!-- 3: SubAction subC -> contents is Redirect (permanent=true) with Location -->
+  <elements xsi:type="CPL:SubAction" id="subC" contents="//@elements.9"/>
+
+  <!-- 4: SubAction subD -> contents is AddressSwitch -->
+  <elements xsi:type="CPL:SubAction" id="subD" contents="//@elements.10"/>
+
+  <!-- 5: Simple Proxy (isSimple = true) => Proxy2Return -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- no busy/noAnswer/redirection/failure/default => isSimple true -->
+  </elements>
+
+  <!-- 6: Complex Proxy (isSimple = false) with all branches and Location -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+    <busy contents="//@elements.8"/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.3"/>
+    <contents contents="//@elements.11"/>
+  </elements>
+
+  <!-- 7: SubCall referencing subA by name -->
+  <elements xsi:type="CPL:SubCall" ref="subA"/>
+
+  <!-- 8: Reject inside Busy (used as contents of Busy, but ignored in statements) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 9: Redirect (permanent=true) whose locations include Location 11 -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents contents="//@elements.11"/>
+  </elements>
+
+  <!-- 10: AddressSwitch used from SubAction subD -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses contents="//@elements.12"/>
+    <notPresent/>
+    <otherwise contents="//@elements.13"/>
+  </elements>
+
+  <!-- 11: Location used by complex Proxy and Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:proxy@example.com" priority="1" clear="yes"/>
+
+  <!-- 12: SwitchedAddress with contents = simple Proxy (5) -->
+  <elements xsi:type="CPL:SwitchedAddress" is="sip:user@example.com" contains="abc" subDomainOf="example.com">
+    <contents contents="//@elements.5"/>
+  </elements>
+
+  <!-- 13: Location used as contents of Otherwise (statements become OclUndefined) -->
+  <elements xsi:type="CPL:Location" url="sip:fallback@example.com" priority="2" clear="no"/>
+
+</CPL:CPLModel>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL to trigger CPL2Program, Incoming2Method, Outgoing2Method, SubAction2Function -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions -->
+    <subActions id="mainSub">
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- simple proxy: triggers Proxy2Return via SubAction2Function -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </subActions>
+
+    <subActions id="complexSub">
+      <!-- complex proxy (has busy/noAnswer/default contents) to trigger Proxy2Select, Busy2SelectCase, NoAnswer2SelectCase, Default2SelectDefault -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <!-- locations for this proxy taken from ancestor CPL: none, so Location2URIConstant not used here -->
+        <busy>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:SubCall" ref="mainSub"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+        </redirection>
+        <failure>
+          <contents xsi:type="CPL:SubCall" ref="helperSub"/>
+        </failure>
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <subActions id="helperSub">
+      <!-- contents is a TimeSwitch so SubAction2Function gives empty statements -->
+      <contents xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz">
+        <times dtstart="20250101T000000Z" interval="60" wkst="MO"/>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+        </otherwise>
+      </contents>
+    </subActions>
+
+    <!-- Incoming and Outgoing methods -->
+    <incoming>
+      <!-- contents is AddressSwitch to exercise AddressSwitch2SelectStat, SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault -->
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com">
+          <contents xsi:type="CPL:Proxy" recurse="false" ordering="parallel">
+            <!-- simple proxy under Incoming: will go through Proxy2Return -->
+            <default>
+              <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+            </default>
+          </contents>
+        </addresses>
+        <addresses is="sip:bob@example.org" contains="bob" subDomainOf="example.org">
+          <!-- address with SubCall contents -->
+          <contents xsi:type="CPL:SubCall" ref="complexSub"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </otherwise>
+      </contents>
+    </incoming>
+
+    <outgoing>
+      <!-- contents is StringSwitch to exercise StringSwitch2SelectStat -->
+      <contents xsi:type="CPL:StringSwitch" field="callType">
+        <strings is="emergency" contains="911">
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </strings>
+        <strings is="normal" contains="0">
+          <contents xsi:type="CPL:SubCall" ref="helperSub"/>
+        </strings>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- 1: Location used by several nodes to trigger Location.locations and Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:test1@example.com" priority="1" clear="yes">
+    <!-- contents points to a SubCall (index 3) so Location.statement is that SubCall -->
+    <contents xsi:type="CPL:SubCall" ref="mainSub"/>
+  </elements>
+
+  <!-- 2: Simple Proxy at top level using Location[1] as its location; triggers Proxy2Return and Location2URIConstant -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- locations for this proxy come from contained Location[4] -->
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </default>
+    <contents xsi:type="CPL:Location" url="sip:topproxy@example.net" priority="5" clear="no"/>
+  </elements>
+
+  <!-- 3: SubCall referencing complexSub to trigger SubCall2Return -->
+  <elements xsi:type="CPL:SubCall" ref="complexSub"/>
+
+  <!-- 4: Redirect that uses Location[5] as location context; triggers Redirect2Return and Location2URIConstant -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:Location" url="sip:redir@example.org" priority="3" clear="yes"/>
+  </elements>
+
+  <!-- 5: AddressSwitch at top level with its own addresses, notPresent and otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="destination">
+    <addresses is="sip:carol@example.com" contains="carol" subDomainOf="example.com">
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+    </addresses>
+    <addresses is="sip:dave@example.com" contains="dave" subDomainOf="example.com">
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+        <!-- complex proxy here (has busy/noAnswer) to trigger Proxy2Select and Busy/NoAnswer rules -->
+        <busy>
+          <contents xsi:type="CPL:Reject" status="600" reason="Busy Everywhere"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="helperSub"/>
+        </default>
+      </contents>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="mainSub"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </otherwise>
+  </elements>
+
+  <!-- 6: TimeSwitch top-level to exercise TimeSwitch in filtering (no direct rule) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz/paris">
+    <times dtstart="20250201T080000Z" dtend="20250201T170000Z" duration="090000" freq="DAILY" until="20250301T000000Z" count="10" interval="30" bySecond="0" byMinute="0" byHour="8" byDay="MO,TU,WE,TH,FR" byMonthDay="1" byYearDay="32" byWeekNo="5" byMonth="2" wkst="MO" bySetPos="1"/>
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="403" reason="Forbidden by time policy"/>
+    </otherwise>
+  </elements>
+
+  <!-- 7: LanguageSwitch top-level to appear in contents filters -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en">
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </languages>
+    <languages matches="fr">
+      <contents xsi:type="CPL:SubCall" ref="mainSub"/>
+    </languages>
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="400" reason="Unsupported language"/>
+    </otherwise>
+  </elements>
+
+  <!-- 8: PrioritySwitch top-level to appear in contents filters -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3">
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </priorities>
+    <priorities greater="0.7" equal="0.7">
+      <contents xsi:type="CPL:SubCall" ref="complexSub"/>
+    </priorities>
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="500" reason="Priority error"/>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

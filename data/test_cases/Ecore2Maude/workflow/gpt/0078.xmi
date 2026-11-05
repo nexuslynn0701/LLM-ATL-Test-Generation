@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="testpkg"
+    nsURI="http://example/testpkg"
+    nsPrefix="tp">
+
+  <!-- 0: Root package with one subpackage and several classifiers -->
+  <eSubpackages name="subpkg"
+                nsURI="http://example/subpkg"
+                nsPrefix="sp">
+    <!-- 0: Enum in subpackage with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Color">
+      <eLiterals name="RED" value="0" literal="RED"/>
+      <eLiterals name="GREEN" value="1" literal="GREEN"/>
+    </eClassifiers>
+
+    <!-- 1: Enum that will be used as attribute type -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Size">
+      <eLiterals name="SMALL" value="0" literal="SMALL"/>
+      <eLiterals name="LARGE" value="1" literal="LARGE"/>
+    </eClassifiers>
+
+    <!-- 2: Simple datatype used as attribute type -->
+    <eClassifiers xsi:type="ecore:EDataType" name="CustomString" instanceTypeName="java.lang.String"/>
+
+    <!-- 3: Abstract superclass with one attribute, one reference -->
+    <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="name"
+                           lowerBound="1"
+                           upperBound="1"
+                           iD="true"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="owner"
+                           lowerBound="0"
+                           upperBound="1"
+                           containment="false"
+                           eType="//@eSubpackages.0/@eClassifiers.4"/>
+    </eClassifiers>
+
+    <!-- 4: Concrete class extending NamedElement, with attrs & refs -->
+    <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="false">
+      <eSuperTypes>//@eSubpackages.0/@eClassifiers.3</eSuperTypes>
+      <!-- Attribute with String type and default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="nickname"
+                           lowerBound="0"
+                           upperBound="1"
+                           defaultValueLiteral="noname"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <!-- Attribute with enum type and default literal -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="size"
+                           lowerBound="0"
+                           upperBound="1"
+                           defaultValueLiteral="SMALL"
+                           eType="//@eSubpackages.0/@eClassifiers.1"/>
+      <!-- Reference to Address, containment, multiplicity * -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="addresses"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="true"
+                           eType="//@eSubpackages.0/@eClassifiers.5"/>
+    </eClassifiers>
+
+    <!-- 5: Class Address with int bounds, opposite, and custom datatype attribute -->
+    <eClassifiers xsi:type="ecore:EClass" name="Address">
+      <!-- Back reference to Person, non-containment, opposite of addresses -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="resident"
+                           lowerBound="1"
+                           upperBound="1"
+                           containment="false"
+                           eType="//@eSubpackages.0/@eClassifiers.4"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.4/@eStructuralFeatures.2"/>
+      <!-- Attribute with EInt type -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="number"
+                           lowerBound="0"
+                           upperBound="1"
+                           defaultValueLiteral="0"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <!-- Attribute with custom datatype -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="label"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="//@eSubpackages.0/@eClassifiers.2"/>
+    </eClassifiers>
+
+  </eSubpackages>
+
+  <!-- 1: Datatype in root package -->
+  <eClassifiers xsi:type="ecore:EDataType" name="RootInt" instanceTypeName="int"/>
+
+  <!-- 2: Root-level class to ensure multiple packages/classes -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="rootName"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.org/companyModel"
+    nsPrefix="company">
+
+  <!-- 0: Data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Email" instanceTypeName="java.lang.String"/>
+
+  <!-- 1: Base class Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="addresses"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 2: Employee, subclass of Person, references Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+                eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="salary"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="department"
+                         eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="manager"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 3: Address is a pure EClass with attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="street"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="city"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="zip"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 4: Department contains employees via opposite reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="employees"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 5: Project with bidirectional association to Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="team"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 6: Role enumeration -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Role">
+    <eLiterals name="DEVELOPER" value="0" literal="DEV"/>
+    <eLiterals name="MANAGER" value="1" literal="MGR"/>
+    <eLiterals name="TESTER" value="2" literal="TST"/>
+  </eClassifiers>
+
+  <!-- 7: Contract module element-like class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contract">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="contractId"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="active"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="employee"
+                         eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 8: Meeting with recursive containment of AgendaItem -->
+  <eClassifiers xsi:type="ecore:EClass" name="Meeting">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="topic"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="participants"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="agenda"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+  <!-- 9: AgendaItem recursive reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="AgendaItem">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subItems"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+</ecore:EPackage>

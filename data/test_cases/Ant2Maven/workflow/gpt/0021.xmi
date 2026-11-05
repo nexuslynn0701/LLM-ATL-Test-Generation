@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="project-root"
+    description="Full build lifecycle: compile, package, and clean"
+    default="build-all">
+  <!-- Properties covering all subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="compile.debug" value="true"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="output/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+  <!-- User-defined task definition and attribute -->
+  <taskdef name="custom.task" classname="org.example.ant.CustomTask"/>
+  <targets xmi:id="build-all" name="build-all">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="output/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false">
+    </tasks>
+    <!-- Package into JAR -->
+    <tasks xsi:type="Ant:Jar"
+        jarfile="output/artifacts/app.jar"
+        basedir="output/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="MANIFEST.MF"/>
+    <!-- Create build directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="output"/>
+    <tasks xsi:type="Ant:Mkdir" dir="output/classes"/>
+    <!-- Clean build output -->
+    <tasks xsi:type="Ant:Delete"
+        dir="output"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        includes="**/*"
+        excludes="**/.keep"
+        defaultexcludes="true"/>
+  </targets>
+  <targets xmi:id="docs" name="docs">
+    <!-- Generate Java documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src/main/java"
+        destdir="output/docs"
+        packagenames="org.example.*"
+        defaultexcludes="true"
+        author="yes"
+        version="yes"
+        use="yes"
+        windowtitle="Example Project API"/>
+  </targets>
+</Ant:Project>

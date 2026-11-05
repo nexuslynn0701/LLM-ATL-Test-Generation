@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="User Busy"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="yes"/>
+        </default>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:alice@example.com">
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:alice@backup.example.com" clear="no"/>
+            </default>
+          </contents>
+        </addresses>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="CPL-Client/1.0">
+          <contents xsi:type="CPL:Location" url="sip:agent-handler@example.com" clear="yes"/>
+        </strings>
+        <otherwise>
+          <contents xsi:type="CPL:Failure"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction"/>
+  <elements xsi:type="CPL:Location" url="sip:fallback@example.com" clear="yes"/>
+  <elements xsi:type="CPL:Reject" status="603" reason="Decline"/>
+</CPL:CPLModel>

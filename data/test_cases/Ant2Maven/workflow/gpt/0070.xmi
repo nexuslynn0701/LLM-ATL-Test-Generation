@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComprehensiveBuild"
+    basedir="workspace"
+    description="Full Ant build with multiple tasks and properties"
+    default="buildTarget">
+
+  <!-- Properties covering all concrete Property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="java.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="workspace/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A standalone task definition (not referenced by tasks) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with a variety of tasks -->
+  <targets xmi:id="buildTarget" name="buildTarget" description="Compile sources, package jar and clean old output">
+    <!-- Ensure Javac rule is exercised -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src/main/java"
+           destdir="workspace/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Ensure Jar rule is exercised -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/target/app-full.jar"
+           basedir="workspace/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="workspace/META-INF/MANIFEST.MF"/>
+    <!-- Ensure Mkdir rule is exercised -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="workspace/target/generated-sources"/>
+    <!-- Ensure Delete rule is exercised -->
+    <tasks xsi:type="Ant:Delete"
+           dir="workspace/target/tmp"
+           includes="**/*"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target with documentation task -->
+  <targets xmi:id="docTarget" name="docTarget" description="Generate Javadoc API documentation">
+    <!-- Ensure Javadoc rule is exercised -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="workspace/src/main/java"
+           destdir="workspace/target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComprehensiveBuild API"/>
+  </targets>
+
+</Ant:Project>

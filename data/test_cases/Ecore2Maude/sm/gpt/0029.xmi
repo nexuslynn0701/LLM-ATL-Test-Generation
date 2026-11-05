@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="universityModel"
+    nsURI="http://example.org/universityModel"
+    nsPrefix="uni">
+
+  <!-- 0: EDataType for String IDs -->
+  <eClassifiers xsi:type="ecore:EDataType" name="StringID"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: EEnum Semester -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Semester">
+    <eLiterals name="SPRING" value="0" literal="SPRING"/>
+    <eLiterals name="FALL" value="1" literal="FALL"/>
+  </eClassifiers>
+
+  <!-- 2: EClass Person (abstract supertype) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        eType="//@eClassifiers.0" lowerBound="1">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="ConsistentTransient"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 3: EClass Student -->
+  <eClassifiers xsi:type="ecore:EClass" name="Student" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="enrollmentYear"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 4: EClass Professor -->
+  <eClassifiers xsi:type="ecore:EClass" name="Professor" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0"/>
+  </eClassifiers>
+
+  <!-- 5: EClass Course -->
+  <eClassifiers xsi:type="ecore:EClass" name="Course" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="//@eClassifiers.0" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="credits"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 6: EClass Department -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 7: EClass Enrollment -->
+  <eClassifiers xsi:type="ecore:EClass" name="Enrollment" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="year"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="semester"
+        eType="//@eClassifiers.1" lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 8: EClass University -->
+  <eClassifiers xsi:type="ecore:EClass" name="University" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 9: EClass Address, referenced but not contained (to test non-containment refs) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="city"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- Now add structural features that cross-reference classes above -->
+
+  <!-- Add structural features to Student (index 3) -->
+  <eClassifiers xsi:type="ecore:EClass" name="StudentExt" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <!-- non-containment reference to Department -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.6"
+        containment="false" lowerBound="0" upperBound="1"/>
+    <!-- many-valued non-containment reference to Enrollment -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="enrollments"
+        eType="//@eClassifiers.7"
+        containment="false" lowerBound="0" upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- Add structural features to Professor (index 4) with bidirectional references -->
+  <eClassifiers xsi:type="ecore:EClass" name="ProfessorExt" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.4">
+    <!-- container department -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.6"
+        containment="false" lowerBound="0" upperBound="1"/>
+    <!-- reference to Address (not contained) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="officeAddress"
+        eType="//@eClassifiers.9"
+        containment="false" lowerBound="0" upperBound="1"/>
+  </eClassifiers>
+
+  <!-- Add structural features to Course (index 5) -->
+  <eClassifiers xsi:type="ecore:EClass" name="CourseExt" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.5">
+    <!-- container department -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="department"
+        eType="//@eClassifiers.6"
+        containment="false" lowerBound="0" upperBound="1"/>
+    <!-- many-valued reference to Enrollment -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="enrollments"
+        eType="//@eClassifiers.7"
+        containment="false" lowerBound="0" upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- Add structural features to Department (index 6) with containments and opposites -->
+  <eClassifiers xsi:type="ecore:EClass" name="DepartmentExt" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.6">
+    <!-- containment of courses -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="courses"
+        eType="//@eClassifiers.5"
+        containment="true" lowerBound="0" upperBound="-1"/>
+    <!-- containment of professors -->
+    <eStructuralFeatures xsi:type="eccore:EReference" name="professors"
+        eType="//@eClassifiers.4"
+        containment="true" lowerBound="0" upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- Add structural features to University (index 8) -->
+  <eClassifiers xsi:type="ecore:EClass" name="UniversityExt" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.8">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="departments"
+        eType="//@eClassifiers.6"
+        containment="true" lowerBound="1" upperBound="-1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="students"
+        eType="//@eClassifiers.3"
+        containment="true" lowerBound="0" upperBound="-1"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="30">
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="User Busy"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="destination">
+            <addresses is="user@example.com">
+              <contents xsi:type="CPL:Location" url="sip:primary@example.com" clear="true" priority="1"/>
+            </addresses>
+            <notPresent>
+              <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+            </notPresent>
+            <otherwise>
+              <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="true" priority="0"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="MobileClient"/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:TimeSwitch" tzid="UTC">
+        <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ref="fallbackAction"/>
+  <elements xsi:type="CPL:Location" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" url="sip:fallback@example.com" clear="true" priority="2"/>
+</CPL:CPLModel>

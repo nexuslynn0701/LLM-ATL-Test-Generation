@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cpx">
+
+  <!-- 0: Primitive String datatype -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="MyString"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Primitive Int datatype -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="MyInt"
+      instanceClassName="int"/>
+
+  <!-- 2: Enum with three literals -->
+  <eClassifiers xsi:type="ecore:EEnum"
+      name="PriorityKind">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 3: Abstract base class -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="BaseElement"
+      abstract="true"
+      interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 4: Interface type -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Named"
+      abstract="true"
+      interface="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="label"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 5: Concrete Task class with attributes, refs and operations -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Task"
+      abstract="false"
+      interface="false"
+      eSuperTypes="//@eClassifiers.3 //@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="description"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="estimate"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="subTasks"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="dependsOn"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+    <eOperations name="getTotalEstimate"
+        lowerBound="0"
+        upperBound="1">
+      <eParameters name="includeSubTasks"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      <eType eType="//@eClassifiers.1"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 6: Container class with containment and non-containment refs and an operation with parameter -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Project"
+      abstract="false"
+      interface="false"
+      eSuperTypes="//@eClassifiers.4">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="rootTasks"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="allTasks"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+    <eOperations name="findTaskById"
+        lowerBound="0"
+        upperBound="1">
+      <eParameters name="taskId"
+          lowerBound="1"
+          upperBound="1"
+          eType="//@eClassifiers.0"/>
+      <eType eType="//@eClassifiers.5"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 7: Another interface to diversify supertypes -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Timestamped"
+      abstract="true"
+      interface="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="createdOn"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="updatedOn"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+  </eClassifiers>
+
+  <!-- 8: User class -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="User"
+      abstract="false"
+      interface="false"
+      eSuperTypes="//@eClassifiers.3 //@eClassifiers.4 //@eClassifiers.7">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="email"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 9: Assignment class linking User and Task -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Assignment"
+      abstract="false"
+      interface="false"
+      eSuperTypes="//@eClassifiers.3 //@eClassifiers.7">
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="assignee"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.8"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="task"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.5"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="effortSpent"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 10: Container for Users and Assignments, separate from Project -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Organization"
+      abstract="false"
+      interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="orgName"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="members"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.8"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="assignments"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.9"/>
+  </eClassifiers>
+
+</ecore:EPackage>

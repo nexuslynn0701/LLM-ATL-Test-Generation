@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexModel"
+    nsURI="http://example.org/complexModel"
+    nsPrefix="cm">
+
+  <!-- Root package classifiers -->
+  <!-- 0: Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="false" interface="false">
+    <!-- Attribute: personId is ID, String with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="personId"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        iD="true"
+        defaultValueLiteral="P-000"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute: age, Int with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        iD="false"
+        defaultValueLiteral="18"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference: primaryAddress, containment, single -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="primaryAddress"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        containment="true"
+        resolveProxies="true"
+        eType="//@eClassifiers.1"/>
+    <!-- Reference: contacts, non-containment, many, opposite is Contact::owner -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="contacts"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.4"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- 1: Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address" abstract="false" interface="false">
+    <!-- street: String with quotes and spaces in default to exercise escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        iD="false"
+        defaultValueLiteral="&quot;Main&quot; Street"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- zipCode: EInt without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="zipCode"
+        lowerBound="0"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        iD="false"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- residents: non-containment many ref to Person, opposite of Person::primaryAddress to trigger eOpposite on refs with nullMaybeRefSort=false -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="residents"
+        lowerBound="0"
+        upperBound="-1"
+        ordered="true"
+        unique="true"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+  <!-- 2: Company (extends Person) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- Attribute: name, String with a simple default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        iD="false"
+        defaultValueLiteral="ACME"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 3: Status enum with three literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="SUSPENDED" value="2" literal="SUSPENDED"/>
+  </eClassifiers>
+
+  <!-- 4: Contact, uses enum Status and opposite back to Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contact" abstract="false" interface="false">
+    <!-- kind: String attribute default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="kind"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        iD="false"
+        defaultValueLiteral="email"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- owner: opposite of Person::contacts -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        containment="false"
+        resolveProxies="true"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.3"/>
+    <!-- status: enum-typed attribute with default enum literal name -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="1"
+        upperBound="1"
+        ordered="true"
+        unique="true"
+        iD="false"
+        defaultValueLiteral="ACTIVE"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 5: AddressKind enum with single literal to cover size=1 literal case -->
+  <eClassifiers xsi:type="ecore:EEnum" name="AddressKind">
+    <eLiterals name="HOME" value="0" literal="HOME"/>
+  </eClassifiers>
+
+  <!-- 6: EDataType mimicking Double to trigger @Float mapping -->
+  <eClassifiers xsi:type="ecore:EDataType" name="DoubleLike" instanceClassName="java.lang.Double"/>
+
+  <!-- Subpackage to exercise eSuperPackage, eSubpackages, and multiple top-level packages in MetamodelEqPackages -->
+  <eSubpackages name="subPkg" nsURI="http://example.org/complexModel/sub" nsPrefix="cms">
+    <!-- 0 in subPkg: Project -->
+    <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="true" interface="false">
+      <!-- title: String without default (no AttEqSpecificDefaultValue) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="title"
+          lowerBound="1"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          iD="false"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <!-- budget: uses custom DoubleLike to trigger @Float branch -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="budget"
+          lowerBound="0"
+          upperBound="1"
+          ordered="true"
+          unique="true"
+          iD="false"
+          eType="//@eSubpackages.0/@eClassifiers.1"/>
+    </eClassifiers>
+
+    <!-- 1 in subPkg: DoubleLike data type (for budget above) -->
+    <eClassifiers xsi:type="ecore:EDataType" name="DoubleLike" instanceClassName="java.lang.Double"/>
+  </eSubpackages>
+
+</ecore:EPackage>

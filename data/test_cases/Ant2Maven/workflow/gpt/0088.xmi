@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="project-root"
+    description="Build and package shared library"
+    default="buildTarget">
+
+  <!-- Mixed property kinds to trigger all AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="build.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="output/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A task definition to trigger AntTaskDef2MavenMavenTaskDef -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with various tasks to exercise task-mapping rules -->
+  <targets xmi:id="buildTarget" name="build">
+    <tasks xsi:type="Ant:Mkdir" dir="output/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="output/classes"
+           debug="on"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/library.jar"
+           basedir="output/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Additional target with file-management and attribute-mapped tasks -->
+  <targets xmi:id="cleanupTarget" name="cleanup">
+    <tasks xsi:type="Ant:Copy"
+           todir="backup/output"
+           presservelastmodified="true"
+           overwrite="false"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="output"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           excludes="**/important/**"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

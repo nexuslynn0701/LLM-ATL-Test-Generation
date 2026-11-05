@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="workflow"
+    nsURI="http://example.org/workflow"
+    nsPrefix="wf">
+
+  <!-- 0: Primitive datatype -->
+  <eClassifiers xsi:type="ecore:EDataType" name="WFString"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 1: Abstract root element -->
+  <eClassifiers xsi:type="ecore:EClass" name="WorkflowElement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 2: Concrete Workflow, root container -->
+  <eClassifiers xsi:type="ecore:EClass" name="Workflow"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="version"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="steps"
+        eType="//@eClassifiers.3" upperBound="-1" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dataItems"
+        eType="//@eClassifiers.5" upperBound="-1" containment="true"/>
+  </eClassifiers>
+
+  <!-- 3: Step, contained in Workflow -->
+  <eClassifiers xsi:type="ecore:EClass" name="Step"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="incoming"
+        eType="//@eClassifiers.4" upperBound="-1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outgoing"
+        eType="//@eClassifiers.4" upperBound="-1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="reads"
+        eType="//@eClassifiers.5" upperBound="-1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="writes"
+        eType="//@eClassifiers.5" upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- 4: Transition between steps -->
+  <eClassifiers xsi:type="ecore:EClass" name="Transition"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source"
+        eType="//@eClassifiers.3" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target"
+        eType="//@eClassifiers.3" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="guard"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 5: Data item, referenced by steps -->
+  <eClassifiers xsi:type="ecore:EClass" name="DataItem"
+      eSuperTypes="//@eClassifiers.1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type"
+        eType="//@eClassifiers.0" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="initialValue"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 6: Enumeration of run states -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RunState">
+    <eLiterals name="CREATED" value="0" literal="CREATED"/>
+    <eLiterals name="RUNNING" value="1" literal="RUNNING"/>
+    <eLiterals name="FINISHED" value="2" literal="FINISHED"/>
+  </eClassifiers>
+
+  <!-- 7: Execution, references Workflow and RunState -->
+  <eClassifiers xsi:type="ecore:EClass" name="Execution">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="definition"
+        eType="//@eClassifiers.2" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="state"
+        eType="//@eClassifiers.6" lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 8: Map entry type for string-to-string metadata -->
+  <eClassifiers xsi:type="ecore:EClass" name="MetadataEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 9: ExtendedStep inheriting from Step, with metadata -->
+  <eClassifiers xsi:type="ecore:EClass" name="ExtendedStep"
+      eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metadata"
+        eType="//@eClassifiers.8" upperBound="-1" containment="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

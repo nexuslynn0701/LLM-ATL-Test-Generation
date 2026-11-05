@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="destination">
+        <addresses is="user@example.com"/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="serial">
+            <busy>
+              <contents xsi:type="CPL:SubCall" ref="fallback"/>
+            </busy>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default>
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings contains="meeting"/>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallback"/>
+  <elements xsi:type="CPL:Location" url="sip:backup@example.com" clear="yes"/>
+</CPL:CPLModel>

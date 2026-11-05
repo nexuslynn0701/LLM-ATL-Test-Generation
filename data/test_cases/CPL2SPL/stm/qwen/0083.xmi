@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:AddressSwitch" field="from" subField="user">
+        <addresses is="alice" contains="example.com"/>
+        <addresses subDomainOf="company.org"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential" timeout="30">
+            <busy>
+              <contents xsi:type="CPL:Location" url="sip:voicemail@company.org" clear="yes" priority="normal"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Redirect" permanent="yes"/>
+            </noAnswer>
+            <default contents="//@elements.1"/>
+          </proxy>
+        </otherwise>
+      </contents>
+    </subActions>
+    <outgoing>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="meeting" contains="urgent"/>
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="handleNormalCall"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+        <times dtstart="20240101T090000" dtend="20240101T170000" interval="1" wkst="MO" byDay="MO,TU,WE,TH,FR"/>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="480" reason="Outside business hours"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:PrioritySwitch">
+            <priorities greater="5" less="10" equal="7"/>
+            <otherwise>
+              <contents xsi:type="CPL:Location" url="sip:reception@company.org" clear="no" priority="high"/>
+            </otherwise>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ref="handleNormalCall"/>
+  <elements xsi:type="CPL:Location" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" url="sip:backup@company.org" clear="yes" priority="low"/>
+</CPL:CPLModel>

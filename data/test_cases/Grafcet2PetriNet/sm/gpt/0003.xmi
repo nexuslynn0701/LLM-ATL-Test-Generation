@@ -1,0 +1,115 @@
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g000" name="ComplexGrafcet" location="file.grafcet#//@grafcet">
+
+    <!-- Elements: Steps and Transitions -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="file.grafcet#//@elements.0"
+              isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="ParallelStepA" location="file.grafcet#//@elements.1"
+              isInitial="false" isActive="false" action="processBranchA"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="ParallelStepB" location="file.grafcet#//@elements.2"
+              isInitial="false" isActive="false" action="processBranchB"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="MergeStep" location="file.grafcet#//@elements.3"
+              isInitial="false" isActive="false" action="mergeBranches"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s4" name="LoopStep" location="file.grafcet#//@elements.4"
+              isInitial="false" isActive="false" action="loopCheck"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s5" name="TerminalStep" location="file.grafcet#//@elements.5"
+              isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="SplitTransition" location="file.grafcet#//@elements.6"
+              condition="startPressed"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="ToMergeFromA" location="file.grafcet#//@elements.7"
+              condition="A_done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="ToMergeFromB" location="file.grafcet#//@elements.8"
+              condition="B_done"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t3" name="FromMergeToLoop" location="file.grafcet#//@elements.9"
+              condition="mergeComplete"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t4" name="LoopBackTransition" location="file.grafcet#//@elements.10"
+              condition="loopAgain"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t5" name="ToTerminal" location="file.grafcet#//@elements.11"
+              condition="finish"/>
+
+    <!-- Connections: StepToTransition and TransitionToStep -->
+    <!-- InitStep -> SplitTransition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0" name="Init_to_Split" location="file.grafcet#//@connections.0"
+                 grafcet="/0"
+                 from="/0/@elements.0"
+                 to="/0/@elements.6"/>
+
+    <!-- SplitTransition -> ParallelStepA -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c1" name="Split_to_A" location="file.grafcet#//@connections.1"
+                 grafcet="/0"
+                 from="/0/@elements.6"
+                 to="/0/@elements.1"/>
+
+    <!-- SplitTransition -> ParallelStepB -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c2" name="Split_to_B" location="file.grafcet#//@connections.2"
+                 grafcet="/0"
+                 from="/0/@elements.6"
+                 to="/0/@elements.2"/>
+
+    <!-- ParallelStepA -> ToMergeFromA -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c3" name="A_to_Merge" location="file.grafcet#//@connections.3"
+                 grafcet="/0"
+                 from="/0/@elements.1"
+                 to="/0/@elements.7"/>
+
+    <!-- ParallelStepB -> ToMergeFromB -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c4" name="B_to_Merge" location="file.grafcet#//@connections.4"
+                 grafcet="/0"
+                 from="/0/@elements.2"
+                 to="/0/@elements.8"/>
+
+    <!-- ToMergeFromA -> MergeStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c5" name="MergeA_to_MergeStep" location="file.grafcet#//@connections.5"
+                 grafcet="/0"
+                 from="/0/@elements.7"
+                 to="/0/@elements.3"/>
+
+    <!-- ToMergeFromB -> MergeStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c6" name="MergeB_to_MergeStep" location="file.grafcet#//@connections.6"
+                 grafcet="/0"
+                 from="/0/@elements.8"
+                 to="/0/@elements.3"/>
+
+    <!-- MergeStep -> FromMergeToLoop -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c7" name="Merge_to_LoopTrans" location="file.grafcet#//@connections.7"
+                 grafcet="/0"
+                 from="/0/@elements.3"
+                 to="/0/@elements.9"/>
+
+    <!-- FromMergeToLoop -> LoopStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c8" name="LoopTrans_to_LoopStep" location="file.grafcet#//@connections.8"
+                 grafcet="/0"
+                 from="/0/@elements.9"
+                 to="/0/@elements.4"/>
+
+    <!-- LoopStep -> LoopBackTransition (back to itself) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c9" name="LoopStep_to_LoopBack" location="file.grafcet#//@connections.9"
+                 grafcet="/0"
+                 from="/0/@elements.4"
+                 to="/0/@elements.10"/>
+
+    <!-- LoopBackTransition -> LoopStep (self-loop) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c10" name="LoopBack_to_LoopStep" location="file.grafcet#//@connections.10"
+                 grafcet="/0"
+                 from="/0/@elements.10"
+                 to="/0/@elements.4"/>
+
+    <!-- LoopStep -> ToTerminal -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c11" name="LoopStep_to_TerminalTrans" location="file.grafcet#//@connections.11"
+                 grafcet="/0"
+                 from="/0/@elements.4"
+                 to="/0/@elements.11"/>
+
+    <!-- ToTerminal -> TerminalStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c12" name="TerminalTrans_to_TerminalStep" location="file.grafcet#//@connections.12"
+                 grafcet="/0"
+                 from="/0/@elements.11"
+                 to="/0/@elements.5"/>
+
+  </Grafcet:Grafcet>
+</xmi:XMI>

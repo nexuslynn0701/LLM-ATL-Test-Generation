@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPack69"
+    nsURI="http://root69"
+    nsPrefix="root69">
+
+  <!-- Subpackage to exercise superPackage/subPackages handling -->
+  <eSubpackages name="subPackAlpha"
+                nsURI="http://root69/alpha"
+                nsPrefix="alpha">
+    <!-- Class in subpackage: no supertypes, one reference and one attribute -->
+    <eClassifiers xsi:type="ecore:EClass" name="AlphaNode">
+      <eStructuralFeatures xsi:type="eccore:EAttribute"
+                           name="alphaName"
+                           lowerBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="parentInRoot"
+                           lowerBound="0"
+                           upperBound="-1"
+                           eType="//@eClassifiers.0"
+                           containment="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers in root package (index-based references rely on this ordering) -->
+
+  <!-- 0: EClass with supertypes, references and attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootEntity">
+    <!-- Supertype is another class in same package (index 1 below) -->
+    <eSuperTypes>//@eClassifiers.1</eSuperTypes>
+
+    <!-- ID attribute with Boolean type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         iD="true"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+
+    <!-- String attribute with default value to trigger AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="label"
+                         lowerBound="0"
+                         upperBound="1"
+                         defaultValueLiteral="root &quot;label&quot;"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+
+    <!-- Boolean attribute without explicit default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="flag"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+
+    <!-- Containment reference to Child (index 1), no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="children"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.1"/>
+
+    <!-- Non-containment reference with opposite, to exercise RefEqOpposite and maudeMaybeRefSort -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="alphaLinks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         eType="//@eSubpackages.0/@eClassifiers.0">
+      <eOpposite href="#//@eClassifiers.1/@eStructuralFeatures.2"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- 1: EClass supertype and bidirectional reference back to RootEntity -->
+  <eClassifiers xsi:type="ecore:EClass" name="Child">
+    <!-- No explicit supertype: will be subsort of @Class in Maude -->
+    <!-- Attribute with Integer type and no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="index"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+
+    <!-- Reference back to RootEntity (opposite of alphaLinks above) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         lowerBound="1"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.0">
+      <eOpposite href="#//@eClassifiers.0/@eStructuralFeatures.4"/>
+    </eStructuralFeatures>
+
+    <!-- Reference to AlphaNode in subpackage (for cross-package ref) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="alphaTargets"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         eType="//@eSubpackages.0/@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 2: EEnum with several literals to trigger enum-related rules -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 3: EClass with enum-typed attribute using default literal -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <!-- Attribute typed by StatusKind enum, with default literal DONE -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="1"
+                         upperBound="1"
+                         defaultValueLiteral="DONE"
+                         eType="//@eClassifiers.2"/>
+    <!-- Attribute typed by EString without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

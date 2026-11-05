@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: Root CPL with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction whose contents is the complex Proxy in elements[1] -->
+    <subActions>
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="yes" ordering="parallel">
+        <!-- complex Proxy (non-simple) with all branches and a Default containing a SubCall -->
+        <busy>
+          <!-- Busy with contents a simple Proxy (uses Location -> triggers Location2URIConstant) -->
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+            <!-- simple Proxy: only default branch and a Location, no other branches -->
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:busy@example.com" priority="1" clear="yes"/>
+            </default>
+          </contents>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- Default whose contents is SubCall in elements[2] -->
+        <default contents="//@elements.2"/>
+      </contents>
+    </subActions>
+
+    <!-- one Outgoing method whose contents is the Redirect in elements[3] -->
+    <outgoing>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: top-level Location to be used by Redirect in elements[3] -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.com" priority="5" clear="yes"/>
+
+  <!-- elements[2]: SubCall referenced from Default inside complex Proxy -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[3]: Redirect whose location is the Location in elements[1] -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:redirect2@example.com" priority="10" clear="no"/>
+  </elements>
+
+</CPL:CPLModel>

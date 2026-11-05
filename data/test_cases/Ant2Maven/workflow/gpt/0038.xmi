@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="workspace"
+    description="Full build lifecycle with properties and file management"
+    default="build-all">
+  <!-- Properties exercising all four Property subtypes -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="build/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by any task, to satisfy safety rules) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple tasks -->
+  <targets xmi:id="build-all" name="build-all" description="Compile, package, and clean outputs">
+    <!-- Compilation task -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Documentation generation task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Project API"/>
+    <!-- Archiving task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/example-app.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Directory creation task -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/logs"/>
+    <!-- File deletion task -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="config/includes.txt"
+           excludes="**/*.bak"
+           excludesfile="config/excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target to exercise multiple Goal creation -->
+  <targets xmi:id="prepare-resources" name="prepare-resources" description="Prepare resource directories">
+    <tasks xsi:type="Ant:Mkdir" dir="build/resources"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/resources/static"/>
+  </targets>
+</Ant:Project>

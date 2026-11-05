@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL container with incoming/outgoing and one SubAction -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- This SubAction's contents point to various top-level nodes -->
+      <contents href="//@elements.3"/>
+      <contents href="//@elements.4"/>
+      <contents href="//@elements.5"/>
+      <contents href="//@elements.6"/>
+      <contents href="//@elements.7"/>
+      <contents href="//@elements.8"/>
+      <contents href="//@elements.9"/>
+    </subActions>
+    <outgoing>
+      <!-- Outgoing branch leads to a Location and a SubCall -->
+      <contents href="//@elements.1"/>
+      <contents href="//@elements.2"/>
+    </outgoing>
+    <incoming>
+      <!-- Incoming branch leads to an AddressSwitch and a Proxy -->
+      <contents href="//@elements.3"/>
+      <contents href="//@elements.8"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location with its own internal flow -->
+  <elements xsi:type="CPL:Location" url="sip:primary@example.com" priority="1" clear="yes">
+    <!-- Location's contents reference a Redirect and a Reject -->
+    <contents href="//@elements.6"/>
+    <contents href="//@elements.7"/>
+  </elements>
+
+  <!-- 2: SubCall referencing another logic unit by name -->
+  <elements xsi:type="CPL:SubCall" ref="voicemailHandler"/>
+
+  <!-- 3: AddressSwitch with two SwitchedAddress branches and fallbacks -->
+  <elements xsi:type="CPL:AddressSwitch" field="source" subField="user">
+    <notPresent>
+      <!-- NotPresent branch sends to a Reject via contents -->
+      <contents href="//@elements.7"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise branch sends to a Proxy -->
+      <contents href="//@elements.8"/>
+    </otherwise>
+    <addresses is="sip:vip@example.com" contains="vip" subDomainOf="example.com">
+      <!-- For VIP caller, go directly to high-priority Location -->
+      <contents href="//@elements.1"/>
+    </addresses>
+    <addresses is="sip:block@example.com" contains="block" subDomainOf="example.com">
+      <!-- For blocked caller, reject -->
+      <contents href="//@elements.7"/>
+    </addresses>
+  </elements>
+
+  <!-- 4: StringSwitch over a generic header -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <notPresent>
+      <!-- If no subject, send to default Proxy handling -->
+      <contents href="//@elements.8"/>
+    </notPresent>
+    <otherwise>
+      <!-- Default goes to TimeSwitch -->
+      <contents href="//@elements.5"/>
+    </otherwise>
+    <strings is="urgent" contains="URGENT">
+      <!-- Urgent goes to Proxy -->
+      <contents href="//@elements.8"/>
+    </strings>
+    <strings is="info" contains="INFO">
+      <!-- Informational goes to low-priority location (same as main Location) -->
+      <contents href="//@elements.1"/>
+    </strings>
+  </elements>
+
+  <!-- 5: TimeSwitch with a detailed SwitchedTime schedule -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Berlin" tzurl="http://tz.example.com/berlin">
+    <notPresent>
+      <!-- If no time information, redirect permanently -->
+      <contents href="//@elements.6"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise, try Proxy -->
+      <contents href="//@elements.8"/>
+    </otherwise>
+    <times dtstart="20260101T080000" dtend="20260101T180000" duration="PT10H"
+           freq="DAILY" until="20261231T235959" count="365" interval="1"
+           bySecond="0" byMinute="0" byHour="8,9,10,11,12,13,14,15,16,17"
+           byDay="MO,TU,WE,TH,FR" byMonthDay="1-31" byYearDay="1-365"
+           byWeekNo="1-52" byMonth="1-12" wkst="MO" bySetPos="1">
+      <!-- Business hours go to Proxy -->
+      <contents href="//@elements.8"/>
+    </times>
+  </elements>
+
+  <!-- 6: Redirect action -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 7: Reject action -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 8: Proxy with full failure branches and nested node flows -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+    <busy>
+      <!-- When callee is busy, send to Reject -->
+      <contents href="//@elements.7"/>
+    </busy>
+    <noAnswer>
+      <!-- On no answer, redirect to voicemail (SubCall) -->
+      <contents href="//@elements.2"/>
+    </noAnswer>
+    <redirection>
+      <!-- On redirection, go through LanguageSwitch -->
+      <contents href="//@elements.9"/>
+    </redirection>
+    <failure>
+      <!-- On failure, try fallback Location -->
+      <contents href="//@elements.1"/>
+    </failure>
+    <default>
+      <!-- Default branch uses a Location and a PrioritySwitch -->
+      <contents href="//@elements.1"/>
+      <contents href="//@elements.10"/>
+    </default>
+  </elements>
+
+  <!-- 9: LanguageSwitch with multiple SwitchedLanguage branches -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <!-- No language info: fallback to Proxy again -->
+      <contents href="//@elements.8"/>
+    </notPresent>
+    <otherwise>
+      <!-- Any other language: go to Reject -->
+      <contents href="//@elements.7"/>
+    </otherwise>
+    <languages matches="en">
+      <!-- English: go to main Location -->
+      <contents href="//@elements.1"/>
+    </languages>
+    <languages matches="de">
+      <!-- German: go to Redirect -->
+      <contents href="//@elements.6"/>
+    </languages>
+  </elements>
+
+  <!-- 10: PrioritySwitch with SwitchedPriority branches -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <!-- No priority: use Redirect -->
+      <contents href="//@elements.6"/>
+    </notPresent>
+    <otherwise>
+      <!-- Otherwise: use Reject -->
+      <contents href="//@elements.7"/>
+    </otherwise>
+    <priorities less="0.3" greater="0.0" equal="0.2">
+      <!-- Low priorities go to SubCall -->
+      <contents href="//@elements.2"/>
+    </priorities>
+    <priorities less="0.8" greater="0.3" equal="0.5">
+      <!-- Medium priorities go to Proxy -->
+      <contents href="//@elements.8"/>
+    </priorities>
+    <priorities less="1.0" greater="0.8" equal="0.9">
+      <!-- High priorities go to Location -->
+      <contents href="//@elements.1"/>
+    </priorities>
+  </elements>
+
+</CPL:CPLModel>

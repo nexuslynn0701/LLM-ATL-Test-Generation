@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Outgoing, one Incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction -->
+    <subActions id="saMain">
+      <!-- SubAction contents: non-simple Proxy (exercises Proxy2Select) -->
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="yes" ordering="parallel">
+        <!-- Non-simple: all branches present -->
+        <busy>
+          <!-- Busy contents: SubCall (exercises Busy2SelectCase + SubCall2Return) -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents: simple Proxy (exercises NoAnswer2SelectCase + Proxy2Return) -->
+          <contents xsi:type="CPL:Proxy" timeout="10" recurse="no" ordering="serial">
+            <!-- Simple Proxy: no branches -->
+          </contents>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents: Redirect (exercises Redirection2SelectCase + Redirect2Return) -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure>
+          <!-- Failure contents: Reject (no extra statements generated) -->
+          <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+        </failure>
+        <default>
+          <!-- Default contents: AddressSwitch (exercises Default2SelectDefault + AddressSwitch2SelectStat) -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+            <!-- AddressSwitch notPresent and otherwise (exercise NotPresent2ErrorResponse, Otherwise2SelectDefault) -->
+            <notPresent>
+              <!-- NotPresent contents: Reject -->
+              <contents xsi:type="CPL:Reject" status="404" reason="NotFound"/>
+            </notPresent>
+            <otherwise>
+              <!-- Otherwise contents: simple Proxy (Proxy2Return) -->
+              <contents xsi:type="CPL:Proxy" timeout="5" recurse="yes" ordering="serial">
+                <!-- Simple Proxy -->
+              </contents>
+            </otherwise>
+            <!-- One SwitchedAddress (exercises SwitchedAddress2SelectCase) -->
+            <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+              <!-- SwitchedAddress contents: simple Proxy (Proxy2Return) -->
+              <contents xsi:type="CPL:Proxy" timeout="15" recurse="no" ordering="parallel">
+                <!-- Simple Proxy -->
+              </contents>
+            </addresses>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- One Outgoing: contents = simple Proxy (Proxy2Return, Outgoing2Method) -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+        <!-- Simple Proxy; statements from Proxy2Return -->
+      </contents>
+    </outgoing>
+
+    <!-- One Incoming: contents = Redirect (Redirect2Return, Incoming2Method) -->
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </incoming>
+  </elements>
+
+  <!-- Used as location for several Proxies and Redirects (Location2URIConstant, Proxy2Return, Redirect2Return) -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" priority="1" clear="yes"/>
+
+  <!-- Additional top-level SubCall (SubCall2Return, referenced by Busy contents) -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+</CPL:CPLModel>

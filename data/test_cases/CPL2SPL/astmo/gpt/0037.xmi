@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents: complex Proxy (not simple) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- locations for this Proxy via Location element below (contents reference) -->
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default contents="//@elements.2"/>
+      </contents>
+    </subActions>
+    <incoming>
+      <!-- Incoming contents: simple Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <!-- simple proxy: all branches undefined, but has locations via Location contents -->
+      </contents>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing contents: AddressSwitch -->
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <!-- AddressSwitch addresses and notPresent, otherwise -->
+        <addresses is="sip:vip@example.com" contains="vip" subDomainOf="example.com">
+          <!-- SwitchedAddress contents: SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </addresses>
+        <addresses is="sip:guest@example.com" contains="guest" subDomainOf="example.com">
+          <!-- SwitchedAddress contents: Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </addresses>
+        <notPresent/>
+        <otherwise>
+          <!-- Otherwise contents: Reject -->
+          <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Location for complex Proxy (used via CPL.locations helper in Proxy2Select) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes">
+    <!-- its statement is its contents (Redirect), so used when needed -->
+    <contents xsi:type="CPL:Redirect" permanent="true"/>
+  </elements>
+
+  <!-- Location for simple Proxy inside Incoming (used via locations helper in Proxy2Return) -->
+  <elements xsi:type="CPL:Location" url="sip:notify-target@example.org" priority="2" clear="yes">
+    <!-- statement of this Location: SubCall, so simple Proxy will return a FunctionCallExp -->
+    <contents xsi:type="CPL:SubCall" ref="saMain"/>
+  </elements>
+
+</CPL:CPLModel>

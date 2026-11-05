@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="testpkg"
+    nsURI="http://test/pkg"
+    nsPrefix="tpk">
+
+  <!-- Class Person with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- id attribute, String-typed, lowerBound=1, upperBound=1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="personId"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- age attribute, Int-typed, lowerBound=0, upperBound=1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- reference to Address (containment), lowerBound=0, upperBound=-1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="addresses"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+    <!-- bidirectional reference to Company.employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employer"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.2"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- Class Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="zipcode"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- Class Company with supertype Person to exercise superTypes and createSort -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company" eSuperTypes="//@eClassifiers.0">
+    <!-- opposite reference to Person.employer (non-containment, multi-valued) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <!-- Enumeration Role with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Role">
+    <eLiterals name="ADMIN" value="0" literal="ADMIN"/>
+    <eLiterals name="USER" value="1" literal="USER"/>
+  </eClassifiers>
+
+  <!-- Data type for a custom string-like type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomString" instanceTypeName="java.lang.String"/>
+
+  <!-- Class Account with attribute typed by EEnum Role -->
+  <eClassifiers xsi:type="ecore:EClass" name="Account">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="role"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+</ecore:EPackage>

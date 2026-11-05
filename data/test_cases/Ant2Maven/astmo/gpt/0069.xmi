@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AntMavenDemo0069"
+    basedir="demo-src"
+    description="Demonstration Ant project for Ant2Maven transformation 0069"
+    default="build-main">
+
+  <!-- Properties (all concrete subtypes covered) -->
+  <properties xsi:type="Ant:PropertyValue" name="app.name" value="DemoApp"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="demo-build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/demo.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- One TaskDef (user-defined task) -->
+  <taskdef name="my.custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple different tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="demo-src/main/java"
+           destdir="demo-build/classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="demo-src/main/java"
+           destdir="demo-build/javadoc"
+           packagenames="com.example.demo"
+           defaultexcludes="yes"
+           author="Example Author"
+           version="1.0.0"
+           use="true"
+           windowtitle="Demo Application API"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="demo-build/demoapp.jar"
+           basedir="demo-build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="demo-build/resources"/>
+    <tasks xsi:type="Ant:Copy"
+           todir="demo-build/resources"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="demo-build/temp"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Additional target without tasks (still transformed to a Goal) -->
+  <targets xmi:id="clean-all" name="clean-all" description="Clean build artifacts"/>
+</Ant:Project>

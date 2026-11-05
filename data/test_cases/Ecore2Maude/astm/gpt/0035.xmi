@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example.org/rootPkg"
+    nsPrefix="root">
+
+  <!-- Top-level classifiers -->
+  <!-- 0: Base class with attributes and single reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseEntity" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        ordered="true" unique="true" lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="flag"
+        ordered="true" unique="true" lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        iD="false" defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="detail"
+        ordered="true" unique="true" lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.1"
+        containment="true" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 1: Referenced class in same package -->
+  <eClassifiers xsi:type="ecore:EClass" name="Detail" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description"
+        ordered="true" unique="true" lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false" defaultValueLiteral="&quot;N/A&quot;"/>
+  </eClassifiers>
+
+  <!-- 2: Enumeration with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Severity">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="HIGH" value="1" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 3: Class with superclass and multiple attributes, one enum-typed with default -->
+  <eClassifiers xsi:type="ecore:EClass" name="Issue" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        ordered="true" unique="true" lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="severity"
+        ordered="true" unique="true" lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.2"
+        iD="false" defaultValueLiteral="HIGH"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relatedTo"
+        ordered="true" unique="true" lowerBound="0" upperBound="-1"
+        eType="//@eClassifiers.3"
+        containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 4: Subpackage -->
+  <eSubpackages name="subPkg"
+      nsURI="http://example.org/subPkg"
+      nsPrefix="sub">
+
+    <!-- 0: Class in subpackage, extends Issue from rootPkg -->
+    <eClassifiers xsi:type="ecore:EClass" name="BugReport" abstract="false" interface="false"
+        eSuperTypes="//@eClassifiers.3">
+      <!-- Bi-directional reference pair with opposite -->
+      <eStructuralFeatures xsi:type="ecore:EReference" name="reporter"
+          ordered="true" unique="true" lowerBound="1" upperBound="1"
+          eType="//@eClassifiers.1"
+          containment="false" resolveProxies="true"
+          eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.0"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="reportedBugs"
+          ordered="true" unique="true" lowerBound="0" upperBound="-1"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          containment="false" resolveProxies="true"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.0"/>
+      <!-- Attribute with integer type and default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+          ordered="true" unique="true" lowerBound="0" upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          iD="false" defaultValueLiteral="5"/>
+    </eClassifiers>
+
+    <!-- 1: Class in subpackage used for opposite reference -->
+    <eClassifiers xsi:type="ecore:EClass" name="Reporter" abstract="false" interface="false">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+          ordered="true" unique="true" lowerBound="1" upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          iD="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="bugs"
+          ordered="true" unique="true" lowerBound="0" upperBound="-1"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          containment="false" resolveProxies="true"
+          eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.0"/>
+    </eClassifiers>
+
+    <!-- 2: Enumeration in subpackage with single literal -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Status">
+      <eLiterals name="OPEN" value="0" literal="OPEN"/>
+    </eClassifiers>
+
+  </eSubpackages>
+
+</ecore:EPackage>

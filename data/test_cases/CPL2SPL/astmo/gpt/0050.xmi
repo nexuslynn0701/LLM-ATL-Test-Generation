@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one outgoing using a complex Proxy, and one incoming using a simple Proxy -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.2" id="saOut"/>
+    <subActions contents="//@elements.3" id="saIn"/>
+    <outgoing contents="//@elements.4"/>
+    <incoming contents="//@elements.5"/>
+  </elements>
+
+  <!-- SubCall used in Outgoing Proxy branch (points to saOut) -->
+  <elements xsi:type="CPL:SubCall" ref="saOut"/>
+
+  <!-- SubCall used as body of saIn -->
+  <elements xsi:type="CPL:SubCall" ref="saOut"/>
+
+  <!-- Location used by the simple Proxy (for redirect URI) -->
+  <elements xsi:type="CPL:Location" url="sip:simple@example.com" clear="true"/>
+
+  <!-- Complex Proxy (non-simple: has all branches) used by Outgoing -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy contents="//@elements.1"/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- Simple Proxy used by Incoming; locations comes from elements[3] -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <!-- no children: simple proxy -->
+  </elements>
+
+  <!-- AddressSwitch used in Busy.contents -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <notPresent/>
+    <otherwise/>
+    <addresses/>
+  </elements>
+
+</CPL:CPLModel>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmi:id="cpl_root">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="30">
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="User busy"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:AddressSwitch" field="destination">
+            <addresses is="user@example.com">
+              <contents xsi:type="CPL:Location" url="sip:user@backup.example.com" clear="true" priority="medium"/>
+            </addresses>
+            <notPresent/>
+            <otherwise>
+              <contents xsi:type="CPL:Reject" status="404" reason="Not found"/>
+            </otherwise>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="MobileApp">
+          <contents xsi:type="CPL:Location" url="sip:mobile-handler@example.com" clear="false" priority="high"/>
+        </strings>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:default-handler@example.com" clear="true" priority="low"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:TimeSwitch" tzid="UTC">
+        <times dtstart="20240101T000000Z" interval="1" wkst="MO">
+          <contents xsi:type="CPL:Location" url="sip:business-hours@example.com" clear="true" priority="normal"/>
+        </times>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="480" reason="Outside business hours"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction"/>
+  <elements xsi:type="CPL:Location" url="sip:fallback@example.com" clear="true" priority="low"/>
+</CPL:CPLModel>

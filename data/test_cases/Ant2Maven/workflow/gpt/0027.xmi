@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="libsrc"
+    description="Build, package, and clean library artifacts"
+    default="build">
+  <!-- Properties to exercise Ant property mapping rules -->
+  <properties xsi:type="Ant:PropertyValue" name="compile.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- User-defined task definition (no taskName references used) -->
+  <taskdef name="customTask" classname="com.example.build.CustomTask"/>
+
+  <!-- Default target: full build -->
+  <targets xmi:id="build" name="build" description="Compile sources, create jar, and prepare output">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="target/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false">
+      <!-- simple inExcludes list to exercise mapping -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/library.jar"
+        basedir="target/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Auxiliary target: prepare and clean directories -->
+  <targets xmi:id="prepare" name="prepare" description="Create and clean build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Delete"
+        dir="target/old"
+        verbose="true"
+        quiet="false"
+        failonerror="false"
+        includeEmptyDirs="true"
+        includes="**/*"
+        includesfile="config/includes.txt"
+        excludes="**/*.bak"
+        excludesfile="config/excludes.txt"
+        defaultexcludes="true"/>
+  </targets>
+
+  <!-- Simple path container to exercise Path rule (no external refs) -->
+  <path id="compile.path">
+    <pathElement path="libs/library-core.jar" location="libs"/>
+  </path>
+</Ant:Project>

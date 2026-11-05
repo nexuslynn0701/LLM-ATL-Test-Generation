@@ -1,0 +1,25 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet name="ComplexGrafcet" location="file://complexGrafcet">
+    <!-- Elements: 4 Steps (2 initial, 2 non-initial) + 3 Transitions -->
+    <elements xsi:type="Grafcet:Step" name="InitStep1" location="file://complexGrafcet#InitStep1" isInitial="true" isActive="true" action="startMotor"/>
+    <elements xsi:type="Grafcet:Step" name="InitStep2" location="file://complexGrafcet#InitStep2" isInitial="true" isActive="false" action="openValve"/>
+    <elements xsi:type="Grafcet:Step" name="IntermediateStep" location="file://complexGrafcet#IntermediateStep" isInitial="false" isActive="false" action="monitorTemperature"/>
+    <elements xsi:type="Grafcet:Step" name="FinalStep" location="file://complexGrafcet#FinalStep" isInitial="false" isActive="false" action="stopSystem"/>
+    <elements xsi:type="Grafcet:Transition" name="T1" location="file://complexGrafcet#T1" condition="sensorA &gt; 10"/>
+    <elements xsi:type="Grafcet:Transition" name="T2" location="file://complexGrafcet#T2" condition="timeElapsed &gt; 5"/>
+    <elements xsi:type="Grafcet:Transition" name="T3" location="file://complexGrafcet#T3" condition="error == false"/>
+    <!-- Connections: multiple branches, merges, and a small cycle -->
+    <!-- InitStep1 -> T1, InitStep2 -> T1 (merge) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Init1_T1" location="file://complexGrafcet#C_Init1_T1" from="/0/@elements.0" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Init2_T1" location="file://complexGrafcet#C_Init2_T1" from="/0/@elements.1" to="/0/@elements.4"/>
+    <!-- T1 -> IntermediateStep, T1 -> FinalStep (branch) -->
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T1_Intermediate" location="file://complexGrafcet#C_T1_Intermediate" from="/0/@elements.4" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T1_Final" location="file://complexGrafcet#C_T1_Final" from="/0/@elements.4" to="/0/@elements.3"/>
+    <!-- IntermediateStep -> T2 -> FinalStep (simple linear path) -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Intermediate_T2" location="file://complexGrafcet#C_Intermediate_T2" from="/0/@elements.2" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T2_Final" location="file://complexGrafcet#C_T2_Final" from="/0/@elements.5" to="/0/@elements.3"/>
+    <!-- Small cycle: FinalStep -> T3 -> InitStep1 -->
+    <connections xsi:type="Grafcet:StepToTransition" name="C_Final_T3" location="file://complexGrafcet#C_Final_T3" from="/0/@elements.3" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" name="C_T3_Init1" location="file://complexGrafcet#C_T3_Init1" from="/0/@elements.6" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

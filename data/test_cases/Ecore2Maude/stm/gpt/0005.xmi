@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyPkg"
+    nsURI="http://example.com/companyPkg"
+    nsPrefix="company">
+
+  <!-- 0: Enum for employee roles -->
+  <eClassifiers xsi:type="ecore:EEnum" name="RoleEnum">
+    <eLiterals name="DEV" value="0" literal="DEV"/>
+    <eLiterals name="QA" value="1" literal="QA"/>
+    <eLiterals name="MANAGER" value="2" literal="MANAGER"/>
+  </eClassifiers>
+
+  <!-- 1: Package-level String->String map entry (non-contained reference target) -->
+  <eClassifiers xsi:type="ecore:EClass" name="MetadataEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 2: Abstract Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 3: Employee extends Person, has EEnum, EInt, EBoolean attributes and a non-containment self ref -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullTime"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <!-- Non-containment reference to manager (another Employee) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 4: Department with containment and non-containment references and an EString list attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tags" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Containment reference to employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="employees" upperBound="-1"
+        eType="//@eClassifiers.3" containment="true"/>
+    <!-- Non-containment cross-reference to a head employee -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="head"
+        eType="//@eClassifiers.3"/>
+    <!-- Reference to shared metadata entries (non-containment, many) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metadata" upperBound="-1"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 5: Project with EReference to Department and cross ref to Employees (non containment) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="budget"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <!-- Reference to owning department (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+        eType="//@eClassifiers.4"/>
+    <!-- Team members (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="team" upperBound="-1"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 6: Utility class with an operation and parameters using both EClass and EDataType -->
+  <eClassifiers xsi:type="ecore:EClass" name="HRServices">
+    <!-- Operation returning Employee and taking Person + int param -->
+    <eOperations name="promote" eType="//@eClassifiers.3">
+      <eParameters name="target" eType="//@eClassifiers.2"/>
+      <eParameters name="levelIncrease"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 7: Class with both attribute and reference features, including a containment reference to MetadataEntry -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Main department (containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mainDept"
+        eType="//@eClassifiers.4" containment="true"/>
+    <!-- Other departments (containment, many) -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="otherDepts" upperBound="-1"
+        eType="//@eClassifiers.4" containment="true"/>
+    <!-- Contained projects at company level -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects" upperBound="-1"
+        eType="//@eClassifiers.5" containment="true"/>
+    <!-- Containment of metadata entries shared by departments -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="globalMetadata" upperBound="-1"
+        eType="//@eClassifiers.1" containment="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

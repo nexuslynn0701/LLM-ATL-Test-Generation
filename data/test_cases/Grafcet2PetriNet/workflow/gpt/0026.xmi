@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="ParallelBranches">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s001" name="StartUp" isInitial="true" isActive="true" action="init_system"/>
+    <elements xsi:type="Grafcet:Step" location="s002" name="BranchA" isInitial="false" isActive="false" action="run_branch_a"/>
+    <elements xsi:type="Grafcet:Step" location="s003" name="BranchB" isInitial="false" isActive="false" action="run_branch_b"/>
+    <elements xsi:type="Grafcet:Step" location="s004" name="Join" isInitial="false" isActive="false" action="merge_results"/>
+    <elements xsi:type="Grafcet:Step" location="s005" name="Shutdown" isInitial="false" isActive="false" action="stop_system"/>
+
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t001" name="StartToBranches" condition="systemReady"/>
+    <elements xsi:type="Grafcet:Transition" location="t002" name="AComplete" condition="branchAComplete"/>
+    <elements xsi:type="Grafcet:Transition" location="t003" name="BComplete" condition="branchBComplete"/>
+    <elements xsi:type="Grafcet:Transition" location="t004" name="AllDone" condition="bothBranchesComplete"/>
+    <elements xsi:type="Grafcet:Transition" location="t005" name="Restart" condition="restartRequested"/>
+
+    <!-- Connections: Step -> Transition -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c001" name="startupToSplit" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c002" name="branchAToAComplete" from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c003" name="branchBToBComplete" from="/0/@elements.2" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c004" name="joinToAllDone" from="/0/@elements.3" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c005" name="shutdownToRestart" from="/0/@elements.4" to="/0/@elements.9"/>
+
+    <!-- Connections: Transition -> Step -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c006" name="splitToBranchA" from="/0/@elements.5" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c007" name="splitToBranchB" from="/0/@elements.5" to="/0/@elements.2"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c008" name="aCompleteToJoin" from="/0/@elements.6" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c009" name="bCompleteToJoin" from="/0/@elements.7" to="/0/@elements.3"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c010" name="allDoneToShutdown" from="/0/@elements.8" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c011" name="restartToStartup" from="/0/@elements.9" to="/0/@elements.0"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

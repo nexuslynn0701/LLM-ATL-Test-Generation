@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL script -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions for SubCall and declarations -->
+    <subActions id="saMain">
+      <!-- contents -> Proxy (complex) via index 8 -->
+      <contents xsi:type="CPL:Node" xmi:nil="true"/>
+    </subActions>
+    <subActions id="saBusyHandler">
+      <!-- contents -> Reject via index 9 -->
+      <contents xsi:type="CPL:Node" xmi:nil="true"/>
+    </subActions>
+    <subActions id="saDefaultHandler">
+      <!-- contents -> Redirect via index 10 -->
+      <contents xsi:type="CPL:Node" xmi:nil="true"/>
+    </subActions>
+
+    <!-- Incoming and Outgoing methods -->
+    <incoming/>
+    <outgoing/>
+  </elements>
+
+  <!-- Location used by Proxy and Redirect (index 1) -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" priority="1" clear="yes">
+    <!-- contents -> SubCall (index 4) -->
+    <contents xsi:type="CPL:Node" xmi:nil="true"/>
+  </elements>
+
+  <!-- Address switch (index 2) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- SwitchedAddress case (index 5) -->
+    <addresses is="alice" contains="example.com" subDomainOf="example.com">
+      <!-- contents -> SubCall (index 4) -->
+      <contents xsi:type="CPL:Node" xmi:nil="true"/>
+    </addresses>
+    <!-- NotPresent branch (index 6) -->
+    <notPresent/>
+    <!-- Otherwise branch (index 7) -->
+    <otherwise/>
+  </elements>
+
+  <!-- StringSwitch (index 3) -->
+  <elements xsi:type="CPL:StringSwitch" field="eventHeader">
+    <!-- no contents needed -->
+  </elements>
+
+  <!-- SubCall to saMain (index 4) -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- SwitchedAddress already declared as child of AddressSwitch (index 5) -->
+
+  <!-- NotPresent for rule R6 (index 6) -->
+  <elements xsi:type="CPL:NotPresent"/>
+
+  <!-- Otherwise with contents -> SubCall (index 4) (index 7) -->
+  <elements xsi:type="CPL:Otherwise">
+    <contents xsi:type="CPL:Node" xmi:nil="true"/>
+  </elements>
+
+  <!-- Complex Proxy as contents of saMain (index 8) -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+    <!-- busy with contents -> SubCall to saBusyHandler (index 11) -->
+    <busy/>
+    <!-- noAnswer empty (index for rule R10) -->
+    <noAnswer/>
+    <!-- redirection empty (index for rule R11) -->
+    <redirection/>
+    <!-- failure empty (index for rule R5) -->
+    <failure/>
+    <!-- default with contents -> SubCall to saDefaultHandler (index 12) -->
+    <default/>
+  </elements>
+
+  <!-- Reject as contents for saBusyHandler (index 9) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- Redirect as contents for saDefaultHandler (index 10) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- SubCall used in Busy contents (index 11) -->
+  <elements xsi:type="CPL:SubCall" ref="saBusyHandler"/>
+
+  <!-- SubCall used in Default contents (index 12) -->
+  <elements xsi:type="CPL:SubCall" ref="saDefaultHandler"/>
+
+</CPL:CPLModel>

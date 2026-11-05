@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MultiStageBuild"
+    basedir="."
+    description="Project with multiple targets and various predefined file and archive tasks"
+    default="build-main">
+
+  <!-- Default/main build target -->
+  <targets xmi:id="build-main" name="build-main" description="Main build target">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/main-app.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Separate target for generating documentation -->
+  <targets xmi:id="generate-docs" name="generate-docs" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Mkdir" dir="build/docs"/>
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="MultiStageBuild API Documentation"/>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="clean-build" name="clean-build" description="Clean build outputs">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes=""
+           defaultexcludes="false"/>
+    <tasks xsi:type="Ant:Delete"
+           file="dist/main-app.jar"
+           verbose="true"
+           quiet="false"
+           failonerror="false"/>
+  </targets>
+
+</Ant:Project>

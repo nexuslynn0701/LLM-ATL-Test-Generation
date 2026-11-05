@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuildPipeline"
+    basedir="project"
+    description="End-to-end build with compilation, packaging, directories and cleanup"
+    default="buildTarget">
+
+  <!-- Properties to trigger AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="project.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="project/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="project/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A standalone task definition (no references from tasks) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with a rich set of predefined tasks -->
+  <targets xmi:id="buildTarget" name="build">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="project/src/main/java"
+           destdir="project/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="project/src/main/java"
+           destdir="project/target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="FullBuild API"/>
+
+    <!-- Create jar archive -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="project/target/fullbuild.jar"
+           basedir="project/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="project/src/main/resources/MANIFEST.MF"/>
+
+    <!-- Create necessary directories -->
+    <tasks xsi:type="Ant:Mkdir"
+           dir="project/target/logs"/>
+
+    <!-- Delete temporary directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="project/target/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target with a different task mix -->
+  <targets xmi:id="cleanupTarget" name="cleanup">
+    <!-- Delete all generated artifacts -->
+    <tasks xsi:type="Ant:Delete"
+           dir="project/target"
+           verbose="false"
+           quiet="true"
+           failonerror="false"
+           includeEmptyDirs="true"
+           excludes="**/.gitignore"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

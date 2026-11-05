@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntBuild"
+    basedir="src/main/java"
+    description="Complex Ant project with multiple targets and tasks"
+    default="buildTarget">
+
+  <!-- Properties exercising all Ant property variants -->
+  <properties xsi:type="Ant:PropertyValue" name="build.mode" value="release"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- A simple task definition not referenced by any task -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Single target used as default, with several different tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Main build target">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntBuild API"/>
+    <!-- Create jar archive -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/lib/complexantbuild.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <!-- Prepare directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/lib"/>
+    <!-- Copy resources with a simple inline fileset and filterset -->
+    <tasks xsi:type="Ant:Copy"
+           file="src/main/resources/config.xml"
+           tofile="build/config/config.xml"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="src/main/resources"/>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="build.mode" value="release"/>
+      </filterset>
+    </tasks>
+    <!-- Cleanup directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/tmp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           includesfile="config/delete-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/delete-excludes.txt"
+           defaultexcludes="true"/>
+    <!-- Timestamp task (no nested formats needed for rule coverage) -->
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+
+  <!-- Second non-default target to produce an additional Maven goal -->
+  <targets xmi:id="testTarget" name="test" description="Run tests">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="build/test-classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+  </targets>
+
+</Ant:Project>

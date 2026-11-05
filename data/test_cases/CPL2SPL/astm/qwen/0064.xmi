@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="alice@example.com"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+            <busy>
+              <contents xsi:type="CPL:Reject" status="486" reason="Busy Now"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </noAnswer>
+            <redirection/>
+            <failure/>
+            <default>
+              <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="friendly-bot"/>
+        <otherwise>
+          <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="yes"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:TimeSwitch">
+        <times dtstart="20240101T090000" wkst="MO" interval="1"/>
+        <otherwise>
+          <contents xsi:type="CPL:Reject" status="403" reason="Outside business hours"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="fallbackAction"/>
+  <elements xsi:type="CPL:Location" url="sip:fallback@example.com" clear="yes"/>
+  <elements xsi:type="CPL:SubAction" id="fallbackAction">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <default/>
+    </contents>
+  </elements>
+</CPL:CPLModel>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="RootMM"
+    nsURI="http://rootmm/1.0"
+    nsPrefix="rootmm">
+
+  <!-- Subpackage to exercise eSuperPackage / eSubpackages -->
+  <eSubpackages name="SubPkg"
+                nsURI="http://rootmm/sub"
+                nsPrefix="sub">
+    <!-- 0: EEnum with 2 literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Color">
+      <eLiterals name="RED" value="0" literal="RED"/>
+      <eLiterals name="GREEN" value="1" literal="GREEN"/>
+    </eClassifiers>
+
+    <!-- 1: EClass in subpackage, with EInt attribute and reference to another class -->
+    <eClassifiers xsi:type="ecore:EClass" name="Item">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="code"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                           lowerBound="0"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           iD="true"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers directly in RootMM -->
+
+  <!-- 0: EEnum used as attribute type -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- 1: Class with String and enum attributes, one with default value -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         eType="//@eClassifiers.0"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="false"
+                         defaultValueLiteral="NEW"/>
+  </eClassifiers>
+
+  <!-- 2: Superclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Container"/>
+
+  <!-- 3: Subclass with attributes, references, opposite, containment, various bounds -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project"
+                eSuperTypes="//@eClassifiers.2">
+    <!-- Attribute with default string value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="false"
+                         defaultValueLiteral="default &quot;project&quot;"/>
+    <!-- Multi-valued attribute, upperBound = -1 to exercise '*' mapping -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="tags"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="false"
+                         iD="false"/>
+    <!-- Reference to Task with opposite, non-containment, [0..1] -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="mainTask"
+                         eType="//@eClassifiers.1"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.2"/>
+    <!-- Containment reference to many Tasks, [0..*] -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="tasks"
+                         eType="//@eClassifiers.1"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         resolveProxies="true"/>
+    <!-- Cross-package reference to SubPkg::Item, no opposite, [1..1] -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="primaryItem"
+                         eType="//@eSubpackages.0/@eClassifiers.1"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 4: Another class to increase coverage of class-related equations, no features -->
+  <eClassifiers xsi:type="ecore:EClass" name="Note"/>
+
+  <!-- Add opposite reference inside Task (classifier 1) now that Project is defined -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         eType="//@eClassifiers.0"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         iD="false"
+                         defaultValueLiteral="NEW"/>
+    <!-- Opposite side of Project.mainTask -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="ownerProject"
+                         eType="//@eClassifiers.3"
+                         lowerBound="0"
+                         upperBound="1"
+                         ordered="true"
+                         unique="true"
+                         containment="false"
+                         resolveProxies="true"
+                         eOpposite="//@eClassifiers.3/@eStructuralFeatures.2"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="."
+    description="Build and package a small library with cleanup and docs"
+    default="compileTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target/classes"/>
+  <properties xsi:type="Ant:PropertyValue" name="jar.dir" value="target/jar"/>
+  <properties xsi:type="Ant:PropertyValue" name="doc.dir" value="target/apidocs"/>
+
+  <!-- Task definition (unreferenced, but exercises TaskDef rule) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Clean target -->
+  <targets xmi:id="cleanTarget" name="clean" description="Clean previous build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="true" quiet="false" failonerror="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+  </targets>
+
+  <!-- Compile target (default) -->
+  <targets xmi:id="compileTarget" name="compile" description="Compile the Java sources">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="false"
+           deprecation="true"/>
+  </targets>
+
+  <!-- Package target -->
+  <targets xmi:id="packageTarget" name="package" description="Create the library jar">
+    <tasks xsi:type="Ant:Mkdir" dir="target/jar"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/jar/library-1.0.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Javadoc target -->
+  <targets xmi:id="javadocTarget" name="javadoc" description="Generate API documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/apidocs"
+           packagenames="com.example.lib.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Library API"/>
+  </targets>
+
+</Ant:Project>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    description="A sample project for testing"
+    default="build"
+    basedir="/home/user/project">
+  <properties xsi:type="Ant:PropertyValue" name="version" value="1.0"/>
+  <properties xsi:type="Ant:PropertyValue" name="debug" value="true"/>
+  <properties xsi:type="Ant:PropertyLocation" name="home" location="/usr/local"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="PATH"/>
+  <targets xmi:id="compile" name="compile" description="Compile sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build" debug="true" optimize="false" deprecation="false"/>
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="API"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run tests">
+    <tasks xsi:type="Ant:Java" classname="org.junit.runner.JUnitCore" fork="true" jar="lib/test.jar"/>
+  </targets>
+  <targets xmi:id="build" name="build" description="Build the project">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build" compress="true"/>
+    <tasks xsi:type="Ant:Copy" todir="dist/lib">
+      <fileset dir="lib">
+        <include name="*.jar"/>
+      </fileset>
+    </tasks>
+    <tasks xsi:type="Ant:Tstamp"/>
+    <tasks xsi:type="Ant:Delete" dir="tmp"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Clean build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build"/>
+    <tasks xsi:type="Ant:Delete" dir="dist"/>
+  </targets>
+</Ant:Project>

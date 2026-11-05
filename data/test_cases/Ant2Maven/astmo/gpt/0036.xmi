@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="project-root"
+    description="Ant build with multiple targets and tasks"
+    default="buildMain">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (not referenced by tasks, but transformed) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Path structure (no cross refs, all contained) -->
+  <path id="mainPath">
+    <pathElement path="lib/dependency.jar" location="lib/dependency.jar"/>
+    <fileset dir="lib">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/test-*.jar"/>
+      </patternset>
+      <include name="core/*.jar"/>
+      <exclude name="old/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- Main build target (default) -->
+  <targets xmi:id="buildMain" name="buildMain" description="Compile and package main artifacts">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="compile.main" unless="skip.main"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/main-app.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <tasks xsi:type="Ant:Mkdir" dir="dist/logs"/>
+    <tasks xsi:type="Ant:Delete" dir="build/tmp"/>
+  </targets>
+
+  <!-- Test target -->
+  <targets xmi:id="runTests" name="runTests" description="Compile and run tests">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/test/java"
+           destdir="build/test-classes"
+           debug="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*Test.java"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/test-artifacts.jar"
+           basedir="build/test-classes"/>
+  </targets>
+
+  <!-- Documentation target with Javadoc -->
+  <targets xmi:id="generateDocs" name="generateDocs" description="Generate project documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="dist/docs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexAntProject API"/>
+  </targets>
+
+  <!-- Maintenance target with Tstamp and Delete -->
+  <targets xmi:id="maintenance" name="maintenance" description="Maintenance tasks">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+
+    <tasks xsi:type="Ant:Delete"
+           dir="dist/old-builds"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           excludes="**/keep/**"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Copy resources target with FileSet, FilterSet, Mapper -->
+  <targets xmi:id="copyResources" name="copyResources" description="Copy and filter resource files">
+    <tasks xsi:type="Ant:Copy"
+           todir="build/resources"
+           overwrit e="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="src/main/resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/secret/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="ComplexAntProject"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.tpl" to="*.cfg"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

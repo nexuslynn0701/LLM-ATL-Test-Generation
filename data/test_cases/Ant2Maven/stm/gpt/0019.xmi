@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="."
+    description="Ant project exercising multiple predefined tasks"
+    default="build-main">
+
+  <!-- Default build target with several different tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Compile, package and clean before build">
+    <!-- Create output directories -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/jar"/>
+
+    <!-- Compile sources with various optional attributes set -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+
+    <!-- Generate javadocs with all mandatory attributes -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+
+    <!-- Create JAR archive -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/jar/complexbuild.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Copy final jar to distribution directory using several optional attributes -->
+    <tasks xsi:type="Ant:Copy"
+           file="build/jar/complexbuild.jar"
+           tofile="dist/complexbuild.jar"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false"/>
+
+    <!-- Clean temporary compilation directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build/classes"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Additional target to demonstrate multiple targets without dependencies -->
+  <targets xmi:id="clean-all" name="clean-all" description="Remove all build and distribution artifacts">
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*"
+           excludes="**/.git/**"
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="dist"
+           verbose="true"
+           quiet="false"
+           failonerror="false"
+           includeEmptyDirs="true"
+           includes="**/*"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

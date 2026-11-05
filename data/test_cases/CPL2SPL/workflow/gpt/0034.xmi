@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <!-- elements[0]: main CPL with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL" contents="//@elements.1">
+    <subActions contents="//@elements.2"/>
+    <outgoing contents="//@elements.3"/>
+  </elements>
+
+  <!-- elements[1]: Location used by the simple Proxy via locations helper (Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:alice@example.com" clear="true"/>
+
+  <!-- elements[2]: SubAction referenced by SubCalls via plain string ref -->
+  <elements xsi:type="CPL:SubCall" ref="sa_main"/>
+
+  <!-- elements[3]: Outgoing whose contents is a complex Proxy -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <!-- complex Proxy: has all branches populated -->
+    <busy contents="//@elements.2"/>
+    <noAnswer contents="//@elements.2"/>
+    <redirection contents="//@elements.2"/>
+    <failure contents="//@elements.2"/>
+    <default contents="//@elements.2"/>
+  </elements>
+
+  <!-- elements[4]: AddressSwitch with SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- switched address with is attribute set -->
+    <addresses is="bob@example.com" contains="bob" subDomainOf="example.com" contents="//@elements.2"/>
+    <!-- notPresent branch with SubCall contents -->
+    <notPresent contents="//@elements.2"/>
+    <!-- otherwise branch with SubCall contents -->
+    <otherwise contents="//@elements.2"/>
+  </elements>
+
+  <!-- elements[5]: Redirect that also uses the Location via locations helper -->
+  <elements xsi:type="CPL:Redirect" permanent="true" contents="//@elements.1"/>
+</CPL:CPLModel>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://rootpkg"
+    nsPrefix="rp">
+
+  <!-- Classifier 0: root-level class -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClass" abstract="false" interface="false">
+    <!-- Attribute: String with default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="rootAttr"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0"
+        upperBound="1"
+        iD="true"
+        defaultValueLiteral="rootDefault"/>
+  </eClassifiers>
+
+  <!-- Classifier 1: second root-level class -->
+  <eClassifiers xsi:type="ecore:EClass" name="OtherRoot" abstract="true" interface="false">
+    <!-- Reference to RootClass with opposite set later via cross-ref -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="otherToRoot"
+        eType="//@eClassifiers.0"
+        lowerBound="1"
+        upperBound="-1"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Classifier 2: data type used as attribute type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="MyNumber" instanceTypeName="int"/>
+
+  <!-- Classifier 3: abstract base class for multiple inheritance -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseA" abstract="true">
+    <!-- Integer attribute with bounds -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="baseAttr"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"
+        upperBound="3"
+        defaultValueLiteral="10"/>
+  </eClassifiers>
+
+  <!-- Classifier 4: another abstract base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseB" abstract="true">
+    <!-- Boolean attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="flag"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="true"/>
+  </eClassifiers>
+
+  <!-- Classifier 5: concrete subclass with multiple inheritance and refs -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Derived"
+      abstract="false"
+      interface="false"
+      eSuperTypes="//@eClassifiers.3 //@eClassifiers.4">
+    <!-- Attribute using custom EDataType -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="amount"
+        eType="//@eClassifiers.2"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="42"/>
+    <!-- Containment reference to RootClass -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        eType="//@eClassifiers.0"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- Classifier 6: enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="RED" value="0" literal="RED"/>
+    <eLiterals name="GREEN" value="1" literal="GREEN"/>
+  </eClassifiers>
+
+  <!-- Classifier 7: enum used as attribute type -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Size">
+    <eLiterals name="SMALL" value="0" literal="SMALL"/>
+    <eLiterals name="LARGE" value="1" literal="LARGE"/>
+  </eClassifiers>
+
+  <!-- Classifier 8: class using enum and reference opposite -->
+  <eClassifiers xsi:type="ecore:EClass" name="EnumUser">
+    <!-- Attribute typed by Color enum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="color"
+        eType="//@eClassifiers.6"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="RED"/>
+    <!-- Attribute typed by Size enum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="size"
+        eType="//@eClassifiers.7"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="SMALL"/>
+    <!-- Reference with opposite to OtherRoot.otherToRoot -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        eType="//@eClassifiers.1"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- Classifier 9: class with both attribute and reference to Derived -->
+  <eClassifiers xsi:type="ecore:EClass" name="Linker">
+    <!-- String attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="label"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="0"
+        upperBound="1"/>
+    <!-- Reference to Derived -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="target"
+        eType="//@eClassifiers.5"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        resolveProxies="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="IntegrationTest"
+    description="Full coverage test project"
+    default="build"
+    basedir=".">
+  <properties xsi:type="Ant:PropertyValue" name="version" value="1.0"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="/usr/local/lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <targets xmi:id="build" name="build" description="Main build target">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="bin" debug="true" optimize="true" deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*Test.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/*.bak"/>
+      <inExcludes xsi:type="Ant:IncludesFile" name="include-list.txt"/>
+      <inExcludes xsi:type="Ant:ExcludesFile" name="exclude-list.txt"/>
+    </tasks>
+    <tasks xsi:type="Ant:Javadoc" 
+        sourcepath="src" 
+        destdir="docs" 
+        packagenames="com.example"
+        defaultexcludes="yes" 
+        author="true" 
+        version="true" 
+        use="true" 
+        windowtitle="My API"/>
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="bin" compress="true" encoding="UTF-8" manifest="MANIFEST.MF">
+      <fileset dir=".">
+        <include name="**/*.class"/>
+        <exclude name="**/test/*.class"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0"/>
+        <filtersfile file="filter.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.class" to="*.class"/>
+    </tasks>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+    <tasks xsi:type="Ant:Copy" todir="dist/lib" filtering="true" overwrite="true">
+      <fileset dir="lib">
+        <include name="*.jar"/>
+      </fileset>
+      <mapper type="flatten"/>
+    </tasks>
+    <tasks xsi:type="Ant:Delete" dir="tmp" verbose="true" includeEmptyDirs="true"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="TODAY" pattern="yyyy-MM-dd"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run tests" unless="skip.tests">
+    <tasks xsi:type="Ant:Mkdir" dir="test-reports"/>
+  </targets>
+</Ant:Project>

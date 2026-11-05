@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexBuild"
+    basedir="workspace"
+    description="Complex Ant project with multiple tasks and properties."
+    default="compileTarget">
+
+  <!-- Properties exercising all AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/output"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="conf/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/global.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="SYSTEM_ENV"/>
+
+  <!-- One TaskDef to exercise AntTaskDef2MavenMavenTaskDef (not referenced by any task) -->
+  <taskdef name="custom.task" classname="com.example.CustomTask"/>
+
+  <!-- Default target with a mix of tasks -->
+  <targets xmi:id="compileTarget" name="compile" description="Compile and prepare artifacts">
+    <!-- Javac with inExcludes and ClassPath (both containment only, no refs/ids) -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="have.sources" unless="skip.compile"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="exclude.internal"/>
+      <classPath refid="cp-main">
+        <pathElement path="lib/core.jar" location="lib/core.jar"/>
+        <fileset dir="lib/ext">
+          <patternset>
+            <inexcludes xsi:type="Ant:IncludesFile" name="includes-list.txt" ifCondition="use.includes.file"/>
+            <inexcludes xsi:type="Ant:ExcludesFile" name="excludes-list.txt" unless="ignore.excludes.file"/>
+          </patternset>
+          <include name="**/*.jar" ifCondition="include.jars"/>
+          <exclude name="**/old/**" unless="keep.old.libs"/>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Javadoc task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/api"
+           packagenames="com.example.*"
+           defaultexcludes="yes"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="ComplexBuild API"/>
+
+    <!-- Jar with simple attributes -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/complexbuild.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Copy with Fileset + FilterSet + Mapper -->
+    <tasks xsi:type="Ant:Copy"
+           todir="build/filtered-resources"
+           overwirte="true">
+      <fileset dir="src/main/resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/secret/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="app.name" value="ComplexBuildApp"/>
+        <filtersfile file="conf/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.properties" to="*.cfg" classname="com.example.Mapping" classpath="lib/mapping.jar"/>
+    </tasks>
+
+    <!-- Tstamp to exercise AntTstamp2MavenMavenTstamp (with a contained format) -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Second target with file-management tasks -->
+  <targets xmi:id="cleanupTarget" name="cleanup" description="Clean build output">
+    <!-- Delete -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="conf/cleanup-includes.txt"
+           excludes="**/.git/**"
+           excludesfile="conf/cleanup-excludes.txt"
+           defaultexcludes="yes"/>
+    <!-- Mkdir -->
+    <tasks xsi:type="Ant:Mkdir" dir="build"/>
+  </targets>
+
+  <!-- Path at project level (exercise AntPath2MavenMavenPath and related rules) -->
+  <path id="main.path">
+    <pathElement path="lib/extra.jar" location="lib/extra.jar"/>
+    <fileset dir="lib/addons">
+      <include name="**/*.jar"/>
+    </fileset>
+    <path>
+      <pathElement path="tools/tool.jar" location="tools/tool.jar"/>
+    </path>
+  </path>
+
+</Ant:Project>

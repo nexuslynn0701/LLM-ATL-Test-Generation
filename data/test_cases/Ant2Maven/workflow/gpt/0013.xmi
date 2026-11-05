@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullLifecycleBuild"
+    basedir="workspace"
+    description="Build, package, and clean application"
+    default="buildAll">
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.output" location="workspace/build/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+  <targets xmi:id="buildAll" name="buildAll">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="workspace/src"
+        destdir="workspace/build/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false">
+      <classPath refid="">
+        <pathElement path="workspace/lib/core.jar" location="workspace/lib"/>
+        <fileset dir="workspace/lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="" unless=""/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="" unless=""/>
+    </tasks>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="workspace/dist/application.jar"
+        basedir="workspace/build/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="workspace/config/manifest.mf"/>
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="workspace/src"
+        destdir="workspace/docs/api"
+        packagenames="com.example.*"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Application API"/>
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss" offset="0" unit="second" locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/build/temp"/>
+    <tasks xsi:type="Ant:Copy"
+        file="workspace/resources/config.xml"
+        presservelastmodified="true"
+        tofile="workspace/build/config.xml"
+        todir=""
+        overwrite="true"
+        filtering="false"
+        flatten="false"
+        includeEmptyDirs="false">
+      <fileset dir="workspace/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="config/includes.txt" ifCondition="" unless=""/>
+        </patternset>
+        <include name="**/*.xml" ifCondition="" unless=""/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="config.profile" value="production"/>
+        <filtersfile file="workspace/config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="" classpath="" classpathref="" from="*.xml" to="*.conf.xml"/>
+    </tasks>
+    <tasks xsi:type="Ant:Delete"
+        file=""
+        dir="workspace/build/temp"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        includes="**/*"
+        includesfile="workspace/config/delete-includes.txt"
+        excludes="**/*.keep"
+        excludesfile="workspace/config/delete-excludes.txt"
+        defaultexcludes="false"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete"
+        file="workspace/dist/application.jar"
+        dir=""
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="false"
+        includes=""
+        includesfile=""
+        excludes=""
+        excludesfile=""
+        defaultexcludes="true"/>
+  </targets>
+</Ant:Project>

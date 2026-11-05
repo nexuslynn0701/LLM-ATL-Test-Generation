@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="mm24root"
+    nsURI="http://example.org/mm24root"
+    nsPrefix="mm24r">
+
+  <!-- Subpackage to trigger super/sub package equations and multiple top-level packages -->
+  <eSubpackages name="mm24sub"
+                nsURI="http://example.org/mm24sub"
+                nsPrefix="mm24s">
+    <!-- Classifiers in subpackage -->
+    <!-- 0: Base class -->
+    <eClassifiers xsi:type="ecore:EClass" name="BaseEntity">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="id"
+                           iD="true"
+                           lowerBound="1"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                           defaultValueLiteral="0"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="label"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                           defaultValueLiteral="&quot;default label&quot;"/>
+    </eClassifiers>
+
+    <!-- 1: Derived class with a super type and references/attributes -->
+    <eClassifiers xsi:type="ecore:EClass" name="SpecialEntity"
+                  eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <!-- Single-valued containment reference with opposite -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="detail"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="//@eSubpackages.0/@eClassifiers.2"
+                           containment="true"
+                           resolveProxies="true"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.2/@eStructuralFeatures.0"/>
+      <!-- Multi-valued non-containment reference without opposite -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="relatedEntities"
+                           lowerBound="0"
+                           upperBound="-1"
+                           eType="//@eSubpackages.0/@eClassifiers.0"
+                           containment="false"
+                           resolveProxies="true"/>
+      <!-- Single attribute with Boolean type -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="active"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                           defaultValueLiteral="true"/>
+    </eClassifiers>
+
+    <!-- 2: Detail class referenced from SpecialEntity.detail -->
+    <eClassifiers xsi:type="ecore:EClass" name="Detail">
+      <!-- Back-reference, opposite of SpecialEntity.detail -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="owner"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="//@eSubpackages.0/@eClassifiers.1"
+                           containment="false"
+                           resolveProxies="true"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.0"/>
+      <!-- Attribute with Float-like type to trigger @Float mapping -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="score"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+                           defaultValueLiteral="3.14"/>
+    </eClassifiers>
+
+    <!-- 3: Enumeration used by attributes and with multiple literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+      <eLiterals name="NEW" value="0" literal="NEW"/>
+      <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+      <eLiterals name="DONE" value="2" literal="DONE"/>
+    </eClassifiers>
+
+    <!-- 4: Class that uses the enumeration and default enum value -->
+    <eClassifiers xsi:type="ecore:EClass" name="Task">
+      <!-- Enum-typed attribute with default literal -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="status"
+                           lowerBound="1"
+                           upperBound="1"
+                           eType="//@eSubpackages.0/@eClassifiers.3"
+                           defaultValueLiteral="IN_PROGRESS"/>
+      <!-- String attribute without default to also cover non-default path -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="description"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers in root package -->
+  <!-- 0: Class with no super types, both attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootNode">
+    <!-- Reference to BaseEntity (non-containment, many, no opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="entities"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eSubpackages.0/@eClassifiers.0"
+                         containment="false"
+                         resolveProxies="true"/>
+    <!-- Containment reference to Task (single) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="mainTask"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eSubpackages.0/@eClassifiers.4"
+                         containment="true"
+                         resolveProxies="true"/>
+    <!-- Attribute with generic DataType mapping (@DataType) by using EDate -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="createdOn"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+  </eClassifiers>
+
+  <!-- 1: Enumeration with single literal to trigger single-literal branch -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityLevel">
+    <eLiterals name="HIGH" value="0" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 2: Class that uses PriorityLevel and basic types -->
+  <eClassifiers xsi:type="ecore:EClass" name="PriorityTask">
+    <!-- Enum-typed attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="priority"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.1"/>
+    <!-- Integer attribute with default to trigger Int mapping and default handling -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="effortHours"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         defaultValueLiteral="8"/>
+    <!-- BooleanObject-type attribute to hit Boolean mapping via wrapper type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="archived"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+  </eClassifiers>
+
+  <!-- 3: DataType classifier to exercise EDataType handling in EqPackage, etc. -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="CustomCode"
+                instanceClassName="java.lang.String"/>
+
+</ecore:EPackage>

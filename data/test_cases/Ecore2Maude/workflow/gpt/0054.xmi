@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootpkg"
+    nsURI="http://rootpkg"
+    nsPrefix="root">
+  <!-- 0: EClass Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <!-- 0.0: EAttribute id (String, ID, default, bounds) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        iD="true"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="ID_DEFAULT"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- 0.1: EAttribute age (int, non-ID, different bounds) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- 0.2: EReference addresses (multi, containment, opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="addresses"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- 1: EClass Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <!-- 1.0: EReference owner (non-containment, opposite to Person.addresses) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="0"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.2"/>
+    <!-- 1.1: EAttribute street (String, with default) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="MainStreet"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 2: EEnum Gender with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Gender">
+    <eLiterals name="MALE" value="0" literal="MALE"/>
+    <eLiterals name="FEMALE" value="1" literal="FEMALE"/>
+  </eClassifiers>
+
+  <!-- 3: EClass Employee extends Person, uses Gender -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="true">
+    <eSuperTypes href="//@eClassifiers.0"/>
+    <!-- 3.0: EAttribute gender (enum-typed, default literal) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="gender"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="MALE"
+        eType="//@eClassifiers.2"/>
+    <!-- 3.1: EAttribute salary (int, upperBound = -1 to trigger '*') -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="salary"
+        lowerBound="0"
+        upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 4: EClass Contractor extends Employee, no extra features -->
+  <eClassifiers xsi:type="ecore:EClass" name="Contractor">
+    <eSuperTypes href="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 5: EDataType CustomString (non-primitive data type) -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomString" instanceTypeName="java.lang.String"/>
+
+  <!-- 6: EClass Project with attribute using custom data type -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <!-- 6.0: EAttribute code with CustomString data type -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="1"
+        upperBound="1"
+        defaultValueLiteral="PRJ-001"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 7: Subpackage with its own classifier -->
+  <eSubpackages name="subpkg" nsURI="http://subpkg" nsPrefix="sub">
+    <!-- 7.0: EClass Task inside subpackage, no features -->
+    <eClassifiers xsi:type="ecore:EClass" name="Task"/>
+  </eSubpackages>
+
+</ecore:EPackage>

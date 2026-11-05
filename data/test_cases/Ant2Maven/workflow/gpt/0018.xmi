@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuildPipeline"
+    basedir="project-root"
+    description="End-to-end build, package and cleanup pipeline"
+    default="buildAll">
+  <!-- Ant properties to exercise all AntProperty* mapping rules -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="project-root/build/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="project-root/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- TaskDef to exercise AntTaskDef2MavenMavenTaskDef and Attribut mapping rules via a simple attribute example -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with multiple tasks to cover Javac, Jar, Mkdir, Delete and Javadoc rules -->
+  <targets xmi:id="buildAll" name="buildAll" description="Compile, document, package and clean outputs">
+    <!-- Compile sources -->
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="project-root/build/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false">
+      <!-- simple classpath container using ClassPath, PathElement and FileSet to exercise path-related rules -->
+      <classPath refid="main.classpath">
+        <pathElement path="lib/runtime.jar" location="project-root/lib"/>
+        <fileset dir="project-root/lib">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+            <inexcludes xsi:type="Ant:Excludes" name="**/*-test.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+      <!-- include/exclude patterns directly on Javac via InExcludes containment -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/generated/**"/>
+    </tasks>
+
+    <!-- Generate Javadoc to exercise AntJavadoc2MavenMavenJavadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src/main/java"
+        destdir="project-root/build/javadoc"
+        packagenames="com.example.*"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="FullBuild API Documentation"/>
+
+    <!-- Package classes into a jar to exercise AntJar2MavenMavenJar -->
+    <tasks xsi:type="Ant:Jar"
+        jarfile="project-root/dist/fullbuild.jar"
+        basedir="project-root/build/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="project-root/META-INF/MANIFEST.MF"/>
+
+    <!-- Create output directory to exercise AntMkdir2MavenMavenMkdir -->
+    <tasks xsi:type="Ant:Mkdir"
+        dir="project-root/output"/>
+
+    <!-- Clean temporary directory using Delete to exercise AntDelete2MavenMavenDelete -->
+    <tasks xsi:type="Ant:Delete"
+        dir="project-root/temp"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        includes="**/*"
+        includesfile=""
+        excludes="**/*.keep"
+        excludesfile=""
+        defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target, no depends, with FilterSet / Copy / PathElement / FileSet / PatternSet etc. -->
+  <targets xmi:id="resources" name="resources" description="Prepare filtered resources">
+    <!-- Timestamp task to exercise AntTstamp2MavenMavenTstamp and FormatTstamp -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd'T'HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+
+    <!-- Define filters and filter files to exercise FilterSet, Filter and FiltersFile rules -->
+    <tasks xsi:type="Ant:Copy"
+        todir="project-root/output/resources"
+        overwrite="true"
+        filtering="true"
+        presservelastmodified="true"
+        flatten="false"
+        includeEmptyDirs="false">
+      <fileset dir="project-root/src/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:IncludesFile" name="includes.list"/>
+          <inexcludes xsi:type="Ant:ExcludesFile" name="excludes.list"/>
+        </patternset>
+        <include name="**/*.properties"/>
+        <exclude name="**/*.bak"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="app.name" value="FullBuildPipeline"/>
+        <filtersfile file="project-root/config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.tmpl" to="*.conf" classname="" classpath="" classpathref=""/>
+    </tasks>
+  </targets>
+
+  <!-- Path definition to exercise AntPath2MavenMavenPath and PathElement / FileSet rules separately from ClassPath -->
+  <path id="runtime.path">
+    <pathElement path="project-root/dist/fullbuild.jar" location="project-root/dist"/>
+    <fileset dir="project-root/lib">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+      </patternset>
+    </fileset>
+  </path>
+</Ant:Project>

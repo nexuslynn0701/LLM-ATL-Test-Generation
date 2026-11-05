@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Main CPL root -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.2" id="saMain"/>
+    <incoming contents="//@elements.4"/>
+    <outgoing contents="//@elements.5"/>
+  </elements>
+
+  <!-- 1: A Location used by multiple elements (Proxy, Redirect, Switch) -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.com" priority="1" clear="yes"/>
+
+  <!-- 2: SubAction whose body is a complex Proxy (via Proxy.statement helper) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy contents="//@elements.6"/>
+    <noAnswer contents="//@elements.7"/>
+    <redirection contents="//@elements.8"/>
+    <failure/>
+    <default contents="//@elements.3"/>
+  </elements>
+
+  <!-- 3: Redirect used inside Default (and referenced by contents) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 4: Location used as statement content for Incoming (will be ignored as statement) -->
+  <elements xsi:type="CPL:Location" url="sip:incoming@example.com" priority="2" clear="no"/>
+
+  <!-- 5: SubCall used as statement content for Outgoing -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- 6: Simple Proxy used as Busy.contents -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- Simple proxy: no children, so isSimple = true -->
+  </elements>
+
+  <!-- 7: Redirect used as NoAnswer.contents -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 8: SubCall used as Redirection.contents -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- 9: AddressSwitch that will trigger AddressSwitch2SelectStat and SwitchedAddress2SelectCase, NotPresent2ErrorResponse, Otherwise2SelectDefault -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <notPresent/>
+    <otherwise contents="//@elements.3"/>
+    <addresses contents="//@elements.10"/>
+  </elements>
+
+  <!-- 10: SwitchedAddress contained in AddressSwitch, with a simple Proxy as contents -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <!-- simple: no outcome branches -->
+  </elements>
+
+  <!-- 11: StringSwitch to trigger StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="subject"/>
+
+  <!-- 12: LanguageSwitch (will be created as top-level but its contents left empty -> no additional statements) -->
+  <elements xsi:type="CPL:LanguageSwitch"/>
+
+  <!-- 13: TimeSwitch top-level (no contents; used only for coverage of filtering in helpers) -->
+  <elements xsi:type="CPL:TimeSwitch"/>
+
+  <!-- 14: PrioritySwitch top-level (also for coverage of filtering in helpers) -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+
+</CPL:CPLModel>

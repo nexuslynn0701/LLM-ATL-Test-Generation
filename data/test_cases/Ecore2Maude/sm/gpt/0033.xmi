@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cpx">
+
+  <!-- 0: primitive-like datatype -->
+  <eClassifiers xsi:type="ecore:EDataType" name="StringAlias" instanceClassName="java.lang.String"/>
+
+  <!-- 1: enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="ARCHIVED" value="2" literal="ARCHIVED"/>
+  </eClassifiers>
+
+  <!-- 2: abstract base class -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="uid"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+  </eClassifiers>
+
+  <!-- 3: concrete class extending NamedElement, with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="User" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="username"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+        lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="primaryProject"
+        lowerBound="0" upperBound="1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.4"/>
+    <eOperations name="getDisplayName"
+        lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eParameters name="prefix"
+          lowerBound="0" upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- 4: class with containment and bidirectional references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+        lowerBound="1" upperBound="1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="contributors"
+        lowerBound="0" upperBound="-1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tasks"
+        lowerBound="0" upperBound="-1"
+        containment="true" resolveProxies="false"
+        eType="//@eClassifiers.5"/>
+  </eClassifiers>
+
+  <!-- 5: contained class with enum attribute and container ref -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+        lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="state"
+        lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="assignee"
+        lowerBound="0" upperBound="1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project"
+        lowerBound="0" upperBound="1"
+        containment="false" resolveProxies="true"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 6: class demonstrating map entry usage -->
+  <eClassifiers xsi:type="ecore:EClass" name="Configuration" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="properties"
+        lowerBound="0" upperBound="-1"
+        containment="true" resolveProxies="false"
+        eType="//@eClassifiers.7"/>
+  </eClassifiers>
+
+  <!-- 7: map entry class (key,value string) -->
+  <eClassifiers xsi:type="ecore:EClass" name="PropertyEntry" instanceClassName="java.util.Map$Entry" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+</ecore:EPackage>

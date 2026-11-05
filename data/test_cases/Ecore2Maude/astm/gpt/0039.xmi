@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg39"
+    nsURI="http://example.org/rootPkg39"
+    nsPrefix="root39">
+
+  <!-- Class 0: Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        defaultValueLiteral="Unknown &quot;Person&quot;"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="bestFriend"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.0"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- Class 1: Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Address">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="street"
+        lowerBound="1"
+        defaultValueLiteral="Main St."
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="number"
+        lowerBound="0"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="resident"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.2/@eStructuralFeatures.1"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- Class 2: Employee extends Person -->
+  <eClassifiers xsi:type="ecore:EClass"
+      name="Employee"
+      abstract="true"
+      interface="false"
+      eSuperTypes="//@eClassifiers.0">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="salary"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="1000"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="officeAddress"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.1"
+        eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- Class 3: Task with reference to Employee and enum attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="title"
+        lowerBound="1"
+        defaultValueLiteral="New Task"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="priority"
+        lowerBound="1"
+        eType="//@eClassifiers.6"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="assignee"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eClassifiers.2"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- Class 4: Project with multi-valued refs and enum literal default via String DT -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="code"
+        lowerBound="1"
+        defaultValueLiteral="P-001"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="statusText"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="ACTIVE"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="tasks"
+        lowerBound="0"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- EDataType 5: custom numeric type, used to trigger @DataType path -->
+  <eClassifiers xsi:type="ecore:EDataType"
+      name="MoneyAmount"
+      instanceClassName="java.math.BigDecimal"/>
+
+  <!-- EEnum 6: PriorityLevel -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityLevel">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="MEDIUM" value="1" literal="MEDIUM"/>
+    <eLiterals name="HIGH" value="2" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- EEnum 7: Color with single literal to exercise single-literal path -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="RED" value="0" literal="RED"/>
+  </eClassifiers>
+
+  <!-- Class 8: ColoredItem uses enum Color and custom MoneyAmount -->
+  <eClassifiers xsi:type="ecore:EClass" name="ColoredItem">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="label"
+        lowerBound="1"
+        defaultValueLiteral="&quot;sample&quot; item"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="color"
+        lowerBound="1"
+        eType="//@eClassifiers.7"
+        defaultValueLiteral="RED"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="price"
+        lowerBound="0"
+        eType="//@eClassifiers.5"
+        defaultValueLiteral="9.99"/>
+  </eClassifiers>
+
+</ecore:EPackage>

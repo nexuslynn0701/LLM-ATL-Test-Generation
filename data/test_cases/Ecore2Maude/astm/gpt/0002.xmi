@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example/root"
+    nsPrefix="root">
+
+  <!-- Subpackage to exercise super/subpackage relations -->
+  <eSubpackages name="subPkg"
+                nsURI="http://example/sub"
+                nsPrefix="sub">
+    <!-- EClassifiers inside subPkg -->
+    <!-- 0: Abstract superclass -->
+    <eClassifiers xsi:type="ecore:EClass" name="AbstractNode"
+                  abstract="true" interface="false">
+      <!-- One attribute with default and ID -->
+      <eStructuralFeatures xsi:type="eccore:EAttribute"
+                           name="nodeId"
+                           lowerBound="1"
+                           upperBound="1"
+                           iD="true"
+                           ordered="true"
+                           unique="true"
+                           defaultValueLiteral="0"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eClassifiers>
+
+    <!-- 1: Concrete subclass with reference and attribute (non-ID, with default) -->
+    <eClassifiers xsi:type="ecore:EClass" name="ConcreteNode"
+                  abstract="false" interface="false"
+                  eSuperTypes="//@eSubpackages.0/@eClassifiers.0">
+      <!-- Reference to parent (non-containment, opposite set below) -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="parent"
+                           lowerBound="0"
+                           upperBound="1"
+                           containment="false"
+                           resolveProxies="true"
+                           eType="//@eSubpackages.0/@eClassifiers.0"/>
+      <!-- Containment reference to children (multi, containment, opposite) -->
+      <eStructuralFeatures xsi:type="eccore:EReference"
+                           name="children"
+                           lowerBound="0"
+                           upperBound="-1"
+                           containment="true"
+                           resolveProxies="true"
+                           eType="//@eSubpackages.0/@eClassifiers.1"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.0"/>
+      <!-- String attribute with default value (non-ID) -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="label"
+                           lowerBound="0"
+                           upperBound="1"
+                           iD="false"
+                           ordered="true"
+                           unique="true"
+                           defaultValueLiteral="default &quot;label&quot;"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+
+    <!-- 2: EEnum with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Status">
+      <eLiterals name="NEW" value="0" literal="NEW"/>
+      <eLiterals name="DONE" value="1" literal="DONE"/>
+    </eClassifiers>
+
+  </eSubpackages>
+
+  <!-- EClassifiers directly in rootPkg -->
+  <!-- 0: Class with no super types, references and attributes (including enum-typed) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task"
+                abstract="false" interface="false">
+    <!-- Containment reference to ConcreteNode (multi, no opposite) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="nodes"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="//@eSubpackages.0/@eClassifiers.1"/>
+    <!-- Simple string attribute without default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Enum-typed attribute with default literal -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         lowerBound="1"
+                         upperBound="1"
+                         iD="false"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="NEW"
+                         eType="//@eSubpackages.0/@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 1: Interface-like class with a super type to an external "ecore" class (to trigger createSort) -->
+  <eClassifiers xsi:type="ecore:EClass" name="ExternalBased"
+                abstract="false" interface="true"
+                eSuperTypes="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EClass">
+    <!-- Reference to Task, non-containment, multi, no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="relatedTasks"
+                         lowerBound="0"
+                         upperBound="-1"
+                         containment="false"
+                         resolveProxies="true"
+                         eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+  <!-- 2: Simple data type to differ from classes and enums -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomData"
+                instanceClassName="java.lang.String"/>
+</ecore:EPackage>

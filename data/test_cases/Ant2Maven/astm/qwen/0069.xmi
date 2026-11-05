@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="SampleProject"
+    default="build-all"
+    basedir="."
+    description="A sample project for testing ATL transformation">
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src"/>
+  <properties xsi:type="Ant:PropertyLocation" name="lib.dir" location="lib"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="mytask" classname="com.example.MyTask"/>
+  <path id="compile.classpath">
+    <pathElement path="lib/commons.jar" location="lib"/>
+    <fileset dir="lib">
+      <include name="*.jar"/>
+      <exclude name="test-*.jar"/>
+    </fileset>
+  </path>
+  <targets xmi:id="init" name="init">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+  </targets>
+  <targets xmi:id="compile" name="compile">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true">
+      <classPath refid="compile.classpath"/>
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/test/**/*.java"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="jar" name="jar">
+    <tasks xsi:type="Ant:Jar" jarfile="dist/app.jar" basedir="build/classes"/>
+  </targets>
+  <targets xmi:id="doc" name="doc">
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src"
+        destdir="docs/api"
+        packagenames="com.example.*"
+        defaultexcludes="yes"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Sample API"/>
+  </targets>
+  <targets xmi:id="clean" name="clean">
+    <tasks xsi:type="Ant:Delete" dir="build"/>
+    <tasks xsi:type="Ant:Delete" dir="dist"/>
+  </targets>
+  <targets xmi:id="copy-resources" name="copy-resources">
+    <tasks xsi:type="Ant:Copy" todir="build/classes">
+      <fileset dir="src">
+        <include name="**/*.properties"/>
+        <include name="**/*.xml"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0.0"/>
+        <filtersfile file="filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.template" to="*"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="timestamp" name="timestamp">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="run-java" name="run-java">
+    <tasks xsi:type="Ant:Java" classname="com.example.Main" fork="true">
+      <classPath>
+        <pathElement path="build/classes" location="."/>
+        <fileset dir="lib">
+          <include name="*.jar"/>
+        </fileset>
+      </classPath>
+    </tasks>
+  </targets>
+  <targets xmi:id="build-all" name="build-all">
+    <tasks xsi:type="Ant:NewTask" taskName="//@taskdef.0">
+      <attributes name="outputDir" value="output"/>
+      <attributes name="verbose" value="true"/>
+    </tasks>
+  </targets>
+</Ant:Project>

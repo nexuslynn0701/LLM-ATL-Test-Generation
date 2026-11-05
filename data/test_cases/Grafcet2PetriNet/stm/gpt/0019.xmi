@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+
+  <Grafcet:Grafcet xmi:id="_g0" name="ComplexGrafcetExample" location="loc:/grafcet/complex">
+    <!-- Elements: 4 Steps + 3 Transitions (7 elements total) -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_s0" name="InitStep" location="loc:/grafcet/complex/s0"
+              isInitial="true" isActive="true" action="initializeSystem"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s1" name="IntermediateStep1" location="loc:/grafcet/complex/s1"
+              isInitial="false" isActive="false" action="computeValues"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s2" name="IntermediateStep2" location="loc:/grafcet/complex/s2"
+              isInitial="false" isActive="false" action="verifyResults"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_s3" name="FinalStep" location="loc:/grafcet/complex/s3"
+              isInitial="false" isActive="false" action="shutdownSystem"/>
+
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t0" name="T_Init_to_Inter1" location="loc:/grafcet/complex/t0"
+              condition="startCommandReceived"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t1" name="T_Inter1_to_Inter2" location="loc:/grafcet/complex/t1"
+              condition="computationDone"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_t2" name="T_Inter2_to_Final" location="loc:/grafcet/complex/t2"
+              condition="verificationOK"/>
+
+    <!-- Connections: Step-Transition chain with a fork and a join pattern -->
+    <!-- From InitStep to first transition -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c0"
+                 name="C_s0_to_t0" location="loc:/grafcet/complex/c0"
+                 from="/0/@elements.0" to="/0/@elements.4"/>
+    <!-- From T_Init_to_Inter1 to IntermediateStep1 -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c1"
+                 name="C_t0_to_s1" location="loc:/grafcet/complex/c1"
+                 from="/0/@elements.4" to="/0/@elements.1"/>
+
+    <!-- From IntermediateStep1 to T_Inter1_to_Inter2 -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c2"
+                 name="C_s1_to_t1" location="loc:/grafcet/complex/c2"
+                 from="/0/@elements.1" to="/0/@elements.5"/>
+    <!-- Additional outgoing connection from IntermediateStep1 to last transition (a forward skip) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c3"
+                 name="C_s1_to_t2" location="loc:/grafcet/complex/c3"
+                 from="/0/@elements.1" to="/0/@elements.6"/>
+
+    <!-- From T_Inter1_to_Inter2 to IntermediateStep2 -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c4"
+                 name="C_t1_to_s2" location="loc:/grafcet/complex/c4"
+                 from="/0/@elements.5" to="/0/@elements.2"/>
+
+    <!-- From IntermediateStep2 to T_Inter2_to_Final -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_c5"
+                 name="C_s2_to_t2" location="loc:/grafcet/complex/c5"
+                 from="/0/@elements.2" to="/0/@elements.6"/>
+
+    <!-- From T_Inter2_to_Final to FinalStep -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_c6"
+                 name="C_t2_to_s3" location="loc:/grafcet/complex/c6"
+                 from="/0/@elements.6" to="/0/@elements.3"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

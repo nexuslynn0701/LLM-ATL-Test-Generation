@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="WebShop"
+    basedir="."
+    description="Build and test a simple web shop application"
+    default="build-main">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="test.src.dir" value="src/test/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="build/classes"/>
+  <properties xsi:type="Ant:PropertyValue" name="dist.dir" value="dist"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="env"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+
+  <!-- A standalone taskdef (not referenced by any task) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: main build -->
+  <targets xmi:id="build-main" name="build-main" description="Compile sources and assemble main JAR">
+    <!-- create build and dist directories -->
+    <tasks xsi:type="Ant:Mkdir">
+      <target xmi:idref="build-main"/>
+    </tasks>
+    <tasks xsi:type="Ant:Mkdir" dir="dist">
+      <target xmi:idref="build-main"/>
+    </tasks>
+
+    <!-- compile main sources -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="build/classes" debug="true" optimize="false" deprecation="true">
+      <target xmi:idref="build-main"/>
+      <!-- include and exclude patterns -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+    </tasks>
+
+    <!-- package main jar -->
+    <tasks xsi:type="Ant:Jar" jarfile="dist/webshop-main.jar" basedir="build/classes" compress="true" encoding="UTF-8">
+      <target xmi:idref="build-main"/>
+    </tasks>
+  </targets>
+
+  <!-- Test compilation target -->
+  <targets xmi:id="build-test" name="build-test" description="Compile test sources">
+    <!-- ensure test output directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-classes">
+      <target xmi:idref="build-test"/>
+    </tasks>
+
+    <!-- compile test sources with a different include/exclude pattern -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/test/java" destdir="build/test-classes" debug="true" fork="false">
+      <target xmi:idref="build-test"/>
+      <inExcludes xsi:type="Ant:Includes" name="**/*Test.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/slow/**"/>
+    </tasks>
+  </targets>
+
+  <!-- Documentation target -->
+  <targets xmi:id="generate-docs" name="generate-docs" description="Generate project Javadoc">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/javadoc"
+           packagenames="com.webshop.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="WebShop API">
+      <target xmi:idref="generate-docs"/>
+    </tasks>
+  </targets>
+
+  <!-- Cleanup target -->
+  <targets xmi:id="clean-all" name="clean-all" description="Remove build and distribution artifacts" unless="skip.clean">
+    <!-- delete build directory -->
+    <tasks xsi:type="Ant:Delete" dir="build" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" defaultexcludes="true">
+      <target xmi:idref="clean-all"/>
+    </tasks>
+    <!-- delete dist directory -->
+    <tasks xsi:type="Ant:Delete" dir="dist" verbose="true" quiet="false" failonerror="true" includeEmptyDirs="true" defaultexcludes="true">
+      <target xmi:idref="clean-all"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

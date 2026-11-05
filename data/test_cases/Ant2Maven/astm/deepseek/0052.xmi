@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="BuildProject"
+    description="Main build project"
+    default="compile"
+    basedir="src">
+  <targets xmi:id="compile" name="compile" description="Compile sources">
+    <tasks xsi:type="Ant:Javac" srcdir="src" destdir="build/classes" debug="true" optimize="false" deprecation="true"/>
+  </targets>
+  <targets xmi:id="test" name="test" description="Run tests" unless="skipTests">
+    <tasks xsi:type="Ant:Javac" srcdir="test" destdir="build/test-classes"/>
+  </targets>
+  <targets xmi:id="package" name="package" description="Create JAR">
+    <tasks xsi:type="Ant:Jar" destfile="dist/app.jar" basedir="build/classes" compress="true" manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+  <targets xmi:id="clean" name="clean" description="Remove build artifacts">
+    <tasks xsi:type="Ant:Delete" dir="build"/>
+    <tasks xsi:type="Ant:Delete" dir="dist"/>
+  </targets>
+  <targets xmi:id="docs" name="docs" description="Generate Javadoc">
+    <tasks xsi:type="Ant:Javadoc" sourcepath="src" destdir="docs/api" packagenames="com.example" defaultexcludes="yes" author="true" version="true" use="true" windowtitle="My API"/>
+  </targets>
+  <targets xmi:id="all" name="all" description="Run all steps without depends">
+    <tasks xsi:type="Ant:Mkdir" dir="build/classes"/>
+    <tasks xsi:type="Ant:Mkdir" dir="build/test-classes"/>
+    <tasks xsi:type="Ant:Copy" todir="dist" filtering="true">
+      <fileset dir="resources">
+        <include name="*.xml"/>
+        <exclude name="secret.xml"/>
+      </fileset>
+      <filterset starttoken="@" endtoken="@">
+        <filter token="version" value="1.0"/>
+        <filtersfile file="filter.properties"/>
+      </filterset>
+    </tasks>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+</Ant:Project>

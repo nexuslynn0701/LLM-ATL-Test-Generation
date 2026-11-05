@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one outgoing and one subaction -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saRoot">
+      <!-- SubAction contents: complex Proxy -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- non-simple proxy: all branches present -->
+        <busy>
+          <!-- Busy contents: SubCall to saRoot -->
+          <contents xsi:type="CPL:SubCall" ref="saRoot"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents: Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents: AddressSwitch -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <!-- AddressSwitch children -->
+            <addresses is="userA" contains="a" subDomainOf="domA.example.org">
+              <!-- SwitchedAddress contents: simple Proxy -->
+              <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential"/>
+            </addresses>
+            <addresses is="userB" contains="b" subDomainOf="domB.example.org">
+              <!-- SwitchedAddress contents: SubCall to saRoot -->
+              <contents xsi:type="CPL:SubCall" ref="saRoot"/>
+            </addresses>
+            <!-- NotPresent and Otherwise with contents -->
+            <notPresent>
+              <!-- NotPresent contents: simple Proxy -->
+              <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel"/>
+            </notPresent>
+            <otherwise>
+              <!-- Otherwise contents: Redirect -->
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </otherwise>
+          </contents>
+        </redirection>
+        <failure>
+          <!-- Failure contents: Reject -->
+          <contents xsi:type="CPL:Reject" status="405" reason="Method Not Allowed"/>
+        </failure>
+        <default>
+          <!-- Default contents: simple Proxy -->
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+        </default>
+      </contents>
+    </subActions>
+    <outgoing>
+      <!-- Outgoing contents: complex Proxy (all branches with contents) -->
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <busy>
+          <!-- Busy contents: SubCall to saOut -->
+          <contents xsi:type="CPL:SubCall" ref="saOut"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer contents: Reject -->
+          <contents xsi:type="CPL:Reject" status="408" reason="Timeout"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection contents: Redirect permanent=false -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure>
+          <!-- Failure contents: AddressSwitch -->
+          <contents xsi:type="CPL:AddressSwitch" field="destination">
+            <!-- AddressSwitch children -->
+            <addresses is="dest1" contains="x" subDomainOf="foo.org">
+              <!-- SwitchedAddress contents: Redirect permanent=true -->
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </addresses>
+            <notPresent>
+              <!-- NotPresent contents: Redirect permanent=false -->
+              <contents xsi:type="CPL:Redirect" permanent="false"/>
+            </notPresent>
+            <otherwise>
+              <!-- Otherwise contents: SubCall to saOut -->
+              <contents xsi:type="CPL:SubCall" ref="saOut"/>
+            </otherwise>
+          </contents>
+        </failure>
+        <default>
+          <!-- Default contents: SubCall to saOut -->
+          <contents xsi:type="CPL:SubCall" ref="saOut"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- SubAction used by outgoing side -->
+  <elements xsi:type="CPL:SubAction" id="saOut">
+    <!-- SubAction contents: AddressSwitch -->
+    <contents xsi:type="CPL:AddressSwitch" field="origin">
+      <!-- AddressSwitch children -->
+      <addresses is="caller1" contains="alpha" subDomainOf="dom1.org">
+        <!-- SwitchedAddress contents: simple Proxy -->
+        <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+      </addresses>
+      <addresses is="caller2" contains="beta" subDomainOf="dom2.org">
+        <!-- SwitchedAddress contents: TimeSwitch -->
+        <contents xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="tz://utc">
+          <times dtstart="20250101T000000Z" interval="1" wkst="MO"/>
+        </contents>
+      </addresses>
+      <notPresent>
+        <!-- NotPresent contents: Reject -->
+        <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+      </notPresent>
+      <otherwise>
+        <!-- Otherwise contents: simple Proxy -->
+        <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential"/>
+      </otherwise>
+    </contents>
+  </elements>
+
+  <!-- Locations used by Proxies and Redirects via 'locations' helper (root CPL has empty locations; 
+       locations of these elements will be computed through containment as needed) -->
+  <elements xsi:type="CPL:Location" url="sip:proxyA@example.org" clear="yes" priority="1.0"/>
+  <elements xsi:type="CPL:Location" url="sip:proxyB@example.org" clear="no" priority="0.5"/>
+
+</CPL:CPLModel>

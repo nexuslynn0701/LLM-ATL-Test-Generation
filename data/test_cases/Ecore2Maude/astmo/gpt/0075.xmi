@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="RootPkg"
+    nsURI="http://rootpkg/1.0"
+    nsPrefix="root">
+
+  <!-- Subpackage to trigger super/sub package rules -->
+  <eSubpackages name="SubPkgA" nsURI="http://rootpkg/subA" nsPrefix="subA">
+    <!-- Classifiers of SubPkgA -->
+    <!-- 0: Address -->
+    <eClassifiers xsi:type="ecore:EClass" name="Address">
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="street"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+          name="zipCode"
+          lowerBound="0"
+          upperBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers of RootPkg -->
+  <!-- 0: NamedElement (base class, no structural features) -->
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement"/>
+
+  <!-- 1: Person extends NamedElement; has attributes and reference to Address -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- id attribute: triggers AttEqIsId with true, String type, default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="id"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"
+        defaultValueLiteral="P-0001"/>
+    <!-- age attribute: Int type, upperBound -1 to exercise '*' in upperBound -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="age"
+        lowerBound="0"
+        upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- home reference to Address in subpackage, containment, upperBound 1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="home"
+        lowerBound="0"
+        upperBound="1"
+        eType="//@eSubpackages.0/@eClassifiers.0"
+        containment="true"/>
+  </eClassifiers>
+
+  <!-- 2: Company extends NamedElement; has collection reference to Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company"
+      eSuperTypes="//@eClassifiers.0">
+    <!-- name attribute: String, lowerBound 1, upperBound 1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="name"
+        lowerBound="1"
+        upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- employees non-containment reference to Person, many (-1) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="employees"
+        lowerBound="0"
+        upperBound="-1"
+        eType="//@eClassifiers.1"
+        containment="false"/>
+  </eClassifiers>
+
+  <!-- 3: KindOfCompany is an EEnum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="KindOfCompany">
+    <eLiterals name="Startup" value="0" literal="Startup"/>
+    <eLiterals name="Enterprise" value="1" literal="Enterprise"/>
+  </eClassifiers>
+
+</ecore:EPackage>

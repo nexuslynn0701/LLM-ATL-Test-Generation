@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <subActions id="mainAction">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel" timeout="30">
+        <busy>
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+        </busy>
+        <noAnswer>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </noAnswer>
+        <redirection>
+          <contents xsi:type="CPL:SubCall" ref="fallbackAction"/>
+        </redirection>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="true"/>
+        </default>
+      </contents>
+    </subActions>
+    <incoming>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="sip:user1@example.com">
+          <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+            <default>
+              <contents xsi:type="CPL:Location" url="sip:handler1@example.com" clear="false"/>
+            </default>
+          </contents>
+        </addresses>
+        <addresses contains="example.org">
+          <contents xsi:type="CPL:Reject" status="403" reason="Forbidden"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Reject" status="400" reason="Missing Address"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing>
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings is="CPL-Client/1.0">
+          <contents xsi:type="CPL:Location" url="sip:ua-specific@example.com" clear="true"/>
+        </strings>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:SubCall" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ref="fallbackAction"/>
+  <elements xsi:type="CPL:Location" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" url="sip:fallback@example.com" clear="true"/>
+  <elements xsi:type="CPL:Reject" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" status="503" reason="Service Unavailable"/>
+</CPL:CPLModel>

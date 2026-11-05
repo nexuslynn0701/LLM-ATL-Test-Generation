@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryManager"
+    basedir="lm-src"
+    description="Library management build"
+    default="buildTarget">
+
+  <!-- Ant properties of several kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="app.name" value="LibraryManagerApp"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.dir" location="conf/"/>
+  <properties xsi:type="Ant:PropertyFile" file="conf/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A user-defined task definition (not referenced by any task) -->
+  <taskdef name="customReport" classname="com.example.ant.CustomReportTask"/>
+
+  <!-- Default target with a mix of tasks -->
+  <targets xmi:id="buildTarget" name="build" description="Compile, document, and package the application">
+    <!-- Make sure build directory exists -->
+    <tasks xsi:type="Ant:Mkdir" dir="lm-build/classes"/>
+    <!-- Clean previous archive -->
+    <tasks xsi:type="Ant:Delete" dir="lm-dist"/>
+    <!-- Compile Java sources with includes/excludes and a simple classpath -->
+    <tasks xsi:type="Ant:Javac" srcdir="lm-src/java" destdir="lm-build/classes" debug="on" fork="false" optimize="off" deprecation="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/test/**"/>
+      <classPath refid="cp-main">
+        <pathElement path="lib/core.jar" location="lib/core.jar"/>
+      </classPath>
+    </tasks>
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="lm-src/java"
+           destdir="lm-build/docs"
+           packagenames="com.example.library.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Library Manager API"/>
+    <!-- Create application JAR with filters and file patterns -->
+    <tasks xsi:type="Ant:Jar" jarfile="lm-dist/library-manager.jar" basedir="lm-build/classes" compress="true" encoding="UTF-8">
+      <fileset dir="lm-build/classes">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="com/example/library/**"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+        </patternset>
+      </fileset>
+    </tasks>
+    <!-- Apply filtered copy of configuration files -->
+    <tasks xsi:type="Ant:Copy" todir="lm-dist/conf" overwrite="true" includeEmptyDirs="false">
+      <fileset dir="conf">
+        <include name="**/*.properties"/>
+        <exclude name="secret/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="appName" value="LibraryManagerApp"/>
+        <filtersfile file="conf/filters.properties"/>
+      </filterset>
+    </tasks>
+    <!-- Timestamp generation -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Additional target to ensure multiple Goal creation -->
+  <targets xmi:id="testTarget" name="test" description="Run tests if present">
+    <tasks xsi:type="Ant:Mkdir" dir="lm-build/test-classes"/>
+    <tasks xsi:type="Ant:Delete" dir="lm-build/test-reports"/>
+    <tasks xsi:type="Ant:Javac" srcdir="lm-src/test" destdir="lm-build/test-classes" debug="true">
+      <classPath refid="cp-test">
+        <pathElement path="lib/junit.jar" location="lib/junit.jar"/>
+        <fileset dir="lib/testlibs">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classPath>
+    </tasks>
+    <!-- Simple jar for test utilities -->
+    <tasks xsi:type="Ant:Jar" jarfile="lm-dist/library-tests.jar" basedir="lm-build/test-classes"/>
+  </targets>
+
+  <!-- A reusable path declared at project level to exercise Path and ClassPath-related rules -->
+  <path id="compile.path">
+    <pathElement path="lib/logging.jar" location="lib/logging.jar"/>
+    <fileset dir="lib/extensions">
+      <include name="**/*.jar"/>
+      <exclude name="**/old/**"/>
+    </fileset>
+  </path>
+
+</Ant:Project>

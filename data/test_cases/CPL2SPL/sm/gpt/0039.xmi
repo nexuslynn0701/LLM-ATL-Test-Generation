@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: main CPL script container -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="subA">
+      <contents href="//@elements.2"/>
+      <contents href="//@elements.3"/>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="subB">
+      <contents href="//@elements.4"/>
+    </subActions>
+    <outgoing>
+      <contents href="//@elements.5"/>
+      <contents href="//@elements.6"/>
+    </outgoing>
+    <incoming>
+      <contents href="//@elements.1"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: proxy with full set of outcome branches -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <busy>
+      <contents href="//@elements.7"/>
+    </busy>
+    <noAnswer>
+      <contents href="//@elements.8"/>
+    </noAnswer>
+    <redirection>
+      <contents href="//@elements.9"/>
+    </redirection>
+    <failure>
+      <contents href="//@elements.10"/>
+    </failure>
+    <default>
+      <contents href="//@elements.2"/>
+    </default>
+  </elements>
+
+  <!-- 2: address switch -->
+  <elements xsi:type="CPL:AddressSwitch" field="from" subField="user">
+    <notPresent>
+      <contents href="//@elements.11"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.3"/>
+    </otherwise>
+    <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+      <contents href="//@elements.4"/>
+    </addresses>
+    <addresses is="bob@example.org" contains="bob" subDomainOf="example.org">
+      <contents href="//@elements.5"/>
+    </addresses>
+  </elements>
+
+  <!-- 3: string switch -->
+  <elements xsi:type="CPL:StringSwitch" field="subject">
+    <notPresent>
+      <contents href="//@elements.6"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.7"/>
+    </otherwise>
+    <strings is="urgent" contains="URGENT">
+      <contents href="//@elements.8"/>
+    </strings>
+    <strings is="info" contains="INFO">
+      <contents href="//@elements.9"/>
+    </strings>
+  </elements>
+
+  <!-- 4: language switch -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent>
+      <contents href="//@elements.10"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.11"/>
+    </otherwise>
+    <languages matches="en">
+      <contents href="//@elements.5"/>
+    </languages>
+    <languages matches="fr">
+      <contents href="//@elements.6"/>
+    </languages>
+  </elements>
+
+  <!-- 5: time switch with rich recurrence -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.example.com/paris">
+    <notPresent>
+      <contents href="//@elements.7"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.8"/>
+    </otherwise>
+    <times dtstart="20250101T080000" dtend="20250101T180000" duration="PT10H"
+           freq="DAILY" until="20251231T180000" count="10" interval="1"
+           bySecond="0" byMinute="0" byHour="8,17"
+           byDay="MO,TU,WE,TH,FR" byMonthDay="1,15" byYearDay="100"
+           byWeekNo="10" byMonth="1,2,3" wkst="MO" bySetPos="1,-1">
+      <contents href="//@elements.9"/>
+    </times>
+    <times dtstart="20250101T000000" interval="2" wkst="SU">
+      <contents href="//@elements.10"/>
+    </times>
+  </elements>
+
+  <!-- 6: priority switch -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <notPresent>
+      <contents href="//@elements.11"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.4"/>
+    </otherwise>
+    <priorities less="0.3" greater="0.0" equal="0.2">
+      <contents href="//@elements.7"/>
+    </priorities>
+    <priorities less="0.7" greater="0.3" equal="0.5">
+      <contents href="//@elements.8"/>
+    </priorities>
+  </elements>
+
+  <!-- 7: location as terminal action -->
+  <elements xsi:type="CPL:Location" url="sip:alice@home.example.com" priority="0.5" clear="no"/>
+
+  <!-- 8: location containing a subcall (demonstrate NodeContainer+Node) -->
+  <elements xsi:type="CPL:Location" url="sip:alice@mobile.example.com" priority="0.8" clear="yes">
+    <contents href="//@elements.12"/>
+  </elements>
+
+  <!-- 9: redirect action -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- 10: reject action -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+  <!-- 11: standalone SubCall -->
+  <elements xsi:type="CPL:SubCall" ref="subA"/>
+
+  <!-- 12: another SubCall -->
+  <elements xsi:type="CPL:SubCall" ref="subB"/>
+
+</CPL:CPLModel>

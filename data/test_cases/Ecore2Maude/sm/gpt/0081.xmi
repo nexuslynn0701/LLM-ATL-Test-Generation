@@ -1,0 +1,81 @@
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="libraryPkg"
+    nsURI="http://example.org/library"
+    nsPrefix="lib">
+
+  <!-- 0: Enumeration for book categories -->
+  <eClassifiers xsi:type="ecore:EEnum" name="BookCategory">
+    <eLiterals name="SCIENCE" value="0" literal="SCIENCE"/>
+    <eLiterals name="NOVEL" value="1" literal="NOVEL"/>
+  </eClassifiers>
+
+  <!-- 1: Simple serializable data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="Code" instanceClassName="java.lang.String"/>
+
+  <!-- 2: Base class for all identified elements -->
+  <eClassifiers xsi:type="ecore:EClass" name="IdentifiedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 3: Person class with attributes and a reference to Library -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="memberOf"
+                         eType="//@eClassifiers.6"
+                         containment="false"
+                         lowerBound="0"/>
+  </eClassifiers>
+
+  <!-- 4: Book class with attributes, enum-typed attribute and reference to Author -->
+  <eClassifiers xsi:type="ecore:EClass" name="Book" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isbn"
+                         eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="category"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="author"
+                         eType="//@eClassifiers.5"
+                         lowerBound="1"/>
+  </eClassifiers>
+
+  <!-- 5: Author class extends Person and has a container reference to Library,
+           plus a non-containment reference back to its Books -->
+  <eClassifiers xsi:type="ecore:EClass" name="Author" eSuperTypes="//@eClassifiers.3">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library"
+                         eType="//@eClassifiers.6"
+                         lowerBound="0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books"
+                         eType="//@eClassifiers.4"
+                         upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- 6: Library is the root container with multiple containment and cross references -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="books"
+                         eType="//@eClassifiers.4"
+                         upperBound="-1"
+                         containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="members"
+                         eType="//@eClassifiers.3"
+                         upperBound="-1"
+                         containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mainAuthor"
+                         eType="//@eClassifiers.5"
+                         containment="true"/>
+  </eClassifiers>
+
+</ecore:EPackage>

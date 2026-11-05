@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainSub"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="alice@example.com">
+          <contents xsi:type="CPL:Location" url="sip:alice@192.168.1.10" priority="1" clear="yes"/>
+        </addresses>
+        <addresses is="bob@example.com">
+          <contents xsi:type="CPL:SubCall" ref="mainSub"/>
+        </addresses>
+        <notPresent>
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy>
+              <contents xsi:type="CPL:SubCall" ref="mainSub"/>
+            </busy>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default contents="//@elements.3"/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy"/>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:default@backup.com" priority="5" clear="no">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+      <busy/>
+      <noAnswer>
+        <contents xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="1" clear="yes"/>
+      </noAnswer>
+      <redirection>
+        <contents xsi:type="CPL:Redirect" permanent="false"/>
+      </redirection>
+      <failure/>
+      <default>
+        <contents xsi:type="CPL:AddressSwitch" field="destination">
+          <addresses is="support@example.com"/>
+          <otherwise>
+            <contents xsi:type="CPL:StringSwitch" field="X-Call-Type">
+              <strings contains="emergency"/>
+              <notPresent/>
+              <otherwise/>
+            </contents>
+          </otherwise>
+        </contents>
+      </default>
+    </contents>
+  </elements>
+  <elements xsi:type="CPL:Location" url="sip:proxy@main.com" priority="3" clear="yes"/>
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <default>
+      <contents xsi:type="CPL:Location" url="sip:final@dest.com" priority="10" clear="yes"/>
+    </default>
+  </elements>
+</CPL:CPLModel>

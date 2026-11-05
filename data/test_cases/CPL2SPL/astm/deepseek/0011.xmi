@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="logCall"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="destination" subField="user">
+        <addresses is="sip:bob@example.com"/>
+        <addresses is="sip:alice@example.com"/>
+        <notPresent/>
+        <otherwise>
+          <contents xsi:type="CPL:SubCall" ref="logCall"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" dtstart="20250101T000000" interval="1" wkst="MO">
+        <times dtstart="20250101T000000" dtend="20250131T235959" interval="1" wkst="MO"/>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+            <busy/>
+            <noAnswer/>
+            <redirection/>
+            <failure/>
+            <default>
+              <contents xsi:type="CPL:Redirect" permanent="false"/>
+            </default>
+          </contents>
+        </otherwise>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="logCall"/>
+  <elements xsi:type="CPL:Location" url="sip:voicemail@example.com" priority="0" clear="yes">
+    <contents xsi:type="CPL:Reject" status="486" reason="User Busy"/>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+  <elements xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <busy>
+      <contents xsi:type="CPL:Location" url="sip:backup@example.com" priority="1" clear="no"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:SubCall" ref="logCall"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </redirection>
+    <failure>
+      <contents xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+    </failure>
+    <default>
+      <contents xsi:type="CPL:Location" url="sip:admin@example.com" priority="2" clear="yes"/>
+    </default>
+  </elements>
+  <elements xsi:type="CPL:StringSwitch" field="user-agent">
+    <strings is="CustomSoftPhone"/>
+    <strings is="LegacyDevice"/>
+    <otherwise>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <default/>
+      </contents>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <languages matches="fr"/>
+    <otherwise>
+      <contents xsi:type="CPL:Reject" status="403" reason="Language Not Supported"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="5"/>
+    <priorities greater="3"/>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:queue@example.com" priority="0" clear="yes"/>
+    </otherwise>
+  </elements>
+</CPL:CPLModel>

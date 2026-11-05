@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with Incoming, Outgoing, SubActions and Switches -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions referenced by SubCalls -->
+    <subActions id="subMain">
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- Complex proxy: all branches present -->
+        <busy contents="//@elements.9"/>
+        <noAnswer contents="//@elements.10"/>
+        <redirection contents="//@elements.11"/>
+        <failure/>
+        <default contents="//@elements.12"/>
+      </contents>
+    </subActions>
+    <subActions id="subSimple">
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+        <!-- Simple proxy: no branches -->
+      </contents>
+    </subActions>
+
+    <!-- Incoming with a Redirect as statement -->
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </incoming>
+
+    <!-- Outgoing with a SubCall as statement -->
+    <outgoing>
+      <contents xsi:type="CPL:SubCall" ref="subMain"/>
+    </outgoing>
+  </elements>
+
+  <!-- Top-level Location used by proxies and redirect (for locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:service@example.com" clear="yes" priority="1"/>
+
+  <!-- AddressSwitch with SwitchedAddress and NotPresent / Otherwise branches -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses is="sip:alice@example.com" contains="alice" subDomainOf="example.com"
+               contents="//@elements.4"/>
+    <addresses is="sip:bob@example.org" contains="bob" subDomainOf="example.org"
+               contents="//@elements.5"/>
+    <notPresent contents="//@elements.6"/>
+    <otherwise contents="//@elements.7"/>
+  </elements>
+
+  <!-- StringSwitch (exercises StringSwitch2SelectStat) -->
+  <elements xsi:type="CPL:StringSwitch" field="call-type"/>
+
+  <!-- LanguageSwitch, TimeSwitch, PrioritySwitch to exercise empty-statement branches -->
+  <elements xsi:type="CPL:LanguageSwitch"/>
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org/utc">
+    <times dtstart="20240101T000000Z" interval="60" wkst="MO"/>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.3" equal="0.5" greater="0.8"/>
+  </elements>
+
+  <!-- Busy with SubCall contents -->
+  <elements xsi:type="CPL:Busy">
+    <contents xsi:type="CPL:SubCall" ref="subSimple"/>
+  </elements>
+
+  <!-- NoAnswer with Reject contents -->
+  <elements xsi:type="CPL:NoAnswer">
+    <contents xsi:type="CPL:Reject" status="480" reason="No Answer"/>
+  </elements>
+
+  <!-- Redirection with complex Proxy contents -->
+  <elements xsi:type="CPL:Redirection">
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <busy/>
+      <noAnswer/>
+      <redirection/>
+      <failure/>
+      <default/>
+    </contents>
+  </elements>
+
+  <!-- Failure (for Failure2ErrorResponse) -->
+  <elements xsi:type="CPL:Failure"/>
+
+  <!-- Default with simple Proxy contents -->
+  <elements xsi:type="CPL:Default">
+    <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel"/>
+  </elements>
+
+</CPL:CPLModel>

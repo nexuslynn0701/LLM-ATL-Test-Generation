@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL, with one SubAction and both Incoming/Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions xsi:type="CPL:SubAction" id="saA">
+      <!-- contents -> complex Proxy (isSimple=false) -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- Attach a Location so locations helper is non-empty -->
+        <contents xsi:type="CPL:Location" url="sip:saA@service.com" clear="true" priority="1">
+          <!-- Location contents -> SubCall, which will be ignored in statements (Location special-cased) -->
+          <contents xsi:type="CPL:SubCall" ref="saB"/>
+        </contents>
+        <!-- Complex proxy: has some non-null branches -->
+        <busy>
+          <!-- Busy.contents -> simple Proxy -->
+          <contents xsi:type="CPL:Proxy" recurse="true" ordering="sequential">
+            <!-- Simple proxy: no branches, but has a Location to test locations on simple proxy -->
+            <contents xsi:type="CPL:Location" url="sip:busy@service.com" clear="true" priority="2"/>
+          </contents>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer.contents -> Redirect (should be filtered out, but exercises Redirect2Return elsewhere) -->
+          <contents xsi:type="CPL:Redirect" permanent="false">
+            <!-- Give redirect a local Location -->
+            <contents xsi:type="CPL:Location" url="sip:noanswer@service.com" clear="true" priority="3"/>
+          </contents>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection.contents -> SubCall -->
+          <contents xsi:type="CPL:SubCall" ref="saB"/>
+        </redirection>
+        <failure>
+          <!-- Failure.contents -> Reject -->
+          <contents xsi:type="CPL:Reject" status="500" reason="server failure"/>
+        </failure>
+        <default>
+          <!-- Default.contents -> AddressSwitch -->
+          <contents xsi:type="CPL:AddressSwitch" field="destination" subField="user">
+            <!-- AddressSwitch.notPresent -->
+            <notPresent>
+              <!-- NotPresent.contents -> TimeSwitch (filtered for statements) -->
+              <contents xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example">
+                <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+              </contents>
+            </notPresent>
+            <!-- AddressSwitch.otherwise -->
+            <otherwise>
+              <!-- Otherwise.contents -> simple Proxy -->
+              <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+                <contents xsi:type="CPL:Location" url="sip:otherwise@service.com" clear="true" priority="4"/>
+              </contents>
+            </otherwise>
+            <!-- AddressSwitch.addresses -->
+            <addresses is="sip:user1@example.com" contains="user1" subDomainOf="example.com">
+              <!-- SwitchedAddress.contents -> Redirect -->
+              <contents xsi:type="CPL:Redirect" permanent="true">
+                <contents xsi:type="CPL:Location" url="sip:user1@alt.com" clear="true" priority="1"/>
+              </contents>
+            </addresses>
+            <addresses is="sip:user2@example.com" contains="user2" subDomainOf="example.com">
+              <!-- SwitchedAddress.contents -> simple Proxy -->
+              <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+                <contents xsi:type="CPL:Location" url="sip:user2@service.com" clear="true" priority="5"/>
+              </contents>
+            </addresses>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Incoming and Outgoing to trigger Incoming2Method / Outgoing2Method -->
+    <incoming/>
+    <outgoing>
+      <!-- Outgoing.contents -> SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="saA"/>
+    </outgoing>
+  </elements>
+
+  <!-- 1: SubAction used as SubCall target -->
+  <elements xsi:type="CPL:SubAction" id="saB">
+    <!-- contents -> simple Proxy with Location -->
+    <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+      <contents xsi:type="CPL:Location" url="sip:saB@service.com" clear="true" priority="1"/>
+    </contents>
+  </elements>
+
+  <!-- 2: Top-level simple Proxy (no branches) -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+    <!-- This Location ensures locations on a simple top-level proxy -->
+    <contents xsi:type="CPL:Location" url="sip:top-simple@service.com" clear="true" priority="10"/>
+  </elements>
+
+  <!-- 3: Top-level complex Proxy with all branches present but some empty -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <!-- Attach a Location so locations for this proxy are non-empty -->
+    <contents xsi:type="CPL:Location" url="sip:complex@service.com" clear="true" priority="20"/>
+    <busy>
+      <!-- Busy.contents -> Reject -->
+      <contents xsi:type="CPL:Reject" status="486" reason="Busy here"/>
+    </busy>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- 4: Top-level AddressSwitch with its own cases -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="domain">
+    <notPresent/>
+    <otherwise>
+      <!-- Otherwise.contents -> Reject, filtered in statements -->
+      <contents xsi:type="CPL:Reject" status="404" reason="Not found"/>
+    </otherwise>
+    <addresses is="sip:alpha@example.org" contains="alpha" subDomainOf="example.org">
+      <!-- SwitchedAddress.contents -> SubCall -->
+      <contents xsi:type="CPL:SubCall" ref="saA"/>
+    </addresses>
+  </elements>
+
+  <!-- 5: Top-level StringSwitch -->
+  <elements xsi:type="CPL:StringSwitch">
+    <!-- Use different field to distinguish from examples -->
+    <contents xsi:type="CPL:Location" url="sip:stringswitch@service.com" clear="true" priority="30"/>
+  </elements>
+
+  <!-- 6: Top-level LanguageSwitch (to be filtered as a direct statement source) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <contents xsi:type="CPL:SwitchedLanguage" matches="en"/>
+  </elements>
+
+  <!-- 7: Top-level TimeSwitch (already used inside switches, but here as a root-level element) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="Europe/Paris" tzurl="http://tz.paris">
+    <times dtstart="20240101T080000Z" dtend="20240101T100000Z" interval="2" wkst="MO"/>
+  </elements>
+
+  <!-- 8: Top-level PrioritySwitch -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <contents xsi:type="CPL:SwitchedPriority" less="0.3" greater="0.7" equal="0.5"/>
+  </elements>
+
+  <!-- 9: Top-level SubCall whose ref does not match any SubAction (should still create call) -->
+  <elements xsi:type="CPL:SubCall" ref="nonExistingAction"/>
+
+  <!-- 10: Top-level Redirect with permanent=false -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:redirect-temp@service.com" clear="true" priority="40"/>
+  </elements>
+
+  <!-- 11: Top-level Redirect with permanent=true -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <contents xsi:type="CPL:Location" url="sip:redirect-perm@service.com" clear="true" priority="50"/>
+  </elements>
+
+  <!-- 12: Top-level Location with nested SubCall to test Location.statement indirection -->
+  <elements xsi:type="CPL:Location" url="sip:standalone@service.com" clear="true" priority="60">
+    <contents xsi:type="CPL:SubCall" ref="saA"/>
+  </elements>
+
+</CPL:CPLModel>

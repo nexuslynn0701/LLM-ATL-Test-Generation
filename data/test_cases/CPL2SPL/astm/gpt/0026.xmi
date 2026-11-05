@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL for R1, with Incoming and Outgoing using different contents -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions for R2 and for SubCall resolution (R13) -->
+    <subActions xsi:type="CPL:SubAction" id="mainAction">
+      <!-- contents -> simple Proxy for R7, and used as statement in R2/R3/R4 -->
+      <contents xsi:type="CPL:Proxy" timeout="15" recurse="no" ordering="parallel">
+        <!-- simple: no busy/noAnswer/redirection/failure/default -->
+      </contents>
+    </subActions>
+    <subActions xsi:type="CPL:SubAction" id="complexAction">
+      <!-- contents -> complex Proxy for R8 and also to provide Busy/NoAnswer/Redirection/Default for R9–R12 -->
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="yes" ordering="serial">
+        <!-- make proxy complex by adding all branches -->
+        <busy>
+          <!-- Busy.contents -> SubCall (R13 as nested statement) -->
+          <contents xsi:type="CPL:SubCall" ref="mainAction"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer.contents -> Reject (will be filtered out as statement) -->
+          <contents xsi:type="CPL:Reject" status="480" reason="Temporarily unreachable"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection.contents -> Redirect (R14 as nested statement) -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default.contents -> Location (will be filtered out as statement) -->
+          <contents xsi:type="CPL:Location" url="sip:default@example.com" clear="true"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <!-- Incoming using SubCall as contents (R3 + R13 via statement helper) -->
+    <incoming>
+      <contents xsi:type="CPL:SubCall" ref="mainAction"/>
+    </incoming>
+
+    <!-- Outgoing using complex Proxy as contents (R4 + R8 + R9–R12 via statement helper) -->
+    <outgoing>
+      <!-- reference complexAction's Proxy via contents path -->
+      <contents xsi:type="CPL:Proxy" timeout="25" recurse="yes" ordering="parallel">
+        <!-- This Proxy is also complex and has its own branches to exercise nested cases -->
+        <busy>
+          <!-- Busy.contents -> Reject (filtered) -->
+          <contents xsi:type="CPL:Reject" status="486" reason="Busy here"/>
+        </busy>
+        <noAnswer>
+          <!-- NoAnswer.contents -> SubCall (R13 again) -->
+          <contents xsi:type="CPL:SubCall" ref="complexAction"/>
+        </noAnswer>
+        <redirection>
+          <!-- Redirection.contents -> Proxy (simple) to trigger nested Proxy2Return -->
+          <contents xsi:type="CPL:Proxy" timeout="10" recurse="no" ordering="parallel"/>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default.contents -> Redirect (R14) -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Top-level Location for R7/R8/R14 location computation, and for R19 -->
+  <elements xsi:type="CPL:Location" url="sip:top@example.com" priority="1" clear="yes"/>
+
+  <!-- Top-level Redirect for R14 (permanent=false) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- Top-level SubCall for R13 (refers to complexAction) -->
+  <elements xsi:type="CPL:SubCall" ref="complexAction"/>
+
+  <!-- AddressSwitch for R15, with SwitchedAddress and NotPresent/Otherwise for R6, R17, R18 -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <!-- SwitchedAddress with contents -> Proxy (simple) for nested R7 -->
+    <addresses is="alice@example.com" contains="example.com" subDomainOf="example.com">
+      <contents xsi:type="CPL:Proxy" timeout="5" recurse="no" ordering="parallel"/>
+    </addresses>
+    <!-- SwitchedAddress with contents -> Reject -->
+    <addresses is="bob@example.com" contains="example.org">
+      <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+    </addresses>
+    <!-- NotPresent for R6 as part of addresses->including(notPresent) -->
+    <notPresent/>
+    <!-- Otherwise for R18 -->
+    <otherwise>
+      <!-- Otherwise.contents -> SubCall to mainAction -->
+      <contents xsi:type="CPL:SubCall" ref="mainAction"/>
+    </otherwise>
+  </elements>
+
+  <!-- StringSwitch for R16 (no dependencies) -->
+  <elements xsi:type="CPL:StringSwitch">
+    <!-- field name will be used as variable name in SPL -->
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <!-- LanguageSwitch, TimeSwitch, PrioritySwitch as top-level to be used as contents in various nodes (exercise filters) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com/utc">
+    <contents xsi:nil="true"/>
+  </elements>
+
+  <elements xsi:type="CPL:PrioritySwitch">
+    <contents xsi:nil="true"/>
+  </elements>
+
+</CPL:CPLModel>

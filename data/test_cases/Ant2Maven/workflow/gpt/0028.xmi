@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullLifecycleBuild"
+    basedir="project-root"
+    description="Build, document, package, and clean project"
+    default="build-all">
+
+  <!-- Properties to exercise all AntProperty* rules -->
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="project-root/target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="project-root/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- TaskDef to exercise AntTaskDef2MavenMavenTaskDef -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default build target with multiple tasks -->
+  <targets xmi:id="build-all" name="build-all">
+    <!-- Javac task -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="project-root/src/main/java"
+           destdir="project-root/target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+    </tasks>
+
+    <!-- Javadoc task -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="project-root/src/main/java"
+           destdir="project-root/target/site/apidocs"
+           packagenames="com.example.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Example Project API Documentation"/>
+    <!-- Jar task -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="project-root/target/example-app.jar"
+           basedir="project-root/target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="project-root/META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Auxiliary target with file and management tasks -->
+  <targets xmi:id="prepare-and-clean" name="prepare-and-clean">
+    <!-- Mkdir task -->
+    <tasks xsi:type="Ant:Mkdir" dir="project-root/target/temp"/>
+    <!-- Copy task -->
+    <tasks xsi:type="Ant:Copy"
+           file="project-root/resources/config.xml"
+           presservelastmodified="true"
+           tofile="project-root/target/temp/config.xml"
+           todir="project-root/target/temp"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false">
+    </tasks>
+    <!-- Delete task -->
+    <tasks xsi:type="Ant:Delete"
+           file="project-root/target/temp/config.xml"
+           dir="project-root/target/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*.tmp"
+           includesfile=""
+           excludes=""
+           excludesfile=""
+           defaultexcludes="true"/>
+    <!-- Tstamp task -->
+    <tasks xsi:type="Ant:Tstamp">
+    </tasks>
+  </targets>
+
+</Ant:Project>

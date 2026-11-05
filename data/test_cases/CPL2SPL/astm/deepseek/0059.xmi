@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:CPL="http://cpl/1.0" xmi:id="modelId">
+  <elements xsi:type="CPL:CPL" xmi:id="cplRoot">
+    <subActions xmi:id="sub1" id="handleIncoming"/>
+    <subActions xmi:id="sub2" id="handleOutgoing"/>
+    <incoming xmi:id="incoming1">
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses xmi:id="addr1" is="sip:alice@example.com">
+          <contents xsi:type="CPL:Location" url="sip:bob@elsewhere.com" priority="1" clear="yes"/>
+        </addresses>
+        <notPresent xmi:id="notPres1">
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </notPresent>
+        <otherwise xmi:id="otherwise1">
+          <contents xsi:type="CPL:Reject" status="404" reason="Not Found"/>
+        </otherwise>
+      </contents>
+    </incoming>
+    <outgoing xmi:id="outgoing1">
+      <contents xsi:type="CPL:StringSwitch" field="user-agent">
+        <strings xmi:id="str1" is="Windows" contains="NT"/>
+        <notPresent xmi:id="notPres2">
+          <contents xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+            <busy xmi:id="busy1"/>
+            <noAnswer xmi:id="noAns1"/>
+            <redirection xmi:id="redir1"/>
+            <failure xmi:id="fail1"/>
+            <default xmi:id="default1" contents="//@elements.5"/>
+          </contents>
+        </notPresent>
+        <otherwise xmi:id="otherwise2">
+          <contents xsi:type="CPL:SubCall" ref="handleOutgoing"/>
+        </otherwise>
+      </contents>
+    </outgoing>
+  </elements>
+  <elements xsi:type="CPL:Location" xmi:id="locDirect1" url="sip:backup@service.net" priority="2" clear="no"/>
+  <elements xsi:type="CPL:SubCall" xmi:id="subcall1" ref="handleIncoming"/>
+  <elements xsi:type="CPL:Redirect" xmi:id="redirect1" permanent="true"/>
+  <elements xsi:type="CPL:Reject" xmi:id="reject1" status="603" reason="Declined"/>
+  <elements xsi:type="CPL:Proxy" xmi:id="proxySimple" recurse="no" ordering="parallel"/>
+  <elements xsi:type="CPL:AddressSwitch" xmi:id="addrSwitch1" field="destination">
+    <addresses xmi:id="addr2" is="sip:carol@domain.com">
+      <contents xsi:type="CPL:TimeSwitch" dtstart="20250101T000000" interval="3600" wkst="MO">
+        <times xmi:id="time1" dtstart="20250101T080000" interval="1" wkst="MO"/>
+        <notPresent xmi:id="notPres3">
+          <contents xsi:type="CPL:LanguageSwitch">
+            <languages xmi:id="lang1" matches="en"/>
+            <notPresent xmi:id="notPres4">
+              <contents xsi:type="CPL:PrioritySwitch">
+                <priorities xmi:id="prio1" less="3" greater="8" equal="5"/>
+              </contents>
+            </notPresent>
+          </contents>
+        </notPresent>
+      </contents>
+    </addresses>
+  </elements>
+</CPL:CPLModel>

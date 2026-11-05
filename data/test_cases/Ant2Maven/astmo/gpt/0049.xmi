@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="multiRuleProject0049"
+    default="buildTarget"
+    basedir="project-root"
+    description="Ant project exercising multiple Ant2Maven rules">
+  <!-- Properties of all four kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/settings.xml"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- Task definition, not referenced by any task (per safety rules) -->
+  <taskdef name="customTask" classname="org.example.ant.CustomTask"/>
+
+  <!-- Default target with several mapped tasks -->
+  <targets xmi:id="buildTarget" name="buildTarget" description="Main build target">
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/multiRuleProject0049.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    <tasks xsi:type="Ant:Mkdir"
+           dir="target/site"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="target/temp"/>
+  </targets>
+
+  <!-- Additional target to increase goal coverage -->
+  <targets xmi:id="docsTarget" name="docsTarget" description="Generate project documentation">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="org.example.project.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="multiRuleProject0049 API"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+  </targets>
+</Ant:Project>

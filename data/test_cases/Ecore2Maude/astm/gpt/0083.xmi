@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage to trigger super/subpackage rules -->
+  <eSubpackages name="subPkg" nsURI="http://rootPkg/sub" nsPrefix="sub">
+    <!-- Class in subpackage, will be referenced as a supertype -->
+    <eClassifiers xsi:type="ecore:EClass" name="SubBase">
+      <!-- one attribute with explicit bounds and default to trigger many attribute rules -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="subFlag"
+                           ordered="false"
+                           unique="true"
+                           lowerBound="0"
+                           upperBound="1"
+                           eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+                           iD="false"
+                           defaultValueLiteral="true"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- EEnum with multiple literals to exercise enum rules and list construction -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS"/>
+    <eLiterals name="DONE" value="2" literal="DONE"/>
+  </eClassifiers>
+
+  <!-- Simple class with only attributes (including ID and default string) -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="id"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="true"
+                         defaultValueLiteral="P-0001"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+                         iD="false"
+                         defaultValueLiteral="30"/>
+  </eClassifiers>
+
+  <!-- Class with:
+       - multiple supertypes (local and from subpackage),
+       - mixed attributes and references,
+       - containment and non-containment,
+       - opposite reference to trigger RefEqOpposite and maybeRefSort
+  -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task"
+                eSuperTypes="//@eClassifiers.1 //@eSubpackages.0/@eClassifiers.0">
+    <!-- attribute typed with enum and enum default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="status"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="//@eClassifiers.0"
+                         iD="false"
+                         defaultValueLiteral="NEW"/>
+
+    <!-- string attribute with escaped quotes in default to test escapeQuotes -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="title"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="1"
+                         upperBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+                         iD="false"
+                         defaultValueLiteral="&quot;Sample&quot; Task"/>
+
+    <!-- containment reference with upperBound = -1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subTasks"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"
+                         containment="true"/>
+    <!-- non-containment reference with explicit upperBound, opposite set below -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owner"
+                         ordered="false"
+                         unique="false"
+                         lowerBound="0"
+                         upperBound="1"
+                         eType="//@eClassifiers.1"
+                         containment="false"
+                         eOpposite="//@eClassifiers.1/@eStructuralFeatures.1"/>
+  </eClassifiers>
+
+  <!-- Class that:
+       - has a reference opposite to Task.owner
+       - has only references (no attributes)
+  -->
+  <eClassifiers xsi:type="ecore:EClass" name="Team">
+    <!-- containment reference without opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="members"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.1"
+                         containment="true"/>
+    <!-- non-containment reference opposite to Task.owner -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="tasks"
+                         ordered="true"
+                         unique="true"
+                         lowerBound="0"
+                         upperBound="-1"
+                         eType="//@eClassifiers.2"
+                         containment="false"/>
+  </eClassifiers>
+
+</ecore:EPackage>

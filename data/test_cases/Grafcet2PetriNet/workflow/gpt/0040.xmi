@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingAndMerge">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s010" name="StartUp" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Step" location="s011" name="PathA" isInitial="false" isActive="false" action="executeA"/>
+    <elements xsi:type="Grafcet:Step" location="s012" name="PathB" isInitial="false" isActive="false" action="executeB"/>
+    <elements xsi:type="Grafcet:Step" location="s013" name="Merge" isInitial="false" isActive="false" action="mergePaths"/>
+    <elements xsi:type="Grafcet:Step" location="s014" name="Shutdown" isInitial="false" isActive="false" action="cleanup"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t010" name="Split" condition="readyToSplit"/>
+    <elements xsi:type="Grafcet:Transition" location="t011" name="Join" condition="bothDone"/>
+    <elements xsi:type="Grafcet:Transition" location="t012" name="FinishCycle" condition="cycleComplete"/>
+    <!-- Connections: branching from StartUp to PathA and PathB via Split -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c010" name="startToSplit" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c011" name="splitToPathA" from="/0/@elements.5" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c012" name="splitToPathB" from="/0/@elements.5" to="/0/@elements.2"/>
+    <!-- Connections: each path goes to Join -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c013" name="pathAToJoin" from="/0/@elements.1" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c014" name="pathBToJoin" from="/0/@elements.2" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c015" name="joinToMerge" from="/0/@elements.6" to="/0/@elements.3"/>
+    <!-- Connections: Merge to Shutdown via FinishCycle, then loop back to StartUp -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c016" name="mergeToFinish" from="/0/@elements.3" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c017" name="finishToShutdown" from="/0/@elements.7" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c018" name="shutdownToSplit" from="/0/@elements.4" to="/0/@elements.5"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

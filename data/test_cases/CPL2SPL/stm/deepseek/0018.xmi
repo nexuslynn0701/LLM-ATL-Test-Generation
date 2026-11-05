@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="mainRouting"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin">
+        <addresses is="192.168.1.100" contains="192.168" subDomainOf="example.com"/>
+        <addresses is="10.0.0.1" contains="10."/>
+        <notPresent>
+          <contents xsi:type="CPL:Location" url="sip:backup@example.com" priority="1" clear="yes"/>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential" timeout="30">
+            <busy>
+              <contents xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:Redirect" permanent="no"/>
+            </noAnswer>
+            <default contents="//@elements.1"/>
+          </contents>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:TimeSwitch" tzid="America/New_York" tzurl="http://tzurl.org">
+        <times dtstart="20240101T090000" dtend="20240101T170000" duration="PT8H" freq="DAILY" interval="1" wkst="MO"/>
+        <times dtstart="20240101T000000" freq="WEEKLY" interval="1" wkst="SU" byDay="SA,SU"/>
+        <notPresent>
+          <contents xsi:type="CPL:PrioritySwitch">
+            <priorities less="5" greater="1" equal="3"/>
+            <otherwise>
+              <contents xsi:type="CPL:LanguageSwitch">
+                <languages matches="en"/>
+                <languages matches="fr"/>
+                <otherwise>
+                  <contents xsi:type="CPL:StringSwitch" field="subject">
+                    <strings is="urgent" contains="emergency"/>
+                    <notPresent>
+                      <contents xsi:type="CPL:SubCall" ref="voicemailHandler"/>
+                    </notPresent>
+                  </contents>
+                </otherwise>
+              </contents>
+            </otherwise>
+          </contents>
+        </notPresent>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:SubCall" ref="voicemailHandler"/>
+  <elements xsi:type="CPL:Location" url="sip:user@voicemail.example.com" priority="10" clear="yes"/>
+  <elements xsi:type="CPL:Redirect" permanent="yes"/>
+  <elements xsi:type="CPL:Reject" status="603" reason="Decline"/>
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel" timeout="60">
+    <failure>
+      <contents xsi:type="CPL:Location" url="sip:failover@example.com" priority="5" clear="no"/>
+    </failure>
+    <redirection>
+      <contents xsi:type="CPL:Redirect" permanent="no"/>
+    </redirection>
+  </elements>
+</CPL:CPLModel>

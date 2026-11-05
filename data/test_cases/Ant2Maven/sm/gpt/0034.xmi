@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="MixedBuildProject"
+    basedir="."
+    description="Project combining compilation, documentation, archiving, and cleanup"
+    default="buildMain">
+
+  <!-- Default build target with a mix of tasks -->
+  <targets xmi:id="buildMain" name="buildMain" description="Compile sources, generate docs, and create jar">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true">
+      <!-- Simple include/exclude patterns to exercise InExcludes -->
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="includeSources"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" unless="skipInternal"/>
+    </tasks>
+
+    <!-- Generate Javadoc documentation -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="build/docs/api"
+           packagenames="com.example.project.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="MixedBuildProject API"/>
+    
+    <!-- Package compiled classes into a jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="dist/mixedbuildproject.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+    
+    <!-- Copy additional resources into the distribution directory -->
+    <tasks xsi:type="Ant:Copy"
+           file="resources/config/app.properties"
+           presservelastmodified="true"
+           tofile="dist/config/app.properties"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="false">
+      <!-- FileSet with patterns to exercise PatternSet/Includes/Excludes -->
+      <fileset dir="resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.xml"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/temp/**"/>
+        </patternset>
+        <include name="**/*.properties"/>
+        <exclude name="**/*.bak"/>
+      </fileset>
+      <!-- FilterSet with a simple token -->
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="env" value="production"/>
+      </filterset>
+      <!-- Mapper to exercise Basic/Mapper -->
+      <mapper type="glob"
+              classname="org.example.build.ResourceMapper"
+              classpath="lib/mappers.jar"
+              from="*.properties"
+              to="*.conf"/>
+    </tasks>
+  </targets>
+
+  <!-- Auxiliary target for preparing and cleaning build directories -->
+  <targets xmi:id="prepareAndClean" name="prepareAndClean" description="Prepare build dirs and clean old artifacts">
+    <!-- Create build directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="build"/>
+
+    <!-- Create distribution directory -->
+    <tasks xsi:type="Ant:Mkdir" dir="dist"/>
+
+    <!-- Delete old build outputs using multiple attributes -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="config/delete-includes.txt"
+           excludes="**/keep/**"
+           excludesfile="config/delete-excludes.txt"
+           defaultexcludes="false"/>
+  </targets>
+</Ant:Project>

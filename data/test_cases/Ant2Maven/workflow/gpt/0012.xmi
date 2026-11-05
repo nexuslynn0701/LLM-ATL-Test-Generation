@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullPipelineBuild"
+    basedir="project-root"
+    description="Build, document, package and manage project files"
+    default="build-main">
+  <!-- Properties exercising all property mapping rules -->
+  <properties xsi:type="Ant:PropertyValue" name="project.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.output.dir" location="output/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- One user-defined taskdef (not referenced by tasks) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target with compilation, docs, packaging and directory management -->
+  <targets xmi:id="build-main" name="build-main" description="Compile, document and package main artifacts">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="output/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="false">
+      <!-- Simple classpath without cross references -->
+      <classPath refid="main.classpath">
+        <pathElement path="libs/core-framework.jar" location="libs"/>
+        <fileset dir="libs">
+          <patternset>
+            <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+            <inexcludes xsi:type="Ant:Excludes" name="**/*-sources.jar"/>
+          </patternset>
+        </fileset>
+      </classPath>
+    </tasks>
+
+    <!-- Generate Javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src/main/java"
+        destdir="output/javadoc"
+        packagenames="com.example.*"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="FullPipeline API Documentation"/>
+
+    <!-- Create main application JAR -->
+    <tasks xsi:type="Ant:Jar"
+        jarfile="output/artifacts/fullpipeline-app.jar"
+        basedir="output/classes"
+        compress="true"
+        encoding="UTF-8"
+        manifest="META-INF/MANIFEST.MF"/>
+
+    <!-- Ensure output directory exists -->
+    <tasks xsi:type="Ant:Mkdir" dir="output/resources"/>
+
+    <!-- Clean up temporary files -->
+    <tasks xsi:type="Ant:Delete"
+        dir="output/temp"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="false"
+        includes="**/*"
+        excludes="**/*.keep"
+        defaultexcludes="true"/>
+  </targets>
+
+  <!-- Secondary target that uses file copying with filters and mapper -->
+  <targets xmi:id="prepare-resources" name="prepare-resources" description="Prepare filtered resources">
+    <!-- Copy resources into output folder with filtering -->
+    <tasks xsi:type="Ant:Copy"
+        file="src/resources/config.xml"
+        presservelastmodified="true"
+        tofile="output/resources/config.xml"
+        todir="output/resources"
+        overwrite="true"
+        filtering="true"
+        flatten="false"
+        includeEmptyDirs="true">
+      <!-- FileSet with explicit includes/excludes -->
+      <fileset dir="src/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.properties"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/secret/*.properties"/>
+        </patternset>
+        <include name="**/*.xml"/>
+        <exclude name="**/backup/**"/>
+      </fileset>
+      <!-- FilterSet combining inline filters and filter file -->
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="FullPipeline"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <!-- Mapper for renaming copied files -->
+      <mapper type="glob" classname="org.apache.tools.ant.util.GlobPatternMapper"
+          classpath="libs/mapper.jar"
+          classpathref="mapper.classpath"
+          from="*.template"
+          to="*.conf"/>
+    </tasks>
+
+    <!-- Timestamp task (no attributes, just existence) -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd'T'HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+  </targets>
+
+  <!-- Project-wide path definition to exercise Path, FileSet, PathElement, FilterSet etc. -->
+  <path id="project.path">
+    <!-- Nested path with one element -->
+    <path>
+      <pathElement path="libs/extra-tools.jar" location="libs"/>
+    </path>
+    <!-- Direct path elements -->
+    <pathElement path="libs/utilities.jar" location="libs"/>
+    <!-- FileSet reused conceptually for classpath resources -->
+    <fileset dir="libs">
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+      </patternset>
+    </fileset>
+  </path>
+</Ant:Project>

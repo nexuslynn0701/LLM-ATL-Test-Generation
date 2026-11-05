@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- elements[0]: Root CPL with one SubAction and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction so that SubAction2Function and Program/Service/Dialog/session rules apply -->
+    <subActions id="sa_main">
+      <!-- SubAction contents: complex Proxy (not simple) to trigger Proxy2Select and ForwardExp with URI -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- locations sequence for this Proxy: contain Location[2] via NodeContainer.contents -->
+        <contents xsi:type="CPL:Location" url="sip:proxyLocation@example.com" clear="true"/>
+        <!-- Non-simple Proxy: all branches present -->
+        <busy>
+          <!-- Busy contents: SubCall, to trigger Busy2SelectCase + SubCall2Return -->
+          <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+        </busy>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <!-- Default contents: Redirect, to trigger Default2SelectDefault + Redirect2Return + Location2URIConstant -->
+        <default>
+          <contents xsi:type="CPL:Redirect" permanent="true">
+            <!-- Location inside Redirect, used by Location2URIConstant -->
+            <contents xsi:type="CPL:Location" url="sip:redirect@example.com" clear="false"/>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <!-- One Outgoing so that Outgoing2Method and Dialog/methods 'out' side are exercised.
+         Its contents is a simple Proxy with Location -> triggers Proxy2Return and Location2URIConstant -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <!-- Simple Proxy (no busy/noAnswer/... children) -->
+        <contents xsi:type="CPL:Location" url="sip:outgoingLocation@example.com" clear="true"/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- elements[1]: Top-level Location (allowed), also used as a location for another Proxy via NodeContainer.locations -->
+  <elements xsi:type="CPL:Location" url="sip:topLevelLocation@example.com" clear="true"/>
+
+  <!-- elements[2]: Top-level Redirect to further exercise Redirect2Return and Location2URIConstant -->
+  <elements xsi:type="CPL:Redirect" permanent="false">
+    <contents xsi:type="CPL:Location" url="sip:redirect2@example.com" clear="false"/>
+  </elements>
+
+  <!-- elements[3]: Top-level Proxy (simple) whose location path comes from elements[1] through locations helper.
+       Uses a Location as its contents, so Location2URIConstant is exercised again. -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="serial">
+    <!-- This Location is its own contents, contributing to locations sequence -->
+    <contents xsi:type="CPL:Location" url="sip:standaloneProxyLoc@example.com" clear="true"/>
+  </elements>
+
+  <!-- elements[4]: Top-level AddressSwitch with SwitchedAddress and Otherwise to exercise switch-related rules.
+       No direct Location here, to keep focus on URIConstant uses already present. -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="user@example.com" contains="user" subDomainOf="example.com">
+      <!-- SwitchedAddress contents: SubCall to exercise SwitchedAddress2SelectCase + SubCall2Return -->
+      <contents xsi:type="CPL:SubCall" ref="sa_main"/>
+    </addresses>
+    <!-- notPresent and otherwise provided to satisfy AddressSwitch2SelectStat -->
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- elements[5]: Top-level StringSwitch to exercise StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch" field="hdrField">
+    <strings is="token" contains="tok">
+      <!-- SwitchedString contents left undefined to keep statements empty -->
+    </strings>
+  </elements>
+
+  <!-- elements[6]: Top-level PrioritySwitch to ensure no statements created from these containers -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <!-- No specific contents needed; rule filters them out -->
+  </elements>
+
+  <!-- elements[7]: Top-level TimeSwitch to ensure it is filtered out from statements as well -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com">
+    <!-- One SwitchedTime child, with required attributes dtstart, interval, wkst -->
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- elements[8]: Top-level LanguageSwitch to combine with NotPresent2ErrorResponse via notPresent child -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <languages matches="en"/>
+    <notPresent/>
+  </elements>
+</CPL:CPLModel>

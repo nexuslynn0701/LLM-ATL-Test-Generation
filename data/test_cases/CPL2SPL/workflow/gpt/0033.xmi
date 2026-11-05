@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: CPL root -->
+  <elements xsi:type="CPL:CPL">
+    <!-- One SubAction with id 'sa1' whose contents is a complex Proxy (elements[3]) -->
+    <subActions id="sa1">
+      <contents contents="//@elements.3"/>
+    </subActions>
+
+    <!-- Outgoing whose contents is the same complex Proxy (elements[3]) -->
+    <outgoing>
+      <contents contents="//@elements.3"/>
+    </outgoing>
+
+    <!-- Incoming whose contents is a simple Proxy (elements[4]) -->
+    <incoming>
+      <contents contents="//@elements.4"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1]: Location used by the simple Proxy to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="true"/>
+
+  <!-- elements[2]: Redirect used by Default of the complex Proxy -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+  <!-- elements[3]: complex Proxy (referenced by SubAction and Outgoing via contents references) -->
+  <elements xsi:type="CPL:Proxy" timeout="t1" recurse="yes" ordering="parallel">
+    <busy>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </busy>
+    <noAnswer>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </noAnswer>
+    <redirection>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </redirection>
+    <failure/>
+    <default contents="//@elements.2"/>
+  </elements>
+
+  <!-- elements[4]: simple Proxy whose location is the Location at elements[1];
+       this Proxy is simple (no busy/noAnswer/.../default children) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <busy>
+      <contents xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="true"/>
+    </busy>
+  </elements>
+
+  <!-- elements[5]: AddressSwitch with one SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="sf1">
+    <addresses is="addr1" contains="c1" subDomainOf="sd1">
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </addresses>
+    <notPresent>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </notPresent>
+    <otherwise>
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

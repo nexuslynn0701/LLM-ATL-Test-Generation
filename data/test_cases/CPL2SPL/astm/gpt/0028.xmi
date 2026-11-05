@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.3" id="saIncoming"/>
+    <subActions contents="//@elements.4" id="saOutgoing"/>
+
+    <incoming contents="//@elements.5"/>
+    <outgoing contents="//@elements.6"/>
+  </elements>
+
+  <!-- 1: Location used by simple proxy (incoming) -->
+  <elements xsi:type="CPL:Location" url="sip:simple@example.com" clear="yes"/>
+
+  <!-- 2: Location used by redirect and complex proxy (outgoing) -->
+  <elements xsi:type="CPL:Location" url="sip:complex@example.org" clear="no" priority="5"/>
+
+  <!-- 3: SubAction whose body is a simple Proxy -->
+  <elements xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default/>
+  </elements>
+
+  <!-- 4: SubAction whose body is a SubCall -->
+  <elements xsi:type="CPL:SubCall" ref="saIncoming"/>
+
+  <!-- 5: Incoming root contents: complex Proxy with all branches -->
+  <elements xsi:type="CPL:Proxy" recurse="false" ordering="serial">
+    <busy contents="//@elements.7"/>
+    <noAnswer contents="//@elements.8"/>
+    <redirection contents="//@elements.9"/>
+    <failure/>
+    <default contents="//@elements.10"/>
+  </elements>
+
+  <!-- 6: Outgoing root contents: AddressSwitch -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses contents="//@elements.11"/>
+    <addresses contents="//@elements.12"/>
+    <notPresent/>
+    <otherwise contents="//@elements.13"/>
+  </elements>
+
+  <!-- 7: Busy branch contents: SubCall -->
+  <elements xsi:type="CPL:SubCall" ref="saOutgoing"/>
+
+  <!-- 8: NoAnswer branch contents: Reject -->
+  <elements xsi:type="CPL:Reject" status="408" reason="Timeout"/>
+
+  <!-- 9: Redirection branch contents: Redirect -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- 10: Default branch contents: TimeSwitch -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.org"/>
+
+  <!-- 11: SwitchedAddress case 1, contents: LanguageSwitch -->
+  <elements xsi:type="CPL:LanguageSwitch"/>
+
+  <!-- 12: SwitchedAddress case 2, contents: PrioritySwitch -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+
+  <!-- 13: Otherwise contents: StringSwitch -->
+  <elements xsi:type="CPL:StringSwitch" field="X-Header"/>
+</CPL:CPLModel>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://example.org/complexPkg"
+    nsPrefix="cpx">
+
+  <!-- 0: Primitive-like data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CustomString" instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="PriorityLevel">
+    <eLiterals name="LOW" value="0" literal="LOW"/>
+    <eLiterals name="HIGH" value="1" literal="HIGH"/>
+  </eClassifiers>
+
+  <!-- 2: Root abstract class with ID attribute and a reference to subclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="createdOn" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="primaryOwner" eType="//@eClassifiers.3" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 3: Concrete element extending BaseElement, with attributes and containment -->
+  <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="false" interface="false" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1" eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority" lowerBound="1" eType="//@eClassifiers.1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="estimateHours" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="subTasks" upperBound="-1" containment="true" eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relatedIssues" upperBound="-1" containment="false" eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 4: Another concrete element extending BaseElement with bi-directional reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="Issue" abstract="false" interface="false" eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="summary" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="resolved" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="linkedTask" eType="//@eClassifiers.3" containment="false" resolveProxies="true"/>
+  </eClassifiers>
+
+  <!-- 5: Interface-like abstract class with no super types -->
+  <eClassifiers xsi:type="ecore:EClass" name="Assignable" abstract="true" interface="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="assignedTo" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 6: Concrete class implementing Assignable and extending Issue -->
+  <eClassifiers xsi:type="ecore:EClass" name="BugReport" abstract="false" interface="false" eSuperTypes="//@eClassifiers.4 //@eClassifiers.5">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="severityCode" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+
+  <!-- 7: Container class with containment of tasks and issues, plus cross-ref -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tasks" upperBound="-1" containment="true" eType="//@eClassifiers.3"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="issues" upperBound="-1" containment="true" eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mainBug" eType="//@eClassifiers.6" containment="true"/>
+  </eClassifiers>
+
+  <!-- 8: Map entry type used in configuration -->
+  <eClassifiers xsi:type="ecore:EClass" name="ConfigEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 9: Configuration class containing multiple entries -->
+  <eClassifiers xsi:type="ecore:EClass" name="ProjectConfig">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entries" upperBound="-1" containment="true" eType="//@eClassifiers.8"/>
+  </eClassifiers>
+
+</ecore:EPackage>

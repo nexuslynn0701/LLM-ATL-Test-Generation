@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPLModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CPL="http://cpl/1.0">
+  <elements xsi:type="CPL:CPL">
+    <subActions id="buyStocks"/>
+    <subActions id="sellBonds"/>
+    <outgoing>
+      <contents xsi:type="CPL:AddressSwitch" field="origin" subField="host">
+        <addresses is="192.168.1.*"/>
+        <addresses contains=".corp.com" subDomainOf="sub.corp.com"/>
+        <notPresent>
+          <contents xsi:type="CPL:TimeSwitch" tzid="America/New_York" tzurl="http://time.example.com">
+            <times dtstart="20240101T090000" dtend="20240101T170000" duration="PT8H" freq="DAILY" until="20241231T235959" count="260" interval="1" byDay="MO,TU,WE,TH,FR" wkst="MO"/>
+            <otherwise>
+              <contents xsi:type="CPL:Reject" status="503" reason="Service Unavailable"/>
+            </otherwise>
+          </contents>
+        </notPresent>
+        <otherwise>
+          <contents xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+            <busy>
+              <contents xsi:type="CPL:Redirect" permanent="no"/>
+            </busy>
+            <noAnswer>
+              <contents xsi:type="CPL:SubCall" ref="voicemailHandler"/>
+            </noAnswer>
+          </proxy>
+        </otherwise>
+      </contents>
+    </outgoing>
+    <incoming>
+      <contents xsi:type="CPL:StringSwitch" field="subject">
+        <strings is="URGENT" contains="meeting"/>
+        <notPresent>
+          <contents xsi:type="CPL:LanguageSwitch">
+            <languages matches="en-US"/>
+            <languages matches="fr-CA"/>
+          </contents>
+        </notPresent>
+      </contents>
+    </incoming>
+  </elements>
+  <elements xsi:type="CPL:PrioritySwitch" field="priority">
+    <priorities less="50" greater="30" equal="40"/>
+    <otherwise>
+      <contents xsi:type="CPL:Location" url="sip:admin@company.com" priority="1" clear="yes"/>
+      <contents xsi:type="CPL:Location" url="sip:backup@company.com" priority="2" clear="no"/>
+    </otherwise>
+  </elements>
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+    <default>
+      <contents xsi:type="CPL:SubCall" ref="defaultHandler"/>
+    </default>
+    <failure>
+      <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+    </failure>
+    <redirection>
+      <contents xsi:type="CPL:Reject" status="302" reason="Moved Temporarily"/>
+    </redirection>
+  </elements>
+  <elements xsi:type="CPL:Redirect" permanent="yes"/>
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+  <elements xsi:type="CPL:SubCall" ref="emergencyRouting"/>
+</CPLModel>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example.org/rootPkg"
+    nsPrefix="root">
+
+  <!-- Subpackage 0 -->
+  <eSubpackages name="subPkgA" nsURI="http://example.org/subPkgA" nsPrefix="subA">
+    <!-- Class 0: BaseA -->
+    <eClassifiers xsi:type="ecore:EClass" name="BaseA">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1" upperBound="1"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="enabled"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+          lowerBound="0" upperBound="1" iD="false" defaultValueLiteral="true"/>
+    </eClassifiers>
+
+    <!-- Class 1: MidA extends BaseA -->
+    <eClassifiers xsi:type="ecore:EClass" name="MidA" abstract="true">
+      <eSuperTypes href="//@eSubpackages.0/@eClassifiers.0"/>
+      <!-- single reference to BaseA, non-containment -->
+      <eStructuralFeatures xsi:type="ecore:EReference" name="baseLink"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          lowerBound="0" upperBound="1" containment="false"/>
+      <!-- attribute with EInt -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+          lowerBound="0" upperBound="1" defaultValueLiteral="5"/>
+    </eClassifiers>
+
+    <!-- Class 2: LeafA extends MidA, has attributes and a containment ref with opposite -->
+    <eClassifiers xsi:type="ecore:EClass" name="LeafA">
+      <eSuperTypes href="//@eSubpackages.0/@eClassifiers.1"/>
+      <!-- id attribute -->
+      <eStructuralFeatures xsi:type="eccore:EAttribute" name="id"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1" upperBound="1" iD="true"/>
+      <!-- BooleanObject attribute, explicit bounds -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="flagObj"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"
+          lowerBound="0" upperBound="-1" ordered="false" unique="false"/>
+      <!-- containment reference to BaseA with opposite set in BaseA via another ref -->
+      <eStructuralFeatures xsi:type="ecore:EReference" name="ownedBase"
+          eType="//@eSubpackages.0/@eClassifiers.0"
+          lowerBound="0" upperBound="-1" containment="true" resolveProxies="true"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Subpackage 1 -->
+  <eSubpackages name="subPkgB" nsURI="http://example.org/subPkgB" nsPrefix="subB">
+    <!-- Enum 0 -->
+    <eClassifiers xsi:type="ecore:EEnum" name="StatusKind">
+      <eLiterals name="NEW" value="0" literal="NEW_LITERAL"/>
+      <eLiterals name="IN_PROGRESS" value="1" literal="IN_PROGRESS_LITERAL"/>
+      <eLiterals name="DONE" value="2" literal="DONE_LITERAL"/>
+    </eClassifiers>
+
+    <!-- Class 0: Task -->
+    <eClassifiers xsi:type="ecore:EClass" name="Task">
+      <!-- String attribute with default value and quotes to exercise escapeQuotes -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="title"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="1" upperBound="1"
+          defaultValueLiteral="&quot;Quoted Title&quot;"/>
+      <!-- Enum attribute with default value literal referencing enum literal name text -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="status"
+          eType="//@eSubpackages.1/@eClassifiers.0"
+          lowerBound="1" upperBound="1"
+          defaultValueLiteral="IN_PROGRESS"/>
+      <!-- reference to Milestone (defined below), non-containment, multi-valued -->
+      <eStructuralFeatures xsi:type="ecore:EReference" name="milestones"
+          eType="//@eSubpackages.1/@eClassifiers.2"
+          lowerBound="0" upperBound="-1" containment="false"
+          ordered="true" unique="true"/>
+    </eClassifiers>
+
+    <!-- Class 1: ExternalClassInRoot (will be referenced from root package class) -->
+    <eClassifiers xsi:type="ecore:EClass" name="ExternalB">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="externalName"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+          lowerBound="0" upperBound="1"/>
+    </eClassifiers>
+
+    <!-- Class 2: Milestone, with opposite ref back to Task -->
+    <eClassifiers xsi:type="ecore:EClass" name="Milestone">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="task"
+          eType="//@eSubpackages.1/@eClassifiers.1"
+          lowerBound="1" upperBound="1" containment="false"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifier 0 in root: RootEntity, supertype from subPkgA to trigger createSort -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootEntity">
+    <!-- Super type is BaseA from subPkgA, which lives in a different package -->
+    <eSuperTypes href="//@eSubpackages.0/@eClassifiers.0"/>
+    <!-- reference to ExternalB in subPkgB, containment with opposite via another reference -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="external"
+        eType="//@eSubpackages.1/@eClassifiers.1"
+        lowerBound="0" upperBound="1" containment="true"/>
+    <!-- attribute with Float type to exercise Float mapping -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="ratio"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"
+        lowerBound="0" upperBound="1"
+        defaultValueLiteral="3.14"/>
+  </eClassifiers>
+
+  <!-- Classifier 1 in root: SimpleData as EDataType to exercise package classifiers mix -->
+  <eClassifiers xsi:type="ecore:EDataType" name="SimpleData"
+      instanceClassName="java.lang.String"/>
+
+</ecore:EPackage>

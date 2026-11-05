@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="AntMavenSample50"
+    basedir="workspace"
+    description="Ant to Maven transformation test project 0050"
+    default="buildTarget">
+
+  <!-- Path for coverage (no cross refs used) -->
+  <path id="main.classpath">
+    <pathElement path="lib/testlib.jar" location="lib/testlib.jar"/>
+    <fileset dir="lib">
+      <include name="**/*.jar"/>
+      <exclude name="**/old/*.jar"/>
+      <patternset>
+        <inexcludes xsi:type="Ant:Includes" name="**/*.jar"/>
+        <inexcludes xsi:type="Ant:Excludes" name="**/deprecated/*.jar"/>
+      </patternset>
+    </fileset>
+  </path>
+
+  <!-- Properties of all four kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="project.name" value="AntMavenSample50"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="workspace/build"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- User-defined task definition (not referenced by tasks) -->
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+
+  <!-- Default target: buildTarget -->
+  <targets xmi:id="buildTarget" name="buildTarget" description="Compile sources and create jar">
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/src/main/java"
+           destdir="workspace/build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java" ifCondition="" unless=""/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**" ifCondition="" unless=""/>
+      <classPath refid="compile.path">
+        <pathElement path="workspace/lib/compile.jar" location="workspace/lib/compile.jar"/>
+        <fileset dir="workspace/lib">
+          <include name="**/*.jar"/>
+          <exclude name="**/test/**"/>
+        </fileset>
+      </classPath>
+    </tasks>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/dist/sample50.jar"
+           basedir="workspace/build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="workspace/META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Secondary target: docsTarget -->
+  <targets xmi:id="docsTarget" name="docsTarget" description="Generate Javadoc and cleanup temp files">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="workspace/src/main/java"
+           destdir="workspace/target/site/apidocs"
+           packagenames="com.example.sample50.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="Sample 50 API Documentation"/>
+    <tasks xsi:type="Ant:Delete"
+           dir="workspace/temp"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="false"
+           includes="**/*"
+           includesfile=""
+           excludes="**/*.bak"
+           excludesfile=""
+           defaultexcludes="true"/>
+  </targets>
+
+  <!-- Third target: propsTarget -->
+  <targets xmi:id="propsTarget" name="propsTarget" description="Timestamp and filtered copy of resources">
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp"
+              pattern="yyyy-MM-dd'T'HH:mm:ss"
+              offset="0"
+              unit="second"
+              locale="en_US"/>
+    </tasks>
+    <tasks xsi:type="Ant:Copy"
+           file=""
+           presservelastmodified="true"
+           tofile=""
+           todir="workspace/build/resources"
+           overwrite="true"
+           filtering="true"
+           flatten="false"
+           includeEmptyDirs="true">
+      <fileset dir="workspace/src/main/resources">
+        <include name="**/*.properties"/>
+        <exclude name="**/secret/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="AntMavenSample50"/>
+        <filtersfile file="workspace/config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" classname="" classpath="" classpathref="" from="*.template" to="*.conf"/>
+    </tasks>
+  </targets>
+
+</Ant:Project>

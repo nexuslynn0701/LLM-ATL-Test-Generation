@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- 0: Root CPL script with multiple subActions, outgoing and incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- two subActions, each referencing different nodes via contents -->
+    <subActions id="initSub">
+      <contents href="//@elements.2"/>
+      <contents href="//@elements.5"/>
+    </subActions>
+    <subActions id="fallbackSub">
+      <contents href="//@elements.3"/>
+    </subActions>
+
+    <!-- outgoing wrapper referencing a Location and an AddressSwitch -->
+    <outgoing>
+      <contents href="//@elements.1"/>
+      <contents href="//@elements.4"/>
+    </outgoing>
+
+    <!-- incoming wrapper referencing a TimeSwitch and a PrioritySwitch -->
+    <incoming>
+      <contents href="//@elements.6"/>
+      <contents href="//@elements.7"/>
+    </incoming>
+  </elements>
+
+  <!-- 1: Location node with nested Location as content (to exercise NodeContainer on Location) -->
+  <elements xsi:type="CPL:Location" url="sip:user1@example.com" priority="0.8" clear="yes">
+    <contents href="//@elements.8"/>
+  </elements>
+
+  <!-- 2: SubCall node -->
+  <elements xsi:type="CPL:SubCall" ref="initSub"/>
+
+  <!-- 3: Redirect node -->
+  <elements xsi:type="CPL:Redirect" permanent="no"/>
+
+  <!-- 4: AddressSwitch with addresses, notPresent and otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="From" subField="user">
+    <addresses is="alice" contains="corp" subDomainOf="example.com">
+      <contents href="//@elements.1"/>
+    </addresses>
+    <addresses is="bob" contains="sales" subDomainOf="example.org">
+      <contents href="//@elements.3"/>
+    </addresses>
+    <notPresent>
+      <contents href="//@elements.2"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.5"/>
+    </otherwise>
+  </elements>
+
+  <!-- 5: Proxy with all result branches plus locations inside some branches -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="sequential">
+    <busy>
+      <contents href="//@elements.3"/>
+    </busy>
+    <noAnswer>
+      <contents href="//@elements.1"/>
+    </noAnswer>
+    <redirection>
+      <contents href="//@elements.8"/>
+    </redirection>
+    <failure>
+      <contents href="//@elements.9"/>
+    </failure>
+    <default>
+      <contents href="//@elements.2"/>
+      <contents href="//@elements.4"/>
+    </default>
+  </elements>
+
+  <!-- 6: TimeSwitch with two SwitchedTime cases and complete recurrence attributes -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://tz.example.com/utc">
+    <times dtstart="20240101T080000Z" dtend="20240101T170000Z" duration="PT9H"
+           freq="DAILY" until="20241231T235959Z" count="1" interval="1"
+           bySecond="0" byMinute="0" byHour="8" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1-31" byYearDay="" byWeekNo="" byMonth="1-12"
+           wkst="MO" bySetPos="">
+      <contents href="//@elements.1"/>
+    </times>
+    <times dtstart="20240101T170000Z" dtend="20240101T235959Z" duration="PT7H"
+           freq="DAILY" until="20241231T235959Z" count="1" interval="1"
+           bySecond="0" byMinute="0" byHour="17" byDay="MO,TU,WE,TH,FR"
+           byMonthDay="1-31" byYearDay="" byWeekNo="" byMonth="1-12"
+           wkst="MO" bySetPos="">
+      <contents href="//@elements.3"/>
+    </times>
+    <notPresent>
+      <contents href="//@elements.7"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.5"/>
+    </otherwise>
+  </elements>
+
+  <!-- 7: PrioritySwitch with two SwitchedPriority entries -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <priorities less="0.5" greater="" equal="">
+      <contents href="//@elements.8"/>
+    </priorities>
+    <priorities less="" greater="0.8" equal="">
+      <contents href="//@elements.9"/>
+    </priorities>
+    <notPresent>
+      <contents href="//@elements.1"/>
+    </notPresent>
+    <otherwise>
+      <contents href="//@elements.2"/>
+    </otherwise>
+  </elements>
+
+  <!-- 8: Nested Location used by several containers -->
+  <elements xsi:type="CPL:Location" url="sip:fallback@example.net" priority="0.3" clear="no"/>
+
+  <!-- 9: Reject node with status and reason -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+</CPL:CPLModel>

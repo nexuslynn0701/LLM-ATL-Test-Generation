@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.org/companyModel"
+    nsPrefix="company">
+
+  <!-- Primitive-like datatypes inside the package -->
+  <eClassifiers xsi:type="ecore:EDataType" name="MyStringType"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="MyIntType"/>
+
+  <!-- Enum with two literals to trigger Enum-related rules -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmploymentType">
+    <eLiterals name="FULL_TIME" value="0" literal="FULL_TIME"/>
+    <eLiterals name="PART_TIME" value="1" literal="PART_TIME"/>
+  </eClassifiers>
+
+  <!-- Abstract superclass -->
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true" interface="false">
+    <!-- ID attribute (EString) with lowerBound=1, upperBound=1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        ordered="true" unique="true" lowerBound="1" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <!-- Name attribute (EString) with default value to trigger AttEqSpecificDefaultValue -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        ordered="true" unique="true" lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="John &quot;Doe&quot;"/>
+  </eClassifiers>
+
+  <!-- Concrete subclass extending Person -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee" abstract="false" interface="false"
+      eSuperTypes="//@eClassifiers.3">
+    <!-- age attribute using EInt -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="age"
+        ordered="false" unique="true" lowerBound="0" upperBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- enum-typed attribute -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="employment"
+        ordered="true" unique="true" lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.2"/>
+    <!-- non-containment reference with opposite, lowerBound=0, upperBound=-1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="managedProjects"
+        ordered="true" unique="true" lowerBound="0" upperBound="-1"
+        eType="//@eClassifiers.5" containment="false" resolveProxies="true"
+        eOpposite="//@eClassifiers.5/@eStructuralFeatures.0"/>
+  </eClassifiers>
+
+  <!-- Another concrete class, referenced by Employee, with opposite and containment -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project" abstract="false" interface="false">
+    <!-- opposite reference back to Employee, containment=true, lowerBound=1, upperBound=1 -->
+    <eStructuralFeatures xsi:type="ecore:EReference" name="manager"
+        ordered="true" unique="true" lowerBound="1" upperBound="1"
+        eType="//@eClassifiers.4" containment="true" resolveProxies="true"
+        eOpposite="//@eClassifiers.4/@eStructuralFeatures.2"/>
+    <!-- attribute using package-local datatype -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        ordered="true" unique="true" lowerBound="0" upperBound="1"
+        eType="//@eClassifiers.0"/>
+  </eClassifiers>
+
+</ecore:EPackage>

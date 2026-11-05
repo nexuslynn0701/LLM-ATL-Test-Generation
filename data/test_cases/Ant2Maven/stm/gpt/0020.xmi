@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="ComplexAntProject"
+    basedir="."
+    description="Ant project with multiple targets and various predefined file and archive tasks"
+    default="buildTarget">
+
+  <!-- Global properties (not referenced by tasks, but exercising Property subtypes) -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyLocation" name="output.dir" location="build/output"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- A standalone task definition (not referenced by any task) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Target used as default -->
+  <targets xmi:id="buildTarget" name="build" description="Compile sources, create output directory and jar">
+    <!-- Compile Java sources -->
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <!-- Ensure destination directory exists -->
+    <tasks xsi:type="Ant:Mkdir" dir="build/dist"/>
+    <!-- Package classes into a jar -->
+    <tasks xsi:type="Ant:Jar"
+           jarfile="build/dist/app-main.jar"
+           basedir="build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Additional target to test file copy and delete operations -->
+  <targets xmi:id="cleanupTarget" name="cleanup" description="Clean build directories and temporary files">
+    <!-- Copy an artifact to a backup location -->
+    <tasks xsi:type="Ant:Copy"
+           file="build/dist/app-main.jar"
+           tofile="backup/app-main-backup.jar"
+           overwrite="true"
+           filtering="false"
+           flatten="false"
+           includeEmptyDirs="true"
+           presservelastmodified="true"/>
+    <!-- Remove build directory -->
+    <tasks xsi:type="Ant:Delete"
+           dir="build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="conf/includes.txt"
+           excludes="**/.git/**"
+           excludesfile="conf/excludes.txt"
+           defaultexcludes="true"/>
+  </targets>
+
+</Ant:Project>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryManager"
+    basedir="src/main"
+    description="Builds and packages the LibraryManager application"
+    default="buildTarget">
+
+  <!-- Properties -->
+  <properties xsi:type="Ant:PropertyValue" name="src.dir" value="src/main/java"/>
+  <properties xsi:type="Ant:PropertyValue" name="build.dir" value="target/classes"/>
+  <properties xsi:type="Ant:PropertyLocation" name="config.file" location="config/app.properties"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+
+  <!-- Task definition (unused by any task) -->
+  <taskdef name="customTask" classname="com.example.ant.CustomTask"/>
+
+  <!-- Targets -->
+  <targets xmi:id="cleanTarget" name="clean" description="Clean build outputs">
+    <tasks xsi:type="Ant:Delete" dir="target" verbose="true" quiet="false" failonerror="true"/>
+  </targets>
+
+  <targets xmi:id="prepareTarget" name="prepare" description="Prepare build directories">
+    <tasks xsi:type="Ant:Mkdir" dir="target"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+  </targets>
+
+  <targets xmi:id="buildTarget" name="build" description="Compile sources and create jar">
+    <!-- Java compilation with includes/excludes and a simple classpath -->
+    <tasks xsi:type="Ant:Javac" srcdir="src/main/java" destdir="target/classes" debug="true" fork="false" optimize="false" deprecation="true">
+      <inExcludes xsi:type="Ant:Includes" name="**/*.java"/>
+      <inExcludes xsi:type="Ant:Excludes" name="**/internal/**"/>
+      <classPath refid="lib.classpath">
+        <pathElement path="lib/dependency1.jar" location="lib/dependency1.jar"/>
+        <pathElement path="lib/dependency2.jar" location="lib/dependency2.jar"/>
+      </classPath>
+    </tasks>
+
+    <!-- Create jar from compiled classes -->
+    <tasks xsi:type="Ant:Jar" jarfile="target/library-manager.jar" basedir="target/classes" compress="true" encoding="UTF-8"/>
+
+    <!-- Generate javadoc -->
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="src/main/java"
+           destdir="target/site/apidocs"
+           packagenames="com.example.library.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="LibraryManager API"/>
+  </targets>
+
+  <!-- Documentation target to exercise Tstamp and FilterSet/FileSet/PatternSet -->
+  <targets xmi:id="docTarget" name="doc" description="Generate documentation resources">
+    <!-- Timestamp properties -->
+    <tasks xsi:type="Ant:Tstamp">
+      <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss" offset="0" unit="hour" locale="en_US"/>
+    </tasks>
+
+    <!-- Copy resources with filters and mapper -->
+    <tasks xsi:type="Ant:Copy" todir="target/site/resources" overwrite="true" includeEmptyDirs="false">
+      <fileset dir="src/main/resources">
+        <patternset>
+          <inexcludes xsi:type="Ant:Includes" name="**/*.txt"/>
+          <inexcludes xsi:type="Ant:Excludes" name="**/draft/**"/>
+        </patternset>
+        <include name="**/*.md"/>
+        <exclude name="**/secret/**"/>
+      </fileset>
+      <filterset starttoken="@{" endtoken="}">
+        <filter token="project.name" value="LibraryManager"/>
+        <filter token="project.version" value="1.0.0"/>
+        <filtersfile file="config/filters.properties"/>
+      </filterset>
+      <mapper type="glob" from="*.txt" to="*.processed.txt" classname="com.example.Mapper" classpath="lib/mapper.jar"/>
+    </tasks>
+  </targets>
+
+  <!-- Shared path definition (used logically by Javac via refid) -->
+  <path id="lib.classpath">
+    <pathElement path="lib/dependency1.jar" location="lib/dependency1.jar"/>
+    <pathElement path="lib/dependency2.jar" location="lib/dependency2.jar"/>
+  </path>
+
+</Ant:Project>

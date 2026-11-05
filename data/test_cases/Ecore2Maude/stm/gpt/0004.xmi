@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="complexPkg"
+    nsURI="http://complex/example/0004"
+    nsPrefix="cplx">
+
+  <!-- 0: Enum for states -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StateEnum">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="ACTIVE" value="1" literal="ACTIVE"/>
+    <eLiterals name="ARCHIVED" value="2" literal="ARCHIVED"/>
+  </eClassifiers>
+
+  <!-- 1: Simple data type -->
+  <eClassifiers xsi:type="ecore:EDataType" name="CodeType"
+      instanceClassName="java.lang.String"/>
+
+  <!-- 2: Abstract base class with ID attribute and references to enum/datatype -->
+  <eClassifiers xsi:type="ecore:EClass" name="BaseElement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1" iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="state"
+        eType="//@eClassifiers.0" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="internalCode"
+        eType="//@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- 3: Container root class -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootContainer">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="version"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="elements"
+        eType="//@eClassifiers.2" upperBound="-1" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="primary"
+        eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 4: Concrete subclass A with operations and attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="PrimaryElement"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="rank"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="secondary"
+        eType="//@eClassifiers.5" upperBound="-1" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="related"
+        eType="//@eClassifiers.6" upperBound="-1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="root"
+        eType="//@eClassifiers.3"/>
+    <eOperations name="computeScore">
+      <eParameters name="weight"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eOperations>
+    <eOperations name="reset"/>
+  </eClassifiers>
+
+  <!-- 5: Concrete subclass B with bidirectional reference -->
+  <eClassifiers xsi:type="ecore:EClass" name="SecondaryElement"
+      eSuperTypes="//@eClassifiers.2">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="code"
+        eType="//@eClassifiers.1" lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner"
+        eType="//@eClassifiers.4" eOpposite="//@eClassifiers.4/@eStructuralFeatures.2"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tags"
+        eType="//@eClassifiers.7" upperBound="-1" containment="true"/>
+  </eClassifiers>
+
+  <!-- 6: Independent class with many refs -->
+  <eClassifiers xsi:type="ecore:EClass" name="RelatedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="primaryRefs"
+        eType="//@eClassifiers.4" upperBound="-1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="secondaryRefs"
+        eType="//@eClassifiers.5" upperBound="-1"/>
+  </eClassifiers>
+
+  <!-- 7: Small contained tag class -->
+  <eClassifiers xsi:type="ecore:EClass" name="Tag">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 8: Map entry class using EString attributes -->
+  <eClassifiers xsi:type="ecore:EClass" name="MetaEntry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+
+  <!-- 9: Class using parameters and exceptions in operations -->
+  <eClassifiers xsi:type="ecore:EClass" name="Service">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="endpoint"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        lowerBound="1"/>
+    <eOperations name="invoke">
+      <eParameters name="request"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+      <eExceptions
+          eType="//@eClassifiers.2"/>
+    </eOperations>
+  </eClassifiers>
+
+  <!-- Instances via default values / attributes are not needed; model is a metamodel only -->
+
+</ecore:EPackage>

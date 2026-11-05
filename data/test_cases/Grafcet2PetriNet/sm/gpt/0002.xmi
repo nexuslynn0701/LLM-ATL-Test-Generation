@@ -1,0 +1,33 @@
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet xmi:id="_G0" name="ComplexGrafcetExample" location="file:/models/grafcet2">
+    <!-- Elements: 5 steps + 3 transitions = 8 elements -->
+    <elements xsi:type="Grafcet:Step" xmi:id="_S0" name="InitStep" location="file:/models/grafcet2#S0" isInitial="true" isActive="true" action="initialize_system"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S1" name="CheckSensors" location="file:/models/grafcet2#S1" isInitial="false" isActive="false" action="read_sensors"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S2" name="ProcessData" location="file:/models/grafcet2#S2" isInitial="false" isActive="false" action="process_input"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S3" name="ErrorHandler" location="file:/models/grafcet2#S3" isInitial="false" isActive="false" action="handle_error"/>
+    <elements xsi:type="Grafcet:Step" xmi:id="_S4" name="Shutdown" location="file:/models/grafcet2#S4" isInitial="false" isActive="false" action="shutdown_system"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T0" name="T_InitToCheck" location="file:/models/grafcet2#T0" condition="system_ready"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T1" name="T_CheckToProcessOrError" location="file:/models/grafcet2#T1" condition="(sensors_ok or sensors_fail)"/>
+    <elements xsi:type="Grafcet:Transition" xmi:id="_T2" name="T_ProcessOrErrorToShutdown" location="file:/models/grafcet2#T2" condition="done_or_abort"/>
+
+    <!-- Connections: StepToTransition -->
+    <!-- From InitStep to T_InitToCheck -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C0" name="C_Init_to_T0" location="file:/models/grafcet2#C0" from="/0/@elements.0" to="/0/@elements.5"/>
+    <!-- From CheckSensors to T_CheckToProcessOrError -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C1" name="C_Check_to_T1" location="file:/models/grafcet2#C1" from="/0/@elements.1" to="/0/@elements.6"/>
+    <!-- From ProcessData to T_ProcessOrErrorToShutdown -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C2" name="C_Process_to_T2" location="file:/models/grafcet2#C2" from="/0/@elements.2" to="/0/@elements.7"/>
+    <!-- From ErrorHandler to T_ProcessOrErrorToShutdown (multiple incoming to same transition) -->
+    <connections xsi:type="Grafcet:StepToTransition" xmi:id="_C3" name="C_Error_to_T2" location="file:/models/grafcet2#C3" from="/0/@elements.3" to="/0/@elements.7"/>
+
+    <!-- Connections: TransitionToStep -->
+    <!-- From T_InitToCheck to CheckSensors -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C4" name="C_T0_to_Check" location="file:/models/grafcet2#C4" from="/0/@elements.5" to="/0/@elements.1"/>
+    <!-- From T_CheckToProcessOrError to ProcessData -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C5" name="C_T1_to_Process" location="file:/models/grafcet2#C5" from="/0/@elements.6" to="/0/@elements.2"/>
+    <!-- From T_CheckToProcessOrError to ErrorHandler (branching to two steps) -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C6" name="C_T1_to_Error" location="file:/models/grafcet2#C6" from="/0/@elements.6" to="/0/@elements.3"/>
+    <!-- From T_ProcessOrErrorToShutdown to Shutdown -->
+    <connections xsi:type="Grafcet:TransitionToStep" xmi:id="_C7" name="C_T2_to_Shutdown" location="file:/models/grafcet2#C7" from="/0/@elements.7" to="/0/@elements.4"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

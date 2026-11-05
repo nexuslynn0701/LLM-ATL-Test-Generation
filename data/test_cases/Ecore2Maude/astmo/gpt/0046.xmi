@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="LibRoot"
+    nsURI="http://example.org/libroot"
+    nsPrefix="libroot">
+
+  <!-- Subpackage -->
+  <eSubpackages name="LibSub"
+                nsURI="http://example.org/libsub"
+                nsPrefix="libsub">
+    <!-- Classifiers in subpackage: one class and one enum -->
+    <eClassifiers xsi:type="ecore:EClass" name="Book" abstract="false" interface="false">
+      <!-- Attribute with String type, iD true, default value, bounds -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="title"
+                           lowerBound="1"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true"
+                           iD="true"
+                           defaultValueLiteral="Untitled">
+        <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      </eStructuralFeatures>
+      <!-- Reference to Member, non-containment, upperBound -1, with opposite -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="borrowers"
+                           lowerBound="0"
+                           upperBound="-1"
+                           ordered="true"
+                           unique="true"
+                           containment="false"
+                           resolveProxies="true"
+                           eType="//@eSubpackages.0/@eClassifiers.1"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.1/@eStructuralFeatures.0"/>
+    </eClassifiers>
+
+    <eClassifiers xsi:type="ecore:EClass" name="Member" abstract="false" interface="false">
+      <!-- Attribute with Int type, no default -->
+      <eStructuralFeatures xsi:type="ecore:EAttribute"
+                           name="age"
+                           lowerBound="0"
+                           upperBound="1"
+                           ordered="true"
+                           unique="true">
+        <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      </eStructuralFeatures>
+      <!-- Containment reference back to Book, opposite of borrowers -->
+      <eStructuralFeatures xsi:type="ecore:EReference"
+                           name="borrowedBooks"
+                           lowerBound="0"
+                           upperBound="-1"
+                           ordered="true"
+                           unique="true"
+                           containment="true"
+                           resolveProxies="true"
+                           eType="//@eSubpackages.0/@eClassifiers.0"
+                           eOpposite="//@eSubpackages.0/@eClassifiers.0/@eStructuralFeatures.1"/>
+    </eClassifiers>
+
+    <!-- Enumeration with two literals -->
+    <eClassifiers xsi:type="ecore:EEnum" name="Genre">
+      <eLiterals name="Fiction" value="0" literal="Fiction"/>
+      <eLiterals name="NonFiction" value="1" literal="NonFiction"/>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- Classifiers in root package: one class and one enum -->
+  <eClassifiers xsi:type="ecore:EClass" name="Library" abstract="false" interface="false">
+    <!-- Super type is Book from subpackage -->
+    <eSuperTypes href="//@eSubpackages.0/@eClassifiers.0"/>
+    <!-- Attribute with Boolean type, default, lower 0 upper -1 -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="open"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         defaultValueLiteral="true">
+      <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eStructuralFeatures>
+    <!-- Reference to Member, containment, no opposite -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="members"
+                         lowerBound="0"
+                         upperBound="-1"
+                         ordered="true"
+                         unique="true"
+                         containment="true"
+                         resolveProxies="true"
+                         eType="//@eSubpackages.0/@eClassifiers.1"/>
+  </eClassifiers>
+
+  <!-- Enumeration in root package with one literal -->
+  <eClassifiers xsi:type="ecore:EEnum" name="Status">
+    <eLiterals name="Active" value="0" literal="Active"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingMergeCycle">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s100" name="Init" isInitial="true" isActive="true" action="initialize"/>
+    <elements xsi:type="Grafcet:Step" location="s101" name="BranchA" isInitial="false" isActive="false" action="executeA"/>
+    <elements xsi:type="Grafcet:Step" location="s102" name="BranchB" isInitial="false" isActive="false" action="executeB"/>
+    <elements xsi:type="Grafcet:Step" location="s103" name="Join" isInitial="false" isActive="false" action="mergeResults"/>
+    <elements xsi:type="Grafcet:Step" location="s104" name="LoopStep" isInitial="false" isActive="false" action="loopAction"/>
+    <!-- Transitions -->
+    <elements xsi:type="Grafcet:Transition" location="t100" name="StartBranches" condition="startSignal"/>
+    <elements xsi:type="Grafcet:Transition" location="t101" name="ToBranchA" condition="routeToA"/>
+    <elements xsi:type="Grafcet:Transition" location="t102" name="ToBranchB" condition="routeToB"/>
+    <elements xsi:type="Grafcet:Transition" location="t103" name="MergeBranches" condition="branchesDone"/>
+    <elements xsi:type="Grafcet:Transition" location="t104" name="RepeatLoop" condition="repeatCondition"/>
+
+    <!-- Connections: branching from Init to StartBranches, then to two branches -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c100" name="initToStartBranches" from="/0/@elements.0" to="/0/@elements.5"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c101" name="startBranchesToBranchA" from="/0/@elements.5" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c102" name="startBranchesToBranchB" from="/0/@elements.5" to="/0/@elements.2"/>
+
+    <!-- Connections: dedicated transitions from Init to each branch (alternative routing) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c103" name="initToBranchATransition" from="/0/@elements.0" to="/0/@elements.6"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c104" name="branchATransitionToBranchA" from="/0/@elements.6" to="/0/@elements.1"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c105" name="initToBranchBTransition" from="/0/@elements.0" to="/0/@elements.7"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c106" name="branchBTransitionToBranchB" from="/0/@elements.7" to="/0/@elements.2"/>
+
+    <!-- Connections: branches to join -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c107" name="branchAToMerge" from="/0/@elements.1" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c108" name="branchBToMerge" from="/0/@elements.2" to="/0/@elements.8"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c109" name="mergeToJoin" from="/0/@elements.8" to="/0/@elements.3"/>
+
+    <!-- Connections: cyclic loop between Join and LoopStep via RepeatLoop -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c110" name="joinToRepeatLoop" from="/0/@elements.3" to="/0/@elements.9"/>
+    <connections xsi:type="Grafcet:TransitionToStep" location="c111" name="repeatLoopToLoopStep" from="/0/@elements.9" to="/0/@elements.4"/>
+    <connections xsi:type="Grafcet:StepToTransition" location="c112" name="loopStepToRepeatLoop" from="/0/@elements.4" to="/0/@elements.9"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

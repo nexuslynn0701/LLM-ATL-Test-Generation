@@ -1,0 +1,63 @@
+<SimpleUml:Package xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:SimpleUml="http://SimpleUML"
+    name="LibraryModel">
+
+  <!-- Class 0: Library (has primitive attributes and strong references to Book and Member) -->
+  <ownedElements name="Library">
+    <ownedProperty name="libraryId" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="address" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="books" complexType="//@ownedElements.1" isContainment="true"/>
+    <ownedProperty name="members" complexType="//@ownedElements.2" isContainment="true"/>
+  </ownedElements>
+
+  <!-- Class 1: Book (has both primitive attributes and weak references) -->
+  <ownedElements name="Book">
+    <ownedProperty name="isbn" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="title" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="publicationYear" primitiveType="Integer" isContainment="false"/>
+    <!-- weak reference to Library -->
+    <ownedProperty name="homeLibrary" complexType="//@ownedElements.0" isContainment="false"/>
+    <!-- weak reference to Author -->
+    <ownedProperty name="mainAuthor" complexType="//@ownedElements.3" isContainment="false"/>
+  </ownedElements>
+
+  <!-- Class 2: Member (inherits from Person and has mixed properties) -->
+  <ownedElements name="Member" superClasses="//@ownedElements.4">
+    <ownedProperty name="memberId" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="email" primitiveType="String" isContainment="false"/>
+    <!-- primitive attribute without primitiveType set; will trigger 'NoType' -->
+    <ownedProperty name="temporaryNote" isContainment="false"/>
+    <!-- weak reference to Library -->
+    <ownedProperty name="registeredAt" complexType="//@ownedElements.0" isContainment="false"/>
+    <!-- strong reference to Loan -->
+    <ownedProperty name="currentLoan" complexType="//@ownedElements.5" isContainment="true"/>
+  </ownedElements>
+
+  <!-- Class 3: Author (has only attributes, some without primitiveType) -->
+  <ownedElements name="Author">
+    <ownedProperty name="authorId" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="name" primitiveType="String" isContainment="false"/>
+    <!-- attribute without primitiveType -->
+    <ownedProperty name="biography" isContainment="false"/>
+  </ownedElements>
+
+  <!-- Class 4: Person (superclass of Member, only primitive attributes) -->
+  <ownedElements name="Person">
+    <ownedProperty name="firstName" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="lastName" primitiveType="String" isContainment="false"/>
+    <ownedProperty name="birthDate" primitiveType="Date" isContainment="false"/>
+  </ownedElements>
+
+  <!-- Class 5: Loan (references Book and Member in different ways) -->
+  <ownedElements name="Loan">
+    <!-- strong reference to Book (containment) -->
+    <ownedProperty name="loanedBook" complexType="//@ownedElements.1" isContainment="true"/>
+    <!-- weak reference back to Member -->
+    <ownedProperty name="borrower" complexType="//@ownedElements.2" isContainment="false"/>
+    <!-- primitive attributes -->
+    <ownedProperty name="startDate" primitiveType="Date" isContainment="false"/>
+    <ownedProperty name="dueDate" primitiveType="Date" isContainment="false"/>
+  </ownedElements>
+
+</SimpleUml:Package>

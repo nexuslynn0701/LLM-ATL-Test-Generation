@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction (saMain), one Outgoing and one Incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction used as target of SubCall and as declaration -->
+    <subActions xsi:type="CPL:SubAction" id="saMain">
+      <!-- Its contents is a simple Proxy (triggers R2 + R7) -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="serial">
+        <!-- simple proxy: all handler refs undefined -->
+      </contents>
+    </subActions>
+
+    <!-- Outgoing -> Method (R4), its contents is a complex Proxy (R8) -->
+    <outgoing xsi:type="CPL:Outgoing">
+      <contents xsi:type="CPL:Proxy" recurse="no" ordering="parallel">
+        <!-- complex proxy handlers -->
+        <busy>
+          <!-- Busy.contents is a SubCall (R9 + R13) -->
+          <contents xsi:type="CPL:SubCall" ref="saMain"/>
+        </busy>
+        <noAnswer/>
+        <redirection>
+          <!-- Redirection.contents is a Redirect (R11 + R14) -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </redirection>
+        <failure/>
+        <default>
+          <!-- Default.contents is an AddressSwitch (R12 + R15) -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <!-- notPresent child (R6, participates via AddressSwitch2SelectStat) -->
+            <notPresent>
+              <!-- NotPresent.contents is a Redirect (R6 + R14) -->
+              <contents xsi:type="CPL:Redirect" permanent="true"/>
+            </notPresent>
+
+            <!-- otherwise child (R18) wrapping a Reject (no statements created) -->
+            <otherwise>
+              <contents xsi:type="CPL:Reject" status="603" reason="Decline"/>
+            </otherwise>
+
+            <!-- SwitchedAddress case (R17), with contents a Location to get statements -->
+            <addresses is="sip:case1@example.com" contains="case1" subDomainOf="example.com">
+              <contents xsi:type="CPL:Location" url="sip:case1loc@example.com" clear="yes"/>
+            </addresses>
+          </contents>
+        </default>
+      </contents>
+    </outgoing>
+
+    <!-- Incoming -> Method (R3), contents is a Location (no statements) -->
+    <incoming xsi:type="CPL:Incoming">
+      <contents xsi:type="CPL:Location" url="sip:incomingloc@example.com" clear="no"/>
+    </incoming>
+  </elements>
+
+  <!-- Location used by simple Proxy (saMain) to drive URIConstant (R19) -->
+  <elements xsi:type="CPL:Location" url="sip:rootloc@example.com" priority="1" clear="yes"/>
+
+</CPL:CPLModel>

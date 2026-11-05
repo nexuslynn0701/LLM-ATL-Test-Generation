@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubAction with id used by SubCall -->
+    <subActions id="saMain">
+      <!-- SubAction contents: Location (simple) -->
+      <contents xsi:type="CPL:Location" url="sip:saMain@example.com" clear="true"/>
+    </subActions>
+
+    <!-- Outgoing with simple Proxy as contents -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- simple proxy: no handlers -->
+      </contents>
+    </outgoing>
+
+    <!-- Incoming with Complex Proxy as contents -->
+    <incoming>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="sequential">
+        <!-- complex proxy: has handlers and locations -->
+        <!-- Location child to trigger Location2URIConstant via Proxy2Select -->
+        <contents xsi:type="CPL:Location" url="sip:proxyTarget@example.com" clear="true"/>
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default/>
+      </contents>
+    </incoming>
+  </elements>
+
+  <!-- Top-level Location used by Redirect to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Location" url="sip:redirectTarget@example.com" clear="true"/>
+
+  <!-- SubCall referring to SubAction 'saMain' -->
+  <elements xsi:type="CPL:SubCall" ref="saMain"/>
+
+  <!-- Redirect using locations (refers to the Location above via locations helper) -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- Redirect's location via containment so locations helper finds it -->
+    <contents xsi:type="CPL:Location" url="sip:redirectInline@example.com" clear="true"/>
+  </elements>
+
+  <!-- AddressSwitch with SwitchedAddress, NotPresent and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <!-- SwitchedAddress case -->
+    <addresses is="case1@example.com"/>
+    <!-- notPresent and otherwise branches -->
+    <notPresent/>
+    <otherwise/>
+  </elements>
+
+  <!-- StringSwitch (top-level) -->
+  <elements xsi:type="CPL:StringSwitch" field="headerField"/>
+
+  <!-- LanguageSwitch (top-level, triggers NotPresent2ErrorResponse through its notPresent) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- TimeSwitch (top-level, with mandatory attributes for SwitchedTime) -->
+  <elements xsi:type="CPL:TimeSwitch">
+    <times dtstart="20240101T000000Z" interval="1" wkst="MO"/>
+  </elements>
+
+  <!-- PrioritySwitch (top-level) -->
+  <elements xsi:type="CPL:PrioritySwitch"/>
+
+  <!-- Reject (top-level) -->
+  <elements xsi:type="CPL:Reject" status="486" reason="Busy Here"/>
+
+</CPL:CPLModel>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0]: one CPL root -->
+  <elements xsi:type="CPL:CPL"/>
+
+  <!-- elements[1]: SubCall referencing a SubAction by plain string ref -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[2]: Location used by simple Proxy and Redirect (Location2URIConstant) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="true" priority="1"/>
+
+  <!-- elements[3]: complex Proxy whose default branch is a SubCall -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <busy/>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <default contents="//@elements.1"/>
+  </elements>
+
+  <!-- elements[4]: simple Proxy whose statement is a ReturnStat with ForwardExp using the Location -->
+  <elements xsi:type="CPL:Proxy" recurse="no" timeout="10" ordering="parallel">
+    <default contents="//@elements.2"/>
+  </elements>
+
+  <!-- elements[5]: Redirect (also uses Location2URIConstant through its locations) -->
+  <elements xsi:type="CPL:Redirect" permanent="true"/>
+
+</CPL:CPLModel>

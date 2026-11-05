@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="companyModel"
+    nsURI="http://example.com/companyModel"
+    nsPrefix="cm">
+
+  <!-- 0: Primitive data type used in attributes -->
+  <eClassifiers xsi:type="ecore:EDataType"
+                name="EStringAlias"
+                instanceClassName="java.lang.String"/>
+
+  <!-- 1: Enum with literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EmployeeLevel">
+    <eLiterals name="JUNIOR" value="0" literal="JUNIOR"/>
+    <eLiterals name="SENIOR" value="1" literal="SENIOR"/>
+    <eLiterals name="LEAD" value="2" literal="LEAD"/>
+  </eClassifiers>
+
+  <!-- 2: Root class Company -->
+  <eClassifiers xsi:type="ecore:EClass" name="Company">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="name"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- containment of departments -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="departments"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.3"/>
+  </eClassifiers>
+
+  <!-- 3: Department, contained in Company -->
+  <eClassifiers xsi:type="ecore:EClass" name="Department">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="code"
+                         lowerBound="1"
+                         eType="//@eClassifiers.0"/>
+    <!-- container back to Company (non-containment) -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="company"
+                         eType="//@eClassifiers.2"
+                         containment="false"/>
+    <!-- employees contained here -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="employees"
+                         upperBound="-1"
+                         containment="true"
+                         eType="//@eClassifiers.4"/>
+    <!-- manager is a non-containment reference to one of employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="manager"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 4: Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Employee">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="empId"
+                         lowerBound="1"
+                         iD="true"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="fullName"
+                         lowerBound="1"
+                         eType="//@eClassifiers.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="age"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="level"
+                         eType="//@eClassifiers.1"/>
+    <!-- bidirectional, non-containment reference to Department -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="department"
+                         lowerBound="0"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.3"/>
+    <!-- manager-subordinate references among employees -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="manager"
+                         upperBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.4"/>
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="subordinates"
+                         upperBound="-1"
+                         containment="false"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+  <!-- 5: Project with cross-links to Department and Employee -->
+  <eClassifiers xsi:type="ecore:EClass" name="Project">
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="identifier"
+                         lowerBound="1"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+                         name="budget"
+                         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <!-- owning department, non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="owningDepartment"
+                         lowerBound="1"
+                         containment="false"
+                         eType="//@eClassifiers.3"/>
+    <!-- team members, non-containment -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+                         name="team"
+                         upperBound="-1"
+                         containment="false"
+                         eType="//@eClassifiers.4"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://ecore"
+    name="rootPkg"
+    nsURI="http://example/root"
+    nsPrefix="root">
+
+  <!-- 0: root EClass with attributes and references -->
+  <eClassifiers xsi:type="ecore:EClass" name="RootClass">
+    <!-- Attribute with EString type, non-default bounds, default value, isID -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="idAttr"
+        lowerBound="1"
+        upperBound="1"
+        iD="true"
+        defaultValueLiteral="root-id"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <!-- Attribute with EInt type, upperBound=-1 (*), no default -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="countAttr"
+        lowerBound="0"
+        upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <!-- Reference to ChildClass, containment=true, lowerBound&gt;0 -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="children"
+        lowerBound="1"
+        upperBound="-1"
+        containment="true"
+        eType="//@eClassifiers.1"/>
+    <!-- Bidirectional non-containment reference to EnumUser, opposite set later -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="enumUsers"
+        lowerBound="0"
+        upperBound="-1"
+        containment="false"
+        eType="//@eClassifiers.2"/>
+  </eClassifiers>
+
+  <!-- 1: child EClass extending RootClass, with its own attribute -->
+  <eClassifiers xsi:type="ecore:EClass" name="ChildClass">
+    <eSuperTypes>//@eClassifiers.0</eSuperTypes>
+    <!-- Boolean attribute with default value -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="active"
+        lowerBound="0"
+        upperBound="1"
+        defaultValueLiteral="true"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+
+  <!-- 2: class that uses the enum and links back to RootClass -->
+  <eClassifiers xsi:type="ecore:EClass" name="EnumUser">
+    <!-- Attribute typed by the custom enum -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute"
+        name="status"
+        lowerBound="1"
+        upperBound="1"
+        eType="//@eClassifiers.3"/>
+    <!-- Reference back to RootClass, non-containment, opposite of RootClass.enumUsers -->
+    <eStructuralFeatures xsi:type="ecore:EReference"
+        name="owner"
+        lowerBound="1"
+        upperBound="1"
+        containment="false"
+        eType="//@eClassifiers.0"
+        eOpposite="//@eClassifiers.0/@eStructuralFeatures.3"/>
+  </eClassifiers>
+
+  <!-- 3: enumeration with two literals -->
+  <eClassifiers xsi:type="ecore:EEnum" name="StateEnum">
+    <eLiterals name="NEW" value="0" literal="NEW"/>
+    <eLiterals name="DONE" value="1" literal="DONE"/>
+  </eClassifiers>
+
+</ecore:EPackage>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL script -->
+  <elements xsi:type="CPL:CPL">
+    <!-- SubActions (functions) -->
+    <subActions id="saIncoming">
+      <!-- Complex Proxy inside SubAction to trigger Proxy2Select and nested cases/default -->
+      <contents xsi:type="CPL:Proxy" timeout="20" recurse="yes" ordering="parallel">
+        <busy>
+          <!-- busy.contents -> SubCall to saRedirect -->
+          <contents xsi:type="CPL:SubCall" ref="saRedirect"/>
+        </busy>
+        <noAnswer>
+          <!-- noAnswer.contents -> Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </noAnswer>
+        <redirection>
+          <!-- redirection.contents -> simple Proxy that returns forward -->
+          <contents xsi:type="CPL:Proxy" timeout="5" recurse="no" ordering="sequential">
+            <!-- simple proxy: only locations, no conditions -->
+          </contents>
+        </redirection>
+        <failure>
+          <!-- failure.contents -> Reject -->
+          <contents xsi:type="CPL:Reject" status="500" reason="Server failure"/>
+        </failure>
+        <default>
+          <!-- default.contents -> SubCall to saSimple -->
+          <contents xsi:type="CPL:SubCall" ref="saSimple"/>
+        </default>
+      </contents>
+    </subActions>
+
+    <subActions id="saOutgoing">
+      <!-- AddressSwitch inside SubAction to trigger AddressSwitch2SelectStat etc. -->
+      <contents xsi:type="CPL:AddressSwitch" field="destination" subField="user">
+        <!-- SwitchedAddress with contents = simple Proxy -->
+        <addresses is="alice@example.com" contains="alice" subDomainOf="example.com">
+          <contents xsi:type="CPL:Proxy" timeout="15" recurse="yes" ordering="parallel">
+            <!-- simple proxy (no busy/noAnswer/etc.) -->
+          </contents>
+        </addresses>
+        <!-- notPresent & otherwise for AddressSwitch -->
+        <notPresent>
+          <!-- NotPresent has no contents; exercises NotPresent2ErrorResponse -->
+        </notPresent>
+        <otherwise>
+          <!-- otherwise.contents -> Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </otherwise>
+      </contents>
+    </subActions>
+
+    <subActions id="saRedirect">
+      <!-- Direct Redirect in SubAction -->
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </subActions>
+
+    <subActions id="saSimple">
+      <!-- Simple Proxy in SubAction -->
+      <contents xsi:type="CPL:Proxy" timeout="10" recurse="no" ordering="sequential">
+        <!-- simple proxy: no condition branches -->
+      </contents>
+    </subActions>
+
+    <!-- Incoming / Outgoing -->
+    <incoming>
+      <!-- Incoming with contents = SubCall to saIncoming -->
+      <contents xsi:type="CPL:SubCall" ref="saIncoming"/>
+    </incoming>
+
+    <outgoing>
+      <!-- Outgoing with contents = Proxy (complex) -->
+      <contents xsi:type="CPL:Proxy" timeout="25" recurse="yes" ordering="parallel">
+        <busy>
+          <!-- busy.contents -> Redirect -->
+          <contents xsi:type="CPL:Redirect" permanent="false"/>
+        </busy>
+        <default>
+          <!-- default.contents -> SubCall to saOutgoing -->
+          <contents xsi:type="CPL:SubCall" ref="saOutgoing"/>
+        </default>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Locations used by proxies / redirects via locations helper -->
+  <elements xsi:type="CPL:Location" url="sip:proxy1@example.com" priority="1" clear="yes"/>
+  <elements xsi:type="CPL:Location" url="sip:proxy2@example.com" priority="2" clear="no"/>
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.net" priority="3" clear="yes"/>
+
+  <!-- Top-level SubCall (exercises SubCall2Return directly at method level) -->
+  <elements xsi:type="CPL:SubCall" ref="saSimple"/>
+
+  <!-- Top-level Redirect (exercises Redirect2Return directly) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- Top-level Proxy (simple) to exercise Proxy2Return directly and Location2URIConstant -->
+  <elements xsi:type="CPL:Proxy" timeout="30" recurse="yes" ordering="parallel">
+    <!-- This proxy uses locations from the model root (via helper) -->
+  </elements>
+
+  <!-- AddressSwitch as a separate top-level element to exercise AddressSwitch2SelectStat & SwitchedAddress2SelectCase again -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="domain">
+    <addresses is="example.org" contains="sales" subDomainOf="example.org">
+      <!-- contents = SubCall to saIncoming -->
+      <contents xsi:type="CPL:SubCall" ref="saIncoming"/>
+    </addresses>
+    <notPresent>
+      <!-- no contents -->
+    </notPresent>
+    <otherwise>
+      <!-- otherwise.contents = Reject -->
+      <contents xsi:type="CPL:Reject" status="480" reason="Temporarily Unavailable"/>
+    </otherwise>
+  </elements>
+
+  <!-- StringSwitch to exercise StringSwitch2SelectStat -->
+  <elements xsi:type="CPL:StringSwitch">
+    <!-- field value is used as variable name in target -->
+    <contents xsi:type="CPL:Proxy" timeout="12" recurse="no" ordering="sequential">
+      <!-- proxy as contents (will be treated as statement) -->
+    </contents>
+    <contents xsi:type="CPL:SubCall" ref="saRedirect"/>
+  </elements>
+
+  <!-- LanguageSwitch to appear in contents guards (ignored as statements) -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <!-- no specific attributes; used only so contents checks see LanguageSwitch type -->
+  </elements>
+
+  <!-- TimeSwitch to appear in contents guards (ignored as statements) -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="UTC" tzurl="http://time.example.com/utc">
+    <!-- no SwitchedTime instances needed to trigger the rule patterns -->
+  </elements>
+
+  <!-- PrioritySwitch to appear in contents guards (ignored as statements) -->
+  <elements xsi:type="CPL:PrioritySwitch">
+    <!-- no SwitchedPriority instances needed here -->
+  </elements>
+
+</CPL:CPLModel>

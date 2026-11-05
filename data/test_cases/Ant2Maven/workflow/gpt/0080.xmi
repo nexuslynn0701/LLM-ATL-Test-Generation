@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="LibraryBuild"
+    basedir="src"
+    description="Build and package shared library"
+    default="build-main">
+  <properties xsi:type="Ant:PropertyValue" name="source.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="JAVA_HOME"/>
+  <taskdef name="custom.task" classname="com.example.ant.CustomTask"/>
+  <targets xmi:id="build-main" name="build-main">
+    <tasks xsi:type="Ant:Javac"
+        srcdir="src/main/java"
+        destdir="target/classes"
+        debug="true"
+        fork="false"
+        optimize="true"
+        deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+        jarfile="target/library.jar"
+        basedir="target/classes"
+        compress="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/dist"/>
+    <tasks xsi:type="Ant:Copy"
+        file="target/library.jar"
+        todir="target/dist"
+        overwrite="true"
+        flatten="false"
+        includeEmptyDirs="false"/>
+    <tasks xsi:type="Ant:Delete"
+        dir="target/tmp"
+        verbose="true"
+        quiet="false"
+        failonerror="true"
+        includeEmptyDirs="true"
+        defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Java"
+        classname="com.example.Main"
+        jar="target/library.jar"
+        fork="true"/>
+    <tasks xsi:type="Ant:Javadoc"
+        sourcepath="src/main/java"
+        destdir="target/apidocs"
+        packagenames="com.example.*"
+        defaultexcludes="true"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="Library API"/>
+    <tasks xsi:type="Ant:Tstamp"/>
+    <tasks xsi:type="Ant:NewTask">
+      <attributes name="level" value="debug"/>
+      <attributes name="enabled" value="true"/>
+    </tasks>
+  </targets>
+  <targets xmi:id="cleanup" name="cleanup">
+    <tasks xsi:type="Ant:Delete"
+        dir="target"
+        verbose="false"
+        quiet="true"
+        failonerror="false"
+        includeEmptyDirs="false"
+        defaultexcludes="false"/>
+  </targets>
+</Ant:Project>

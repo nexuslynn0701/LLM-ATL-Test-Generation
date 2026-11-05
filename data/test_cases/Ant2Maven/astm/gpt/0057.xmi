@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullBuildProject"
+    basedir="workspace/fullbuild"
+    description="Full build with docs and packaging."
+    default="compileTarget">
+
+  <!-- Default compile target with multiple tasks -->
+  <targets xmi:id="compileTarget" name="compile" description="Compile project sources">
+    <tasks xsi:type="Ant:Mkdir" dir="workspace/fullbuild/build/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="workspace/fullbuild/src"
+           destdir="workspace/fullbuild/build/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="true"/>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="workspace/fullbuild/dist/fullbuild.jar"
+           basedir="workspace/fullbuild/build/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="workspace/fullbuild/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Separate target for cleaning build artifacts -->
+  <targets xmi:id="cleanTarget" name="clean" description="Clean build outputs">
+    <tasks xsi:type="Ant:Delete"
+           dir="workspace/fullbuild/build"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           defaultexcludes="false"/>
+  </targets>
+
+  <!-- Target for generating documentation -->
+  <targets xmi:id="docsTarget" name="docs" description="Generate project Javadoc">
+    <tasks xsi:type="Ant:Javadoc"
+           sourcepath="workspace/fullbuild/src"
+           destdir="workspace/fullbuild/build/docs"
+           packagenames="com.example.fullbuild.*"
+           defaultexcludes="true"
+           author="true"
+           version="true"
+           use="true"
+           windowtitle="FullBuild Project API"/>
+  </targets>
+
+  <!-- Properties: one of each supported kind -->
+  <properties xsi:type="Ant:PropertyValue" name="java.version" value="17"/>
+  <properties xsi:type="Ant:PropertyLocation" name="build.dir" location="workspace/fullbuild/build"/>
+  <properties xsi:type="Ant:PropertyFile" file="workspace/fullbuild/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+</Ant:Project>

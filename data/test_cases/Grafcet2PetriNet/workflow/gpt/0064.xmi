@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Grafcet="Grafcet">
+  <Grafcet:Grafcet location="net010" name="BranchingAndMerge">
+    <!-- Steps -->
+    <elements xsi:type="Grafcet:Step" location="s010" name="Start" isInitial="true" isActive="true" action="init"/>
+    <elements xsi:type="Grafcet:Transition" location="t010" name="Fork" condition="beginSequence"/>
+    <elements xsi:type="Grafcet:Step" location="s011" name="BranchA" isInitial="false" isActive="false" action="doA"/>
+    <elements xsi:type="Grafcet:Step" location="s012" name="BranchB" isInitial="false" isActive="false" action="doB"/>
+    <elements xsi:type="Grafcet:Transition" location="t011" name="Join" condition="bothDone"/>
+    <elements xsi:type="Grafcet:Step" location="s013" name="End" isInitial="false" isActive="false" action="finish"/>
+    <!-- Extra transition forming a small cycle on BranchA -->
+    <elements xsi:type="Grafcet:Transition" location="t012" name="RetryA" condition="aFailed"/>
+
+    <!-- Connections: sequence with branch, merge, and local cycle -->
+    <!-- Start -> Fork -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c010" name="startToFork" from="/0/@elements.0" to="/0/@elements.1"/>
+    <!-- Fork -> BranchA -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c011" name="forkToBranchA" from="/0/@elements.1" to="/0/@elements.2"/>
+    <!-- Fork -> BranchB -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c012" name="forkToBranchB" from="/0/@elements.1" to="/0/@elements.3"/>
+    <!-- BranchA -> Join -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c013" name="branchAToJoin" from="/0/@elements.2" to="/0/@elements.4"/>
+    <!-- BranchB -> Join -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c014" name="branchBToJoin" from="/0/@elements.3" to="/0/@elements.4"/>
+    <!-- Join -> End -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c015" name="joinToEnd" from="/0/@elements.4" to="/0/@elements.5"/>
+    <!-- BranchA -> RetryA (cycle start) -->
+    <connections xsi:type="Grafcet:StepToTransition" location="c016" name="branchAToRetryA" from="/0/@elements.2" to="/0/@elements.6"/>
+    <!-- RetryA -> BranchA (cycle close) -->
+    <connections xsi:type="Grafcet:TransitionToStep" location="c017" name="retryAToBranchA" from="/0/@elements.6" to="/0/@elements.2"/>
+  </Grafcet:Grafcet>
+</xmi:XMI>

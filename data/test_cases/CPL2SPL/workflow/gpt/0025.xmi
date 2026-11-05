@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ASCII"?>
+<CPL:CPLModel xmi:version="2.0"
+              xmlns:xmi="http://www.omg.org/XMI"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:CPL="http://cpl/1.0">
+  <!-- elements[0]: main CPL with subActions, outgoing, incoming -->
+  <elements xsi:type="CPL:CPL">
+    <!-- one SubAction with id 'sa1', contents is the complex Proxy at elements[2] -->
+    <subActions>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <!-- complex proxy: all branches present -->
+        <busy>
+          <!-- busy.contents is a SubCall to 'sa1' -->
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </busy>
+        <noAnswer>
+          <!-- noAnswer.contents is Redirect at elements[4] -->
+          <contents xsi:type="CPL:Redirect" permanent="true"/>
+        </noAnswer>
+        <redirection>
+          <!-- redirection.contents is the AddressSwitch at elements[5] -->
+          <contents xsi:type="CPL:AddressSwitch" field="origin">
+            <addresses is="addr1"/>
+            <notPresent/>
+            <otherwise>
+              <!-- otherwise.contents is a simple Proxy at elements[3] -->
+              <contents xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+                <busy/>
+                <noAnswer/>
+                <redirection/>
+                <failure/>
+                <default>
+                  <!-- default.contents is SubCall at elements[1] -->
+                  <contents xsi:type="CPL:SubCall" ref="sa1"/>
+                </default>
+              </contents>
+            </otherwise>
+          </contents>
+        </redirection>
+        <failure>
+          <!-- failure.contents is LanguageSwitch at elements[6] -->
+          <contents xsi:type="CPL:LanguageSwitch">
+            <notPresent/>
+          </contents>
+        </failure>
+        <default>
+          <!-- default.contents is TimeSwitch at elements[7] -->
+          <contents xsi:type="CPL:TimeSwitch" tzid="tz1" tzurl="tzurl1">
+            <times dtstart="tstart" interval="int1" wkst="wk1"/>
+          </contents>
+        </default>
+      </contents>
+    </subActions>
+    <!-- Outgoing method: contents is simple Proxy at elements[3] -->
+    <outgoing>
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </default>
+      </contents>
+    </outgoing>
+    <!-- Incoming method: contents is Redirect at elements[4] -->
+    <incoming>
+      <contents xsi:type="CPL:Redirect" permanent="false"/>
+    </incoming>
+  </elements>
+
+  <!-- elements[1]: top-level SubCall used by various contents -->
+  <elements xsi:type="CPL:SubCall" ref="sa1"/>
+
+  <!-- elements[2]: complex Proxy with a Location child to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- this Location contributes to locations helper -->
+    <busy>
+      <contents xsi:type="CPL:Location" url="sip:example1" clear="yes"/>
+    </busy>
+    <noAnswer/>
+    <redirection/>
+    <failure/>
+    <!-- default.contents is Redirect at elements[4] -->
+    <default>
+      <contents xsi:type="CPL:Redirect" permanent="true"/>
+    </default>
+  </elements>
+
+  <!-- elements[3]: simple Proxy (isSimple = true because all branches undefined) -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <!-- no child branches: simple proxy, uses locations inherited from CPL root (empty) -->
+  </elements>
+
+  <!-- elements[4]: Redirect using Location at elements[8] to trigger Location2URIConstant -->
+  <elements xsi:type="CPL:Redirect" permanent="true">
+    <!-- child Location to build locations sequence -->
+    <busy>
+      <contents xsi:type="CPL:Location" url="sip:redirectTarget" clear="yes"/>
+    </busy>
+  </elements>
+
+  <!-- elements[5]: AddressSwitch with one SwitchedAddress and Otherwise -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="addr1">
+      <!-- SwitchedAddress contents is simple Proxy at elements[3] -->
+      <contents xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <failure/>
+        <default>
+          <contents xsi:type="CPL:SubCall" ref="sa1"/>
+        </default>
+      </contents>
+    </addresses>
+    <notPresent/>
+    <otherwise>
+      <!-- otherwise.contents is SubCall at elements[1] -->
+      <contents xsi:type="CPL:SubCall" ref="sa1"/>
+    </otherwise>
+  </elements>
+
+  <!-- elements[6]: LanguageSwitch with NotPresent -->
+  <elements xsi:type="CPL:LanguageSwitch">
+    <notPresent/>
+  </elements>
+
+  <!-- elements[7]: TimeSwitch with a SwitchedTime -->
+  <elements xsi:type="CPL:TimeSwitch" tzid="tz-main" tzurl="tz-url-main">
+    <times dtstart="start-main" interval="int-main" wkst="wk-main"/>
+  </elements>
+
+  <!-- elements[8]: standalone Location also exercising Location2URIConstant via helpers -->
+  <elements xsi:type="CPL:Location" url="sip:standalone" clear="yes"/>
+</CPL:CPLModel>

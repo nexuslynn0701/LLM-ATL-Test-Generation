@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Ant:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:Ant="Ant"
+    name="FullLifecycleBuild"
+    basedir="project-root"
+    description="End-to-end build including compile, package, and cleanup"
+    default="build-main">
+  <!-- Properties of all four concrete kinds -->
+  <properties xsi:type="Ant:PropertyValue" name="compiler.encoding" value="UTF-8"/>
+  <properties xsi:type="Ant:PropertyLocation" name="classes.dir" location="target/classes"/>
+  <properties xsi:type="Ant:PropertyFile" file="config/build.properties"/>
+  <properties xsi:type="Ant:PropertyEnv" environment="BUILD_ENV"/>
+
+  <!-- One user-defined taskdef (not referenced by any task) -->
+  <taskdef name="custom.compiler" classname="com.example.tools.CustomCompiler"/>
+
+  <!-- Default target with a mix of supported tasks -->
+  <targets xmi:id="build-main" name="build-main" description="Compile and package main artifacts">
+    <tasks xsi:type="Ant:Mkdir" dir="target/classes"/>
+    <tasks xsi:type="Ant:Javac"
+           srcdir="src/main/java"
+           destdir="target/classes"
+           debug="true"
+           fork="false"
+           optimize="true"
+           deprecation="false">
+      <!-- All nested references avoided as required -->
+    </tasks>
+    <tasks xsi:type="Ant:Jar"
+           jarfile="target/full-lifecycle.jar"
+           basedir="target/classes"
+           compress="true"
+           encoding="UTF-8"
+           manifest="META-INF/MANIFEST.MF"/>
+  </targets>
+
+  <!-- Secondary target with file-management tasks -->
+  <targets xmi:id="cleanup" name="cleanup" description="Clean generated output">
+    <tasks xsi:type="Ant:Delete"
+           dir="target"
+           verbose="true"
+           quiet="false"
+           failonerror="true"
+           includeEmptyDirs="true"
+           includes="**/*"
+           includesfile="cleanup-includes.txt"
+           excludes="**/*.keep"
+           excludesfile="cleanup-excludes.txt"
+           defaultexcludes="true"/>
+    <tasks xsi:type="Ant:Mkdir" dir="target/temp"/>
+  </targets>
+</Ant:Project>

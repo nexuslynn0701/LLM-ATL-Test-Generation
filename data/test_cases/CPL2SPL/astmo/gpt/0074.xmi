@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:CPL="http://cpl/1.0">
+
+  <!-- Root CPL with one SubAction, one Incoming and one Outgoing -->
+  <elements xsi:type="CPL:CPL">
+    <subActions id="saMain">
+      <!-- SubAction contents: simple Proxy (triggers Proxy2Return via SubAction2Function) -->
+      <contents xsi:type="CPL:Proxy" recurse="true" ordering="parallel">
+        <!-- simple proxy: no busy/noAnswer/redirection/failure/default children -->
+      </contents>
+    </subActions>
+    <incoming>
+      <!-- Incoming contents: SubCall (triggers SubCall2Return via Incoming2Method) -->
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </incoming>
+    <outgoing>
+      <!-- Outgoing contents: complex Proxy (triggers Proxy2Select + Busy/NoAnswer/Redirection/Default) -->
+      <contents xsi:type="CPL:Proxy" recurse="false" ordering="sequential">
+        <busy/>
+        <noAnswer/>
+        <redirection/>
+        <default/>
+      </contents>
+    </outgoing>
+  </elements>
+
+  <!-- Location used by Redirect and also as a Location "statement" -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" clear="yes" priority="1">
+    <!-- Location contents: Redirect (triggers Redirect2Return, uses Location2URIConstant through locations helper) -->
+    <contents xsi:type="CPL:Redirect" permanent="true"/>
+  </elements>
+
+  <!-- AddressSwitch exercising AddressSwitch2SelectStat, SwitchedAddress2SelectCase, Otherwise2SelectDefault, NotPresent2ErrorResponse -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin">
+    <addresses is="alice@example.com"/>
+    <addresses is="bob@example.com"/>
+    <notPresent/>
+    <otherwise>
+      <!-- Otherwise contents: SubCall to saMain (triggers SubCall2Return via Otherwise2SelectDefault) -->
+      <contents xsi:type="CPL:SubCall" ref="saMain"/>
+    </otherwise>
+  </elements>
+
+</CPL:CPLModel>

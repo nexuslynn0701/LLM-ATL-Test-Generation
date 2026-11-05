@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPL:CPLModel xmi:version="2.0"
+  xmlns:xmi="http://www.omg.org/XMI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:CPL="http://cpl/1.0">
+
+  <!-- elements[0] -->
+  <elements xsi:type="CPL:CPL">
+    <subActions contents="//@elements.2" id="saMain"/>
+    <subActions contents="//@elements.3" id="saBusy"/>
+    <subActions contents="//@elements.12" id="saRedirect"/>
+    <incoming contents="//@elements.5"/>
+    <outgoing contents="//@elements.6"/>
+  </elements>
+
+  <!-- elements[1] : simple Proxy, used by multiple containers -->
+  <elements xsi:type="CPL:Proxy" recurse="yes" ordering="parallel">
+    <!-- simple proxy: no busy/noAnswer/redirection/failure/default children -->
+  </elements>
+
+  <!-- elements[2] : SubCall inside SubAction saMain -->
+  <elements xsi:type="CPL:SubCall" ref="saRedirect"/>
+
+  <!-- elements[3] : complex Proxy (has all branches) for saBusy -->
+  <elements xsi:type="CPL:Proxy" recurse="no" ordering="sequential">
+    <busy contents="//@elements.1"/>
+    <noAnswer contents="//@elements.1"/>
+    <redirection contents="//@elements.9"/>
+    <failure/>
+    <default contents="//@elements.4"/>
+  </elements>
+
+  <!-- elements[4] : Redirect (used as default of complex proxy and as switch content) -->
+  <elements xsi:type="CPL:Redirect" permanent="false"/>
+
+  <!-- elements[5] : AddressSwitch (contents of Incoming) -->
+  <elements xsi:type="CPL:AddressSwitch" field="origin" subField="user">
+    <addresses contents="//@elements.7"/>
+    <addresses contents="//@elements.8"/>
+    <notPresent/>
+    <otherwise contents="//@elements.1"/>
+  </elements>
+
+  <!-- elements[6] : StringSwitch (contents of Outgoing) -->
+  <elements xsi:type="CPL:StringSwitch" field="call-id">
+    <!-- no strings needed; transformation only uses 'field' -->
+  </elements>
+
+  <!-- elements[7] : SwitchedAddress with simple proxy as content -->
+  <elements xsi:type="CPL:SwitchedAddress" is="userA" contains="domainA" subDomainOf="example.com" contents="//@elements.1"/>
+
+  <!-- elements[8] : SwitchedAddress without contents (empty case) -->
+  <elements xsi:type="CPL:SwitchedAddress" is="userB" contains="domainB" subDomainOf="example.org"/>
+
+  <!-- elements[9] : Location used by complex proxy (through locations helper) -->
+  <elements xsi:type="CPL:Location" url="sip:user@example.com" priority="1" clear="yes"/>
+
+  <!-- elements[10] : Location used by simple proxy and by Redirect -->
+  <elements xsi:type="CPL:Location" url="sip:main@example.org" priority="5" clear="no" contents="//@elements.1"/>
+
+  <!-- elements[11] : Location used by SubCall target saRedirect -->
+  <elements xsi:type="CPL:Location" url="sip:redirect@example.net" priority="10" clear="yes"/>
+
+  <!-- elements[12] : SubAction whose contents is a Redirect -->
+  <elements xsi:type="CPL:SubAction" id="saRedirect" contents="//@elements.4"/>
+
+</CPL:CPLModel>
