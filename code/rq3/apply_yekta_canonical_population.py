@@ -20,9 +20,9 @@ from statistics import median
 from scipy.stats import wilcoxon, mannwhitneyu
 
 ROOT = Path(__file__).resolve().parents[2]
-DATA = ROOT / "results/rq3/data"
+DATA = ROOT / "results/experiment_results/RQ3"
 SUP = ROOT / "results/rq3/supplementary"
-KILL_MATRIX = ROOT / "results/rq2/supplementary/mutant_kill_matrix.csv"
+KILL_MATRIX = ROOT / "results/experiment_results/RQ2/mutant_kill_matrix.csv"
 EXAM_CSV = DATA / "mutant_level_exam.csv"
 
 P = ["GPT", "Qwen", "DeepSeek"]
@@ -202,49 +202,6 @@ def cell_scores(rows, old_cells):
     return cellrows
 
 
-def baseline_columns(examrows, rows):
-    """Regenerate results/rq3/supplementary/rq3_baseline_columns/ (export_rq3_baseline_exam.py format)."""
-    g = defaultdict(list)
-    counts = defaultdict(set)
-    for r in rows:
-        if r["provider"] not in ["Yekta-ACO"] or r["evaluable"] != "1":
-            continue
-        g[r["provider"], r["formula"]].append(grid(r))
-        counts[r["provider"], r["subject"]].add(r["mutant_id"])
-    prior = {(r["formula"]): r for r in examrows}
-    names = ["Ochiai", "Tarantula", "DStar2", "Kulczynski2", "Mountford", "Zoltar",
-             "ArithmeticMean", "Barinel", "BraunBanquet", "BaroniUrbaniBuser", "Cohen",
-             "Ochiai2", "OP2", "Phi", "Pierce", "RogersTanimoto", "RussellRao", "SimpleMatching"]
-    long_rows, wide = [], []
-    for name, f in zip(names, N):
-        row = {"Formula": name}
-        pr = prior[f]
-        for p, suffix in [("Yekta-ACO", "ACO")]:
-            v = g[p, f]
-            a = sum(v, F(0)) / len(v)
-            b = median(v)
-            k = f"{p}-{suffix}"
-            assert len(v) == int(pr[k + "_n"]) and abs(a - F(pr[k + "_mean"])) < F(1, 10**14) \
-                and abs(b - F(pr[k + "_median"])) < F(1, 10**14), f"baseline/pooled mismatch {p}/{f}"
-            long_rows.append(dict(formula=f, baseline=p, n_mutants=len(v),
-                                  mean_15dp=fmt(a, 15), median_15dp=fmt(b, 15),
-                                  mean_numerator=a.numerator, mean_denominator=a.denominator,
-                                  median_numerator=b.numerator, median_denominator=b.denominator,
-                                  display_mean=fmt(a, 2), display_median=fmt(b, 2)))
-            row[p] = fmt(a, 2) + "/" + fmt(b, 2)
-        wide.append(row)
-    pop = [dict(baseline=p, subject=s, n_evaluable=len(v)) for (p, s), v in sorted(counts.items())]
-    tex = ["% Formula & Yekta-ACO mean/median",
-           "% Pooled evaluable mutants; exact rank-grid EXAM; ROUND_HALF_EVEN.",
-           "% Yekta-ACO uses canonical pair outcomes for all 95 evaluable mutants; see",
-           "% code/rq3/build_aco_canonical_localization.py; old rankings are not retained."]
-    tex += [" & ".join(r.values()) + r" \\" for r in wide]
-    audit = dict(status="PASS", baseline_formula_groups=len(long_rows),
-                 matches_rebuilt_pooled_summary=True,
-                 Yekta_ACO_n=len(g["Yekta-ACO", "ochiai"]),
-                 population_basis="canonical RQ2 pair outcomes and original source-rule coverage; rankings fully recomputed",
-                 manuscript_modified=False)
-    return long_rows, wide, pop, "\n".join(tex) + "\n", audit
 
 
 def main():

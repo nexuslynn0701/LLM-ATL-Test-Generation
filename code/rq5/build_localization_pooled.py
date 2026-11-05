@@ -13,7 +13,7 @@ from pathlib import Path
 from statistics import median
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / 'results/rq3/data/mutant_level_exam.csv'
+SOURCE = ROOT / 'results/experiment_results/RQ3/mutant_level_exam.csv'
 OUTPUT = ROOT / 'rebuild/rq5/pooled_overall_by_formula.csv'
 FORMULAS = [
     ('ochiai', 'Ochiai'), ('tarantula', 'Tarantula'), ('dstar2', 'DStar2'),

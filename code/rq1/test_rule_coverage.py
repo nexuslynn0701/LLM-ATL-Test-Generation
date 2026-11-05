@@ -15,8 +15,8 @@ class RuleCoverageTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.data = Path(temporary.name)
-        for name in ("rq1/data/rule_coverage.csv", "rq1/supplementary/source_rule_coverage.csv",
-                     "rq1/supplementary/source_population.csv", "rq1/data/subjects.csv"):
+        for name in ("experiment_results/RQ1/rule_coverage.csv", "rq1/supplementary/source_rule_coverage.csv",
+                     "rq1/supplementary/source_population.csv", "rq1/supplementary/subjects.csv"):
             target = self.data / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(DATA / name, target)
@@ -30,14 +30,14 @@ class RuleCoverageTests(unittest.TestCase):
             union_coverage([{"unknown"}], {"a"})
 
     def test_released_results_and_reruns_preserve_original_rows(self):
-        path = self.data / "rq1/data/rule_coverage.csv"
+        path = self.data / "experiment_results/RQ1/rule_coverage.csv"
         base = [r for r in read_csv(path) if r["prompt_condition"] != "All prompts"]
         rebuild_rule_coverage(self.data)
         updated = read_csv(path)
         self.assertEqual([r for r in updated if r["prompt_condition"] != "All prompts"], base)
         self.assertEqual(len(base), 75)
         self.assertEqual(len(updated), 99)
-        table = {r["Approach"]: r for r in read_csv(self.data / "rq1/tables/rq1_rule_coverage_all_prompts.csv")}
+        table = {r["Approach"]: r for r in read_csv(self.data / "rq1/supplementary/rq1_rule_coverage_all_prompts.csv")}
         for llm, overall in (("GPT", "97.58"), ("Qwen", "80.81"),
                              ("DeepSeek", "96.71"), ("All LLM", "99.12")):
             self.assertEqual(table[llm]["Overall"], overall)
@@ -48,13 +48,13 @@ class RuleCoverageTests(unittest.TestCase):
         self.assertEqual(index["CPL2SPL", "Qwen"]["n_trace_eligible"], "0")
         self.assertEqual(index["Ant2Maven", "GPT"]["n_attempts"], "400")
         self.assertEqual(index["Ant2Maven", "All LLM"]["n_attempts"], "1200")
-        outputs = [path, self.data / "rq1/data/rule_coverage_overall_pooled.csv",
-                   *sorted((self.data / "rq1/tables").glob("*.csv"))]
+        outputs = [path, self.data / "rq1/supplementary/rule_coverage_overall_pooled.csv",
+                   *sorted((self.data / "rq1/supplementary").glob("*.csv"))]
         first = [p.read_bytes() for p in outputs]
         rebuild_rule_coverage(self.data)
         self.assertEqual(first, [p.read_bytes() for p in outputs])
         pooled = {(r["generator"], r["prompt_condition"]): r
-                  for r in read_csv(self.data / "rq1/data/rule_coverage_overall_pooled.csv")}
+                  for r in read_csv(self.data / "rq1/supplementary/rule_coverage_overall_pooled.csv")}
         self.assertEqual(pooled["GPT", "SM"]["pooled_covered_rules"], "95")
         self.assertEqual(pooled["GPT", "SM"]["pooled_total_rules"], "110")
         self.assertEqual(pooled["GPT", "SM"]["overall_pooled_pct"], "86.36")
@@ -67,7 +67,7 @@ class RuleCoverageTests(unittest.TestCase):
         rows = [r for r in rows if not (r["subject"] == "Ant2Maven" and r["provider"] == "gpt"
                                        and r["condition"] == "astmo" and r["source_id"] == "0001")]
         write_csv(path, rows, list(rows[0]))
-        output = self.data / "rq1/data/rule_coverage.csv"
+        output = self.data / "experiment_results/RQ1/rule_coverage.csv"
         before = output.read_bytes()
         with self.assertRaisesRegex(ValueError, "Missing rule-level evidence"):
             rebuild_rule_coverage(self.data)

@@ -17,7 +17,7 @@ class ModelSizeTests(unittest.TestCase):
         audit = {(r["subject"], gen_map[r["approach"]], prompt_map[r["prompt"]]): r
                  for r in read_csv(audit_dir / "audit_group_summary.csv")}
         diff = read_csv(audit_dir / "audit_paper_diff.csv")
-        summary = read_csv(DATA / "rq1/data/model_size.csv")
+        summary = read_csv(DATA / "experiment_results/RQ1/model_size.csv")
         self.assertEqual(len(summary), 78)
         self.assertFalse({"q1", "q3", "iqr"} & set(summary[0]))
         ok_groups = empty_cells = not_applicable = 0

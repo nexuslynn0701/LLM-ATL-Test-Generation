@@ -1,12 +1,12 @@
 """B10 check: does published pooled Top-1/EXAM include multi-faulty-rule mutants?
 
-Read-only against results/rq3/data; prints published vs include/exclude variants.
+Read-only against results/experiment_results/RQ3; prints published vs include/exclude variants.
 """
 import csv
 from pathlib import Path
 from fractions import Fraction as F
 
-D = Path(__file__).resolve().parents[2] / 'results' / 'rq3' / 'data'
+D = Path(__file__).resolve().parents[2] / 'results/experiment_results/RQ3'
 rows = list(csv.DictReader((D / 'mutant_level_exam.csv').open(encoding='utf-8-sig')))
 
 

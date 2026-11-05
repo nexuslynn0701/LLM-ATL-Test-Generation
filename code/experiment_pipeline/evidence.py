@@ -43,8 +43,8 @@ def protocol():
     sys.path.insert(0, str(RUNTIME))
     from src.experiment.run_ladder_experiment import DATASETS
     from src.analyzer.coverage_analyzer import extract_rules_and_helpers
-    counts = {r['transformation']: r for r in read_csv(ROOT/'results/rq1/data/subjects.csv')}
-    mutants = read_csv(ROOT/'code/rq2/data/canonical_mutants.csv')
+    counts = {r['transformation']: r for r in read_csv(ROOT/'results/rq1/supplementary/subjects.csv')}
+    mutants = read_csv(ROOT/'results/rq2/supplementary/inputs/canonical_mutants.csv')
     result = {}
     for subject, ds in DATASETS.items():
         rules = extract_rules_and_helpers(str(ds['dataset_dir']/ds['atl_file']))['rules']

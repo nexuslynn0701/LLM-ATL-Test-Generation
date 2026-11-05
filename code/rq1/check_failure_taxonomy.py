@@ -3,7 +3,7 @@
 against their evidence.
 
 Table 3 layers, in order:
-1. Aggregate consistency: breakdown rows in rq1/data/failure_taxonomy.csv sum
+1. Aggregate consistency: breakdown rows in rq1/supplementary/failure_taxonomy.csv sum
    to their parents and every percentage matches its count over the total.
 2. Cross-check with validity.csv: failed attempts = LLM ladder attempts minus
    valid models, using both the published fraction totals row and the 72
@@ -18,7 +18,7 @@ Table 5 layers:
 4. Rule coverage recount: all 72 LLM cells and the six retired baseline cells are
    recounted as rule-ID unions from rq1/supplementary/source_rule_coverage.csv over the
    trace-eligible sources of rq1/supplementary/source_population.csv, with per-subject
-   universes checked against rq1/data/subjects.csv. The retired baseline Ant2Maven
+   universes checked against rq1/supplementary/subjects.csv. The retired baseline Ant2Maven
    cell keeps only 10/100 traces on disk, so its recount is a lower bound.
 5. Pooled Overall: every Table 5 "Overall" value (12 LLM rows, retired baseline,
    Yekta-ACO) is recomputed as covered/total rules pooled across subjects and
@@ -35,13 +35,13 @@ from common import DATA, read_csv
 
 DIAGNOSTICS = DATA / "rq1/supplementary/failure_diagnostics/rq1_execution_failure_diagnostics_by_attempt.csv"
 GENERATION_RECORDS = DATA / "rq1/supplementary/generation_attempt_records/generation_attempt_records.csv"
-TAXONOMY = DATA / "rq1/data/failure_taxonomy.csv"
-RULE_COVERAGE = DATA / "rq1/data/rule_coverage.csv"
-RULE_COVERAGE_POOLED = DATA / "rq1/data/rule_coverage_overall_pooled.csv"
+TAXONOMY = DATA / "rq1/supplementary/failure_taxonomy.csv"
+RULE_COVERAGE = DATA / "experiment_results/RQ1/rule_coverage.csv"
+RULE_COVERAGE_POOLED = DATA / "rq1/supplementary/rule_coverage_overall_pooled.csv"
 SOURCE_RULES = DATA / "rq1/supplementary/source_rule_coverage.csv"
 POPULATION = DATA / "rq1/supplementary/source_population.csv"
-SUBJECTS_TABLE = DATA / "rq1/data/subjects.csv"
-ACO_RULE_COVERAGE = DATA / "shared/aco/rule_coverage.csv"
+SUBJECTS_TABLE = DATA / "rq1/supplementary/subjects.csv"
+ACO_RULE_COVERAGE = DATA / "rq1/supplementary/aco/rule_coverage.csv"
 LLMS = {"Gpt", "Qwen", "DeepSeek"}
 LLM_CONDITIONS = {"SM", "STM", "ASTM", "ASTMO"}
 DIAG_PROVIDERS = {"gpt", "qwen", "deepseek-flash"}
@@ -117,7 +117,7 @@ def check_aggregate(total: dict, entries: list, errors: list[str]) -> None:
 
 
 def validity_failures(subjects: list[str], errors: list[str]) -> tuple[int, int]:
-    rows = read_csv(DATA / "rq1/data/validity.csv")
+    rows = read_csv(DATA / "experiment_results/RQ1/validity.csv")
     fractions = [r for r in rows if r["Generator"] == "LLM Overall" and "/" in r["Cond."]]
     if len(fractions) != 1:
         raise SystemExit("validity.csv: expected exactly one LLM Overall fraction row")
@@ -252,7 +252,7 @@ def check_rule_coverage(errors: list[str]) -> None:
     for subject, row in sorted(aco_cells.items()):
         counts = aco_evidence.get(subject)
         if counts != (int(row["covered_rules"]), int(row["total_rules"])):
-            errors.append(f"ACO {subject}: shared/aco evidence {counts} != table "
+            errors.append(f"ACO {subject}: rq1/supplementary/aco evidence {counts} != table "
                           f"{row['covered_rules']}/{row['total_rules']}")
     aco_pooled = round(100 * sum(c for c, _ in aco_evidence.values())
                        / sum(t for _, t in aco_evidence.values()), 2)
@@ -329,7 +329,7 @@ def main() -> None:
     print(f"- aggregate: {len(entries)} rows, total {total_count}, hierarchy and percentages consistent"
           if not errors else "- aggregate: see errors below")
 
-    subjects = [k for k in read_csv(DATA / "rq1/data/validity.csv")[0] if k not in {"Generator", "Cond."}]
+    subjects = [k for k in read_csv(DATA / "experiment_results/RQ1/validity.csv")[0] if k not in {"Generator", "Cond."}]
     failures, attempts = validity_failures(subjects, errors)
     if failures != total_count:
         errors.append(f"validity failures {failures} != taxonomy total {total_count}")

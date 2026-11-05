@@ -16,7 +16,7 @@ def require(condition: bool, message: str) -> None:
 
 
 def main() -> None:
-    cells = read_csv(DATA / "shared/population/estar_population_by_cell.csv")
+    cells = read_csv(DATA / "rq1/supplementary/population/estar_population_by_cell.csv")
     workflow = [r for r in cells if r["condition"] == "workflow"]
     require(len(workflow) == 18, "workflow contains 6 subjects x 3 providers")
     require(sum(int(r["n_estar"]) for r in workflow) == 1644, "workflow E* count is 1,644")
@@ -37,10 +37,10 @@ def main() -> None:
     require(index[("CPL2SPL", "Qwen", "workflow", "0080")]["in_estar"] == "0", "source 0080 is excluded")
     require(index[("Ant2Maven", "GPT", "astmo", "0030")]["in_estar"] == "1", "source 0030 is included")
 
-    subjects = {r["transformation"]: r for r in read_csv(ROOT / "results/rq1/data/subjects.csv")}
+    subjects = {r["transformation"]: r for r in read_csv(ROOT / "results/rq1/supplementary/subjects.csv")}
     require(subjects["Ant2Maven"]["total_rules"] == "30", "Ant2Maven protocol uses the 30-rule original transformation")
 
-    ant_audit = json.loads((DATA / "shared/audit/ant2maven_trace_scope_audit.json").read_text(encoding="utf-8"))
+    ant_audit = json.loads((DATA / "rq1/supplementary/audit/ant2maven_trace_scope_audit.json").read_text(encoding="utf-8"))
     require(ant_audit["base_rules"] == 30, "Ant2Maven audited base rule universe has 30 rules")
     require(ant_audit["final_script_universe_equal_base"] and ant_audit["rq1_canonical_equal_base"], "Ant2Maven final rule universes equal the original rule set")
     require(ant_audit["spectra"] == {
@@ -65,10 +65,10 @@ def main() -> None:
     require(ant_rq4 and all(r["total_rules"] == "30" for r in ant_rq4), "all released Ant2Maven RQ4 cells use 30 coverage rules")
     ant_rq5 = [r for r in read_csv(DATA / "rq5/supplementary/localization_mechanism.csv") if r["subject"] == "Ant2Maven"]
     require(ant_rq5 and all(r["rule_universe_size"] == "30" for r in ant_rq5), "all released Ant2Maven RQ5 localization cells use 30 rules")
-    ant_exam = [r for r in read_csv(DATA / "rq3/data/mutant_level_exam.csv") if r["subject"] == "Ant2Maven"]
+    ant_exam = [r for r in read_csv(DATA / "experiment_results/RQ3/mutant_level_exam.csv") if r["subject"] == "Ant2Maven"]
     require(ant_exam and all(r["rule_count"] == "30" for r in ant_exam), "all released Ant2Maven mutant-level EXAM rows use denominator 30")
 
-    workflow_metrics = read_csv(DATA / "rq5/data/workflow_metrics.csv")
+    workflow_metrics = read_csv(DATA / "rq5/supplementary/workflow_metrics.csv")
     wf_index = {(r["subject"], r["llm"], r["condition"]): r for r in workflow_metrics}
     require(round(float(wf_index[("Ant2Maven", "GPT", "astmo")]["coverage_pct"]), 1) == 93.3, "final Ant2Maven/GPT/ASTMO coverage is 93.3%")
     require(round(float(wf_index[("Ant2Maven", "Qwen", "astmo")]["coverage_pct"]), 1) == 60.0, "final Ant2Maven/Qwen/ASTMO coverage is 60.0%")
@@ -98,7 +98,7 @@ def main() -> None:
     ]
     require(median(ecore_ds_sizes) == 7.5, "minimum workflow cell median model size is 7.5 EObjects")
 
-    overlap = read_csv(DATA / "rq5/data/mutant_overlap.csv")
+    overlap = read_csv(DATA / "experiment_results/RQ5/mutant_overlap.csv")
     comparable_overlap = [r for r in overlap if r["comparison_status"] != "BASELINE_EMPTY"]
     wf_only = {
         llm: sum(int(r["workflow_only_mutants"]) for r in comparable_overlap if r["provider"] == llm)
@@ -114,17 +114,17 @@ def main() -> None:
     workflow_ochiai = mean(float(r["mean_exam_ac"]) for r in ochiai if r["condition"] == "workflow" and (r["subject"], r["provider"]) in astmo_keys)
     require(round(astmo_ochiai, 3) == 0.402 and round(workflow_ochiai, 3) == 0.372, "paired Ochiai EXAM-AC is 0.402 to 0.372")
 
-    aco = {r["subject"]: r for r in read_csv(DATA / "shared/aco/mutation_score.csv")}
+    aco = {r["subject"]: r for r in read_csv(DATA / "rq2/supplementary/aco/mutation_score.csv")}
     expected = {"BibTeX2DocBook": 80.0, "CPL2SPL": 100.0, "UML2ER": 72.2222}
     for subject, score in expected.items():
         require(abs(float(aco[subject]["strict_mutation_score_pct"]) - score) < 0.0001, f"ACO {subject} strict score is {score:g}%")
 
-    aco_validity = {r["subject"]: r for r in read_csv(DATA / "shared/aco/validity.csv")}
+    aco_validity = {r["subject"]: r for r in read_csv(DATA / "rq1/supplementary/aco/validity.csv")}
     require(aco_validity["BibTeX2DocBook"]["n_original_executable"] == "100", "ACO BibTeX2DocBook has 100 executable sources")
-    aco_coverage = {r["subject"]: r for r in read_csv(DATA / "shared/aco/rule_coverage.csv")}
+    aco_coverage = {r["subject"]: r for r in read_csv(DATA / "rq1/supplementary/aco/rule_coverage.csv")}
     require(aco_coverage["BibTeX2DocBook"]["rule_coverage_pct"] == "77.78", "ACO BibTeX2DocBook rule coverage is 77.78%")
 
-    per_mutant = read_csv(DATA / "shared/aco/per_mutant_outcomes.csv")
+    per_mutant = read_csv(DATA / "rq2/supplementary/aco/per_mutant_outcomes.csv")
     by_subject: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in per_mutant:
         by_subject[row["subject"]].append(row)
@@ -138,11 +138,11 @@ def main() -> None:
     aco_pairs = []
     for name in ("source_mutant_outcomes_aco_canonical_bibtex.csv",
                  "source_mutant_outcomes_aco_replay_cpl_uml.csv"):
-        aco_pairs += read_csv(ROOT / "code/rq2/data/aco" / name)
+        aco_pairs += read_csv(ROOT / "results/rq2/supplementary/inputs/aco" / name)
     failure_counts = defaultdict(int)
     for row in aco_pairs:
         failure_counts[(row["subject"], row["mutant_id"])] += row["outcome"] == "KILLED"
-    aco_exam = [r for r in read_csv(DATA / "rq3/data/mutant_level_exam.csv") if r["provider"] == "Yekta-ACO"]
+    aco_exam = [r for r in read_csv(DATA / "experiment_results/RQ3/mutant_level_exam.csv") if r["provider"] == "Yekta-ACO"]
     require(len(aco_pairs) == 10600 and len(aco_exam) == 1944,
             "ACO canonical evidence covers 10,600 pairs and 1,944 localization rows")
     require(all(int(r["failing_sources"] or 0) == failure_counts[(r["subject"], r["mutant_id"])] for r in aco_exam),
@@ -197,8 +197,8 @@ def main() -> None:
 
     require({r["condition"] for r in cells} <= {"sm", "stm", "astm", "astmo", "workflow", "random"}, "population uses the public condition vocabulary")
     local_paths = []
-    released_bases = [DATA / f"rq{i}/data" for i in range(1, 6)]
-    released_bases += [DATA / "shared" / n for n in ("aco", "audit", "population", "protocol")]
+    released_bases = [DATA / "experiment_results"]
+    released_bases += [DATA / "rq1/supplementary/protocol"]
     released_bases += [ROOT / "data/prompts" / s for s in subjects]
     released_bases += [ROOT / "data/workflow/prompts"]
     local_path_markers = (

@@ -11,7 +11,7 @@ Chain (all real repo assets, deterministic fixed input):
      the RQ1 model-size metric with EmfSizeCount.
   4. Execute a fixed shipped mutant (data/mutants/BibTeX2DocBook/
      BibTeX2DocBook_Mutant1.asm; recorded as killed by all four methods in
-     results/rq2/supplementary/mutant_kill_matrix.csv) on the same input.
+     results/experiment_results/RQ2/mutant_kill_matrix.csv) on the same input.
   5. Compare original vs mutant outputs with the experiment's actual XMI
      oracle (code/pipeline/src/analyzer/coverage_analyzer.compare_xmi_models)
      and classify the mutant KILLED/ALIVE.
@@ -184,7 +184,7 @@ def main() -> int:
             check("Mutant1/ochiai localization anchors "
                   "(rank 1, tie 8/9 rules, EXAM-AC 0.5)", not bad, str(bad))
             cm = list(_csv.DictReader(
-                (ROOT / "code/rq2/data/canonical_mutants.csv").open(encoding="utf-8-sig")))
+                (ROOT / "results/rq2/supplementary/inputs/canonical_mutants.csv").open(encoding="utf-8-sig")))
             fault = next(r["faulty_rule"] for r in cm if r["mutant_id"] == EXPECTED["mutant_id"])
             check("faulty rule mapped to Article_Title_Journal",
                   fault == "Article_Title_Journal", f"got {fault!r}")

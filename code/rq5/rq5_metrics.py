@@ -11,9 +11,9 @@ from decimal import Decimal, localcontext, ROUND_HALF_EVEN
 from fractions import Fraction
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_METRICS = ROOT / 'results/rq5/data/workflow_metrics.csv'
-DEFAULT_SUBJECTS = ROOT / 'results/rq1/data/subjects.csv'
-DEFAULT_TABLES = ROOT / 'results/rq5/tables'
+DEFAULT_METRICS = ROOT / 'results/rq5/supplementary/workflow_metrics.csv'
+DEFAULT_SUBJECTS = ROOT / 'results/rq1/supplementary/subjects.csv'
+DEFAULT_OUTPUT = ROOT / 'rebuild/rq5'
 SUBJECTS = ['Ant2Maven', 'BibTeX2DocBook', 'CPL2SPL', 'Ecore2Maude',
             'Grafcet2PetriNet', 'UML2ER']
 MODELS = ['GPT', 'Qwen', 'DeepSeek']
@@ -165,7 +165,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--metrics', type=Path, default=DEFAULT_METRICS)
     parser.add_argument('--subjects', type=Path, default=DEFAULT_SUBJECTS)
-    parser.add_argument('--out', type=Path, default=DEFAULT_TABLES)
+    parser.add_argument('--out', type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
     counts = build_counts(args.metrics, args.subjects)
     export_tables(counts, args.out)

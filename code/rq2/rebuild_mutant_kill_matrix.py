@@ -1,6 +1,6 @@
 """Rebuild the released mutant kill matrix from the pair-level inputs.
 
-Reproduces ``results/rq2/supplementary/mutant_kill_matrix.csv`` from ``code/rq2/data/``:
+Reproduces ``results/experiment_results/RQ2/mutant_kill_matrix.csv`` from ``results/rq2/supplementary/inputs/``:
 
 - LLM columns (GPT / Qwen / DeepSeek-Flash): prompt-pooled union — a mutant is
   1 if any pair from an original-executable source has outcome KILLED, else 0;
@@ -33,9 +33,9 @@ from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-DATA = ROOT / "code" / "rq2" / "data"
-SRC = ROOT / "results/rq2/supplementary/mutant_kill_matrix.csv"
-OUT = ROOT / "results/rq2/supplementary/mutant_kill_matrix.csv"
+DATA = ROOT / 'results/rq2/supplementary/inputs'
+SRC = ROOT / "results/experiment_results/RQ2/mutant_kill_matrix.csv"
+OUT = ROOT / "results/experiment_results/RQ2/mutant_kill_matrix.csv"
 
 MUTANT_MANIFEST = DATA / "canonical_mutants.csv"
 OPERATOR_MAP = DATA / "rq2_mutant_operator_map.csv"

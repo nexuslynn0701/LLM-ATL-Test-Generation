@@ -21,8 +21,8 @@ from experiment_pipeline.aggregate import exam_rows
 from experiment_pipeline.evidence import read_csv, write_csv
 from src.analyzer.coverage_analyzer import extract_rules_and_helpers
 
-BIB_PAIRS=ROOT/'code/rq2/data/aco/source_mutant_outcomes_aco_canonical_bibtex.csv'
-OTHER_PAIRS=ROOT/'code/rq2/data/aco/source_mutant_outcomes_aco_replay_cpl_uml.csv'
+BIB_PAIRS=ROOT/'results/rq2/supplementary/inputs/aco/source_mutant_outcomes_aco_canonical_bibtex.csv'
+OTHER_PAIRS=ROOT/'results/rq2/supplementary/inputs/aco/source_mutant_outcomes_aco_replay_cpl_uml.csv'
 COVERAGE=ROOT/'results/rq1/supplementary/model_size_audit/aco_archive/source_rule_coverage_aco.csv'
 EXPECTED_SOURCES={'BibTeX2DocBook':100,'CPL2SPL':96,'UML2ER':100}
 ATL_NAMES={'BibTeX2DocBook':'BibTeX2DocBook','CPL2SPL':'CPL2SPL','UML2ER':'SimpleUml2ER'}
@@ -78,7 +78,7 @@ def load_cells(bib_pairs=BIB_PAIRS,other_pairs=OTHER_PAIRS,coverage_path=COVERAG
     if {r['subject'] for r in pair_rows}!=set(EXPECTED_SOURCES):
         raise ValueError('Canonical pair files must cover exactly the three ACO subjects')
     coverage_rows=read_csv(coverage_path)
-    metadata=read_csv(ROOT/'code/rq2/data/canonical_mutants.csv')
+    metadata=read_csv(ROOT/'results/rq2/supplementary/inputs/canonical_mutants.csv')
     cells=[]
     for subject,n in EXPECTED_SOURCES.items():
         rules=extract_rules_and_helpers(str(ROOT/'subjects'/subject/'transformations'/(ATL_NAMES[subject]+'.atl')))['rules']

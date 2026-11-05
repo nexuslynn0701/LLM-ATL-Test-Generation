@@ -11,13 +11,13 @@ Chain position:
     (Validity/Coverage/Mutation/Failure columns of tab:rq4-ladder)
 
 Inputs:
-    results/rq1/data/validity.csv
-    results/shared/population/estar_population_by_cell.csv
-    results/rq1/data/rule_coverage.csv
-    results/rq2/data/mutation_score.csv
-    results/rq2/data/failure_rate_summary.csv
+    results/experiment_results/RQ1/validity.csv
+    results/rq1/supplementary/population/estar_population_by_cell.csv
+    results/experiment_results/RQ1/rule_coverage.csv
+    results/experiment_results/RQ2/mutation_results.csv
+    results/experiment_results/RQ2/failure_rates.csv
     results/rq3/supplementary/cell_formula_scores.csv
-    results/rq3/data/mutant_level_exam.csv
+    results/experiment_results/RQ3/mutant_level_exam.csv
 
 Default mode verifies the recomputation against the existing
 results/rq4/supplementary/rq4_values_72_current.csv and
@@ -32,7 +32,7 @@ from decimal import Decimal, localcontext, ROUND_HALF_EVEN
 from collections import defaultdict
 
 BUNDLE = Path(__file__).resolve().parents[2]
-RQ4_DATA = BUNDLE / 'results' / 'rq4' / 'data'
+RQ4_DATA = BUNDLE / 'results/experiment_results/RQ4'
 RQ4_SUPP = BUNDLE / 'results' / 'rq4' / 'supplementary'
 P = ['GPT', 'Qwen', 'DeepSeek']
 C = ['sm', 'stm', 'astm', 'astmo']
@@ -71,7 +71,7 @@ def main():
     args = ap.parse_args()
 
     # --- cell-level Top-1 / EXAM from the mutant-level file -----------------
-    mutants = read('results/rq3/data/mutant_level_exam.csv')
+    mutants = read('results/experiment_results/RQ3/mutant_level_exam.csv')
     cells = read('results/rq3/supplementary/cell_formula_scores.csv')
     groups = defaultdict(list)
     for r in mutants:
@@ -107,7 +107,7 @@ def main():
 
     # --- Failure: unique integer pair-count recovery from RQ2 summary -------
     failure_audit = []
-    for r in read('results/rq2/data/failure_rate_summary.csv'):
+    for r in read('results/experiment_results/RQ2/failure_rates.csv'):
         if r['method_id'].replace('DeepSeek-Flash', 'DeepSeek') not in [p + '-' + c.upper() for p in P for c in C]:
             continue
         if r['mean_fail_ratio_pct'] in ('', 'NA', 'N/A'):
@@ -137,13 +137,13 @@ def main():
     print('Failure raw count differences (RQ2 recovery vs RQ3 failing_sources):', len(fc_bad), fc_bad[:5])
 
     # --- assemble the 72 values ---------------------------------------------
-    valid = {(r['Generator'].lower(), r['Cond.']): r for r in read('results/rq1/data/validity.csv')}
+    valid = {(r['Generator'].lower(), r['Cond.']): r for r in read('results/experiment_results/RQ1/validity.csv')}
     estar = {(r['provider'], r['condition'], r['subject']): int(r['n_estar'])
-             for r in read('results/shared/population/estar_population_by_cell.csv')}
+             for r in read('results/rq1/supplementary/population/estar_population_by_cell.csv')}
     cov = {(r['llm'], r['prompt_condition'], r['subject']): r
-           for r in read('results/rq1/data/rule_coverage.csv')}
+           for r in read('results/experiment_results/RQ1/rule_coverage.csv')}
     mut = {(r['approach'].replace('DeepSeek-Flash', 'DeepSeek'), r['prompt_condition'], r['subject']): r
-           for r in read('results/rq2/data/mutation_score.csv')}
+           for r in read('results/experiment_results/RQ2/mutation_results.csv')}
     fail = {(method.replace('DeepSeek-Flash', 'DeepSeek'), s): (n, d, x, raw)
             for method, s, n, d, x, raw in failure_audit}
 

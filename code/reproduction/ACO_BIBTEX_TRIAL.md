@@ -63,5 +63,5 @@ Outputs are under the chosen run's `derived/` directory, including:
 - `report.json` and, for full runs with differences, `localization_differences.csv`
 
 The diagnostic output is not automatically promoted into `results/`,
-`code/rq2/data/aco/` or the paper CSV directory. Other subjects, workflows and
+`results/rq2/supplementary/inputs/aco/` or the paper CSV directory. Other subjects, workflows and
 the remaining reproduction gaps have not been rerun by this trial.

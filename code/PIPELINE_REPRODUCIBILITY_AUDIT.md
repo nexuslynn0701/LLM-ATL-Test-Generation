@@ -26,7 +26,7 @@
 | Windows ATL 执行失败 | `pipeline/src/executor/transformation_executor.py` 两处 classpath 为 `lib/*:lib`；`data/workflow/src/executor/` 同样如此。真实执行器实测返回 1；直接启动 runner 报 `ClassNotFoundException: ATLRunner`。只在诊断命令中改成 `os.pathsep` 后成功进入 runner 参数检查 | 当前 Windows 本机不能直接执行。需修正单/多输出执行路径，并在六科目验证原转换与 mutant；本轮保留 pipeline 源码，未将诊断性控制实验当作修复 |
 | 生成与 mutation/SBFL 未由同一入口串接 | `run_ladder_experiment.py` 执行生成、原转换、coverage 和 CSV；`run_workflow.py` 也是生成/原转换/反馈入口。谱导出器读取已经执行出的 mutant 文件，不负责产生这些文件 | 还需调用正式 mutant 集合上的执行、oracle 判定，再导出规则谱；不能只运行生成脚本就期望得到 RQ2/RQ3 |
 | RQ1 模型大小重建不具备包内直接运行路径 | `rq1/model_size_audit/build_deliverables.py` 的 `REPO=<old-machine>/research/llm_mt_experiment`，并依赖历史审计输入；`reproduce_all.rq1()` 有意不再重建 model_size | 现有审计结果可校验；新样本的 containment-size 计算及发布还需接入 |
-| RQ2 原始证据有一个明确缺口 | `rq2/rebuild_mutant_kill_matrix.py` 实测 `unexpected=0, pending(BibTeX ACO)=40`；`rq2/data/README.md` 说明缺少 canonical BibTeX ACO 配对矩阵 | 其他列可重建，但当前不能从包内配对证据完整重建该基线列；`--write` 会拒绝不完整覆盖。需要补件或按同一 oracle 重跑该格 |
+| RQ2 原始证据有一个明确缺口 | `rq2/rebuild_mutant_kill_matrix.py` 实测 `unexpected=0, pending(BibTeX ACO)=40`；`../results/rq2/supplementary/inputs/README.md` 说明缺少 canonical BibTeX ACO 配对矩阵 | 其他列可重建，但当前不能从包内配对证据完整重建该基线列；`--write` 会拒绝不完整覆盖。需要补件或按同一 oracle 重跑该格 |
 | RQ3 replay 依赖包外数据 | `rq3/replay_sandbox.py` 使用 `<external-assets>/ppt` 谱/ZIP 及 `Documents/Codex/...` 的输入；适配版仍调用这个沙箱 | 本机已有沙箱的成功不能证明新电脑可运行。需将必需输入入包或改为直接接收新 run 的谱/配对数据，并去掉论文历史修补流程的必需依赖 |
 | RQ5 新运行接口未实现 | `rq5/build_workflow_metrics.py --from-run` 明确退出并说明未实现；离线实测 54 格、312 项精确比较无 hard mismatch，但跳过 12 个 workflow coverage 格，另有 Ant/DeepSeek/workflow 一格冲突 | 该程序目前验证发布证据；尚不能自动把新 workflow 运行聚合成正式表。缺少的逐源 coverage 与冲突也需处理，不能把退出码 0 等同于全量证据齐全 |
 | API 配置绑定历史网关 | Ladder 与 workflow 的 `llm_client.py` 默认使用 `api.agicto.cn`，Ladder 锁定特定模型 ID；workflow 另要求 `--atl-lib` | key 必须与配置端点匹配。需统一并外置 provider/endpoint/model/runtime 配置；本轮未联网确认这些服务 |
@@ -65,4 +65,4 @@
 | 更新版 Fig.8 | `code/rq5/plotting/workflow_complementarity` |
 | 更新版 `run_all.py` | `code/reproduction/draw_all_figures.py` |
 
-已更新 RQ3 适配脚本及其生成器中的公式源码路径。另修复方法图对 runtime 的导入，以及 RQ5 图对当前 `results/rq1/data/subjects.csv` 的查找。历史脚本保留外部路径与溯源逻辑，它们不会因为移动目录就自动变成可独立运行的程序。
+已更新 RQ3 适配脚本及其生成器中的公式源码路径。另修复方法图对 runtime 的导入，以及 RQ5 图对当前 `results/rq1/supplementary/subjects.csv` 的查找。历史脚本保留外部路径与溯源逻辑，它们不会因为移动目录就自动变成可独立运行的程序。

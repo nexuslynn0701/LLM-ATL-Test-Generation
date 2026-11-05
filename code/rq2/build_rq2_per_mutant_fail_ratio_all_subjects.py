@@ -24,7 +24,7 @@ Definition of n_original_executable_sources:
     2026-10-15: the bundled source_mutant_outcomes.csv carries the Ant0030
     replay patch — the 100 Ant2Maven/gpt/astmo/0030 rows (original_success=0,
     ERROR in the frozen export) were restored to original_success=1 with the
-    outcomes of results/shared/audits/rq23_ant0030_replay.csv (14 KILLED /
+    outcomes of results/rq2/supplementary/audits/rq23_ant0030_replay.csv (14 KILLED /
     72 ALIVE / 14 INVALID_RUNTIME). n is therefore 96 for GPT-ASTMO on
     Ant2Maven, matching the released RQ2 tables.
 
@@ -34,11 +34,11 @@ Methods (fixed order, 13): 12 LLM (GPT/Qwen/DeepSeek-Flash × SM/STM/ASTM/ASTMO)
 
 Yekta-ACO pair data: the canonical replay matrix is available in-bundle for
     CPL2SPL and UML2ER (aco/source_mutant_outcomes_aco_replay_cpl_uml.csv,
-    converted from results/shared/aco/estar_evidence). The BibTeX2DocBook
+    converted from results/rq1/supplementary/aco/estar_evidence). The BibTeX2DocBook
     canonical pair matrix (unified XMI oracle, 4,000 pairs, 32/40 mutants
     killed) did not survive the workspace migration; until
     aco/source_mutant_outcomes_aco_canonical_bibtex.csv is placed in
-    code/rq2/data/aco/, that one cell is reported as MISSING_PAIR_INPUT
+    results/rq2/supplementary/inputs/aco/, that one cell is reported as MISSING_PAIR_INPUT
     instead of being silently dropped. The legacy aggregate matrix
     (aco/source_mutant_outcomes_aco_legacy.csv, 100%/100%/100%) is kept only
     for the audit's canonical-vs-legacy comparison.
@@ -62,7 +62,7 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
-DATA = ROOT / "code" / "rq2" / "data"
+DATA = ROOT / 'results/rq2/supplementary/inputs'
 OUT_ROOT = ROOT / "results" / "rq2" / "supplementary" / "per_mutant_fail_ratio"
 
 # ── Input files ──
@@ -514,7 +514,7 @@ def build_audit(all_subjects: list[dict]) -> str:
                  "are excluded from BOTH the denominator and the outcome counts.")
     lines.append("- 2026-10-15: the bundled outcomes file carries the Ant0030 replay patch — the 100 "
                  "Ant2Maven/gpt/astmo/0030 rows were restored to `original_success == '1'` with the "
-                 "outcomes of `results/shared/audits/rq23_ant0030_replay.csv` (14 KILLED / 72 ALIVE / "
+                 "outcomes of `results/rq2/supplementary/audits/rq23_ant0030_replay.csv` (14 KILLED / 72 ALIVE / "
                  "14 INVALID_RUNTIME), so GPT-ASTMO on Ant2Maven has n = 96, matching the released tables.")
     lines.append("- `fail_ratio = n_killed / n_original_executable_sources`; ERROR and INVALID count as "
                  "`not killed` and stay in the denominator.")
@@ -605,7 +605,7 @@ def build_audit(all_subjects: list[dict]) -> str:
         lines.append(f"| {subject} | {canon['ms_pct']:.1f} ({canon['n_killed_mutants']}/{len(d['eligible'])}) | "
                      f"{legacy['ms_pct']:.1f} ({legacy['n_killed_mutants']}/{len(d['eligible'])}) | {agree} |")
     lines.append(f"\n- `{ACO_CANONICAL_OUTCOMES.name}` — canonical replay for CPL2SPL/UML2ER (converted from "
-                 "results/shared/aco/estar_evidence).")
+                 "results/rq1/supplementary/aco/estar_evidence).")
     lines.append(f"- `{ACO_CANONICAL_BIBTEX.name}` — canonical BibTeX2DocBook pair matrix, **pending** "
                  "re-export from the original workspace; the subject is reported as MISSING_PAIR_INPUT.")
     lines.append(f"- `{ACO_LEGACY_OUTCOMES.name}` — legacy supplementary (deprecated for source-level evidence).")
@@ -670,7 +670,7 @@ def main() -> int:
     print("=== RQ2 Per-Mutant Fail-Ratio Builder — ALL SUBJECTS ===\n")
     if not ACO_CANONICAL_BIBTEX.is_file():
         print(f"[warn] {ACO_CANONICAL_BIBTEX.name} not found — Yekta-ACO x BibTeX2DocBook "
-              "will be reported as MISSING_PAIR_INPUT (see code/rq2/data/aco/README.md).\n")
+              "will be reported as MISSING_PAIR_INPUT (see results/rq2/supplementary/inputs/aco/README.md).\n")
     all_long: list[dict] = []
     all_summary: list[dict] = []
     all_subjects_data: list[dict] = []

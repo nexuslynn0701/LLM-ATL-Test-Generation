@@ -1,4 +1,4 @@
-"""Forward builder for results/rq5/data/workflow_metrics.csv (四指标 54 格).
+"""Forward builder for results/rq5/supplementary/workflow_metrics.csv (四指标 54 格).
 
 历史上该表的数值经 LaTeX 表与 figure.zip 传递，从未有可运行的聚合脚本（断点 4）。
 本脚本补上"原始证据 → 四指标"的前向计算，并用已发布表格做全量往返校验：
@@ -10,11 +10,11 @@
   n_estar = 0 的格（如 Qwen×CPL2SPL×astm/astmo）：三项下游指标按约定记 N/A("--")，不计 0/0。
 
 校验输入（均为包内发布证据）：
-  results/rq1/data/subjects.csv            规则/变异体固定全域
+  results/rq1/supplementary/subjects.csv            规则/变异体固定全域
   results/rq1/supplementary/source_population.csv   逐源执行结果（E* 判定）
   results/rq1/supplementary/source_rule_coverage.csv 逐源×规则覆盖标记（含 astm/astmo/workflow）
-  results/rq3/data/mutant_level_exam.csv   逐变异体记录（failing_sources 跨 18 公式一致，取 ochiai）
-对照目标：results/rq5/data/workflow_metrics.csv（分子/分母为最简百分比分数，精确比对）
+  results/experiment_results/RQ3/mutant_level_exam.csv   逐变异体记录（failing_sources 跨 18 公式一致，取 ochiai）
+对照目标：results/rq5/supplementary/workflow_metrics.csv（分子/分母为最简百分比分数，精确比对）
 
 新运行对接：--from-run 读取 code/run_pipeline.py 的完整 cell.json 证据，
   检查每个 E* 源的全部正式变异体配对记录，按实际 attempts 聚合四指标。
@@ -34,11 +34,11 @@ from fractions import Fraction
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SUBJECTS_CSV = ROOT / 'results/rq1/data/subjects.csv'
+SUBJECTS_CSV = ROOT / 'results/rq1/supplementary/subjects.csv'
 POPULATION_CSV = ROOT / 'results/rq1/supplementary/source_population.csv'
 RULE_COVERAGE_CSV = ROOT / 'results/rq1/supplementary/source_rule_coverage.csv'
-MUTANT_EXAM_CSV = ROOT / 'results/rq3/data/mutant_level_exam.csv'
-RELEASED_CSV = ROOT / 'results/rq5/data/workflow_metrics.csv'
+MUTANT_EXAM_CSV = ROOT / 'results/experiment_results/RQ3/mutant_level_exam.csv'
+RELEASED_CSV = ROOT / 'results/rq5/supplementary/workflow_metrics.csv'
 
 CONDITIONS = ('astm', 'astmo', 'workflow')
 LLMS = ('GPT', 'Qwen', 'DeepSeek')

@@ -16,7 +16,9 @@ python -X utf8 code/reproduction/injection_tests.py
 
 GNU make is optional: the equivalents are `make smoke-test`, `make tables` and `make inject`. Run the table builder before injection checks, because they use rebuilt artifacts.
 
-All 19 paper-facing CSVs are collected under `code/experiment_results/`, organized as RQ1 through RQ5. A successful full build refreshes this directory automatically; failed verification never overwrites it. RQ5 includes `rq5_overall_pooled.csv` for the four-metric figure and `pooled_overall_by_formula.csv` for Tables 16/17. These are rebuilt into `rebuild/rq5/`, checked against the released tables, then exported. The localization table is reaggregated from shipped historical per-mutant records rather than new ATL executions. The report remains at `rebuild/report.json` and `rebuild/report.md`. Internal comparison artifacts remain under `rebuild/` and are compared against the sibling `experiment_results/` author reference when present. A missing reference is not proof of reference equality.
+All 19 paper-facing CSVs are collected under `results/experiment_results/`, organized as RQ1 through RQ5. Each `results/rq1/` through `results/rq5/` contains only `supplementary/`: attempt ledgers, source/model evidence, canonical pair outcomes, coverage records and supporting counts. There are no `data/`, `tables/` or `shared/` directories under `results/`. Duplicate paper CSVs have one canonical location. RQ2 pair inputs formerly under code are in `results/rq2/supplementary/inputs/`.
+
+A successful full build verifies the numerical results and refreshes the paper CSV directory; failed verification never overwrites it. Reports and temporary reconstruction artifacts remain under `rebuild/`. The comparison reference defaults to the shipped `results/experiment_results/`; `PAPER_REFERENCE_DIR` can select a separate reviewer copy. Export provenance is written to `rebuild/experiment_results_manifest.json`. Publication-format table scripts and LaTeX/Excel table outputs have been removed. The remaining scripts compute and verify CSV values.
 
 ## Verified computation boundaries
 
@@ -32,7 +34,7 @@ The mirror manifest separates recomputed values, metadata/copied ACO rows and co
 
 MATCH: the specified complete comparison passed. PARTIAL: comparable values passed, but explicitly identified evidence, measurements or source-backed inputs remain unavailable or conflicting. MISMATCH/ERROR: the run exits nonzero. The scope gate checks active CSVs for retired-method contamination and enforces 13 RQ3 configurations and 216 comparisons.
 
-The eight-case injection suite checks altered Top-1, altered killed count, impossible validity rounding, a missing RQ4 anchor, a missing column, an invalid candidate count, a stale ACO failing-source count with unchanged evaluability, and an empty reconstructed ACO kill flag. All eight must return MISMATCH. If no sibling author export is present, a temporary reference is built from formal inputs. Tests do not modify reference files.
+The eight-case injection suite checks altered Top-1, altered killed count, impossible validity rounding, a missing RQ4 anchor, a missing column, an invalid candidate count, a stale ACO failing-source count with unchanged evaluability, and an empty reconstructed ACO kill flag. All eight must return MISMATCH. The shipped paper CSVs provide the reference; tampering occurs only in memory. Tests do not modify reference files.
 
 ## Remaining limitations (unaffected by the scope change)
 
@@ -41,7 +43,6 @@ The eight-case injection suite checks altered Top-1, altered killed count, impos
 3. Ant2Maven/GPT/workflow and Ant2Maven/DeepSeek/workflow kill sets differ between the pair export and localization records by 2 and 7 mutants respectively. RQ5 uses the localization records and retains the paper anchors; the underlying evidence conflict remains.
 4. Full historical non-ACO localization spectra are not bundled. The 74,160 non-ACO rows remain input evidence; ACO spectra and 1,944 localization rows are rebuilt from canonical pairs. Fixed-scenario smoke testing demonstrates fresh execution and localization, and does not claim to reproduce all original generated samples.
 5. LLM generation is nondeterministic. The supplied prompts and attempt ledger document the experiment; repeating API calls cannot guarantee the original samples.
-6. The existing RQ4 LaTeX ladder's left four columns use the older equal-subject view; the current pooled CSV is emitted separately. The baseline-scope update does not change this pre-existing distinction.
 
 The ACO protocol change preserves the 95-mutant evaluable population (BibTeX/CPL/UML = 32/50/13) and all LLM/workflow rows. It changes ACO Top-1/EXAM columns, 214 raw p-values and two classifications. RussellRao's W/S/B count becomes 12/0/0. The before/after paper values are recorded in `code/reproduction/ACO_PROTOCOL_CHANGES.md`. The earlier [trial record](code/reproduction/ACO_BIBTEX_TRIAL.md) explains why changing evaluable flags alone was insufficient.
 

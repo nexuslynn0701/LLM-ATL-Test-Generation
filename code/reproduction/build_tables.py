@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Deterministic rebuild of the paper's tables and headline metrics.
 
-Reads only released data under ``results/`` (and ``code/rq2/data/``), reuses
+Reads only released data under ``results/`` (and ``results/rq2/supplementary/inputs/``), reuses
 the existing per-RQ computation code, and writes every rebuilt artifact to
 ``rebuild/`` at the repository root. The released tree is never modified.
 
@@ -39,7 +39,7 @@ ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "results"
 OUT = ROOT / "rebuild"
 CODE = ROOT / "code"
-REFERENCE_DIR = Path(os.environ.get("PAPER_REFERENCE_DIR", str(ROOT.parent / "experiment_results")))
+REFERENCE_DIR = Path(os.environ.get("PAPER_REFERENCE_DIR", str(RESULTS / "experiment_results")))
 
 LLMS = ("GPT", "Qwen", "DeepSeek")
 ATTEMPT_GENS = ("Gpt", "Qwen", "DeepSeek")  # generator spelling in validity.csv / attempt records
@@ -154,7 +154,7 @@ def _attempt_cells() -> dict:
 
 
 @step("rq1-validity", "Independently recomputed",
-      "results/rq1/data/validity.csv (LLM cells and all pooled rows)")
+      "results/experiment_results/RQ1/validity.csv (LLM cells and all pooled rows)")
 def rq1_validity():
     acc = _attempt_cells()
     fields = ["Generator", "Cond."] + list(SUBJECTS)
@@ -199,12 +199,12 @@ def rq1_validity():
     out.append(counts_row)
     # baseline rows carry their own success/attempt counts (self-contained
     # aggregates; no finer-grained baseline attempt log is bundled)
-    for r in read_csv(RESULTS / "rq1/data/validity.csv"):
+    for r in read_csv(RESULTS / "experiment_results/RQ1/validity.csv"):
         if r["Generator"] in ("Yekta-ACO",):
             out.append({k: r[k] for k in fields})
     write_csv(OUT / "rq1/validity.csv", fields, out)
 
-    released_path = RESULTS / "rq1/data/validity.csv"
+    released_path = RESULTS / "experiment_results/RQ1/validity.csv"
     released = read_csv(released_path)
     ridx = {(r["Generator"], r["Cond."]): r for r in released}
     midx = {(r["Generator"], r["Cond."]): r for r in out}
@@ -240,7 +240,7 @@ def rq1_validity():
 
 
 @step("rq1-model-size", "Independently recomputed",
-      "results/rq1/data/model_size.csv (from the per-model containment-size audit, E* models only)")
+      "results/experiment_results/RQ1/model_size.csv (from the per-model containment-size audit, E* models only)")
 def rq1_model_size():
     rows = read_csv(RESULTS / "rq1/supplementary/model_size_audit/audit_per_model.csv")
     acc = defaultdict(list)
@@ -284,7 +284,7 @@ def rq1_model_size():
                             ("GPT", "Qwen", "DeepSeek-Flash", "Yekta-ACO").index(r["test_generator"]),
                             ("SM", "STM", "ASTM", "ASTMO", "N/A").index(r["prompt_configuration"])))
     write_csv(OUT / "rq1/model_size.csv", fields, out)
-    released = read_csv(RESULTS / "rq1/data/model_size.csv")
+    released = read_csv(RESULTS / "experiment_results/RQ1/model_size.csv")
     ridx = {(r["subject"], r["test_generator"], r["prompt_configuration"]): r for r in released}
     n, details = 0, []
     skipped = []
@@ -321,12 +321,16 @@ def rq1_model_size():
 
 
 @step("rq1-rule-coverage", "Independently recomputed",
-      "results/rq1/data/rule_coverage.csv (via code/rq1/rule_coverage.py on a sandbox copy)")
+      "results/experiment_results/RQ1/rule_coverage.csv (via code/rq1/rule_coverage.py on a sandbox copy)")
 def rq1_rule_coverage():
     sandbox = OUT / "sandbox" / "results"
-    if (sandbox / "rq1").exists():
-        shutil.rmtree(sandbox / "rq1")
+    if sandbox.exists():
+        assert sandbox.resolve().is_relative_to(OUT.resolve())
+        shutil.rmtree(sandbox)
     shutil.copytree(RESULTS / "rq1", sandbox / "rq1")
+    reference = sandbox / "experiment_results/RQ1/rule_coverage.csv"
+    reference.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(RESULTS / "experiment_results/RQ1/rule_coverage.csv", reference)
     sys.path.insert(0, str(CODE / "rq1"))
     try:
         import rule_coverage as rc1
@@ -334,7 +338,7 @@ def rq1_rule_coverage():
     finally:
         sys.path.pop(0)
     details, n = [], 0
-    for rel in ("rq1/data/rule_coverage.csv", "rq1/tables/rq1_rule_coverage_all_prompts.csv"):
+    for rel in ("experiment_results/RQ1/rule_coverage.csv", "rq1/supplementary/rq1_rule_coverage_all_prompts.csv"):
         rebuilt = (sandbox / rel).read_text(encoding="utf-8-sig")
         released = (RESULTS / rel).read_text(encoding="utf-8-sig")
         if rebuilt == released:
@@ -348,7 +352,7 @@ def rq1_rule_coverage():
 # ---------------------------------------------------------------- RQ2 inputs
 
 def _canonical_eligible() -> dict[str, set[str]]:
-    rows = read_csv(CODE / "rq2/data/canonical_mutants.csv")
+    rows = read_csv(CODE / "../results/rq2/supplementary/inputs/canonical_mutants.csv")
     elig = defaultdict(set)
     for r in rows:
         elig[r["subject"]].add(r["mutant_id"])
@@ -358,7 +362,7 @@ def _canonical_eligible() -> dict[str, set[str]]:
 def _outcome_cells() -> dict:
     """Per (subject, method) from the pair-level mutant outcomes:
     candidates, executable sources, killed-union (over eligible mutants)."""
-    rows = read_csv(CODE / "rq2/data/source_mutant_outcomes.csv")
+    rows = read_csv(CODE / "../results/rq2/supplementary/inputs/source_mutant_outcomes.csv")
     elig = _canonical_eligible()
     cand, exe, killed = defaultdict(set), defaultdict(set), defaultdict(set)
     for r in rows:
@@ -378,7 +382,7 @@ def _aco_pairs():
     rows = []
     for name in ("source_mutant_outcomes_aco_canonical_bibtex.csv",
                  "source_mutant_outcomes_aco_replay_cpl_uml.csv"):
-        rows.extend(read_csv(CODE / "rq2/data/aco" / name))
+        rows.extend(read_csv(CODE / "../results/rq2/supplementary/inputs/aco" / name))
     return rows
 
 
@@ -392,7 +396,7 @@ def _aco_cells():
 
 
 @step("rq2-mutation-score", "Independently recomputed",
-      "results/rq2/data/mutation_score.csv + mutation_score_overall_pooled.csv (from pair-level outcomes)")
+      "results/experiment_results/RQ2/mutation_results.csv + mutation_score_overall_pooled.csv (from pair-level outcomes)")
 def rq2_mutation_score():
     cand, exe, killed = _outcome_cells()
     attempts = _attempt_cells()
@@ -421,7 +425,7 @@ def rq2_mutation_score():
                         "mutation_score": f"{q(Decimal(100) * k / e, '0.1'):.1f}" if e else "N/A"})
     aco_cells = _aco_cells()
     labels = {r["subject"]: r["prompt_condition"]
-              for r in read_csv(RESULTS / "rq2/data/mutation_score.csv") if r["approach"] == "Yekta-ACO"}
+              for r in read_csv(RESULTS / "experiment_results/RQ2/mutation_results.csv") if r["approach"] == "Yekta-ACO"}
     for cell in aco_cells:
         n_eligible = len(cell["faults"])
         kset = {m for s in cell["sources"] for m, o in s["outcomes"].items() if o == "KILLED"}
@@ -431,7 +435,7 @@ def rq2_mutation_score():
                         undetected_mutants=n_eligible-len(kset),
                         mutation_score=f"{q(Decimal(100)*len(kset)/n_eligible, '0.1'):.1f}"))
     write_csv(OUT / "rq2/mutation_score_llm.csv", fields, out)
-    released_path = RESULTS / "rq2/data/mutation_score.csv"
+    released_path = RESULTS / "experiment_results/RQ2/mutation_results.csv"
     released = read_csv(released_path)
     ridx = {}
     for r in released:
@@ -479,7 +483,7 @@ def rq2_mutation_score():
     aco_e = sum(len(c["faults"]) for c in aco_cells)
     pooled.append(dict(method_id="Yekta-ACO", pooled_killed_mutants=aco_k, pooled_eligible_mutants=aco_e,
                        overall_pooled_pct=f"{q(Decimal(100)*aco_k/aco_e, '0.01'):.2f}"))
-    prel = {r["method_id"]: r for r in read_csv(RESULTS / "rq2/data/mutation_score_overall_pooled.csv")}
+    prel = {r["method_id"]: r for r in read_csv(RESULTS / "rq2/supplementary/mutation_score_overall_pooled.csv")}
     pooled_skipped = []
     for row in pooled:
         rr = prel.get(row["method_id"])
@@ -508,9 +512,9 @@ def rq2_mutation_score():
 
 
 @step("rq2-failure-rate", "Independently recomputed",
-      "results/rq2/data/failure_rate_summary.csv + failure_rate_overall_pooled.csv (from pair-level outcomes)")
+      "results/experiment_results/RQ2/failure_rates.csv + failure_rate_overall_pooled.csv (from pair-level outcomes)")
 def rq2_failure_rate():
-    rows = read_csv(CODE / "rq2/data/source_mutant_outcomes.csv")
+    rows = read_csv(CODE / "../results/rq2/supplementary/inputs/source_mutant_outcomes.csv")
     rows += [dict(r, provider="aco", condition="aco", original_success="1") for r in _aco_pairs()]
     elig = _canonical_eligible()
     per = defaultdict(lambda: defaultdict(lambda: [0, set()]))  # key -> mutant -> [killed, exec_sources]
@@ -551,7 +555,7 @@ def rq2_failure_rate():
                     "status": status})
     write_csv(OUT / "rq2/failure_rate_summary_llm.csv", fields, out)
     released = {(r["subject"], r["method_id"]): r
-                for r in read_csv(RESULTS / "rq2/data/failure_rate_summary.csv")}
+                for r in read_csv(RESULTS / "experiment_results/RQ2/failure_rates.csv")}
     n, details = 0, []
     compared = set()
     for row in out:
@@ -599,8 +603,8 @@ def rq2_failure_rate():
                     if released[(s, m)]["status"] in ("OK", "OK_STRICT_CANONICAL")]
     if skipped_rows:
         details.append(f"released OK rows never compared: {skipped_rows}")
-    # pooled (identical formula to code/rq2/regenerate_table8_failure_rate.py)
-    prel = {r["method_id"]: r for r in read_csv(RESULTS / "rq2/data/failure_rate_overall_pooled.csv")}
+    # Pooled pair counts use the same formula as code/rq2/pool_failure_rates.py.
+    prel = {r["method_id"]: r for r in read_csv(RESULTS / "rq2/supplementary/failure_rate_overall_pooled.csv")}
     idx = {(r["subject"], r["method_id"]): r for r in out}
     for method_id, rr in prel.items():
         total = killed = Decimal(0)
@@ -626,15 +630,36 @@ def rq2_failure_rate():
 
 
 @step("rq2-released-chain", "Recomputed from released cells",
-      "code/rq2 regenerate_table6/table8 self-verification (pooled CSV + table tex)")
+      "Mutation and failure pooled counts; numeric CSV verification only")
 def rq2_released_chain():
-    outs = []
-    for script in ("regenerate_table6_mutation_score.py", "regenerate_table8_failure_rate.py"):
-        p = run_py(CODE / "rq2" / script)
-        outs.append((script, p.returncode, (p.stdout + p.stderr).strip().splitlines()[-3:]))
-    details = [f"{s}: exit {c}" for s, c, _ in outs if c != 0]
-    verdict = "MATCH" if all(c == 0 for _, c, _ in outs) else "MISMATCH"
-    return "; ".join(f"{s} exit={c}" for s, c, _ in outs), verdict, details
+    sys.path.insert(0, str(CODE / "rq2"))
+    try:
+        import pool_mutation_scores as mutation
+        import pool_failure_rates as failure
+        cells = mutation.load_cells()
+        mutations = {mid: mutation.pool(cells, approach, prompt)
+                     for approach, _, prompt, mid in mutation.ROWS}
+        summary = failure.load_summary()
+        failures = {mid: failure.pool(summary, mid) for _, _, _, mid in failure.ROWS}
+        try:
+            mutation.verify(mutations)
+            failure.verify(failures)
+        except SystemExit as exc:
+            return str(exc), "MISMATCH", [str(exc)]
+        computed = [(mutation.pooled_csv_rows(mutations), mutation.POOLED_CSV),
+                    (failure.pooled_csv_rows(failures), failure.POOLED_CSV)]
+    finally:
+        sys.path.pop(0)
+    count, details = 0, []
+    for rows, path in computed:
+        fields = [f for f in rows[0] if f != "method_id"]
+        n, diffs, verdict, missing, extra = compare_table(
+            path.name, rows, path, ("method_id",), fields)
+        count += n
+        details.extend(diffs)
+        details.extend(f"{path.name}: missing {k}" for k in missing)
+        details.extend(f"{path.name}: extra {k}" for k in extra)
+    return f"{count} numeric/metadata fields checked in 26 pooled rows", "MISMATCH" if details else "MATCH", details
 
 
 @step("rq2-per-mutant-builder", "Independently recomputed",
@@ -656,7 +681,7 @@ def rq2_per_mutant_builder():
                    if "CHECK" in ln and "FAIL" in ln]
     long_path = out_root / "rq2_per_mutant_fail_ratio_long_all_subjects.csv"
     summ_path = out_root / "rq2_per_mutant_fail_ratio_summary_all_subjects.csv"
-    rel_long = RESULTS / "rq2/supplementary/per_mutant_fail_ratio/rq2_per_mutant_fail_ratio_long_all_subjects.csv"
+    rel_long = RESULTS / "experiment_results/RQ2/per_mutant_failure_counts.csv"
     rel_summ = RESULTS / "rq2/supplementary/per_mutant_fail_ratio/rq2_per_mutant_fail_ratio_summary_all_subjects.csv"
     n, details = 0, []
     for mine_path, theirs_path, skip_cols in ((long_path, rel_long, {"source_matrix_path"}),
@@ -696,7 +721,7 @@ def rq2_per_mutant_builder():
 
 
 @step("rq2-kill-matrix", "Independently recomputed",
-      "results/rq2/supplementary/mutant_kill_matrix.csv (via rebuild_mutant_kill_matrix.py "
+      "results/experiment_results/RQ2/mutant_kill_matrix.csv (via rebuild_mutant_kill_matrix.py "
       "--output side-write; all three ACO canonical pair matrices available)")
 def rq2_kill_matrix():
     side = OUT / "rq2" / "mutant_kill_matrix_partial.csv"
@@ -705,7 +730,7 @@ def rq2_kill_matrix():
         return (f"builder exit={p.returncode}", "ERROR",
                 (p.stdout + p.stderr).strip().splitlines()[-6:])
     mine = read_csv(side)
-    theirs = read_csv(RESULTS / "rq2/supplementary/mutant_kill_matrix.csv")
+    theirs = read_csv(RESULTS / "experiment_results/RQ2/mutant_kill_matrix.csv")
     mkeys = {(r["subject"], r["mutant_id"]): r for r in mine}
     tkeys = {(r["subject"], r["mutant_id"]): r for r in theirs}
     n, details, pending = 0, [], 0
@@ -721,7 +746,7 @@ def rq2_kill_matrix():
             if a == "" and b == "":
                 n += 1
             elif (a == "" and b != "" and f == "killed_Yekta-ACO" and key[0] == "BibTeX2DocBook"
-                  and not (CODE / "rq2/data/aco/source_mutant_outcomes_aco_canonical_bibtex.csv").is_file()):
+                  and not (CODE / "../results/rq2/supplementary/inputs/aco/source_mutant_outcomes_aco_canonical_bibtex.csv").is_file()):
                 pending += 1  # expected: canonical ACO pair matrix lost
             elif a != "" and b != "" and float(a) == float(b):
                 n += 1
@@ -760,10 +785,10 @@ OPERATOR_GROUP = {
 
 
 @step("rq2-operator-counts", "Independently recomputed",
-      "results/rq2/supplementary/operator_wise_mutation_score.csv (n_mutants from the "
+      "results/experiment_results/RQ2/operator_counts.csv (n_mutants from the "
       "per-mutant operator ledger; operator-wise mutation scores from pair-level kill sets)")
 def rq2_operator_counts():
-    opmap = read_csv(CODE / "rq2/data/rq2_mutant_operator_map.csv")
+    opmap = read_csv(CODE / "../results/rq2/supplementary/inputs/rq2_mutant_operator_map.csv")
     groups = defaultdict(set)
     unmapped = set()
     for r in opmap:
@@ -781,7 +806,7 @@ def rq2_operator_counts():
     for r in _aco_pairs():
         if r["outcome"] == "KILLED":
             killed[(r["subject"], "Yekta-ACO")].add(r["mutant_id"])
-    released = read_csv(RESULTS / "rq2/supplementary/operator_wise_mutation_score.csv")
+    released = read_csv(RESULTS / "experiment_results/RQ2/operator_counts.csv")
     fields = ["subject", "generator", "prompt", "operator_group", "n_mutants",
               "operator_wise_mutation_score", "suite_mutation_score",
               "operator_label_short", "operator_order", "available"]
@@ -850,7 +875,7 @@ def rq2_operator_counts():
 # ---------------------------------------------------------------- RQ3
 
 @step("rq3-aco-canonical-localization", "Recomputed from canonical pair outcomes and rule coverage",
-      "ACO rows of results/rq3/data/mutant_level_exam.csv; RQ2 and SBFL share the same fail/pass labels")
+      "ACO rows of results/experiment_results/RQ3/mutant_level_exam.csv; RQ2 and SBFL share the same fail/pass labels")
 def rq3_aco_canonical():
     sys.path.insert(0, str(CODE / "rq3"))
     try:
@@ -858,7 +883,7 @@ def rq3_aco_canonical():
         rows, audit = export(OUT / "rq3/aco_canonical")
     finally:
         sys.path.pop(0)
-    published = [r for r in read_csv(RESULTS / "rq3/data/mutant_level_exam.csv") if r["provider"] == "Yekta-ACO"]
+    published = [r for r in read_csv(RESULTS / "experiment_results/RQ3/mutant_level_exam.csv") if r["provider"] == "Yekta-ACO"]
     key = lambda r: (r["subject"], r["mutant_id"], r["formula"])
     expected, actual = {key(r): r for r in published}, {key(r): r for r in rows}
     details = []
@@ -883,7 +908,7 @@ def rq3_aco_canonical():
     return f"{n} fields compared across 1944 ACO rows; 10600 canonical pairs", "MISMATCH" if details else "MATCH", details[:15]
 
 @step("rq3-top1-exam-pooled", "Independently recomputed",
-      "results/rq3/data/rq3_top1_pooled.csv + rq3_exam_pooled.csv (from per-mutant EXAM scores)")
+      "results/experiment_results/RQ3/top1_rates.csv + rq3_exam_pooled.csv (from per-mutant EXAM scores)")
 def rq3_pooled():
     sys.path.insert(0, str(CODE / "rq3"))
     try:
@@ -899,7 +924,7 @@ def rq3_pooled():
     write_csv(OUT / "rq3/rq3_exam_pooled.csv", exam_fields, examrows)
     n, details = 0, []
     for name, mine, fields in (("top1", toprows, top_fields), ("exam", examrows, exam_fields)):
-        released = read_csv(RESULTS / "rq3/data" / f"rq3_{name}_pooled.csv")
+        released = read_csv(RESULTS / "experiment_results/RQ3" / {"top1": "top1_rates.csv", "exam": "EXAM_score.csv"}[name])
         ridx = {r["formula"]: r for r in released}
         for row in mine:
             rr = ridx.get(row["formula"])
@@ -916,7 +941,7 @@ def rq3_pooled():
 
 
 @step("rq3-statistical-tests", "Independently recomputed",
-      "results/rq3/data/rq3_pairwise_tests.csv (Wilcoxon raw p + A12 over 216 tests) + rq3_pairwise_counts.csv")
+      "results/experiment_results/RQ3/wilcoxon.csv (Wilcoxon raw p + A12 over 216 tests) + rq3_pairwise_counts.csv")
 def rq3_tests():
     sys.path.insert(0, str(CODE / "rq3"))
     try:
@@ -927,7 +952,7 @@ def rq3_tests():
             tests = ayk.pairwise_tests(rows)
     finally:
         sys.path.pop(0)
-    released = read_csv(RESULTS / "rq3/data/rq3_pairwise_tests.csv")
+    released = read_csv(RESULTS / "experiment_results/RQ3/wilcoxon.csv")
     # full 216-row statistical table is also emitted for the results mirror
     write_csv(OUT / "rq3/rq3_pairwise_tests.csv",
               ["provider", "condition", "formula", "baseline", "n_common",
@@ -967,7 +992,7 @@ def rq3_tests():
                            "Worse": c.get("Worse", 0)})
     write_csv(OUT / "rq3/pairwise_classification_counts.csv",
               ["formula", "baseline", "Better", "Similar", "Worse"], count_rows)
-    prel = read_csv(RESULTS / "rq3/data/rq3_pairwise_counts.csv")
+    prel = read_csv(RESULTS / "rq3/supplementary/rq3_pairwise_counts.csv")
     if prel and "formula" in prel[0]:
         for r in prel:
             f = r["formula"]
@@ -986,11 +1011,11 @@ def rq3_tests():
 # ---------------------------------------------------------------- RQ4
 
 @step("rq4-top1-exam-pooled", "Independently recomputed",
-      "results/rq4/data/rq4_top1_exam_pooled.csv (via code/rq4/build_rq4_ladder_table.py)")
+      "results/experiment_results/RQ4/rq4_top1_exam_pooled.csv (via code/rq4/pool_localization.py)")
 def rq4_pooled():
     sys.path.insert(0, str(CODE / "rq4"))
     try:
-        import build_rq4_ladder_table as b4
+        import pool_localization as b4
         pooled = b4.pooled_top1_exam()
     finally:
         sys.path.pop(0)
@@ -1005,7 +1030,7 @@ def rq4_pooled():
                         "top1_15dp": b4.fmt(d["top1"], 15), "top1_2dp": b4.fmt(d["top1"]),
                         "exam_15dp": b4.fmt(d["exam"], 15), "exam_2dp": b4.fmt(d["exam"])})
     write_csv(OUT / "rq4/rq4_top1_exam_pooled.csv", fields, out)
-    released = read_csv(RESULTS / "rq4/data/rq4_top1_exam_pooled.csv")
+    released = read_csv(RESULTS / "experiment_results/RQ4/rq4_top1_exam_pooled.csv")
     n, details = 0, []
     for mine, theirs in zip(out, released):
         for f in fields[2:]:
@@ -1025,15 +1050,15 @@ def rq4_four_columns():
     acc = _attempt_cells()
     cov = {(r["subject"], r["llm"], r["prompt_condition"]):
            (int(r["covered_rules"]), int(r["total_rules"]))
-           for r in read_csv(RESULTS / "rq1/data/rule_coverage.csv")
+           for r in read_csv(RESULTS / "experiment_results/RQ1/rule_coverage.csv")
            if r["generator"] == "llm_ladder"}
     ms = {(r["subject"], r["approach"].replace("DeepSeek-Flash", "DeepSeek"), r["prompt_condition"]):
           (int(r["killed_mutants"]), int(r["eligible_mutants"]))
-          for r in read_csv(RESULTS / "rq2/data/mutation_score.csv")
+          for r in read_csv(RESULTS / "experiment_results/RQ2/mutation_results.csv")
           if r["availability_status"] == "OK"}
     fr = {(r["method_id"].replace("DeepSeek-Flash", "DeepSeek")):
           (int(r["pooled_killed_pairs"]), int(r["pooled_total_pairs"]))
-          for r in read_csv(RESULTS / "rq2/data/failure_rate_overall_pooled.csv")}
+          for r in read_csv(RESULTS / "rq2/supplementary/failure_rate_overall_pooled.csv")}
     fields = ["LLM", "context", "validity_pct", "coverage_pct", "mutation_pct", "failure_pct"]
     elig4 = _canonical_eligible()
     out = []
@@ -1056,9 +1081,9 @@ def rq4_four_columns():
     # cross-checks against the released pooled CSVs (normalising the released
     # "DeepSeek-Flash-*" method ids to the "DeepSeek-*" spelling used here)
     prel = {r["method_id"].replace("DeepSeek-Flash", "DeepSeek"): r["overall_pooled_pct"]
-            for r in read_csv(RESULTS / "rq2/data/mutation_score_overall_pooled.csv")}
+            for r in read_csv(RESULTS / "rq2/supplementary/mutation_score_overall_pooled.csv")}
     frel = {r["method_id"].replace("DeepSeek-Flash", "DeepSeek"): r["overall_pooled_pairs_pct"]
-            for r in read_csv(RESULTS / "rq2/data/failure_rate_overall_pooled.csv")}
+            for r in read_csv(RESULTS / "rq2/supplementary/failure_rate_overall_pooled.csv")}
     n, details = 0, []
     anchored = 0
     for row in out:
@@ -1077,10 +1102,8 @@ def rq4_four_columns():
         anchor_guard_failed = True
     else:
         anchor_guard_failed = False
-    details.append("validity/coverage pooled from released rq1 cells (mutation/failure cross-checked "
-                   "against rq2 pooled CSVs); values match the current paper text; the bundled "
-                   "results/rq4/tables/rq4_ladder.tex still carries the older subject-equal-weight "
-                   "values for these four columns (known deviation, see REPRODUCIBILITY.md)")
+    details.append("validity/coverage pooled from rq1 cells; mutation/failure cross-checked "
+                   "against rq2 pooled counts; no publication-format table is generated")
     if [d for d in details if "rebuilt=" in d] or anchor_guard_failed:
         verdict = "MISMATCH"
     else:
@@ -1091,7 +1114,7 @@ def rq4_four_columns():
 # ---------------------------------------------------------------- RQ5
 
 @step("rq5-workflow-metrics", "Independently recomputed",
-      "results/rq5/data/workflow_metrics.csv (via code/rq5/build_workflow_metrics.py forward builder)")
+      "results/rq5/supplementary/workflow_metrics.csv (via code/rq5/build_workflow_metrics.py forward builder)")
 def rq5_metrics():
     p = run_py(CODE / "rq5" / "build_workflow_metrics.py")
     out_lines = (p.stdout + p.stderr).strip().splitlines()
@@ -1109,7 +1132,7 @@ def rq5_metrics():
 
 
 @step("rq5-overall-metrics", "Reconstructed from aggregates",
-      "results/rq5/tables/rq5_overall_pooled.csv (four-metric figure Overall)")
+      "results/experiment_results/RQ5/rq5_overall_pooled.csv (four-metric figure Overall)")
 def rq5_overall_metrics():
     sys.path.insert(0, str(CODE / "rq5"))
     try:
@@ -1120,14 +1143,14 @@ def rq5_overall_metrics():
     write_csv(OUT / "rq5/rq5_overall_pooled.csv", list(rows[0]), rows)
     values = [f for f in rows[0] if f not in ("model", "metric")]
     n, diffs, verdict, missing, extra = compare_table(
-        "rq5-overall", rows, RESULTS / "rq5/tables/rq5_overall_pooled.csv",
+        "rq5-overall", rows, RESULTS / "experiment_results/RQ5/rq5_overall_pooled.csv",
         ("model", "metric"), values)
     return (f"{n} fields compared across 12 Overall rows", verdict,
             diffs + [f"missing row: {k}" for k in missing] + [f"extra row: {k}" for k in extra])
 
 
 @step("rq5-localization-pooled", "Recomputed from shipped localization records",
-      "results/rq5/data/pooled_overall_by_formula.csv (Tables 16/17)")
+      "results/experiment_results/RQ5/pooled_overall_by_formula.csv (Tables 16/17)")
 def rq5_localization_pooled():
     sys.path.insert(0, str(CODE / "rq5"))
     try:
@@ -1138,7 +1161,7 @@ def rq5_localization_pooled():
     write_csv(OUT / "rq5/pooled_overall_by_formula.csv", list(rows[0]), rows)
     values = [f for f in rows[0] if f not in ("formula", "llm", "condition")]
     n, diffs, verdict, missing, extra = compare_table(
-        "rq5-localization", rows, RESULTS / "rq5/data/pooled_overall_by_formula.csv",
+        "rq5-localization", rows, RESULTS / "experiment_results/RQ5/pooled_overall_by_formula.csv",
         ("formula", "llm", "condition"), values)
     details = diffs + [f"missing row: {k}" for k in missing] + [f"extra row: {k}" for k in extra]
     details.append("Reaggregates shipped historical per-mutant records; does not replay historical ATL runs.")
@@ -1146,13 +1169,13 @@ def rq5_localization_pooled():
 
 
 @step("rq5-mutant-overlap", "Independently recomputed",
-      "results/rq5/data/mutant_overlap.csv (ASTMO vs workflow kill unions, all 18 cells)")
+      "results/experiment_results/RQ5/mutant_overlap.csv (ASTMO vs workflow kill unions, all 18 cells)")
 def rq5_overlap():
     # Primary source: the per-mutant localization records, which cover every
     # subject x LLM x {astmo, workflow} cell. A mutant counts as killed for a
     # cell iff `evaluable == 1`; the kill set must be identical across all 18
     # formulas (asserted — `failing_sources` is formula-independent).
-    mle = read_csv(RESULTS / "rq3/data/mutant_level_exam.csv")
+    mle = read_csv(RESULTS / "experiment_results/RQ3/mutant_level_exam.csv")
     by_formula = defaultdict(lambda: defaultdict(set))
     for r in mle:
         if r["provider"] in ("GPT", "Qwen", "DeepSeek") and r["condition"] in ("astmo", "workflow"):
@@ -1186,7 +1209,7 @@ def rq5_overlap():
                         "astmo_only_mutants": len(a - w), "workflow_only_mutants": len(w - a),
                         "neither_mutants": e - len(a | w), "comparison_status": status})
     write_csv(OUT / "rq5/mutant_overlap.csv", fields, out)
-    released = read_csv(RESULTS / "rq5/data/mutant_overlap.csv")
+    released = read_csv(RESULTS / "experiment_results/RQ5/mutant_overlap.csv")
     ridx = {(r["subject"], r["provider"]): r for r in released}
     n, details = 0, []
     for row in out:
@@ -1216,7 +1239,7 @@ def rq5_overlap():
                            f"additional={len(W - A)} vs paper {pa}/{pw}/{pd}")
     # Secondary cross-check: the pair-level export agrees wherever it carries
     # data (astmo everywhere; workflow for Ant2Maven/Grafcet2PetriNet only).
-    pair_rows = read_csv(CODE / "rq2/data/source_mutant_outcomes.csv")
+    pair_rows = read_csv(CODE / "../results/rq2/supplementary/inputs/source_mutant_outcomes.csv")
     pair_killed = defaultdict(set)
     for r in pair_rows:
         if r["original_success"] == "1" and r["outcome"] == "KILLED" and r["condition"] in ("astmo", "workflow"):
@@ -1252,7 +1275,7 @@ def emit_mirror():
     # RQ2/mutation_results.csv: recomputed cells (from pair outcomes) merged with
     # the ledger/text columns copied from the released file so the mirror stays
     # directly comparable; the 6 Yekta-ACO rows are copied rows.
-    ms_released_rows = read_csv(RESULTS / "rq2/data/mutation_score.csv")
+    ms_released_rows = read_csv(RESULTS / "experiment_results/RQ2/mutation_results.csv")
     ms_mine = {(r["approach"], r["prompt_condition"], r["subject"]): r
                for r in read_csv(OUT / "rq2/mutation_score_llm.csv")}
     MS_RECOMPUTED_COLS = ["eligible_mutants", "generated_candidates",
@@ -1281,7 +1304,7 @@ def emit_mirror():
     mirror = [
         ("RQ1/validity.csv", OUT / "rq1/validity.csv", "recomputed", ""),
         ("RQ1/model_size.csv", OUT / "rq1/model_size.csv", "recomputed", ""),
-        ("RQ1/rule_coverage.csv", OUT / "sandbox/results/rq1/data/rule_coverage.csv",
+        ("RQ1/rule_coverage.csv", OUT / "sandbox/results/experiment_results/RQ1/rule_coverage.csv",
          "recomputed", "byte-identical sandbox rebuild"),
         ("RQ2/mutation_results.csv", None, "mixed",
          "3 key columns + 6 recomputed metric columns; " + str(len(MS_COPIED_COLS)) +
@@ -1302,7 +1325,7 @@ def emit_mirror():
         ("RQ3/wilcoxon.csv", OUT / "rq3/rq3_pairwise_tests.csv", "recomputed", ""),
         ("RQ3/top1_rates.csv", OUT / "rq3/rq3_top1_pooled.csv", "recomputed", ""),
         ("RQ3/EXAM_score.csv", OUT / "rq3/rq3_exam_pooled.csv", "recomputed", ""),
-        ("RQ3/mutant_level_exam.csv", RESULTS / "rq3/data/mutant_level_exam.csv",
+        ("RQ3/mutant_level_exam.csv", RESULTS / "experiment_results/RQ3/mutant_level_exam.csv",
          "mixed", "74,160 historical non-ACO records; 1,944 ACO rows verified against canonical pair outcomes and rule coverage"),
         ("RQ5/mutant_overlap.csv", OUT / "rq5/mutant_overlap.csv", "recomputed", ""),
         ("RQ5/astmo.csv", None, "filtered-input",
@@ -1311,7 +1334,7 @@ def emit_mirror():
          "condition=workflow rows of the same file; 12 coverage-evidence gaps and 1 "
          "audited conflict are listed in the rq5-workflow-metrics step"),
     ]
-    wm_path = RESULTS / "rq5/data/workflow_metrics.csv"
+    wm_path = RESULTS / "rq5/supplementary/workflow_metrics.csv"
     manifest = []
     for rel, src, provenance, note in mirror:
         dst = emit_root / rel
@@ -1339,7 +1362,7 @@ def emit_mirror():
 
     def classify(rel, i, f, va, vb, rb):
         if (rel == "RQ2/per_mutant_failure_counts.csv" and f == "source_matrix_path"
-                and va.replace(chr(92), "/").endswith(vb)):
+                and va.replace(chr(92), "/").endswith(vb.replace("code/rq2/data/", "results/rq2/supplementary/inputs/"))):
             counters["path"] += 1
             return
         if rel == "RQ1/validity.csv":
@@ -1383,7 +1406,7 @@ def emit_mirror():
         for rel, *_ in mirror:
             dfile = desktop / rel
             if not dfile.exists():
-                real_diffs.append(rel + ": absent on Desktop copy")
+                real_diffs.append(rel + ": missing from reference")
                 continue
             a = read_csv(emit_root / rel)
             b = read_csv(dfile)
@@ -1416,7 +1439,7 @@ def emit_mirror():
     details = [m["file"] + ": " + m["provenance"] + (" — " + m["note"] if m["note"] else "")
                for m in manifest if m["provenance"] != "recomputed"]
     if desktop.exists():
-        details.append("Desktop reviewer copy: " + str(compared) + " files field-compared; "
+        details.append("Reference CSVs: " + str(compared) + " files field-compared; "
                        + str(len(real_diffs)) + " real differences (these FAIL the step):")
         details.extend(real_diffs[:20])
         if rounding_cells:
@@ -1431,7 +1454,7 @@ def emit_mirror():
                        + " kill-matrix pending, " + str(counters["operator_pending"])
                        + " operator pending")
     else:
-        details.append("Desktop reviewer copy not found; mirror not cross-compared")
+        details.append("Reference CSVs not found; mirror not cross-compared")
     if real_diffs:
         verdict = "MISMATCH"
     elif (declared_rows or rounding_cells or counters["kill_pending"]
@@ -1441,7 +1464,7 @@ def emit_mirror():
         verdict = "MATCH"
     return ("15 files emitted (" + str(n_recomputed) + " recomputed, "
             + str(n_mixed) + " mixed/partial, " + str(n_input)
-            + " input-backed); Desktop cross-compare: " + str(len(real_diffs))
+            + " input-backed); Reference comparison: " + str(len(real_diffs))
             + " real differences"), verdict, details
 
 # ---------------------------------------------------------------- driver
@@ -1449,7 +1472,7 @@ def emit_mirror():
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*", default=None, help="step id prefixes to run")
-    ap.add_argument("--export-dir", type=Path, default=CODE / "experiment_results",
+    ap.add_argument("--export-dir", type=Path, default=RESULTS / "experiment_results",
                     help="Unified RQ1--RQ5 paper CSV directory (updated after a successful full run)")
     args = ap.parse_args()
     OUT.mkdir(exist_ok=True)

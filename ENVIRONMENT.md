@@ -88,18 +88,20 @@ file plus its manifest.
 - Population ledger: `results/rq1/supplementary/source_population.csv`
   (`artifact_exists`, `in_estar` select the final E\* population; the 79
   attempts without an artifact are retained there with their status).
-- Kill matrix: `results/rq2/supplementary/mutant_kill_matrix.csv`;
-  per-mutant fail-ratio inputs in `code/rq2/data/source_mutant_outcomes.csv`.
+- Kill matrix: `results/experiment_results/RQ2/mutant_kill_matrix.csv`;
+  per-mutant fail-ratio inputs in `results/rq2/supplementary/inputs/source_mutant_outcomes.csv`.
 - `code/reproduction/verify.py` cross-checks ledger ↔ regenerated artifacts and
   the 300-file ACO SHA ledger whenever generated outputs are present, and
   reports a SKIP line otherwise.
 
 ## Baselines
 
-- **Yekta-ACO**: third-party search-based tool (cited in the paper); not
-  `data/test_cases/_metadata/aco/`, and its released outputs are
-  `results/shared/aco/`. Run configuration (as-shipped hyperparameters) is
-  documented in the paper's baseline section.
+- **Yekta-ACO**: third-party search-based tool (cited in the paper). The search
+  tool is not redistributed. Frozen source models are in `data/test_cases/`,
+  with their population metadata in `data/test_cases/_metadata/aco/`.
+  Source evidence is under `results/rq1/supplementary/aco/`; mutation evidence
+  is under `results/rq2/supplementary/`. Run configuration is documented in
+  the paper's baseline section.
 
 ## Entry points and expected runtimes
 
@@ -112,7 +114,8 @@ Measured on a commodity laptop (Windows, warm cache), from the package root:
 | `python -m unittest discover -s code/rq1 -p "test_*.py"` | ~2 s |
 | `python code/rq1/check_failure_taxonomy.py` | < 1 s |
 | `python code/rq1/rule_coverage.py` | ~1 s |
-| `python code/reproduction/reproduce_all.py` | ~1 s |
+| `python code/reproduction/build_tables.py` | ~1–2 min |
 
-Which script produces which table: `results/README.md` (table → data source)
-and the per-RQ READMEs under `code/rq1/` … `code/rq5/`.
+The 19 paper CSVs are in `results/experiment_results/`. Supporting evidence is
+under `results/rq1/supplementary/` through `results/rq5/supplementary/`.
+See `REPRODUCIBILITY.md` for the calculation commands and evidence boundaries.

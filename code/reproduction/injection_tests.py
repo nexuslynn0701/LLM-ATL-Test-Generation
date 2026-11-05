@@ -21,7 +21,7 @@ import build_tables as bt  # noqa: E402
 
 RESULTS = []
 
-REAL_DESKTOP = ROOT.parent / "experiment_results"
+REAL_DESKTOP = ROOT / "results/experiment_results"
 
 
 def patched_read_csv(mutator):
@@ -142,7 +142,7 @@ def case_candidate_count():
 def case_stale_aco_failure_count():
     """An old failing-source count must fail even when evaluable stays one."""
     def mutate(path, rows):
-        if path == str(ROOT / "results/rq3/data/mutant_level_exam.csv").replace(chr(92), "/"):
+        if path == str(ROOT / "results/experiment_results/RQ3/mutant_level_exam.csv").replace(chr(92), "/"):
             row = next(r for r in rows if r["provider"] == "Yekta-ACO"
                        and r["mutant_id"] == "BibTeX2DocBook_Mutant1" and r["formula"] == "ochiai")
             row["failing_sources"] = "38"
@@ -177,35 +177,12 @@ def case_blank_rebuilt_aco_flag():
 
 def main() -> int:
     global REAL_DESKTOP
-    # Build the reference from formal inputs when the author's sibling export
-    # is absent, so the tests execute in a clean public checkout too.
-    temporary = None
-    if not REAL_DESKTOP.exists():
-        temporary = tempfile.TemporaryDirectory(prefix="paper-injection-reference-")
-        REAL_DESKTOP = Path(temporary.name)
-        mapping = {
-            "RQ1/validity.csv": "rq1/data/validity.csv",
-            "RQ1/model_size.csv": "rq1/data/model_size.csv",
-            "RQ1/rule_coverage.csv": "rq1/data/rule_coverage.csv",
-            "RQ2/mutation_results.csv": "rq2/data/mutation_score.csv",
-            "RQ2/failure_rates.csv": "rq2/data/failure_rate_summary.csv",
-            "RQ2/per_mutant_failure_counts.csv": "rq2/supplementary/per_mutant_fail_ratio/rq2_per_mutant_fail_ratio_long_all_subjects.csv",
-            "RQ2/mutant_kill_matrix.csv": "rq2/supplementary/mutant_kill_matrix.csv",
-            "RQ2/operator_counts.csv": "rq2/supplementary/operator_wise_mutation_score.csv",
-            "RQ3/wilcoxon.csv": "rq3/data/rq3_pairwise_tests.csv",
-            "RQ3/top1_rates.csv": "rq3/data/rq3_top1_pooled.csv",
-            "RQ3/EXAM_score.csv": "rq3/data/rq3_exam_pooled.csv",
-            "RQ3/mutant_level_exam.csv": "rq3/data/mutant_level_exam.csv",
-            "RQ5/mutant_overlap.csv": "rq5/data/mutant_overlap.csv",
-        }
-        for dst, src in mapping.items():
-            target = REAL_DESKTOP / dst
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(ROOT / "results" / src, target)
-        metrics = bt.read_csv(ROOT / "results/rq5/data/workflow_metrics.csv")
-        for condition, name in [("astmo", "astmo.csv"), ("workflow", "fd_astmo.csv")]:
-            selected = [r for r in metrics if r["condition"] == condition]
-            bt.write_csv(REAL_DESKTOP / "RQ5" / name, list(selected[0]), selected)
+    # Keep injected reference reads separate from canonical calculation inputs.
+    # Every case tampers only in memory; the private copy is removed afterward.
+    reference = REAL_DESKTOP
+    temporary = tempfile.TemporaryDirectory(prefix='paper-injection-reference-')
+    shutil.copytree(reference, temporary.name, dirs_exist_ok=True)
+    REAL_DESKTOP = Path(temporary.name)
     bt.REFERENCE_DIR = REAL_DESKTOP
     run_case("I1 top1 98.95->105.95 in reference", case_top1_tampered)
     run_case("I2 mutation killed +7 in reference", case_mutation_tampered)

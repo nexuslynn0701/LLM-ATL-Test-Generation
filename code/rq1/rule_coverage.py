@@ -55,7 +55,7 @@ def pooled_overall_rows(base: list[dict]) -> list[dict]:
 
 
 def rebuild_rule_coverage(data: Path = DATA) -> list[dict]:
-    path = data / "rq1/data/rule_coverage.csv"
+    path = data / "experiment_results/RQ1/rule_coverage.csv"
     original = read_csv(path)
     # Replace aggregates on reruns; preserve every released configuration/baseline row.
     base = [r for r in original if r["prompt_condition"] != "All prompts"]
@@ -72,7 +72,7 @@ def rebuild_rule_coverage(data: Path = DATA) -> list[dict]:
     if len(subjects) != 6 or set(cells) != expected:
         raise ValueError("Expected all 72 subject/LLM/prompt cells")
     totals = {r["transformation"]: int(r["total_rules"])
-              for r in read_csv(data / "rq1/data/subjects.csv")}
+              for r in read_csv(data / "rq1/supplementary/subjects.csv")}
 
     population = defaultdict(list)
     eligible = {}
@@ -156,10 +156,10 @@ def rebuild_rule_coverage(data: Path = DATA) -> list[dict]:
 
     # All validation finishes before any published output is changed.
     write_csv(path, base + aggregates, list(original[0]))
-    write_csv(data / "rq1/tables/rq1_rule_coverage_all_prompts.csv", wide,
+    write_csv(data / "rq1/supplementary/rq1_rule_coverage_all_prompts.csv", wide,
               ["Approach", "Prompt", *subjects, "Overall"])
-    write_csv(data / "rq1/tables/rq1_rule_coverage_union_details.csv", details, list(details[0]))
-    write_csv(data / "rq1/data/rule_coverage_overall_pooled.csv", pooled_overall_rows(base),
+    write_csv(data / "rq1/supplementary/rq1_rule_coverage_union_details.csv", details, list(details[0]))
+    write_csv(data / "rq1/supplementary/rule_coverage_overall_pooled.csv", pooled_overall_rows(base),
               ["generator", "prompt_condition", "subjects_included", "pooled_covered_rules",
                "pooled_total_rules", "overall_pooled_pct", "notes"])
     return aggregates

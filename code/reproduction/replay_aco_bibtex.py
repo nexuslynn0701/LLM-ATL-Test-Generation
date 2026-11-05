@@ -85,7 +85,7 @@ def main():
            ('aco_bibtex_' + datetime.now().strftime('%Y%m%d_%H%M%S'))).resolve()
     if run == ROOT or any(run.is_relative_to(ROOT / x) for x in ('results','data','subjects','code')):
         parser.error('Use an isolated run directory, e.g. work/runs/aco_bibtex_trial')
-    mutants = [r for r in read_csv(ROOT / 'code/rq2/data/canonical_mutants.csv')
+    mutants = [r for r in read_csv(ROOT / 'results/rq2/supplementary/inputs/canonical_mutants.csv')
                if r['subject'] == SUBJECT and r['evaluated_in_exported_matrix'] == '1']
     faults = {r['mutant_id']: list(filter(None,re.split(r'[;,|]',r['faulty_rule']))) for r in mutants}
     rules = sorted(extract_rules_and_helpers(str(SUB / 'transformations/BibTeX2DocBook.atl'))['rules'])
@@ -116,7 +116,7 @@ def main():
             parser.error('Resume requires unchanged code/assets/inputs and a nondecreasing source count')
     run.mkdir(parents=True, exist_ok=True)
     save_json(manifest, plan)
-    formal = {p:p.read_bytes() for p in (ROOT/'code/experiment_results').rglob('*.csv')}
+    formal = {p:p.read_bytes() for p in (ROOT/'results/experiment_results').rglob('*.csv')}
     cfg = dict(java_cp=str(ROOT/'code/pipeline/lib'), source_mm=str(SUB/'BibTeX.ecore'),
                target_mm=str(SUB/'DocBook.ecore'),trace_mm=str(SUB/'Trace.ecore'),
                source_mm_name='BibTeX',target_mm_name='DocBook',trace_mm_name='TMM',
@@ -191,9 +191,9 @@ def main():
     eligible = [s for s in sources if s['in_estar']]
     killed = {m for s in eligible for m,o in s['outcomes'].items() if o == 'KILLED'}
     counter = Counter(o for s in eligible for o in s['outcomes'].values())
-    published = [r for r in read_csv(ROOT/'results/rq2/supplementary/mutant_kill_matrix.csv') if r['subject']==SUBJECT]
+    published = [r for r in read_csv(ROOT/'results/experiment_results/RQ2/mutant_kill_matrix.csv') if r['subject']==SUBJECT]
     published_killed = {r['mutant_id'] for r in published if r['killed_Yekta-ACO'] in ('1','1.0')}
-    reference = next(r for r in read_csv(ROOT/'results/rq2/data/failure_rate_summary.csv')
+    reference = next(r for r in read_csv(ROOT/'results/experiment_results/RQ2/failure_rates.csv')
                      if r['subject']==SUBJECT and r['method_id']=='Yekta-ACO')
     full = args.n == 100
     counts = dict(attempts=args.n,n_estar=len(eligible),eligible_mutants=40,killed_mutants=len(killed),
@@ -212,7 +212,7 @@ def main():
     if full:
         report['paper_kill_set_matches']=killed==published_killed
         report['paper_failure_rate_matches']=counts['failure_rate_pct'] is not None and abs(counts['failure_rate_pct']-float(reference['mean_fail_ratio_pct']))<1e-9
-        prior={(r['mutant_id'],r['formula']):r for r in read_csv(ROOT/'results/rq3/data/mutant_level_exam.csv')
+        prior={(r['mutant_id'],r['formula']):r for r in read_csv(ROOT/'results/experiment_results/RQ3/mutant_level_exam.csv')
                if r['subject']==SUBJECT and r['provider']=='Yekta-ACO'}
         differences=[]
         for row in exam:

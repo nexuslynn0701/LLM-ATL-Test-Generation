@@ -9,7 +9,6 @@ Pipeline
   Step 1  01_mutant_coverage.py          – rule-coverage classification
   Step 2  02_mutant_type_breakdown.py    – per-operator kill/survive rates
   Step 3  03_suspected_equivalents.py    – union-pool labeling + sensitivity
-  Step 4  04_generate_paper_tables.py    – LaTeX tables
 
 Each step is run as a subprocess so its own argparse + error handling applies.
 
@@ -22,7 +21,7 @@ Usage
   python run_all.py --base /path/to/llm_mt_experiment
 
   # Run only specific steps
-  python run_all.py --steps 1 3 4
+  python run_all.py --steps 1 3
 
   # Only specific datasets
   python run_all.py --datasets BibTeX2DocBook CPL2SPL
@@ -40,7 +39,6 @@ STEPS = {
     1: ("01_mutant_coverage.py",       "Mutant Reachability / Rule Coverage"),
     2: ("02_mutant_type_breakdown.py", "Mutation Operator Breakdown"),
     3: ("03_suspected_equivalents.py", "Suspected-Equivalent Labeling"),
-    4: ("04_generate_paper_tables.py", "LaTeX Table Generation"),
 }
 
 
@@ -81,8 +79,8 @@ def main():
     )
     parser.add_argument(
         "--steps", nargs="+", type=int,
-        default=[1, 2, 3, 4],
-        choices=[1, 2, 3, 4],
+        default=[1, 2, 3],
+        choices=[1, 2, 3],
         help="Which steps to run (default: all)",
     )
     parser.add_argument(
@@ -103,8 +101,7 @@ def main():
     results = {}
     for step in sorted(args.steps):
         script, _ = STEPS[step]
-        # Step 4 (table generation) doesn't accept --datasets
-        step_args = extra if step < 4 else ["--base", args.base]
+        step_args = extra
         ok = run_step(step, script, step_args)
         results[step] = ok
         if not ok and args.stop_on_error:
@@ -132,9 +129,6 @@ def main():
         print(f"    mutation_types/operator_breakdown_overall.csv")
         print(f"    suspected_equiv/suspected_equiv_summary.csv")
         print(f"    suspected_equiv/sensitivity_analysis.json")
-        print(f"    paper_tables/table_mutant_classification.tex")
-        print(f"    paper_tables/table_sensitivity.tex")
-        print(f"    paper_tables/inline_paragraph_template.tex")
 
 
 if __name__ == "__main__":

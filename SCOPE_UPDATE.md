@@ -2,9 +2,9 @@
 
 当前方法：GPT、Qwen、DeepSeek 的四档提示词及 Yekta-ACO。RQ5 的 workflow 保留。历史基线的数据、方法列表、重算输出与相关绘图入口已同步清理；原件保存在仓库之外的备份目录。
 
-- 活跃 CSV 已清除已删除基线；论文核对文件统一放在 code/experiment_results/。
+- 活跃 CSV 已清除已删除基线；论文核对文件统一放在 results/experiment_results/。
 - RQ3：13 个配置，76,104 条变异体/公式记录，216 项检验统一使用原始 p < 0.05。
-- 发布 CSV、绘图副本、每公式显著性计数、ACO 汇总片段与桌面 experiment_results 已同步。
+- 19 个论文 CSV 统一在 results/experiment_results/，底层证据及辅助计数归入各 RQ 的 supplementary/。各 RQ 不再保留 data/、tables/；论文排版脚本及产物已删除。
 - 按正文恢复原始 p 值：ACO统一canonical定位后，216项为208 Worse、8 Similar、0 Better；继续使用原始p < 0.05。
 - 生成次数在没有可执行配对记录的格中从生成台账计算，Qwen/CPL 的候选数为100；不再依赖任意差异豁免。
 - 镜像检查验证完整列集合。operator_counts 输出完整10列。
@@ -22,4 +22,4 @@ python -X utf8 code/reproduction/build_tables.py
 python -X utf8 code/reproduction/injection_tests.py
 ```
 
-论文CSV统一目录：code/experiment_results/（19个CSV，含RQ4、RQ5 Overall及Table 16/17）。详细重建记录保存在rebuild/，同步统计在rebuild/scope_sync.json。
+论文CSV统一目录：results/experiment_results/（19个CSV，含RQ4、RQ5 Overall及Table 16/17）。详细重建记录保存在rebuild/，同步统计在rebuild/scope_sync.json。
