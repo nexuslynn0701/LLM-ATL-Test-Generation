@@ -26,4 +26,4 @@ The final audit covered 16 configurations and 4,449,000 spectrum records. Every 
 
 The legacy coverage helper retains a fallback that infers Ant2Maven coverage from the input model when a trace is empty. It therefore should not be claimed that every historical path derives coverage exclusively from a dynamic trace. The fallback can only select names from the original rule set and cannot add `createTrace`. In the audited final archive, all 1,101 trace files were non-empty and none contained a rule name outside the original 30-rule set.
 
-The machine-readable summary is in `data/audit/ant2maven_trace_scope_audit.json`.
+The machine-readable summary is in `results/rq1/supplementary/audit/ant2maven_trace_scope_audit.json`.

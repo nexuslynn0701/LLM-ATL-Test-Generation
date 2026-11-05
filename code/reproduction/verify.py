@@ -155,9 +155,8 @@ def main() -> None:
     prompts += list((ROOT / "data/workflow/prompts").glob("*.txt"))
     require(len(prompts) == 31, "24 ladder prompts, 6 workflow prompts, and the workflow template are present")
 
-    # The generated XMI artifacts (data/test_cases/*.xmi) are regenerable via
-    # the shipped harness and are not part of the public checkout; the checks
-    # below run only when the artifacts are present (e.g. after regeneration).
+    # Frozen models are shipped for offline replay. Their population and
+    # path checks run here; new API generation cannot promise identical samples.
     test_cases_root = ROOT / "data/test_cases"
     if next(test_cases_root.rglob("*.xmi"), None) is None:
         print("SKIP  generated test models (data/test_cases/*.xmi) are not present in this checkout;")

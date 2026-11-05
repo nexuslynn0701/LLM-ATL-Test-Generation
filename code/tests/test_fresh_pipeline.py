@@ -1,10 +1,7 @@
 from pathlib import Path
-import ast
 import copy
 import csv
-from fractions import Fraction
 import json
-import math
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -65,14 +62,8 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(row['total_pairs'],0)
 
     def test_all_18_formulas_match_published_rebuild_tie_handling(self):
-        # Execute only the old pure calculation function; no replay imports/data.
-        path=CODE/'rq3/rebuild_top1_source.py'
-        node=next(n for n in ast.parse(path.read_text(encoding='utf-8')).body
-                  if isinstance(n,ast.FunctionDef) and n.name=='calc')
-        ns=dict(NAMES=FORMULA_NAMES,ns=formulas(),math=math,F=Fraction,
-                mean=lambda v:sum(v,Fraction(0))/len(v))
-        exec(compile(ast.Module(body=[node],type_ignores=[]),str(path),'exec'),ns)
-        expected=ns['calc']({'a':[1,0,0,1],'b':[0,1,1,0],'c':[0,0,1,1]},['a','b'],1,3)
+        from fixtures.sbfl_rank_reference import calc
+        expected=calc({'a':[1,0,0,1],'b':[0,1,1,0],'c':[0,0,1,1]},['a','b'],1,3)
         actual=list(exam_rows(cell()))
         self.assertEqual(len(actual),18)
         for row in actual:

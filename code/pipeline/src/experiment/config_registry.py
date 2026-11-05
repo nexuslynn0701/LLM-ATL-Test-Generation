@@ -616,7 +616,7 @@ register(ExperimentConfig(
 # Output directories follow standard convention:
 #   results/generated_models/{dataset}/SAT_AWARE_{suffix}/
 #   results/outputs/{dataset}/SAT_AWARE_{suffix}/
-# Compatible with export_sbfl_detailed.py (add SAT_AWARE to METHOD_DIRS).
+# Current fresh-run spectra are exported by code/run_pipeline.py.
 
 register(ExperimentConfig(
     config_id             = "SAT_AWARE_cpl",

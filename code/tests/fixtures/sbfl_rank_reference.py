@@ -1,11 +1,13 @@
-"""Historical-only entry point, excluded from the current paper protocol.
+"""Independent reference arithmetic for SBFL tie/rank regression checks."""
+import math
+from fractions import Fraction as F
+from experiment_pipeline.aggregate import FORMULA_NAMES, formulas
 
-The original source is retained in the dated external scope-migration backup.
-Use code/reproduction/build_tables.py for released evidence aggregation, or
-code/run_pipeline.py for a fresh execution. Full historical spectra are not
-bundled; no historical values are synthesized here.
-"""
-# Pure tie/rank arithmetic retained for independent regression checks.
+NAMES=FORMULA_NAMES
+ns=formulas()
+def mean(values):
+    return sum(values,F(0))/len(values)
+
 def calc(spec,faults,failing,rulecount):
     if not failing:return {f:dict(evaluable='0',failing_sources='0',n_faulty_rules=str(len(faults)),rule_count=str(rulecount),exam_bc='',exam_ac='',exam_wc='',best_rank='',tie_size='') for f in NAMES}
     output={}
@@ -18,6 +20,3 @@ def calc(spec,faults,failing,rulecount):
             best.append(hi+1);worst.append(hi+eq);ties.append(eq);ranks.append(F(2*hi+1+eq,2))
         output[name]=dict(evaluable='1',failing_sources=str(failing),n_faulty_rules=str(len(faults)),rule_count=str(rulecount),exam_bc=f'{min(best)/rulecount:.12g}',exam_ac=f'{float(mean(ranks)/rulecount):.12g}',exam_wc=f'{max(worst)/rulecount:.12g}',best_rank=str(min(best)),tie_size=f'{float(mean(list(map(F,ties)))):.6f}')
     return output
-
-if __name__ == '__main__':
-    raise SystemExit('This historical entry point is not part of the current paper. Use code/reproduction/build_tables.py or code/run_pipeline.py.')

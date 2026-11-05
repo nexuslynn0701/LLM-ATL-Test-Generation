@@ -12,7 +12,7 @@ Prevents the expected-root mapping from being overly strict and rejecting
 legitimate XMI serializations.
 
 Run:
-  python3 tests/test_expected_root_regression.py
+  python -X utf8 code/runtime/pipeline_toolchain/tests/test_expected_root_regression.py
 """
 
 import os
@@ -22,37 +22,23 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.llm.openllm_extraction import EXPECTED_ROOT, _resolve_model_root
+from src.llm.xmi_extraction import EXPECTED_ROOT, _resolve_model_root
 from src.experiment.run_ladder_experiment import DATASETS, get_executor_config
 
 # ── Known-good XMI per subject (verified in prior experiments) ────────────────
 
-KNOWN_GOOD = {
-    "BibTeX2DocBook": {
-        "path": "results/generated_models/BibTeX2DocBook/ABL_no_feedback/source_model_0075.xmi",
-        
-    },
-    "CPL2SPL": {
-        "path": "results/generated_models/CPL2SPL/ABL_no_feedback/source_model_0075.xmi",
-        
-    },
-    "UML2ER": {
-        "path": "results/generated_models/UML2ER/ABL_no_feedback/source_model_0075.xmi",
-        
-    },
-    "Ecore2Maude": {
-        "path": "results/generated_models/Ecore2Maude/ABL_no_atl/source_model_0075.xmi",
-        
-    },
-    "Ant2Maven": {
-        "path": "results/generated_models/Ant2Maven/failratio_covfix_micro_core_v2/source_model_0003.xmi",
-        
-    },
-    "Grafcet2PetriNet": {
-        "path": "results_v3_troya_aligned/rq4_grafcet_ladder_generation/deepseek/generated_models/Grafcet2PetriNet/sm/source_model_0075.xmi",
-        
-    },
-}
+BUNDLE = next(parent for parent in ROOT.parents
+              if (parent/'results/experiment_results').is_dir())
+import csv
+with (BUNDLE/'results/rq1/supplementary/source_population.csv').open(encoding='utf-8-sig', newline='') as handle:
+    population = list(csv.DictReader(handle))
+KNOWN_GOOD = {}
+for subject in EXPECTED_ROOT:
+    row = next(r for r in population if r['subject']==subject and r['provider']=='GPT'
+               and r['condition']=='astmo' and r['in_estar']=='1')
+    source = BUNDLE/'data/test_cases'/subject/'astmo/gpt'/(row['source_id']+'.xmi')
+    KNOWN_GOOD[subject] = {'path':str(source)}
+
 
 
 def run_regression():
@@ -137,10 +123,9 @@ def run_regression():
             if atl_ok:
                 print(f"  ✓ ATL execution")
             else:
-                # ATL failures on CPL/Ecore are known Java env issues;
-                # root mapping correctness is already verified above.
+                all_ok = False
                 err = (exec_result.get("error") or exec_result.get("stderr", ""))[:150]
-                print(f"  ⚠ ATL execution FAILED (env issue, root mapping OK)")
+                print(f"  ⚠ ATL execution FAILED")
                 print(f"    Error: {err}")
         except Exception as e:
             print(f"  ✗ ATL execution exception: {e}")
@@ -157,7 +142,7 @@ def run_regression():
         # Check 4: Expected-root mapping produces the correct Clark notation
         # when classify_extraction is given a strict-valid response
         # ═══════════════════════════════════════════════════════════════════════
-        from src.llm.openllm_extraction import (
+        from src.llm.xmi_extraction import (
             classify_extraction,
             STRICT_CONTRACT_PASS,
             PATHWAY_STRICT,

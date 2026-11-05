@@ -113,7 +113,7 @@ def main():
             parser.error('Run exists; choose another directory or use --resume')
         previous = json.loads(manifest.read_text(encoding='utf-8'))
         if args.n < previous['source_count'] or any(previous[k] != plan[k] for k in plan if k != 'source_count'):
-            parser.error('Resume requires unchanged code/assets/inputs and a nondecreasing source count')
+            parser.error('Resume requires compatible execution settings and a nondecreasing source count; use a new run after code or asset changes')
     run.mkdir(parents=True, exist_ok=True)
     save_json(manifest, plan)
     formal = {p:p.read_bytes() for p in (ROOT/'results/experiment_results').rglob('*.csv')}

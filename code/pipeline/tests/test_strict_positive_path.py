@@ -32,7 +32,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.llm.openllm_extraction import (
+from src.llm.xmi_extraction import (
     classify_extraction,
     STRICT_CONTRACT_PASS,
     STRICT_CONTRACT_FAIL,
@@ -192,7 +192,7 @@ def test_strict_positive_path():
         assert noxml_result["sensitivity_analysis_eligible"] == SENSITIVITY_INELIGIBLE
 
         # E3: PRE_GATE row MUST be rejected by primary analysis loader
-        from src.experiment.run_openllm_ladder import assert_primary_analysis_eligible
+        from src.llm.xmi_extraction import assert_primary_analysis_eligible
 
         # Construct a PRE_GATE row (run_scope=PRE_GATE, counts=False)
         pre_gate_row = {

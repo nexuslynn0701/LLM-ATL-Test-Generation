@@ -52,7 +52,7 @@ def protocol():
         faults = {}
         for row in selected:
             names = set(filter(None, re.split(r'[;|,]', row['faulty_rule'])))
-            # Published 2026-10-07 correction, also used by rebuild_top1_source.
+            # Canonical multi-rule fault mapping used by all current localization paths.
             if (subject, row['mutant_id']) == ('CPL2SPL', 'CPL2SPL_Mutant47'):
                 names = {'CPL2Program', 'SubAction2Function'}
             if not names or not names <= set(rules):

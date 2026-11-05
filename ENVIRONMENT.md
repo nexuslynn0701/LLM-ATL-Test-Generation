@@ -18,9 +18,9 @@ Everything below is stated with the in-package file that carries the fact.
   (`gpt → gpt-5.1`, `qwen → qwen3-max`, `deepseek-flash → deepseek-v4-flash`).
 - Sampling: `temperature = 0.2` for all providers, set in
   `code/pipeline/src/llm/llm_client.py`. No `top_p` or `seed` overrides are
-  sent to the APIs; remaining parameters are provider defaults. (A deterministic
-  per-attempt seed schedule exists in `openllm_config.py` but belongs to the
-  local open-weight model line, which is not used for the paper's results.)
+  sent to the APIs; remaining parameters are provider defaults. The supported
+  generation path uses these three providers. Optional local-model experiments
+  that did not contribute to the paper are excluded from this release.
 - Per-call audit: `code/pipeline/src/llm/call_logger.py` records, for every API
   call, the resolved model string returned by the provider, token usage, the
   sampling parameters actually sent, retries, and the
@@ -28,7 +28,7 @@ Everything below is stated with the in-package file that carries the fact.
 - Access window: **2026-06-01 – 2026-08-06**, identical for all three providers,
   derived from the `timestamp` column of
   `results/rq1/supplementary/generation_attempt_records/generation_attempt_records.csv`.
-- Raw responses are **not** part of this package (see Scope in `README.md`);
+- Raw responses are **not** part of this package;
   API output is non-deterministic, so reproduction is defined at the level of
   the shipped per-attempt ledger plus the harness.
 
@@ -38,8 +38,8 @@ The RQ5 workflow starts from six fully rendered initial prompts
 (`data/workflow/prompts/<subject>.txt`) and one template
 (`data/workflow/prompts/template.txt`). Later turns are assembled at runtime:
 covered-rule feedback is appended to the next request, and failed executions go
-through the adaptive repair component — see the six-step loop in
-`data/workflow/README.md` and `data/workflow/src/generator/test_generator.py`
+through the adaptive repair component in
+`data/workflow/src/generator/test_generator.py`
 ("ATL verification with adaptive repair"). The complete workflow engine
 (Python + Java sources, dependencies, entry point `run_workflow.py`) is in
 `data/workflow/`.
@@ -90,9 +90,9 @@ file plus its manifest.
   attempts without an artifact are retained there with their status).
 - Kill matrix: `results/experiment_results/RQ2/mutant_kill_matrix.csv`;
   per-mutant fail-ratio inputs in `results/rq2/supplementary/inputs/source_mutant_outcomes.csv`.
-- `code/reproduction/verify.py` cross-checks ledger ↔ regenerated artifacts and
-  the 300-file ACO SHA ledger whenever generated outputs are present, and
-  reports a SKIP line otherwise.
+- `code/reproduction/verify.py` checks the shipped population against all
+  8,921 LLM-generated source artifacts and 300 archived ACO source models.
+  It also checks ACO fail labels and evaluability against canonical RQ2 pairs.
 
 ## Baselines
 

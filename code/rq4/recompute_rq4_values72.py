@@ -1,13 +1,13 @@
 """Recompute the 72 absolute values and 54 SM-deltas of the RQ4 ladder table
 (tab:rq4-ladder) from bundle-internal data only.
 
-Adapted (2026-10-15) from the 2026-10-07 Codex session script
-`work/recompute_rq4.py` (verbatim copy: code/rq4/recompute_rq4_values.py); the arithmetic is unchanged (exact Fractions,
-ROUND_HALF_EVEN at display time). Paper-diff sections were dropped; inputs now
-point at results/ inside the bundle.
+Auxiliary equal-subject summary retained as evidence. This command verifies
+the supplementary values; the current paper's pooled CSVs are computed by
+code/reproduction/build_tables.py. Arithmetic uses exact Fractions and
+ROUND_HALF_EVEN at display time.
 
 Chain position:
-    results/{rq1,rq2,rq3,shared} CSVs  -->  rq4_values_72.csv / rq4_deltas_54.csv
+    results/experiment_results/ and results/rq*/supplementary/ CSVs  -->  rq4_values_72.csv / rq4_deltas_54.csv
     (Validity/Coverage/Mutation/Failure columns of tab:rq4-ladder)
 
 Inputs:

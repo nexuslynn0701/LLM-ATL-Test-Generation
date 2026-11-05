@@ -116,7 +116,7 @@ def pool_of(rows):
 
 
 def pooled_tables(pool):
-    """Recompute rq3_top1_pooled / rq3_exam_pooled exactly as compute_top1_pooled.py."""
+    """Pool the current Top-1 and EXAM metrics using exact fractions."""
     toprows, examrows = [], []
     for f in N:
         t = dict(formula=f)

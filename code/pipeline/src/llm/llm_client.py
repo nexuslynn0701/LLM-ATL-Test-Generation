@@ -186,7 +186,7 @@ def call_llm(
     retry_delay      : 重试间隔秒数
     timeout          : 读取超时秒数（连接超时固定30秒）
     max_tokens       : 显式输出上限。None=沿用网关默认（历史行为）。
-                       正式重跑建议显式钉死（openllm 侧为 8192）并保持一致。
+                       正式重跑时可显式指定预算，并在待比较的配置间保持一致。
     reasoning_effort : 仅 openai 分支生效（gpt-5.1 的推理预算）。
                        None=网关默认；建议显式设置以统一三家的推理条件。
     call_meta        : 附加到审计记录的任意元数据（如 {"cell": "..."}）。

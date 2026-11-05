@@ -1,9 +1,6 @@
 """Reconstruct the pipeline's original relative layout from the organized bundle.
 
-Rewritten 2026-10-15: the previous version read the migration manifest from
-code/maintenance/relocation_manifest.csv, which was deleted together with
-code/maintenance/ per user decision. The mapping is now expressed directly
-here and reproduces the same pipeline_toolchain layout the manifest described:
+The execution copy uses this bundle-internal mapping:
 
   <output>/datasets/models_<X>/   <- subjects/<X>/ (metamodels, scenarios/,
                                      transformations/) with
@@ -115,8 +112,8 @@ def prepare(output: Path) -> None:
     print(f'Prepared execution copy: {output}')
     print(f'datasets/: 6 subjects, {n_files} files (metamodels + scenarios + '
           f'transformations incl. mutants + OCL contracts)')
-    print('Historical absolute paths, API keys and external raw-evidence '
-          'dependencies still need configuration before any real run.')
+    print('Offline replay and CSV verification require no API key. '
+          'New LLM generation requires provider credentials.')
 
 
 def main():
