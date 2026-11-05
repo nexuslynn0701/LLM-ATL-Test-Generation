@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 from datetime import datetime
 import argparse
+import os
 import csv
 import json
 import re
@@ -11,10 +12,10 @@ import subprocess
 import shutil
 import sys
 
-ROOT = Path(".").resolve()
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.experiment.multi_config_experiment import DATASETS, _dataset_executor_config
+from src.experiment.subject_config import DATASETS, get_mutant_executor_config
 from src.executor.transformation_executor import run_transformation
 
 
@@ -93,7 +94,7 @@ def clean_compiled(trans: Path, name: str) -> None:
 
 
 def compile_atl(root: Path, atl_path: Path, asm_path: Path) -> dict:
-    cmd = ["java", "-cp", "lib/*:lib", "ATLAsmCompilerRunner", str(atl_path), str(asm_path)]
+    cmd = ["java", "-cp", os.pathsep.join([str(root/"lib"/"*"), str(root/"lib")]), "ATLAsmCompilerRunner", str(atl_path), str(asm_path)]
     p = subprocess.run(cmd, cwd=root, text=True, capture_output=True, timeout=120)
     return {
         "returncode": p.returncode,
@@ -108,23 +109,29 @@ def main() -> int:
     ap.add_argument("--n", type=int, default=30)
     ap.add_argument("--prefix", default="Grafcet2PetriNet_ManualMutant")
     ap.add_argument("--keep-rejected", action="store_true")
+    ap.add_argument("--examples-dir", type=Path, help="Directory containing three positive source XMI models")
+    ap.add_argument("--work-dir", type=Path, help="A new directory for mutant smoke outputs")
     args = ap.parse_args()
 
     ds = DATASETS["Grafcet2PetriNet"]
-    cfg = _dataset_executor_config(ds)
+    cfg = get_mutant_executor_config("Grafcet2PetriNet")
     trans = Path(cfg["transformations_dir"])
     base_atl = trans / f"{cfg['atl_name']}.atl"
     base_text = base_atl.read_text(encoding="utf-8")
 
-    examples = sorted(
-        (ROOT / "results_v3_troya_aligned/grafcet2petrinet_extension/draft_examples").glob("*.xmi")
-    )
+    bundle = next(parent for parent in ROOT.parents if (parent/'results/experiment_results').is_dir())
+    if args.examples_dir:
+        examples = sorted(args.examples_dir.glob('*.xmi'))
+    else:
+        examples = sorted((bundle/'data/test_cases/Grafcet2PetriNet/astmo/gpt').glob('*.xmi'))[:3]
     if len(examples) != 3:
         raise SystemExit(f"Expected 3 Grafcet examples, found {len(examples)}")
 
-    work = ROOT / "results_v3_troya_aligned/grafcet2petrinet_extension/manual_mutant_gate"
+    work = (args.work_dir or bundle/'work/mutant_generation/grafcet_manual_gate').resolve()
+    if work == bundle or any(work.is_relative_to(bundle/folder) for folder in ('code','data','subjects','results')):
+        raise SystemExit('Use an isolated work directory outside source/evidence folders')
     if work.exists():
-        shutil.rmtree(work)
+        raise SystemExit('Work directory exists; choose a new --work-dir')
     work.mkdir(parents=True)
 
     accepted = []

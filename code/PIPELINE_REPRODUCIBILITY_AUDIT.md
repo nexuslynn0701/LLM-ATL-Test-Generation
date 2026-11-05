@@ -36,3 +36,9 @@ coverage. Twelve workflow coverage cells lack per-source evidence, one coverage
 cell conflicts with available evidence, and two workflow kill sets disagree
 between pair and localization records. Cleanup does not resolve these gaps.
 See REPRODUCIBILITY.md for the complete computation boundaries.
+
+Subject execution settings are centralized in
+code/pipeline/src/experiment/subject_config.py. The ladder entry point and
+mutant utilities use that same registry. The alternate experiment framework,
+disabled library copies and third-party source-only JARs are excluded from
+the runtime bundle. Binary runtime JARs and compiler/runner sources remain.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import csv
 import json
 import random
@@ -12,9 +13,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
-sys.path.insert(0, str(Path.cwd()))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
-from src.experiment.multi_config_experiment import DATASETS, _dataset_executor_config
+from src.experiment.subject_config import DATASETS, get_mutant_executor_config
 from src.executor.transformation_executor import run_transformation
 
 
@@ -347,7 +349,7 @@ def allocate_counts(total: int, weights: dict[str, int]) -> dict[str, int]:
 
 
 def compile_atl(root: Path, atl_path: Path, asm_path: Path) -> dict:
-    cmd = ["java", "-cp", "lib/*:lib", "ATLAsmCompilerRunner", str(atl_path), str(asm_path)]
+    cmd = ["java", "-cp", os.pathsep.join([str(root/"lib"/"*"), str(root/"lib")]), "ATLAsmCompilerRunner", str(atl_path), str(asm_path)]
     p = subprocess.run(cmd, cwd=root, text=True, capture_output=True, timeout=120)
     return {
         "returncode": p.returncode,
@@ -359,7 +361,7 @@ def compile_atl(root: Path, atl_path: Path, asm_path: Path) -> dict:
 
 def smoke_execute(dataset: str, mutant_name: str, root: Path, out_base: Path) -> dict:
     ds = DATASETS[dataset]
-    cfg = _dataset_executor_config(ds)
+    cfg = get_mutant_executor_config(dataset)
 
     smoke_input = cfg.get("smoke_input")
     if not smoke_input:
@@ -445,7 +447,7 @@ def main():
     ap.add_argument("--max-attempts", type=int, default=3000)
     args = ap.parse_args()
 
-    root = Path.cwd()
+    root = ROOT
     rng = random.Random(args.seed)
 
     if args.dataset not in DATASETS:
@@ -466,11 +468,7 @@ def main():
     original_lines = original_text.splitlines()
     rules = parse_rules(original_text)
 
-    target_mm_paths = []
-    if "target_mms" in ds:
-        target_mm_paths = [ds_dir / p for p in ds["target_mms"].values()]
-    else:
-        target_mm_paths = [ds_dir / ds["target_mm"]]
+    target_mm_paths = [ds_dir / name for name in ds["target_mms"]]
 
     target_classes = []
     for p in target_mm_paths:

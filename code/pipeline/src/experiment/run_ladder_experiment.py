@@ -7,8 +7,8 @@ run_ladder_experiment.py
 实验矩阵：
   4 conditions (sm / stm / astm / astmo)
   × 3 LLMs    (gpt / qwen / deepseek-flash)
-  × N datasets (默认 4 个，可扩展)
-  = 48 cells，每 cell 生成 100 个候选 source model
+  × 6 datasets
+  = 72 cells，每 cell 生成 100 个候选 source model
 
 设计约束：
   - 四档严格累加：sm ⊂ stm ⊂ astm ⊂ astmo
@@ -42,6 +42,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+from src.experiment.subject_config import DATASETS, get_executor_config
 from src.generator.test_generator import generate_tests
 from src.llm.llm_client import PROVIDER_CONFIGS, get_api_key
 
@@ -54,102 +55,6 @@ logger = logging.getLogger(__name__)
 
 
 # ── 数据集配置（可扩展）────────────────────────────────────────────────────────
-DATASETS = {
-    "BibTeX2DocBook": {
-        "dataset_dir":    ROOT / "datasets/models_BibTexML2DocBook",
-        "source_mm":      "BibTeX.ecore",
-        "target_mms":     ["DocBook.ecore"],
-        "atl_name":       "BibTeX2DocBook",
-        "atl_file":       "transformations/BibTeX2DocBook.atl",
-        "ocl_file":       "OCL_Constraints.txt",
-        "source_mm_name": "BibTeX",
-        "target_mm_name": "DocBook",
-        "trace_mm_name":  "TMM",
-        "trace_mm":       "Trace.ecore",
-        "java_cp":        str(ROOT / "lib"),
-    },
-    "CPL2SPL": {
-        "dataset_dir":    ROOT / "datasets/models_CPL2SPL",
-        "source_mm":      "CPL.ecore",
-        "target_mms":     ["SPL.ecore"],
-        "atl_name":       "CPL2SPL",
-        "atl_file":       "transformations/CPL2SPL.atl",
-        "ocl_file":       "OCL_Constraints.txt",
-        "source_mm_name": "CPL",
-        "target_mm_name": "SPL",
-        "trace_mm_name":  "TMM",
-        "trace_mm":       "Trace.ecore",
-        "java_cp":        str(ROOT / "lib"),
-    },
-    "UML2ER": {
-        "dataset_dir":    ROOT / "datasets/models_UML2ER",
-        "source_mm":      "SimpleUml.ecore",
-        "target_mms":     ["ER.ecore"],
-        "atl_name":       "SimpleUml2ER",
-        "atl_file":       "transformations/SimpleUml2ER.atl",
-        "ocl_file":       "OCL_Constraints.txt",
-        "source_mm_name": "SimpleUML",
-        "target_mm_name": "ER",
-        "trace_mm_name":  "TMM",
-        "trace_mm":       "Trace.ecore",
-        "java_cp":        str(ROOT / "lib"),
-    },
-    "Ecore2Maude": {
-        "dataset_dir":    ROOT / "datasets/models_Ecore2Maude",
-        "source_mm":      "ecore.ecore",
-        "target_mms":     ["Maude.ecore"],
-        "atl_name":       "Ecore2Maude",
-        "atl_file":       "transformations/Ecore2Maude.atl",
-        "ocl_file":       "OCL_Constraints.txt",
-        "source_mm_name": "Ecore",
-        "target_mm_name": "Maude",
-        "trace_mm_name":  "TMM",
-        "trace_mm":       "Trace.ecore",
-        "java_cp":        str(ROOT / "lib"),
-    },
-    "Ant2Maven": {
-        "dataset_dir":          ROOT / "datasets/models_Ant2Maven",
-        "source_mm":            "Ant.ecore",
-        "target_mms":           ["MavenMaven.ecore", "MavenProject.ecore"],
-        "executor_target_mms":  {
-            "OUTMaven":   "MavenMaven.ecore",
-            "OUTProject": "MavenProject.ecore",
-        },
-        "atl_name":             "Ant2Maven",
-        "atl_exec_name":        "Ant2Maven_trace",
-        "atl_file":             "transformations/Ant2Maven.atl",
-        "ocl_file":             "OCL_CONTRACT.txt",
-        "source_mm_name":       "Ant",
-        "target_mm_name":       "MavenMaven",
-        "target_mm_names":      {
-            "OUTMaven":   "MavenMaven",
-            "OUTProject": "MavenProject",
-        },
-        "trace_mm_name":        "TMM",
-        "trace_mm":             "Trace.ecore",
-        "java_cp":              str(ROOT / "lib"),
-        "normalize_source_xmi_ids": True,
-        "reject_containment_warning": True,
-        "reject_source_xsi_types": ["Echo", "Exec"],
-        "conditions":           ["sm", "stm", "astm", "astmo"],
-        "pilot_min_validity":   0.70,
-    },
-    "Grafcet2PetriNet": {
-        "dataset_dir":    ROOT / "datasets/models_Grafcet2PetriNet",
-        "source_mm":      "Grafcet.ecore",
-        "target_mms":     ["PetriNet.ecore"],
-        "atl_name":       "Grafcet2PetriNet_trace",
-        "atl_file":       "transformations/Grafcet2PetriNet_trace.atl",
-        "ocl_file":       "OCL_CONTRACT.txt",
-        "source_mm_name": "Grafcet",
-        "target_mm_name": "PetriNet",
-        "trace_mm_name":  "TMM",
-        "trace_mm":       "Trace.ecore",
-        "java_cp":        str(ROOT / "lib"),
-        "conditions":     ["sm", "stm", "astm", "astmo"],
-        "pilot_min_validity": 0.10,
-    },
-}
 
 # ── LLM provider 配置 ─────────────────────────────────────────────────────────
 PROVIDERS = {
@@ -224,9 +129,8 @@ CONDITION_FLAGS = {
 
 # ── Safety note（Fix #4：显式dict，未配置数据集raise ValueError）────────────────
 
-# frozen Grafcet note locations: canonical path first, frozen copy fallback
+# Frozen Grafcet note is shipped with the prompt configuration.
 _GRAFCET_NOTE_PATHS = [
-    ROOT / "results_v3_troya_aligned/grafcet2petrinet_extension/SAFETY_NOTE_DRAFT.txt",
     ROOT / "reproducibility/frozen_prompts/grafcet_safety_note_202606.txt",
 ]
 
@@ -241,12 +145,39 @@ def _ant2maven_safety_note_run3() -> str:
 
     The formal-run prompts (2026-06-01/02 and the 2026-08-06 astmo rerun)
     use the Ant:Jar task attribute ``destfile``; the current constant in
-    multi_config_experiment was later edited to ``jarfile``.  The historical
+    test-model generator now uses ``jarfile``. The historical
     variant is reconstructed by reverting that edit on the current text.
     """
     from src.generator.test_generator import _ANT2MAVEN_SAFETY_NOTE
     return _ANT2MAVEN_SAFETY_NOTE.replace(
         'jarfile="dist/app.jar"', 'destfile="dist/app.jar"')
+
+
+def _get_base_safety_note(dataset_name: str) -> str:
+    """
+    Subject-specific source XMI serialization format notes.
+    Only added when the subject has known serialization conventions
+    that LLMs frequently violate. Describes source-side structure only;
+    no target output, mutant behavior, or expected faults.
+    """
+    from src.generator.test_generator import (
+        _ANT2MAVEN_SAFETY_NOTE,
+        _CPL_SAFETY_NOTE,
+        _UML2ER_SAFETY_NOTE,
+        _ECORE_SAFETY_NOTE,
+        _BIBTEX_SAFETY_NOTE,
+    )
+    if "Ant2Maven" in dataset_name:
+        return _ANT2MAVEN_SAFETY_NOTE
+    if "CPL" in dataset_name:
+        return _CPL_SAFETY_NOTE
+    if "UML" in dataset_name:
+        return _UML2ER_SAFETY_NOTE
+    if "Ecore" in dataset_name:
+        return _ECORE_SAFETY_NOTE
+    if "BibTeX" in dataset_name:
+        return _BIBTEX_SAFETY_NOTE
+    return ""
 
 
 def get_safety_note(dataset_name: str, prompt_version: str = "latest") -> str:
@@ -267,7 +198,6 @@ def get_safety_note(dataset_name: str, prompt_version: str = "latest") -> str:
     try:
         if dataset_name == "Ant2Maven" and prompt_version == "run3_202606":
             return _ant2maven_safety_note_run3()
-        from src.experiment.multi_config_experiment import _get_base_safety_note
         return _get_base_safety_note(dataset_name)
     except Exception as exc:
         raise ValueError(
@@ -542,36 +472,6 @@ def append_result(csv_path: Path, row: dict):
 
 # ── 执行器配置 ────────────────────────────────────────────────────────────────
 
-def get_executor_config(dataset_name: str) -> dict:
-    ds = DATASETS[dataset_name]
-    dd = ds["dataset_dir"]
-    cfg = {
-        "source_mm":           str(dd / ds["source_mm"]),
-        "target_mm":           str(dd / ds["target_mms"][0]),
-        "trace_mm":            str(dd / ds["trace_mm"]),
-        "source_mm_name":      ds["source_mm_name"],
-        "target_mm_name":      ds["target_mm_name"],
-        "trace_mm_name":       ds["trace_mm_name"],
-        "transformations_dir": str(dd / "transformations"),
-        "atl_name":            ds["atl_name"],
-        "atl_exec_name":       ds.get("atl_exec_name", ds["atl_name"]),
-        "java_cp":             ds["java_cp"],
-        "max_workers":         8,
-    }
-    if "executor_target_mms" in ds:
-        cfg["target_mms"] = {
-            name: str(dd / filename)
-            for name, filename in ds["executor_target_mms"].items()
-        }
-        cfg["target_mm_names"] = ds["target_mm_names"]
-    for key in (
-        "normalize_source_xmi_ids",
-        "reject_containment_warning",
-        "reject_source_xsi_types",
-    ):
-        if key in ds:
-            cfg[key] = ds[key]
-    return cfg
 
 
 # ── 单个 cell ─────────────────────────────────────────────────────────────────

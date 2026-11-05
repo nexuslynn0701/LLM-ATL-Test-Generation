@@ -10,7 +10,7 @@
 #   config/qwen_api_key.txt
 #   config/glm_api_key.txt
 #
-# 使用方式（在config_registry.py或实验脚本里设置）：
+# 可在调用脚本或环境中选择提供商：
 #   LLM_PROVIDER = "deepseek"   # 默认
 #   LLM_PROVIDER = "qwen"
 #   LLM_PROVIDER = "glm"
