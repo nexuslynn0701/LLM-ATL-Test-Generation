@@ -13,7 +13,7 @@ We tested the package on Windows with JDK 17.0.7. Use Python 3.10 or later and m
 On Windows, use a short path such as `C:/atl-repro`. A long path can cause the pipeline to fail when it creates its working copy. Run the commands from the repository root in Git Bash.
 
 ```bash
-python -m pip install -r requirements.txt
+python -m pip install -r code/requirements.txt
 ```
 
 ## 1. Run the mutation and fault localization example

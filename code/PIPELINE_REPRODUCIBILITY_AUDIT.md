@@ -1,6 +1,6 @@
 # Current reproduction checks
 
-Run these commands from the repository root after installing requirements.txt
+Run these commands from the repository root after installing `code/requirements.txt`
 and making Java 17 (including javac) available on PATH:
 
 ```bash
