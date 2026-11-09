@@ -27,5 +27,4 @@ The run's derived/ directory contains the pair matrix, mutant-level EXAM,
 rule spectra, SBFL rule scores, metrics and a comparison report. For the full
 suite, differences against the shipped localization CSV are listed explicitly.
 The prior ACO protocol's numerical changes are documented in
-ACO_PROTOCOL_CHANGES.md. The remaining non-ACO and workflow evidence limits
-are described in REPRODUCIBILITY.md.
+ACO_PROTOCOL_CHANGES.md.

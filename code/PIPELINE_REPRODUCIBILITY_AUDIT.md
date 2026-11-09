@@ -35,7 +35,6 @@ localization records are rebuilt from 10,600 canonical pairs and source-rule
 coverage. Twelve workflow coverage cells lack per-source evidence, one coverage
 cell conflicts with available evidence, and two workflow kill sets disagree
 between pair and localization records. Cleanup does not resolve these gaps.
-See REPRODUCIBILITY.md for the complete computation boundaries.
 
 Subject execution settings are centralized in
 code/pipeline/src/experiment/subject_config.py. The ladder entry point and

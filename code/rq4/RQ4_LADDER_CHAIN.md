@@ -18,7 +18,3 @@ ranks recovered onto the exact `2 * rule_count * n_faulty_rules` rank grid.
 Fractions are pooled before display rounding. Supplementary audit records
 remain under `results/rq4/supplementary/`. Older equal-subject summaries in
 that directory are historical evidence, not the current pooled paper CSVs.
-
-No LaTeX or Excel publication table is generated. The missing historical
-non-ACO spectra and workflow evidence conflicts are described in
-`REPRODUCIBILITY.md`.
